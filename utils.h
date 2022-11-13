@@ -280,7 +280,7 @@ string replaceStrChar(string str, T old, T the_new)
 }
 
 template <typename T>
-bool is_close(T a, T b, long double percent = 1)
+bool is_close(T a, T b, long double percent)
 {
   long double decimal = percent / (long double)100;
   long double range = b * decimal;
@@ -293,7 +293,7 @@ bool is_close(T a, T b, long double percent = 1)
 }
 
 template <typename T>
-void writeVector(vector<T>& v, const string& separator = "  ")
+void writeVector(vector<T>& v, const string& separator)
 {
   // capture the size of the vector in n
   int i, n = v.size();
