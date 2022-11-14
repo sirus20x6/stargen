@@ -53,11 +53,24 @@ auto stellar_dust_limit(long double stell_mass_ratio) -> long double {
   return 200.0 * pow(stell_mass_ratio, 1.0 / 3.0);
 }
 
+/**
+ * @brief Returns the nearest a planet can be to this star, based on the mass ratio.
+ * 
+ * @param stell_mass_ratio 
+ * @param nearest_planet_factor 
+ * @return long double 
+ */
 auto nearest_planet(long double stell_mass_ratio,
                     long double nearest_planet_factor) -> long double {
   return nearest_planet_factor * pow(stell_mass_ratio, 1.0 / 3.0);
 }
 
+/**
+ * @brief Returns the farthest a planet can be from this star, based on the mass ratio.
+ * 
+ * @param stell_mass_ratio 
+ * @return long double 
+ */
 auto farthest_planet(long double stell_mass_ratio) -> long double {
   return 50.0 * pow(stell_mass_ratio, 1.0 / 3.0);
 }
@@ -72,26 +85,42 @@ auto outer_effect_limit(long double a, long double e, long double mass)
   return a * (1.0 + e) * (1.0 + mass) / (1.0 - cloud_eccentricity);
 }
 
+/**
+ * @brief Returns whether or not there is still dust between inside_range and 
+ * outside_range in this current accretion process.
+ * 
+ * @param inside_range 
+ * @param outside_range 
+ * @return true 
+ * @return false 
+ */
 auto dust_available(long double inside_range, long double outside_range)
     -> bool {
   dust *current_dust_band = nullptr;
   bool dust_here = false;
 
+  // this loop finds the dust band whose outer edge is within our inside range.
   current_dust_band = dust_head;
   while (current_dust_band != nullptr &&
          current_dust_band->getOuterEdge() < inside_range) {
     current_dust_band = current_dust_band->next_band;
   }
+  // if we have no dust band, there's no dust here; otherwise, it depends on the
+  // dust record
   if (current_dust_band == nullptr) {
     dust_here = false;
   } else {
     dust_here = current_dust_band->getDustPresent();
   }
+  // this loop ORs together all of the dust bands between the first one we found
+  // and the dust band whose inner edge is outside our outside range.
   while (current_dust_band != nullptr &&
          current_dust_band->getInnerEdge() < outside_range) {
     dust_here = dust_here || current_dust_band->getDustPresent();
     current_dust_band = current_dust_band->next_band;
   }
+
+  // return whether or not we found a dust band in our range that still had dust
   return dust_here;
 }
 
@@ -225,16 +254,20 @@ auto collect_dust(long double last_mass, long double &new_dust,
   if (r_inner < 0.0) {
     r_inner = 0.0;
   }
-
+// base case: if this is the last dust band, return 0
   if (dust_band == nullptr) {
     return 0;
   } else {
+    // if we have dust, use the dust density, otherwise zero
     if (!dust_band->getDustPresent()) {
       temp_density = 0.0;
     } else {
       temp_density = dust_density;
     }
 
+    // if the last mass is below the critical mass, or there's no dust in this 
+    // dust band, the density is the overall accretion density;
+    // otherwise, the mass density is this horrifying formula
     if (last_mass < crit_mass || !dust_band->getGasPresent()) {
       mass_density = temp_density;
     } else {
@@ -246,6 +279,8 @@ auto collect_dust(long double last_mass, long double &new_dust,
     // cout << dust_band->getOuterEdge() << " " << dust_band->getInnerEdge() <<
     // endl;
 
+    // if the outer edge exceeds the accretion inner limit or the inner edge is 
+    // outside the outer limit, just collect the dust from the next band
     if (dust_band->getOuterEdge() <= r_inner ||
         dust_band->getInnerEdge() >= r_outer) {
       return collect_dust(last_mass, new_dust, new_gas, a, e, crit_mass,
@@ -259,16 +294,20 @@ auto collect_dust(long double last_mass, long double &new_dust,
       }
       width = bandwidth - temp1;
 
+      // account for the gap between the inner edge and the start of 
+      // the accretion radius
       temp2 = dust_band->getInnerEdge() - r_inner;
       if (temp2 < 0.0) {
         temp2 = 0.0;
       }
       width = width - temp2;
 
+      // calculate the area of a cross-section, and the volume
       temp = 4.0 * PI * pow(a, 2.0) * reduced_mass *
              (1.0 - e * (temp1 - temp2) / bandwidth);
       volume = temp * width;
 
+      // calculate the total mass of this lane plus the mass of the next lane
       new_mass = volume * mass_density;
       new_gas = volume * gas_density;
       new_dust = new_mass - new_gas;
@@ -303,6 +342,20 @@ auto critical_limit(long double orb_radius, long double eccentricity,
   return B * pow(temp, -0.75);
 }
 
+/**
+ * @brief ACCRETE, the algorithm. Accrete some dust for the current process, using the 
+ * supplied mass, the planetoid properties given, and the inner and outer bounds
+ * of the new body.
+ * 
+ * @param seed_mass 
+ * @param new_dust 
+ * @param new_gas 
+ * @param a 
+ * @param e 
+ * @param crit_mass 
+ * @param body_inner_bound 
+ * @param body_outer_bound 
+ */
 void accrete_dust(long double &seed_mass, long double &new_dust,
                   long double &new_gas, long double a, long double e,
                   long double crit_mass, long double body_inner_bound,
@@ -313,6 +366,8 @@ void accrete_dust(long double &seed_mass, long double &new_dust,
   do {
     // cout << "test1" << endl;
     temp_mass = new_mass;
+    // fixed point algorithm: accumulate more mass until the difference is less 
+    // than .01% of the old mass
     new_mass =
         collect_dust(new_mass, new_dust, new_gas, a, e, crit_mass, dust_head);
     // cout << "test2" << endl;
@@ -324,7 +379,9 @@ void accrete_dust(long double &seed_mass, long double &new_dust,
     }
   } while (!((new_mass - temp_mass) < (0.0001 * temp_mass)));
 
+  // add the new mass to the seed mass
   seed_mass += new_mass;
+  // update the dust lanes with the new seed mass
   update_dust_lanes(r_inner, r_outer, seed_mass, crit_mass, body_inner_bound,
                     body_outer_bound);
   // cout << "test" << endl;
@@ -560,6 +617,7 @@ void coalesce_planetesimals(long double a, long double e, long double mass,
   }
 }
 
+// this appears to be the entry point into the entire module - DKL
 auto dist_planetary_masses(sun &the_sun, long double inner_dust,
                            long double outer_dust,
                            long double outer_planet_limit,
@@ -622,8 +680,10 @@ auto dist_planetary_masses(sun &the_sun, long double inner_dust,
 
   // cout << planet_inner_bound << " " << planet_outer_bound << endl;
 
+  // while there's still dust left...
   while (dust_left) {
     if (seeds != nullptr) {
+      // give us a random proto planet within the inner and outer bounds
       a = seeds->getA();
       e = seeds->getE();
       dust_mass = seeds->getDustMass();
@@ -682,6 +742,7 @@ auto dist_planetary_masses(sun &the_sun, long double inner_dust,
     if (flag_verbose & 0x0200) {
       cerr << "Checking " << toString(a) << " AU." << endl;
     }
+    // if we have dust inside the limits...
     if (dust_available(inner_effect_limit(a, e, total_mass),
                        outer_effect_limit(a, e, total_mass))) {
       if (flag_verbose & 0x0100) {
