@@ -9,8 +9,7 @@
 
 using namespace std;
 
-using planet_type = enum planet_type
-{
+using planet_type = enum planet_type {
   tUnknown,
   tRock,
   tVenusian,
@@ -23,7 +22,7 @@ using planet_type = enum planet_type
   tSubSubGasGiant,
   tAsteroids,
   t1Face,
-  tBrownDwarf,  //seb
+  tBrownDwarf,  // seb
   tIron,
   tCarbon,
   tOil
@@ -32,12 +31,12 @@ using planet_type = enum planet_type
 class gas;
 auto operator<<(ostream &, gas &) -> ostream &;
 
-class gas
-{
-private:
+class gas {
+ private:
   int num;
   long double surfPressure;
-public:
+
+ public:
   gas();
   void setNum(int);
   auto getNum() -> int;
@@ -48,9 +47,8 @@ public:
   friend auto operator<<(ostream &, gas &) -> ostream &;
 };
 
-class sun
-{
-private:
+class sun {
+ private:
   long double luminosity;
   long double mass;
   long double effTemp;
@@ -65,11 +63,12 @@ private:
   string secondarySpecType;
   long double seperation;
   long double eccentricity;
-public:
+
+ public:
   sun();
   sun(long double, long double, long double, string, long double, string);
   sun(sun &);
-  sun(const sun&);
+  sun(const sun &);
   void setLuminosity(long double);
   auto getLuminosity() -> long double;
   void setMass(long double);
@@ -103,56 +102,55 @@ public:
   auto getSecondaryLife() -> long double;
   auto getMinStableDistance() -> long double;
   auto getCombinedEffTemp() -> long double;
-  //sun operator=(sun &);
+  // sun operator=(sun &);
 };
 
-class planet
-{
-private:
+class planet {
+ private:
   int planetNo;
-  long double a;					/* semi-major axis of solar orbit (in AU)*/
-  long double e;					/* eccentricity of solar orbit		 */
-  long double axialTilt;			/* units of degrees					 */
-  bool gasGiant;			/* TRUE if the planet is a gas giant */
-  long double dustMass;			/* mass, ignoring gas				 */
-  long double gasMass;			/* mass, ignoring dust				 */
-  long double imf;				/* ice mass fraction */
-  long double rmf;				/* rock mass fraction */
-  long double cmf;				/* fraction of rock that's carbon instead of silicate*/
-  long double moonA;				/* semi-major axis of lunar orbit (in AU)*/
-  long double moonE;				/* eccentricity of lunar orbit		 */
-  long double coreRadius;		/* radius of the rocky core (in km)	 */
-  long double radius;				/* equatorial radius (in km)		 */
-  int orbitZone;			/* the 'zone' of the planet			 */
-  long double density;			/* density (in g/cc)				 */
-  long double orbPeriod;			/* length of the local year (days)	 */
-  long double day;				/* length of the local day (hours)	 */
-  bool resonantPeriod;	/* TRUE if in resonant rotation		 */
-  long double escVelocity;		/* units of cm/sec					 */
-  long double surfAccel;			/* units of cm/sec2					 */
-  long double surfGrav;			/* units of Earth gravities			 */
-  long double rmsVelocity;		/* units of cm/sec					 */
-  long double molecWeight;		/* smallest molecular weight retained*/
+  long double a;         /* semi-major axis of solar orbit (in AU)*/
+  long double e;         /* eccentricity of solar orbit		 */
+  long double axialTilt; /* units of degrees */
+  bool gasGiant;         /* TRUE if the planet is a gas giant */
+  long double dustMass;  /* mass, ignoring gas				 */
+  long double gasMass;   /* mass, ignoring dust				 */
+  long double imf;       /* ice mass fraction */
+  long double rmf;       /* rock mass fraction */
+  long double cmf;       /* fraction of rock that's carbon instead of silicate*/
+  long double moonA;     /* semi-major axis of lunar orbit (in AU)*/
+  long double moonE;     /* eccentricity of lunar orbit		 */
+  long double coreRadius;  /* radius of the rocky core (in km)	 */
+  long double radius;      /* equatorial radius (in km)		 */
+  int orbitZone;           /* the 'zone' of the planet			 */
+  long double density;     /* density (in g/cc)				 */
+  long double orbPeriod;   /* length of the local year (days)	 */
+  long double day;         /* length of the local day (hours)	 */
+  bool resonantPeriod;     /* TRUE if in resonant rotation		 */
+  long double escVelocity; /* units of cm/sec */
+  long double surfAccel;   /* units of cm/sec2   */
+  long double surfGrav;    /* units of Earth gravities			 */
+  long double rmsVelocity; /* units of cm/sec */
+  long double molecWeight; /* smallest molecular weight retained*/
   long double volatileGasInventory;
-  long double surfPressure;		/* units of millibars (mb)			 */
-  bool greenhouseEffect;	/* runaway greenhouse effect?		 */
-  long double boilPoint;			/* the boiling point of water (Kelvin)*/
-  long double albedo;				/* albedo of the planet				 */
-  long double exosphericTemp;	/* units of degrees Kelvin			 */
+  long double surfPressure;      /* units of millibars (mb)			 */
+  bool greenhouseEffect;         /* runaway greenhouse effect?		 */
+  long double boilPoint;         /* the boiling point of water (Kelvin)*/
+  long double albedo;            /* albedo of the planet				 */
+  long double exosphericTemp;    /* units of degrees Kelvin    */
   long double estimatedTemp;     /* quick non-iterative estimate (K)  */
-  long double estimatedTerrTemp;/* for terrestrial moons and the like*/
-  long double surfTemp;			/* surface temperature in Kelvin	 */
-  long double greenhsRise;		/* Temperature rise due to greenhouse */
-  long double highTemp;			/* Day-time temperature              */
-  long double lowTemp;			/* Night-time temperature			 */
-  long double maxTemp;			/* Summer/Day						 */
-  long double minTemp;			/* Winter/Night						 */
-  long double hydrosphere;		/* fraction of surface covered		 */
-  long double cloudCover;		/* fraction of surface covered		 */
-  long double iceCover;			/* fraction of surface covered		 */
+  long double estimatedTerrTemp; /* for terrestrial moons and the like*/
+  long double surfTemp;          /* surface temperature in Kelvin	 */
+  long double greenhsRise;       /* Temperature rise due to greenhouse */
+  long double highTemp;          /* Day-time temperature              */
+  long double lowTemp;           /* Night-time temperature			 */
+  long double maxTemp;           /* Summer/Day           */
+  long double minTemp;           /* Winter/Night           */
+  long double hydrosphere;       /* fraction of surface covered		 */
+  long double cloudCover;        /* fraction of surface covered		 */
+  long double iceCover;          /* fraction of surface covered		 */
   sun theSun;
   vector<gas> atmosphere;
-  planet_type type;				/* Type code						 */
+  planet_type type; /* Type code */
   int minorMoons;
   long double inclination;
   long double ascendingNode;
@@ -167,10 +165,11 @@ private:
   bool deleteable;
   long double knownRadius;
   void estimateMass();
-  //vector<planet *> temp_moon;
-public:
+  // vector<planet *> temp_moon;
+ public:
   planet();
-  planet(int, long double, long double, long double, bool, long double, long double, planet*, planet*);
+  planet(int, long double, long double, long double, bool, long double,
+         long double, planet *, planet *);
   ~planet();
   void setPlanetNo(int);
   auto getPlanetNo() -> int;
@@ -287,10 +286,10 @@ public:
   auto getOblateness() -> long double;
   auto getEquatrorialRadius() -> long double;
   auto getPolarRadius() -> long double;
-  //void addMoon(planet *);
-  //planet *getMoon(int);
-  //int getMoonCount();
-  //void deleteMoon(int);
+  // void addMoon(planet *);
+  // planet *getMoon(int);
+  // int getMoonCount();
+  // void deleteMoon(int);
   void setDeletable(bool);
   auto getDeletable() -> bool;
   void setKnownRadius(long double);
@@ -304,14 +303,14 @@ public:
   planet *first_moon_backup;
 };
 
-class dust
-{
-private:
+class dust {
+ private:
   long double innerEdge;
   long double outerEdge;
   bool dustPresent;
   bool gasPresent;
-public:
+
+ public:
   dust();
   ~dust();
   void setInnerEdge(long double);
@@ -329,9 +328,8 @@ class star;
 
 auto operator<<(ostream &, star &) -> ostream &;
 
-class star
-{
-private:
+class star {
+ private:
   long double luminosity{};
   long double mass{};
   long double eff_temp{};
@@ -353,10 +351,11 @@ private:
   long double eff_temp2{};
   string spec_type2;
   long double luminosity2{};
-public:
-  star()
-  = default;
-  star(long double, long double, long double, string, long double, long double, long double, long double, long double, planet *, string, bool, string);
+
+ public:
+  star() = default;
+  star(long double, long double, long double, string, long double, long double,
+       long double, long double, long double, planet *, string, bool, string);
   star(star &);
   star(const star &);
   star(star2 &);
@@ -388,7 +387,7 @@ public:
   void setIsCircumbinary(bool);
   auto getIsCircumbinary() -> bool;
   auto operator=(star &) -> star;
-  //star operator=(const star);
+  // star operator=(const star);
   auto operator<(star &) -> bool;
   auto operator==(star &) -> bool;
   friend auto operator<<(ostream &, star &) -> ostream &;
@@ -397,13 +396,13 @@ public:
 class catalog;
 auto operator<<(ostream &, catalog &) -> ostream &;
 
-class catalog
-{
-private:
+class catalog {
+ private:
   int extra_spaces;
   string arg;
   vector<star> stars;
-public:
+
+ public:
   catalog();
   catalog(string);
   ~catalog();
@@ -417,9 +416,8 @@ public:
   void sort();
 };
 
-class gen
-{
-public:
+class gen {
+ public:
   gen();
   ~gen();
   dust *dusts;
@@ -430,9 +428,8 @@ public:
 class Chemicle;
 auto operator<<(ostream &, Chemicle &) -> ostream &;
 
-class Chemicle
-{
-private:
+class Chemicle {
+ private:
   int num;
   string symbol;
   string htmlSymbol;
@@ -458,9 +455,12 @@ private:
   void fixAbunde();
   void fixAbunds();
   void setSpaces();
-public:
+
+ public:
   Chemicle();
-  Chemicle(int, string, string, string, long double, long double, long double, long double, long double, long double, long double, long double, long double, long double, long double, long double);
+  Chemicle(int, string, string, string, long double, long double, long double,
+           long double, long double, long double, long double, long double,
+           long double, long double, long double, long double);
   Chemicle(Chemicle &);
   Chemicle(const Chemicle &);
   ~Chemicle();
@@ -497,13 +497,12 @@ public:
 class ChemTable;
 auto operator<<(ostream &, ChemTable &) -> ostream &;
 
-class ChemTable
-{
-private:
+class ChemTable {
+ private:
   vector<Chemicle> chemicles;
-public:
-  ChemTable()
-  = default;
+
+ public:
+  ChemTable() = default;
   void addChemicle(Chemicle);
   auto count() -> int;
   auto operator[](const int &) -> Chemicle &;

@@ -77,19 +77,18 @@ map<int, long double> gas_4point5Gyr_78K_10core_mass;
 map<int, long double> gas_4point5Gyr_78K_25core_mass;
 map<int, long double> gas_4point5Gyr_78K_50core_mass;
 map<int, long double> gas_4point5Gyr_78K_100core_mass;
-map<long double, long double> solid_water; 
-map<long double, long double> solid_one_quater_rock_three_fourths_water; 
-map<long double, long double> solid_half_rock_half_water; 
-map<long double, long double> solid_rock; 
-map<long double, long double> solid_half_rock_half_iron; 
-map<long double, long double> solid_iron; 
-map<long double, long double> solid_0point953_iron_0point047_water; 
-map<long double, long double> solid_0point51_iron_0point49_water; 
+map<long double, long double> solid_water;
+map<long double, long double> solid_one_quater_rock_three_fourths_water;
+map<long double, long double> solid_half_rock_half_water;
+map<long double, long double> solid_rock;
+map<long double, long double> solid_half_rock_half_iron;
+map<long double, long double> solid_iron;
+map<long double, long double> solid_0point953_iron_0point047_water;
+map<long double, long double> solid_0point51_iron_0point49_water;
 map<long double, long double> solid_0point264_iron_0point736_water;
 map<long double, long double> earth_like;
 
-void initRadii()
-{
+void initRadii() {
   gas_300Myr_1960K_0core_mass[0] = 0.0;
   gas_300Myr_1960K_0core_mass[28] = 2.326;
   gas_300Myr_1960K_0core_mass[46] = 1.883;
@@ -102,7 +101,7 @@ void initRadii()
   gas_300Myr_1960K_0core_mass[1292] = 1.311;
   gas_300Myr_1960K_0core_mass[2154] = 1.315;
   gas_300Myr_1960K_0core_mass[3594] = 1.284;
-  
+
   gas_300Myr_1960K_10core_mass[17] = 1.102;
   gas_300Myr_1960K_10core_mass[28] = 1.388;
   gas_300Myr_1960K_10core_mass[46] = 1.465;
@@ -115,7 +114,7 @@ void initRadii()
   gas_300Myr_1960K_10core_mass[1292] = 1.304;
   gas_300Myr_1960K_10core_mass[2154] = 1.31;
   gas_300Myr_1960K_10core_mass[3594] = 1.281;
-  
+
   gas_300Myr_1960K_25core_mass[28] = 0.493;
   gas_300Myr_1960K_25core_mass[46] = 0.945;
   gas_300Myr_1960K_25core_mass[77] = 1.133;
@@ -127,7 +126,7 @@ void initRadii()
   gas_300Myr_1960K_25core_mass[1292] = 1.294;
   gas_300Myr_1960K_25core_mass[2154] = 1.304;
   gas_300Myr_1960K_25core_mass[3594] = 1.277;
-  
+
   gas_300Myr_1960K_50core_mass[77] = 0.801;
   gas_300Myr_1960K_50core_mass[129] = 1.03;
   gas_300Myr_1960K_50core_mass[215] = 1.144;
@@ -137,7 +136,7 @@ void initRadii()
   gas_300Myr_1960K_50core_mass[1292] = 1.276;
   gas_300Myr_1960K_50core_mass[2154] = 1.292;
   gas_300Myr_1960K_50core_mass[3594] = 1.27;
-  
+
   gas_300Myr_1960K_100core_mass[129] = 0.669;
   gas_300Myr_1960K_100core_mass[215] = 0.939;
   gas_300Myr_1960K_100core_mass[318] = 1.055;
@@ -146,7 +145,7 @@ void initRadii()
   gas_300Myr_1960K_100core_mass[1292] = 1.242;
   gas_300Myr_1960K_100core_mass[2154] = 1.27;
   gas_300Myr_1960K_100core_mass[3594] = 1.256;
-  
+
   gas_300Myr_1300K_0core_mass[0] = 0.0;
   gas_300Myr_1300K_0core_mass[17] = 2.795;
   gas_300Myr_1300K_0core_mass[28] = 1.522;
@@ -160,7 +159,7 @@ void initRadii()
   gas_300Myr_1300K_0core_mass[1292] = 1.21;
   gas_300Myr_1300K_0core_mass[2154] = 1.203;
   gas_300Myr_1300K_0core_mass[3594] = 1.17;
-  
+
   gas_300Myr_1300K_10core_mass[17] = 0.801;
   gas_300Myr_1300K_10core_mass[28] = 1.012;
   gas_300Myr_1300K_10core_mass[46] = 1.091;
@@ -173,7 +172,7 @@ void initRadii()
   gas_300Myr_1300K_10core_mass[1292] = 1.204;
   gas_300Myr_1300K_10core_mass[2154] = 1.199;
   gas_300Myr_1300K_10core_mass[3594] = 1.168;
-  
+
   gas_300Myr_1300K_25core_mass[28] = 0.447;
   gas_300Myr_1300K_25core_mass[46] = 0.793;
   gas_300Myr_1300K_25core_mass[77] = 0.968;
@@ -185,7 +184,7 @@ void initRadii()
   gas_300Myr_1300K_25core_mass[1292] = 1.195;
   gas_300Myr_1300K_25core_mass[2154] = 1.193;
   gas_300Myr_1300K_25core_mass[3594] = 1.164;
-  
+
   gas_300Myr_1300K_50core_mass[77] = 0.719;
   gas_300Myr_1300K_50core_mass[129] = 0.921;
   gas_300Myr_1300K_50core_mass[215] = 1.033;
@@ -195,7 +194,7 @@ void initRadii()
   gas_300Myr_1300K_50core_mass[1292] = 1.179;
   gas_300Myr_1300K_50core_mass[2154] = 1.183;
   gas_300Myr_1300K_50core_mass[3594] = 1.157;
-  
+
   gas_300Myr_1300K_100core_mass[129] = 0.627;
   gas_300Myr_1300K_100core_mass[215] = 0.863;
   gas_300Myr_1300K_100core_mass[318] = 0.968;
@@ -204,7 +203,7 @@ void initRadii()
   gas_300Myr_1300K_100core_mass[1292] = 1.148;
   gas_300Myr_1300K_100core_mass[2154] = 1.163;
   gas_300Myr_1300K_100core_mass[3594] = 1.146;
-  
+
   gas_300Myr_875K_0core_mass[0] = 0.0;
   gas_300Myr_875K_0core_mass[17] = 1.595;
   gas_300Myr_875K_0core_mass[28] = 1.395;
@@ -218,7 +217,7 @@ void initRadii()
   gas_300Myr_875K_0core_mass[1292] = 1.189;
   gas_300Myr_875K_0core_mass[2154] = 1.178;
   gas_300Myr_875K_0core_mass[3594] = 1.144;
-  
+
   gas_300Myr_875K_10core_mass[17] = 0.755;
   gas_300Myr_875K_10core_mass[28] = 0.956;
   gas_300Myr_875K_10core_mass[46] = 1.035;
@@ -231,7 +230,7 @@ void initRadii()
   gas_300Myr_875K_10core_mass[1292] = 1.183;
   gas_300Myr_875K_10core_mass[2154] = 1.174;
   gas_300Myr_875K_10core_mass[3594] = 1.142;
-  
+
   gas_300Myr_875K_25core_mass[28] = 0.438;
   gas_300Myr_875K_25core_mass[46] = 0.767;
   gas_300Myr_875K_25core_mass[77] = 0.938;
@@ -243,7 +242,7 @@ void initRadii()
   gas_300Myr_875K_25core_mass[1292] = 1.174;
   gas_300Myr_875K_25core_mass[2154] = 1.169;
   gas_300Myr_875K_25core_mass[3594] = 1.138;
-  
+
   gas_300Myr_875K_50core_mass[77] = 0.702;
   gas_300Myr_875K_50core_mass[129] = 0.899;
   gas_300Myr_875K_50core_mass[215] = 1.011;
@@ -253,7 +252,7 @@ void initRadii()
   gas_300Myr_875K_50core_mass[1292] = 1.158;
   gas_300Myr_875K_50core_mass[2154] = 1.159;
   gas_300Myr_875K_50core_mass[3594] = 1.132;
-  
+
   gas_300Myr_875K_100core_mass[129] = 0.618;
   gas_300Myr_875K_100core_mass[215] = 0.847;
   gas_300Myr_875K_100core_mass[318] = 0.95;
@@ -262,7 +261,7 @@ void initRadii()
   gas_300Myr_875K_100core_mass[1292] = 1.128;
   gas_300Myr_875K_100core_mass[2154] = 1.14;
   gas_300Myr_875K_100core_mass[3594] = 1.121;
-  
+
   gas_300Myr_260K_0core_mass[0] = 0.0;
   gas_300Myr_260K_0core_mass[17] = 1.504;
   gas_300Myr_260K_0core_mass[28] = 1.325;
@@ -276,7 +275,7 @@ void initRadii()
   gas_300Myr_260K_0core_mass[1292] = 1.179;
   gas_300Myr_260K_0core_mass[2154] = 1.169;
   gas_300Myr_260K_0core_mass[3594] = 1.136;
-  
+
   gas_300Myr_260K_10core_mass[17] = 0.727;
   gas_300Myr_260K_10core_mass[28] = 0.921;
   gas_300Myr_260K_10core_mass[46] = 1.004;
@@ -289,7 +288,7 @@ void initRadii()
   gas_300Myr_260K_10core_mass[1292] = 1.173;
   gas_300Myr_260K_10core_mass[2154] = 1.165;
   gas_300Myr_260K_10core_mass[3594] = 1.134;
-  
+
   gas_300Myr_260K_25core_mass[28] = 0.433;
   gas_300Myr_260K_25core_mass[46] = 0.754;
   gas_300Myr_260K_25core_mass[77] = 0.923;
@@ -301,7 +300,7 @@ void initRadii()
   gas_300Myr_260K_25core_mass[1292] = 1.164;
   gas_300Myr_260K_25core_mass[2154] = 1.159;
   gas_300Myr_260K_25core_mass[3594] = 1.13;
-  
+
   gas_300Myr_260K_50core_mass[77] = 0.693;
   gas_300Myr_260K_50core_mass[129] = 0.888;
   gas_300Myr_260K_50core_mass[215] = 0.999;
@@ -311,7 +310,7 @@ void initRadii()
   gas_300Myr_260K_50core_mass[1292] = 1.149;
   gas_300Myr_260K_50core_mass[2154] = 1.149;
   gas_300Myr_260K_50core_mass[3594] = 1.124;
-  
+
   gas_300Myr_260K_100core_mass[129] = 0.613;
   gas_300Myr_260K_100core_mass[215] = 0.839;
   gas_300Myr_260K_100core_mass[318] = 0.941;
@@ -320,7 +319,7 @@ void initRadii()
   gas_300Myr_260K_100core_mass[1292] = 1.119;
   gas_300Myr_260K_100core_mass[2154] = 1.131;
   gas_300Myr_260K_100core_mass[3594] = 1.113;
-  
+
   gas_300Myr_78K_0core_mass[0] = 0.0;
   gas_300Myr_78K_0core_mass[17] = 0.929;
   gas_300Myr_78K_0core_mass[28] = 0.951;
@@ -334,7 +333,7 @@ void initRadii()
   gas_300Myr_78K_0core_mass[1292] = 1.169;
   gas_300Myr_78K_0core_mass[2154] = 1.156;
   gas_300Myr_78K_0core_mass[3594] = 1.13;
-  
+
   gas_300Myr_78K_10core_mass[17] = 0.565;
   gas_300Myr_78K_10core_mass[28] = 0.733;
   gas_300Myr_78K_10core_mass[46] = 0.847;
@@ -347,7 +346,7 @@ void initRadii()
   gas_300Myr_78K_10core_mass[1292] = 1.163;
   gas_300Myr_78K_10core_mass[2154] = 1.152;
   gas_300Myr_78K_10core_mass[3594] = 1.127;
-  
+
   gas_300Myr_78K_25core_mass[28] = 0.394;
   gas_300Myr_78K_25core_mass[46] = 0.664;
   gas_300Myr_78K_25core_mass[77] = 0.826;
@@ -359,7 +358,7 @@ void initRadii()
   gas_300Myr_78K_25core_mass[1292] = 1.153;
   gas_300Myr_78K_25core_mass[2154] = 1.146;
   gas_300Myr_78K_25core_mass[3594] = 1.124;
-  
+
   gas_300Myr_78K_50core_mass[77] = 0.635;
   gas_300Myr_78K_50core_mass[129] = 0.823;
   gas_300Myr_78K_50core_mass[215] = 0.951;
@@ -369,7 +368,7 @@ void initRadii()
   gas_300Myr_78K_50core_mass[1292] = 1.137;
   gas_300Myr_78K_50core_mass[2154] = 1.137;
   gas_300Myr_78K_50core_mass[3594] = 1.118;
-  
+
   gas_300Myr_78K_100core_mass[129] = 0.587;
   gas_300Myr_78K_100core_mass[215] = 0.81;
   gas_300Myr_78K_100core_mass[318] = 0.92;
@@ -378,7 +377,7 @@ void initRadii()
   gas_300Myr_78K_100core_mass[1292] = 1.107;
   gas_300Myr_78K_100core_mass[2154] = 1.119;
   gas_300Myr_78K_100core_mass[3594] = 1.107;
-  
+
   gas_1Gyr_1960K_0core_mass[0] = 0.0;
   gas_1Gyr_1960K_0core_mass[28] = 1.77;
   gas_1Gyr_1960K_0core_mass[46] = 1.539;
@@ -391,7 +390,7 @@ void initRadii()
   gas_1Gyr_1960K_0core_mass[1292] = 1.244;
   gas_1Gyr_1960K_0core_mass[2154] = 1.24;
   gas_1Gyr_1960K_0core_mass[3594] = 1.199;
-  
+
   gas_1Gyr_1960K_10core_mass[17] = 0.909;
   gas_1Gyr_1960K_10core_mass[28] = 1.15;
   gas_1Gyr_1960K_10core_mass[46] = 1.221;
@@ -404,7 +403,7 @@ void initRadii()
   gas_1Gyr_1960K_10core_mass[1292] = 1.237;
   gas_1Gyr_1960K_10core_mass[2154] = 1.235;
   gas_1Gyr_1960K_10core_mass[3594] = 1.197;
-  
+
   gas_1Gyr_1960K_25core_mass[28] = 0.461;
   gas_1Gyr_1960K_25core_mass[46] = 0.838;
   gas_1Gyr_1960K_25core_mass[77] = 1.022;
@@ -416,7 +415,7 @@ void initRadii()
   gas_1Gyr_1960K_25core_mass[1292] = 1.228;
   gas_1Gyr_1960K_25core_mass[2154] = 1.229;
   gas_1Gyr_1960K_25core_mass[3594] = 1.192;
-  
+
   gas_1Gyr_1960K_50core_mass[77] = 0.746;
   gas_1Gyr_1960K_50core_mass[129] = 0.958;
   gas_1Gyr_1960K_50core_mass[215] = 1.072;
@@ -426,7 +425,7 @@ void initRadii()
   gas_1Gyr_1960K_50core_mass[1292] = 1.211;
   gas_1Gyr_1960K_50core_mass[2154] = 1.218;
   gas_1Gyr_1960K_50core_mass[3594] = 1.186;
-  
+
   gas_1Gyr_1960K_100core_mass[129] = 0.64;
   gas_1Gyr_1960K_100core_mass[215] = 0.888;
   gas_1Gyr_1960K_100core_mass[318] = 0.997;
@@ -435,7 +434,7 @@ void initRadii()
   gas_1Gyr_1960K_100core_mass[1292] = 1.179;
   gas_1Gyr_1960K_100core_mass[2154] = 1.198;
   gas_1Gyr_1960K_100core_mass[3594] = 1.173;
-  
+
   gas_1Gyr_1300K_0core_mass[0] = 0.0;
   gas_1Gyr_1300K_0core_mass[17] = 1.49;
   gas_1Gyr_1300K_0core_mass[28] = 1.271;
@@ -449,7 +448,7 @@ void initRadii()
   gas_1Gyr_1300K_0core_mass[1292] = 1.164;
   gas_1Gyr_1300K_0core_mass[2154] = 1.149;
   gas_1Gyr_1300K_0core_mass[3594] = 1.107;
-  
+
   gas_1Gyr_1300K_10core_mass[17] = 0.698;
   gas_1Gyr_1300K_10core_mass[28] = 0.888;
   gas_1Gyr_1300K_10core_mass[46] = 0.975;
@@ -462,7 +461,7 @@ void initRadii()
   gas_1Gyr_1300K_10core_mass[1292] = 1.158;
   gas_1Gyr_1300K_10core_mass[2154] = 1.145;
   gas_1Gyr_1300K_10core_mass[3594] = 1.105;
-  
+
   gas_1Gyr_1300K_25core_mass[28] = 0.436;
   gas_1Gyr_1300K_25core_mass[46] = 0.739;
   gas_1Gyr_1300K_25core_mass[77] = 0.908;
@@ -474,7 +473,7 @@ void initRadii()
   gas_1Gyr_1300K_25core_mass[1292] = 1.149;
   gas_1Gyr_1300K_25core_mass[2154] = 1.14;
   gas_1Gyr_1300K_25core_mass[3594] = 1.101;
-  
+
   gas_1Gyr_1300K_50core_mass[77] = 0.684;
   gas_1Gyr_1300K_50core_mass[129] = 0.877;
   gas_1Gyr_1300K_50core_mass[215] = 0.988;
@@ -484,7 +483,7 @@ void initRadii()
   gas_1Gyr_1300K_50core_mass[1292] = 1.134;
   gas_1Gyr_1300K_50core_mass[2154] = 1.13;
   gas_1Gyr_1300K_50core_mass[3594] = 1.095;
-  
+
   gas_1Gyr_1300K_100core_mass[129] = 0.607;
   gas_1Gyr_1300K_100core_mass[215] = 0.831;
   gas_1Gyr_1300K_100core_mass[318] = 0.932;
@@ -493,7 +492,7 @@ void initRadii()
   gas_1Gyr_1300K_100core_mass[1292] = 1.105;
   gas_1Gyr_1300K_100core_mass[2154] = 1.111;
   gas_1Gyr_1300K_100core_mass[3594] = 1.084;
-  
+
   gas_1Gyr_875K_0core_mass[0] = 0;
   gas_1Gyr_875K_0core_mass[17] = 1.298;
   gas_1Gyr_875K_0core_mass[28] = 1.197;
@@ -507,7 +506,7 @@ void initRadii()
   gas_1Gyr_875K_0core_mass[1292] = 1.147;
   gas_1Gyr_875K_0core_mass[2154] = 1.13;
   gas_1Gyr_875K_0core_mass[3594] = 1.087;
-  
+
   gas_1Gyr_875K_10core_mass[17] = 0.665;
   gas_1Gyr_875K_10core_mass[28] = 0.847;
   gas_1Gyr_875K_10core_mass[46] = 0.934;
@@ -520,7 +519,7 @@ void initRadii()
   gas_1Gyr_875K_10core_mass[1292] = 1.141;
   gas_1Gyr_875K_10core_mass[2154] = 1.126;
   gas_1Gyr_875K_10core_mass[3594] = 1.085;
-  
+
   gas_1Gyr_875K_25core_mass[28] = 0.42;
   gas_1Gyr_875K_25core_mass[46] = 0.719;
   gas_1Gyr_875K_25core_mass[77] = 0.883;
@@ -532,7 +531,7 @@ void initRadii()
   gas_1Gyr_875K_25core_mass[1292] = 1.132;
   gas_1Gyr_875K_25core_mass[2154] = 1.121;
   gas_1Gyr_875K_25core_mass[3594] = 1.081;
-  
+
   gas_1Gyr_875K_50core_mass[77] = 0.67;
   gas_1Gyr_875K_50core_mass[129] = 0.859;
   gas_1Gyr_875K_50core_mass[215] = 0.97;
@@ -542,7 +541,7 @@ void initRadii()
   gas_1Gyr_875K_50core_mass[1292] = 1.117;
   gas_1Gyr_875K_50core_mass[2154] = 1.111;
   gas_1Gyr_875K_50core_mass[3594] = 1.076;
-  
+
   gas_1Gyr_875K_100core_mass[129] = 0.6;
   gas_1Gyr_875K_100core_mass[215] = 0.818;
   gas_1Gyr_875K_100core_mass[318] = 0.918;
@@ -551,7 +550,7 @@ void initRadii()
   gas_1Gyr_875K_100core_mass[1292] = 1.088;
   gas_1Gyr_875K_100core_mass[2154] = 1.093;
   gas_1Gyr_875K_100core_mass[3594] = 1.065;
-  
+
   gas_1Gyr_260K_0core_mass[0] = 0.0;
   gas_1Gyr_260K_0core_mass[17] = 1.229;
   gas_1Gyr_260K_0core_mass[28] = 1.148;
@@ -565,7 +564,7 @@ void initRadii()
   gas_1Gyr_260K_0core_mass[1292] = 1.137;
   gas_1Gyr_260K_0core_mass[2154] = 1.121;
   gas_1Gyr_260K_0core_mass[3594] = 1.079;
-  
+
   gas_1Gyr_260K_10core_mass[17] = 0.646;
   gas_1Gyr_260K_10core_mass[28] = 0.823;
   gas_1Gyr_260K_10core_mass[46] = 0.915;
@@ -578,7 +577,7 @@ void initRadii()
   gas_1Gyr_260K_10core_mass[1292] = 1.131;
   gas_1Gyr_260K_10core_mass[2154] = 1.117;
   gas_1Gyr_260K_10core_mass[3594] = 1.077;
-  
+
   gas_1Gyr_260K_25core_mass[28] = 0.416;
   gas_1Gyr_260K_25core_mass[46] = 0.709;
   gas_1Gyr_260K_25core_mass[77] = 0.871;
@@ -590,7 +589,7 @@ void initRadii()
   gas_1Gyr_260K_25core_mass[1292] = 1.123;
   gas_1Gyr_260K_25core_mass[2154] = 1.112;
   gas_1Gyr_260K_25core_mass[3594] = 1.073;
-  
+
   gas_1Gyr_260K_50core_mass[77] = 0.663;
   gas_1Gyr_260K_50core_mass[129] = 0.85;
   gas_1Gyr_260K_50core_mass[215] = 0.961;
@@ -600,7 +599,7 @@ void initRadii()
   gas_1Gyr_260K_50core_mass[1292] = 1.108;
   gas_1Gyr_260K_50core_mass[2154] = 1.102;
   gas_1Gyr_260K_50core_mass[3594] = 1.068;
-  
+
   gas_1Gyr_260K_100core_mass[129] = 0.595;
   gas_1Gyr_260K_100core_mass[215] = 0.811;
   gas_1Gyr_260K_100core_mass[318] = 0.91;
@@ -609,7 +608,7 @@ void initRadii()
   gas_1Gyr_260K_100core_mass[1292] = 1.08;
   gas_1Gyr_260K_100core_mass[2154] = 1.085;
   gas_1Gyr_260K_100core_mass[3594] = 1.057;
-  
+
   gas_1Gyr_78K_0core_mass[0] = 0.0;
   gas_1Gyr_78K_0core_mass[17] = 0.857;
   gas_1Gyr_78K_0core_mass[28] = 0.877;
@@ -623,7 +622,7 @@ void initRadii()
   gas_1Gyr_78K_0core_mass[1292] = 1.119;
   gas_1Gyr_78K_0core_mass[2154] = 1.109;
   gas_1Gyr_78K_0core_mass[3594] = 1.074;
-  
+
   gas_1Gyr_78K_10core_mass[17] = 0.532;
   gas_1Gyr_78K_10core_mass[28] = 0.683;
   gas_1Gyr_78K_10core_mass[46] = 0.791;
@@ -636,7 +635,7 @@ void initRadii()
   gas_1Gyr_78K_10core_mass[1292] = 1.113;
   gas_1Gyr_78K_10core_mass[2154] = 1.105;
   gas_1Gyr_78K_10core_mass[3594] = 1.072;
-  
+
   gas_1Gyr_78K_25core_mass[28] = 0.386;
   gas_1Gyr_78K_25core_mass[46] = 0.631;
   gas_1Gyr_78K_25core_mass[77] = 0.78;
@@ -648,7 +647,7 @@ void initRadii()
   gas_1Gyr_78K_25core_mass[1292] = 1.105;
   gas_1Gyr_78K_25core_mass[2154] = 1.1;
   gas_1Gyr_78K_25core_mass[3594] = 1.069;
-  
+
   gas_1Gyr_78K_50core_mass[77] = 0.61;
   gas_1Gyr_78K_50core_mass[129] = 0.784;
   gas_1Gyr_78K_50core_mass[215] = 0.904;
@@ -658,7 +657,7 @@ void initRadii()
   gas_1Gyr_78K_50core_mass[1292] = 1.09;
   gas_1Gyr_78K_50core_mass[2154] = 1.091;
   gas_1Gyr_78K_50core_mass[3594] = 1.063;
-  
+
   gas_1Gyr_78K_100core_mass[129] = 0.57;
   gas_1Gyr_78K_100core_mass[215] = 0.775;
   gas_1Gyr_78K_100core_mass[318] = 0.878;
@@ -667,7 +666,7 @@ void initRadii()
   gas_1Gyr_78K_100core_mass[1292] = 1.063;
   gas_1Gyr_78K_100core_mass[2154] = 1.074;
   gas_1Gyr_78K_100core_mass[3594] = 1.053;
-  
+
   gas_4point5Gyr_1960K_0core_mass[0] = 0.0;
   gas_4point5Gyr_1960K_0core_mass[28] = 1.355;
   gas_4point5Gyr_1960K_0core_mass[46] = 1.252;
@@ -680,7 +679,7 @@ void initRadii()
   gas_4point5Gyr_1960K_0core_mass[1292] = 1.178;
   gas_4point5Gyr_1960K_0core_mass[2154] = 1.164;
   gas_4point5Gyr_1960K_0core_mass[3594] = 1.118;
-  
+
   gas_4point5Gyr_1960K_10core_mass[17] = 0.726;
   gas_4point5Gyr_1960K_10core_mass[28] = 0.934;
   gas_4point5Gyr_1960K_10core_mass[46] = 1.019;
@@ -693,7 +692,7 @@ void initRadii()
   gas_4point5Gyr_1960K_10core_mass[1292] = 1.172;
   gas_4point5Gyr_1960K_10core_mass[2154] = 1.16;
   gas_4point5Gyr_1960K_10core_mass[3594] = 1.116;
-  
+
   gas_4point5Gyr_1960K_25core_mass[28] = 0.43;
   gas_4point5Gyr_1960K_25core_mass[46] = 0.756;
   gas_4point5Gyr_1960K_25core_mass[77] = 0.928;
@@ -705,7 +704,7 @@ void initRadii()
   gas_4point5Gyr_1960K_25core_mass[1292] = 1.163;
   gas_4point5Gyr_1960K_25core_mass[2154] = 1.155;
   gas_4point5Gyr_1960K_25core_mass[3594] = 1.112;
-  
+
   gas_4point5Gyr_1960K_50core_mass[77] = 0.695;
   gas_4point5Gyr_1960K_50core_mass[129] = 0.891;
   gas_4point5Gyr_1960K_50core_mass[215] = 1.004;
@@ -715,7 +714,7 @@ void initRadii()
   gas_4point5Gyr_1960K_50core_mass[1292] = 1.148;
   gas_4point5Gyr_1960K_50core_mass[2154] = 1.144;
   gas_4point5Gyr_1960K_50core_mass[3594] = 1.106;
-  
+
   gas_4point5Gyr_1960K_100core_mass[129] = 0.613;
   gas_4point5Gyr_1960K_100core_mass[215] = 0.841;
   gas_4point5Gyr_1960K_100core_mass[318] = 0.944;
@@ -724,7 +723,7 @@ void initRadii()
   gas_4point5Gyr_1960K_100core_mass[1292] = 1.118;
   gas_4point5Gyr_1960K_100core_mass[2154] = 1.125;
   gas_4point5Gyr_1960K_100core_mass[3594] = 1.095;
-  
+
   gas_4point5Gyr_1300K_0core_mass[0] = 0.0;
   gas_4point5Gyr_1300K_0core_mass[17] = 1.103;
   gas_4point5Gyr_1300K_0core_mass[28] = 1.065;
@@ -738,7 +737,7 @@ void initRadii()
   gas_4point5Gyr_1300K_0core_mass[1292] = 1.118;
   gas_4point5Gyr_1300K_0core_mass[2154] = 1.099;
   gas_4point5Gyr_1300K_0core_mass[3594] = 1.053;
-  
+
   gas_4point5Gyr_1300K_10core_mass[17] = 0.599;
   gas_4point5Gyr_1300K_10core_mass[28] = 0.775;
   gas_4point5Gyr_1300K_10core_mass[46] = 0.878;
@@ -751,7 +750,7 @@ void initRadii()
   gas_4point5Gyr_1300K_10core_mass[1292] = 1.112;
   gas_4point5Gyr_1300K_10core_mass[2154] = 1.095;
   gas_4point5Gyr_1300K_10core_mass[3594] = 1.05;
-  
+
   gas_4point5Gyr_1300K_25core_mass[28] = 0.403;
   gas_4point5Gyr_1300K_25core_mass[46] = 0.686;
   gas_4point5Gyr_1300K_25core_mass[77] = 0.846;
@@ -763,7 +762,7 @@ void initRadii()
   gas_4point5Gyr_1300K_25core_mass[1292] = 1.104;
   gas_4point5Gyr_1300K_25core_mass[2154] = 1.09;
   gas_4point5Gyr_1300K_25core_mass[3594] = 1.047;
-  
+
   gas_4point5Gyr_1300K_50core_mass[77] = 0.648;
   gas_4point5Gyr_1300K_50core_mass[129] = 0.831;
   gas_4point5Gyr_1300K_50core_mass[215] = 0.942;
@@ -773,7 +772,7 @@ void initRadii()
   gas_4point5Gyr_1300K_50core_mass[1292] = 1.09;
   gas_4point5Gyr_1300K_50core_mass[2154] = 1.081;
   gas_4point5Gyr_1300K_50core_mass[3594] = 1.042;
-  
+
   gas_4point5Gyr_1300K_100core_mass[129] = 0.587;
   gas_4point5Gyr_1300K_100core_mass[215] = 0.798;
   gas_4point5Gyr_1300K_100core_mass[318] = 0.896;
@@ -782,7 +781,7 @@ void initRadii()
   gas_4point5Gyr_1300K_100core_mass[1292] = 1.062;
   gas_4point5Gyr_1300K_100core_mass[2154] = 1.063;
   gas_4point5Gyr_1300K_100core_mass[3594] = 1.032;
-  
+
   gas_4point5Gyr_875K_0core_mass[0] = 0.0;
   gas_4point5Gyr_875K_0core_mass[17] = 1.068;
   gas_4point5Gyr_875K_0core_mass[28] = 1.027;
@@ -796,7 +795,7 @@ void initRadii()
   gas_4point5Gyr_875K_0core_mass[1292] = 1.104;
   gas_4point5Gyr_875K_0core_mass[2154] = 1.084;
   gas_4point5Gyr_875K_0core_mass[3594] = 1.038;
-  
+
   gas_4point5Gyr_875K_10core_mass[17] = 0.592;
   gas_4point5Gyr_875K_10core_mass[28] = 0.755;
   gas_4point5Gyr_875K_10core_mass[46] = 0.858;
@@ -809,7 +808,7 @@ void initRadii()
   gas_4point5Gyr_875K_10core_mass[1292] = 1.098;
   gas_4point5Gyr_875K_10core_mass[2154] = 1.08;
   gas_4point5Gyr_875K_10core_mass[3594] = 1.036;
-  
+
   gas_4point5Gyr_875K_25core_mass[28] = 0.404;
   gas_4point5Gyr_875K_25core_mass[46] = 0.675;
   gas_4point5Gyr_875K_25core_mass[77] = 0.829;
@@ -821,7 +820,7 @@ void initRadii()
   gas_4point5Gyr_875K_25core_mass[1292] = 1.09;
   gas_4point5Gyr_875K_25core_mass[2154] = 1.075;
   gas_4point5Gyr_875K_25core_mass[3594] = 1.033;
-  
+
   gas_4point5Gyr_875K_50core_mass[77] = 0.639;
   gas_4point5Gyr_875K_50core_mass[129] = 0.817;
   gas_4point5Gyr_875K_50core_mass[215] = 0.928;
@@ -831,7 +830,7 @@ void initRadii()
   gas_4point5Gyr_875K_50core_mass[1292] = 1.076;
   gas_4point5Gyr_875K_50core_mass[2154] = 1.066;
   gas_4point5Gyr_875K_50core_mass[3594] = 1.027;
-  
+
   gas_4point5Gyr_875K_100core_mass[129] = 0.582;
   gas_4point5Gyr_875K_100core_mass[215] = 0.788;
   gas_4point5Gyr_875K_100core_mass[318] = 0.884;
@@ -840,7 +839,7 @@ void initRadii()
   gas_4point5Gyr_875K_100core_mass[1292] = 1.049;
   gas_4point5Gyr_875K_100core_mass[2154] = 1.049;
   gas_4point5Gyr_875K_100core_mass[3594] = 1.018;
-  
+
   gas_4point5Gyr_260K_0core_mass[0] = 0.0;
   gas_4point5Gyr_260K_0core_mass[17] = 1.014;
   gas_4point5Gyr_260K_0core_mass[28] = 0.993;
@@ -854,7 +853,7 @@ void initRadii()
   gas_4point5Gyr_260K_0core_mass[1292] = 1.096;
   gas_4point5Gyr_260K_0core_mass[2154] = 1.075;
   gas_4point5Gyr_260K_0core_mass[3594] = 1.03;
-  
+
   gas_4point5Gyr_260K_10core_mass[17] = 0.576;
   gas_4point5Gyr_260K_10core_mass[28] = 0.738;
   gas_4point5Gyr_260K_10core_mass[46] = 0.845;
@@ -867,7 +866,7 @@ void initRadii()
   gas_4point5Gyr_260K_10core_mass[1292] = 1.09;
   gas_4point5Gyr_260K_10core_mass[2154] = 1.072;
   gas_4point5Gyr_260K_10core_mass[3594] = 1.028;
-  
+
   gas_4point5Gyr_260K_25core_mass[28] = 0.4;
   gas_4point5Gyr_260K_25core_mass[46] = 0.666;
   gas_4point5Gyr_260K_25core_mass[77] = 0.82;
@@ -879,7 +878,7 @@ void initRadii()
   gas_4point5Gyr_260K_25core_mass[1292] = 1.082;
   gas_4point5Gyr_260K_25core_mass[2154] = 1.067;
   gas_4point5Gyr_260K_25core_mass[3594] = 1.025;
-  
+
   gas_4point5Gyr_260K_50core_mass[77] = 0.633;
   gas_4point5Gyr_260K_50core_mass[129] = 0.81;
   gas_4point5Gyr_260K_50core_mass[215] = 0.92;
@@ -889,7 +888,7 @@ void initRadii()
   gas_4point5Gyr_260K_50core_mass[1292] = 1.068;
   gas_4point5Gyr_260K_50core_mass[2154] = 1.058;
   gas_4point5Gyr_260K_50core_mass[3594] = 1.02;
-  
+
   gas_4point5Gyr_260K_100core_mass[129] = 0.578;
   gas_4point5Gyr_260K_100core_mass[215] = 0.782;
   gas_4point5Gyr_260K_100core_mass[318] = 0.878;
@@ -898,7 +897,7 @@ void initRadii()
   gas_4point5Gyr_260K_100core_mass[1292] = 1.041;
   gas_4point5Gyr_260K_100core_mass[2154] = 1.041;
   gas_4point5Gyr_260K_100core_mass[3594] = 1.01;
-  
+
   gas_4point5Gyr_78K_0core_mass[0] = 0.0;
   gas_4point5Gyr_78K_0core_mass[17] = 0.798;
   gas_4point5Gyr_78K_0core_mass[28] = 0.827;
@@ -912,7 +911,7 @@ void initRadii()
   gas_4point5Gyr_78K_0core_mass[1292] = 1.062;
   gas_4point5Gyr_78K_0core_mass[2154] = 1.055;
   gas_4point5Gyr_78K_0core_mass[3594] = 1.023;
-  
+
   gas_4point5Gyr_78K_10core_mass[17] = 0.508;
   gas_4point5Gyr_78K_10core_mass[28] = 0.653;
   gas_4point5Gyr_78K_10core_mass[46] = 0.759;
@@ -925,7 +924,7 @@ void initRadii()
   gas_4point5Gyr_78K_10core_mass[1292] = 1.057;
   gas_4point5Gyr_78K_10core_mass[2154] = 1.052;
   gas_4point5Gyr_78K_10core_mass[3594] = 1.021;
-  
+
   gas_4point5Gyr_78K_25core_mass[28] = 0.378;
   gas_4point5Gyr_78K_25core_mass[46] = 0.611;
   gas_4point5Gyr_78K_25core_mass[77] = 0.75;
@@ -937,7 +936,7 @@ void initRadii()
   gas_4point5Gyr_78K_25core_mass[1292] = 1.05;
   gas_4point5Gyr_78K_25core_mass[2154] = 1.047;
   gas_4point5Gyr_78K_25core_mass[3594] = 1.018;
-  
+
   gas_4point5Gyr_78K_50core_mass[77] = 0.594;
   gas_4point5Gyr_78K_50core_mass[129] = 0.754;
   gas_4point5Gyr_78K_50core_mass[215] = 0.865;
@@ -947,7 +946,7 @@ void initRadii()
   gas_4point5Gyr_78K_50core_mass[1292] = 1.037;
   gas_4point5Gyr_78K_50core_mass[2154] = 1.039;
   gas_4point5Gyr_78K_50core_mass[3594] = 1.013;
-  
+
   gas_4point5Gyr_78K_100core_mass[129] = 0.558;
   gas_4point5Gyr_78K_100core_mass[215] = 0.746;
   gas_4point5Gyr_78K_100core_mass[318] = 0.842;
@@ -956,7 +955,7 @@ void initRadii()
   gas_4point5Gyr_78K_100core_mass[1292] = 1.012;
   gas_4point5Gyr_78K_100core_mass[2154] = 1.023;
   gas_4point5Gyr_78K_100core_mass[3594] = 1.004;
-  
+
   solid_water[0.04663] = 0.58;
   solid_water[0.06174] = 0.63;
   solid_water[0.08208] = 0.6853;
@@ -1006,7 +1005,7 @@ void initRadii()
   solid_water[390.1] = 4.639;
   solid_water[435.9] = 4.656;
   solid_water[486.4] = 4.669;
-  
+
   solid_one_quater_rock_three_fourths_water[0.01217] = 0.3616;
   solid_one_quater_rock_three_fourths_water[0.01699] = 0.4009;
   solid_one_quater_rock_three_fourths_water[0.02351] = 0.4432;
@@ -1056,7 +1055,7 @@ void initRadii()
   solid_one_quater_rock_three_fourths_water[266.8] = 4.265;
   solid_one_quater_rock_three_fourths_water[297.9] = 4.288;
   solid_one_quater_rock_three_fourths_water[332.1] = 4.307;
-  
+
   solid_half_rock_half_water[0.008278] = 0.2963;
   solid_half_rock_half_water[0.01156] = 0.3286;
   solid_half_rock_half_water[0.01615] = 0.3647;
@@ -1106,7 +1105,7 @@ void initRadii()
   solid_half_rock_half_water[227.7] = 3.959;
   solid_half_rock_half_water[254.2] = 3.983;
   solid_half_rock_half_water[283.3] = 4.002;
-  
+
   solid_rock[0.00623] = 0.2029;
   solid_rock[0.008748] = 0.227;
   solid_rock[0.01227] = 0.254;
@@ -1156,7 +1155,7 @@ void initRadii()
   solid_rock[199.2] = 3.255;
   solid_rock[222.5] = 3.274;
   solid_rock[248.1] = 3.288;
-  
+
   solid_half_rock_half_iron[0.00177] = 0.121;
   solid_half_rock_half_iron[0.002481] = 0.1354;
   solid_half_rock_half_iron[0.003472] = 0.1513;
@@ -1206,7 +1205,7 @@ void initRadii()
   solid_half_rock_half_iron[116.5] = 2.745;
   solid_half_rock_half_iron[133.8] = 2.789;
   solid_half_rock_half_iron[153.1] = 2.829;
-  
+
   solid_iron[0.001496] = 0.09947;
   solid_iron[0.002096] = 0.1112;
   solid_iron[0.002931] = 0.1243;
@@ -1256,133 +1255,133 @@ void initRadii()
   solid_iron[99.8] = 2.183;
   solid_iron[115.0] = 2.226;
   solid_iron[132.1] = 2.266;
-  
-  solid_0point953_iron_0point047_water[0.1] = 0.4226; 
-  solid_0point953_iron_0point047_water[0.1259] = 0.4536; 
-  solid_0point953_iron_0point047_water[0.1585] = 0.4867; 
-  solid_0point953_iron_0point047_water[0.1995] = 0.522; 
-  solid_0point953_iron_0point047_water[0.2512] = 0.5594; 
-  solid_0point953_iron_0point047_water[0.3162] = 0.5992; 
-  solid_0point953_iron_0point047_water[0.3981] = 0.6414; 
-  solid_0point953_iron_0point047_water[0.5012] = 0.6861; 
-  solid_0point953_iron_0point047_water[0.631] = 0.7334; 
-  solid_0point953_iron_0point047_water[0.7943] = 0.7833; 
-  solid_0point953_iron_0point047_water[1.0] = 	0.836; 
-  solid_0point953_iron_0point047_water[1.122] = 0.8634; 
-  solid_0point953_iron_0point047_water[1.259] = 0.8915; 
-  solid_0point953_iron_0point047_water[1.413] = 0.9203; 
-  solid_0point953_iron_0point047_water[1.585] = 0.9499; 
-  solid_0point953_iron_0point047_water[1.778] = 0.9802; 
-  solid_0point953_iron_0point047_water[1.995] = 1.011; 
-  solid_0point953_iron_0point047_water[2.239] = 1.043; 
-  solid_0point953_iron_0point047_water[2.512] = 1.076; 
-  solid_0point953_iron_0point047_water[2.818] = 1.109; 
-  solid_0point953_iron_0point047_water[3.162] = 1.143; 
-  solid_0point953_iron_0point047_water[3.548] = 1.178; 
-  solid_0point953_iron_0point047_water[3.981] = 1.214; 
-  solid_0point953_iron_0point047_water[4.467] = 1.25; 
-  solid_0point953_iron_0point047_water[5.012] = 1.287; 
-  solid_0point953_iron_0point047_water[5.623] = 1.325; 
-  solid_0point953_iron_0point047_water[6.31] = 1.353; 
-  solid_0point953_iron_0point047_water[7.079] = 1.402; 
-  solid_0point953_iron_0point047_water[7.943] = 1.442; 
-  solid_0point953_iron_0point047_water[8.913] = 1.483; 
-  solid_0point953_iron_0point047_water[10.0] = 1.524; 
-  solid_0point953_iron_0point047_water[12.59] = 1.607; 
-  solid_0point953_iron_0point047_water[15.85] = 1.693; 
-  solid_0point953_iron_0point047_water[19.95] = 1.78; 
-  solid_0point953_iron_0point047_water[25.12] = 1.868; 
-  solid_0point953_iron_0point047_water[31.62] = 1.956; 
-  solid_0point953_iron_0point047_water[39.81] = 2.043; 
-  solid_0point953_iron_0point047_water[50.12] = 2.13; 
-  solid_0point953_iron_0point047_water[63.1] = 2.215; 
-  solid_0point953_iron_0point047_water[79.43] = 2.297; 
+
+  solid_0point953_iron_0point047_water[0.1] = 0.4226;
+  solid_0point953_iron_0point047_water[0.1259] = 0.4536;
+  solid_0point953_iron_0point047_water[0.1585] = 0.4867;
+  solid_0point953_iron_0point047_water[0.1995] = 0.522;
+  solid_0point953_iron_0point047_water[0.2512] = 0.5594;
+  solid_0point953_iron_0point047_water[0.3162] = 0.5992;
+  solid_0point953_iron_0point047_water[0.3981] = 0.6414;
+  solid_0point953_iron_0point047_water[0.5012] = 0.6861;
+  solid_0point953_iron_0point047_water[0.631] = 0.7334;
+  solid_0point953_iron_0point047_water[0.7943] = 0.7833;
+  solid_0point953_iron_0point047_water[1.0] = 0.836;
+  solid_0point953_iron_0point047_water[1.122] = 0.8634;
+  solid_0point953_iron_0point047_water[1.259] = 0.8915;
+  solid_0point953_iron_0point047_water[1.413] = 0.9203;
+  solid_0point953_iron_0point047_water[1.585] = 0.9499;
+  solid_0point953_iron_0point047_water[1.778] = 0.9802;
+  solid_0point953_iron_0point047_water[1.995] = 1.011;
+  solid_0point953_iron_0point047_water[2.239] = 1.043;
+  solid_0point953_iron_0point047_water[2.512] = 1.076;
+  solid_0point953_iron_0point047_water[2.818] = 1.109;
+  solid_0point953_iron_0point047_water[3.162] = 1.143;
+  solid_0point953_iron_0point047_water[3.548] = 1.178;
+  solid_0point953_iron_0point047_water[3.981] = 1.214;
+  solid_0point953_iron_0point047_water[4.467] = 1.25;
+  solid_0point953_iron_0point047_water[5.012] = 1.287;
+  solid_0point953_iron_0point047_water[5.623] = 1.325;
+  solid_0point953_iron_0point047_water[6.31] = 1.353;
+  solid_0point953_iron_0point047_water[7.079] = 1.402;
+  solid_0point953_iron_0point047_water[7.943] = 1.442;
+  solid_0point953_iron_0point047_water[8.913] = 1.483;
+  solid_0point953_iron_0point047_water[10.0] = 1.524;
+  solid_0point953_iron_0point047_water[12.59] = 1.607;
+  solid_0point953_iron_0point047_water[15.85] = 1.693;
+  solid_0point953_iron_0point047_water[19.95] = 1.78;
+  solid_0point953_iron_0point047_water[25.12] = 1.868;
+  solid_0point953_iron_0point047_water[31.62] = 1.956;
+  solid_0point953_iron_0point047_water[39.81] = 2.043;
+  solid_0point953_iron_0point047_water[50.12] = 2.13;
+  solid_0point953_iron_0point047_water[63.1] = 2.215;
+  solid_0point953_iron_0point047_water[79.43] = 2.297;
   solid_0point953_iron_0point047_water[100.0] = 2.376;
-  
-  solid_0point51_iron_0point49_water[0.1] = 0.5915; 
-  solid_0point51_iron_0point49_water[0.1259] = 0.6338; 
-  solid_0point51_iron_0point49_water[0.1585] = 0.679; 
-  solid_0point51_iron_0point49_water[0.1995] = 0.7271; 
-  solid_0point51_iron_0point49_water[0.2512] = 0.7784; 
-  solid_0point51_iron_0point49_water[0.3162] = 0.8328; 
-  solid_0point51_iron_0point49_water[0.3981] = 0.8905; 
-  solid_0point51_iron_0point49_water[0.5012] = 0.9516; 
-  solid_0point51_iron_0point49_water[0.631] = 1.016; 
-  solid_0point51_iron_0point49_water[0.7943] = 1.084; 
-  solid_0point51_iron_0point49_water[1.0] = 1.156; 
-  solid_0point51_iron_0point49_water[1.122] = 1.194; 
-  solid_0point51_iron_0point49_water[1.259] = 1.232; 
-  solid_0point51_iron_0point49_water[1.413] = 1.272; 
-  solid_0point51_iron_0point49_water[1.585] = 1.312; 
-  solid_0point51_iron_0point49_water[1.778] = 1.354; 
-  solid_0point51_iron_0point49_water[1.995] = 1.397; 
-  solid_0point51_iron_0point49_water[2.239] = 1.441; 
-  solid_0point51_iron_0point49_water[2.512] = 1.486; 
-  solid_0point51_iron_0point49_water[2.818] = 1.533; 
-  solid_0point51_iron_0point49_water[3.162] = 1.581; 
-  solid_0point51_iron_0point49_water[3.548] = 1.629; 
-  solid_0point51_iron_0point49_water[3.981] = 1.679; 
-  solid_0point51_iron_0point49_water[4.467] = 1.731; 
-  solid_0point51_iron_0point49_water[5.012] = 1.783; 
-  solid_0point51_iron_0point49_water[5.623] = 1.836; 
-  solid_0point51_iron_0point49_water[6.31] = 1.89; 
-  solid_0point51_iron_0point49_water[7.079] = 1.946; 
-  solid_0point51_iron_0point49_water[7.943] = 2.002; 
-  solid_0point51_iron_0point49_water[8.913] = 2.059; 
-  solid_0point51_iron_0point49_water[10.0] = 2.118; 
-  solid_0point51_iron_0point49_water[12.59] = 2.237; 
-  solid_0point51_iron_0point49_water[15.85] = 2.359; 
-  solid_0point51_iron_0point49_water[19.95] = 2.483; 
+
+  solid_0point51_iron_0point49_water[0.1] = 0.5915;
+  solid_0point51_iron_0point49_water[0.1259] = 0.6338;
+  solid_0point51_iron_0point49_water[0.1585] = 0.679;
+  solid_0point51_iron_0point49_water[0.1995] = 0.7271;
+  solid_0point51_iron_0point49_water[0.2512] = 0.7784;
+  solid_0point51_iron_0point49_water[0.3162] = 0.8328;
+  solid_0point51_iron_0point49_water[0.3981] = 0.8905;
+  solid_0point51_iron_0point49_water[0.5012] = 0.9516;
+  solid_0point51_iron_0point49_water[0.631] = 1.016;
+  solid_0point51_iron_0point49_water[0.7943] = 1.084;
+  solid_0point51_iron_0point49_water[1.0] = 1.156;
+  solid_0point51_iron_0point49_water[1.122] = 1.194;
+  solid_0point51_iron_0point49_water[1.259] = 1.232;
+  solid_0point51_iron_0point49_water[1.413] = 1.272;
+  solid_0point51_iron_0point49_water[1.585] = 1.312;
+  solid_0point51_iron_0point49_water[1.778] = 1.354;
+  solid_0point51_iron_0point49_water[1.995] = 1.397;
+  solid_0point51_iron_0point49_water[2.239] = 1.441;
+  solid_0point51_iron_0point49_water[2.512] = 1.486;
+  solid_0point51_iron_0point49_water[2.818] = 1.533;
+  solid_0point51_iron_0point49_water[3.162] = 1.581;
+  solid_0point51_iron_0point49_water[3.548] = 1.629;
+  solid_0point51_iron_0point49_water[3.981] = 1.679;
+  solid_0point51_iron_0point49_water[4.467] = 1.731;
+  solid_0point51_iron_0point49_water[5.012] = 1.783;
+  solid_0point51_iron_0point49_water[5.623] = 1.836;
+  solid_0point51_iron_0point49_water[6.31] = 1.89;
+  solid_0point51_iron_0point49_water[7.079] = 1.946;
+  solid_0point51_iron_0point49_water[7.943] = 2.002;
+  solid_0point51_iron_0point49_water[8.913] = 2.059;
+  solid_0point51_iron_0point49_water[10.0] = 2.118;
+  solid_0point51_iron_0point49_water[12.59] = 2.237;
+  solid_0point51_iron_0point49_water[15.85] = 2.359;
+  solid_0point51_iron_0point49_water[19.95] = 2.483;
   solid_0point51_iron_0point49_water[25.12] = 2.608;
-  solid_0point51_iron_0point49_water[31.62] = 2.733; 
-  solid_0point51_iron_0point49_water[39.81] = 2.858; 
-  solid_0point51_iron_0point49_water[50.12] = 2.982; 
-  solid_0point51_iron_0point49_water[63.1] = 3.104; 
-  solid_0point51_iron_0point49_water[79.43] = 3.222; 
-  solid_0point51_iron_0point49_water[100.0] = 3.335; 
-  
-  solid_0point264_iron_0point736_water[0.1] = 0.6591; 
-  solid_0point264_iron_0point736_water[0.1259] = 0.7059; 
-  solid_0point264_iron_0point736_water[0.1585] = 0.7559; 
-  solid_0point264_iron_0point736_water[0.1995] = 0.8092; 
-  solid_0point264_iron_0point736_water[0.2512] = 0.8659; 
-  solid_0point264_iron_0point736_water[0.3162] = 0.9262; 
-  solid_0point264_iron_0point736_water[0.3981] = 0.9902; 
-  solid_0point264_iron_0point736_water[0.5012] = 1.058; 
-  solid_0point264_iron_0point736_water[0.631] = 1.129; 
-  solid_0point264_iron_0point736_water[0.7943] = 1.205; 
-  solid_0point264_iron_0point736_water[1.0] = 1.284; 
-  solid_0point264_iron_0point736_water[1.122] = 1.326; 
-  solid_0point264_iron_0point736_water[1.259] = 1.368; 
-  solid_0point264_iron_0point736_water[1.413] = 1.412; 
-  solid_0point264_iron_0point736_water[1.585] = 1.457; 
-  solid_0point264_iron_0point736_water[1.778] = 1.504; 
-  solid_0point264_iron_0point736_water[1.995] = 1.551; 
-  solid_0point264_iron_0point736_water[2.239] = 1.6; 
-  solid_0point264_iron_0point736_water[2.512] = 1.651; 
-  solid_0point264_iron_0point736_water[2.818] = 1.702; 
-  solid_0point264_iron_0point736_water[3.162] = 1.756; 
-  solid_0point264_iron_0point736_water[3.548] = 1.81; 
-  solid_0point264_iron_0point736_water[3.981] = 1.866; 
-  solid_0point264_iron_0point736_water[4.467] = 1.923; 
-  solid_0point264_iron_0point736_water[5.012] = 1.981; 
-  solid_0point264_iron_0point736_water[5.623] = 2.041; 
-  solid_0point264_iron_0point736_water[6.31] = 2.101; 
-  solid_0point264_iron_0point736_water[7.079] = 2.163; 
-  solid_0point264_iron_0point736_water[7.943] = 2.226; 
-  solid_0point264_iron_0point736_water[8.913] = 2.29; 
-  solid_0point264_iron_0point736_water[10.0] = 2.355; 
-  solid_0point264_iron_0point736_water[12.59] = 2.489; 
-  solid_0point264_iron_0point736_water[15.85] = 2.625; 
-  solid_0point264_iron_0point736_water[19.95] = 2.764; 
-  solid_0point264_iron_0point736_water[25.12] = 2.904; 
-  solid_0point264_iron_0point736_water[31.62] = 3.044; 
-  solid_0point264_iron_0point736_water[39.81] = 3.184; 
-  solid_0point264_iron_0point736_water[50.12] = 3.322; 
-  solid_0point264_iron_0point736_water[63.1] = 3.459; 
-  solid_0point264_iron_0point736_water[79.43] = 3.592; 
+  solid_0point51_iron_0point49_water[31.62] = 2.733;
+  solid_0point51_iron_0point49_water[39.81] = 2.858;
+  solid_0point51_iron_0point49_water[50.12] = 2.982;
+  solid_0point51_iron_0point49_water[63.1] = 3.104;
+  solid_0point51_iron_0point49_water[79.43] = 3.222;
+  solid_0point51_iron_0point49_water[100.0] = 3.335;
+
+  solid_0point264_iron_0point736_water[0.1] = 0.6591;
+  solid_0point264_iron_0point736_water[0.1259] = 0.7059;
+  solid_0point264_iron_0point736_water[0.1585] = 0.7559;
+  solid_0point264_iron_0point736_water[0.1995] = 0.8092;
+  solid_0point264_iron_0point736_water[0.2512] = 0.8659;
+  solid_0point264_iron_0point736_water[0.3162] = 0.9262;
+  solid_0point264_iron_0point736_water[0.3981] = 0.9902;
+  solid_0point264_iron_0point736_water[0.5012] = 1.058;
+  solid_0point264_iron_0point736_water[0.631] = 1.129;
+  solid_0point264_iron_0point736_water[0.7943] = 1.205;
+  solid_0point264_iron_0point736_water[1.0] = 1.284;
+  solid_0point264_iron_0point736_water[1.122] = 1.326;
+  solid_0point264_iron_0point736_water[1.259] = 1.368;
+  solid_0point264_iron_0point736_water[1.413] = 1.412;
+  solid_0point264_iron_0point736_water[1.585] = 1.457;
+  solid_0point264_iron_0point736_water[1.778] = 1.504;
+  solid_0point264_iron_0point736_water[1.995] = 1.551;
+  solid_0point264_iron_0point736_water[2.239] = 1.6;
+  solid_0point264_iron_0point736_water[2.512] = 1.651;
+  solid_0point264_iron_0point736_water[2.818] = 1.702;
+  solid_0point264_iron_0point736_water[3.162] = 1.756;
+  solid_0point264_iron_0point736_water[3.548] = 1.81;
+  solid_0point264_iron_0point736_water[3.981] = 1.866;
+  solid_0point264_iron_0point736_water[4.467] = 1.923;
+  solid_0point264_iron_0point736_water[5.012] = 1.981;
+  solid_0point264_iron_0point736_water[5.623] = 2.041;
+  solid_0point264_iron_0point736_water[6.31] = 2.101;
+  solid_0point264_iron_0point736_water[7.079] = 2.163;
+  solid_0point264_iron_0point736_water[7.943] = 2.226;
+  solid_0point264_iron_0point736_water[8.913] = 2.29;
+  solid_0point264_iron_0point736_water[10.0] = 2.355;
+  solid_0point264_iron_0point736_water[12.59] = 2.489;
+  solid_0point264_iron_0point736_water[15.85] = 2.625;
+  solid_0point264_iron_0point736_water[19.95] = 2.764;
+  solid_0point264_iron_0point736_water[25.12] = 2.904;
+  solid_0point264_iron_0point736_water[31.62] = 3.044;
+  solid_0point264_iron_0point736_water[39.81] = 3.184;
+  solid_0point264_iron_0point736_water[50.12] = 3.322;
+  solid_0point264_iron_0point736_water[63.1] = 3.459;
+  solid_0point264_iron_0point736_water[79.43] = 3.592;
   solid_0point264_iron_0point736_water[100.0] = 3.718;
-  
+
   earth_like[0.01] = 0.24;
   earth_like[0.032] = 0.34;
   earth_like[0.1] = 0.5;

@@ -35,7 +35,7 @@ extern planet *mars;
 extern planet *earth;
 extern planet *venus;
 extern planet *mercury;
-  
+
 extern planet *eriEpsI;
 extern planet *UMa47III;
 extern planet *UMa47II;
