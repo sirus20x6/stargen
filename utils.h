@@ -18,50 +18,50 @@ extern long jseed;
 extern long ifrst;
 extern long nextn;
 
-bool compare_string_char(string& a_string, int place, const char *a_character, int length = 1);
+auto compare_string_char(string& a_string, int place, const char *a_character, int length = 1) -> bool;
 //string replaceStrChar(string, const char *, const char *);
-char *my_itoa(int, char *, int);
-string float_to_string(long double);
-long double random_number(long double, long double);
-long double about(long double, long double);
-long double random_eccentricity(long double);
-long double gaussian(long double);
-long poisson(long double);
-long double exponential(long double);
-long double quad_trend(long double, long double, long double, long double);
-long double ln_trend(long double, long double, long double);
-long double logistal_trend(long double, long double, long double, long double);
-bool polynomialfit(int, int, double *, double *, double *);
-long double soft(long double, long double, long double);
-long double lim(long double);
-string remove_spaces(string);
-double randf();
+auto my_itoa(int, char *, int) -> char *;
+auto float_to_string(long double) -> string;
+auto random_number(long double, long double) -> long double;
+auto about(long double, long double) -> long double;
+auto random_eccentricity(long double) -> long double;
+auto gaussian(long double) -> long double;
+auto poisson(long double) -> long;
+auto exponential(long double) -> long double;
+auto quad_trend(long double, long double, long double, long double) -> long double;
+auto ln_trend(long double, long double, long double) -> long double;
+auto logistal_trend(long double, long double, long double, long double) -> long double;
+auto polynomialfit(int, int, double *, double *, double *) -> bool;
+auto soft(long double, long double, long double) -> long double;
+auto lim(long double) -> long double;
+auto remove_spaces(string) -> string;
+auto randf() -> double;
 void srandf(long);
-long double fix_inclination(long double);
-long double linear_trend(long double, long double, long double);
-string my_strtoupper(const string&);
-int star_type_to_num(const string& spec_type, long double luminosity, int run = 1);
+auto fix_inclination(long double) -> long double;
+auto linear_trend(long double, long double, long double) -> long double;
+auto my_strtoupper(const string&) -> string;
+auto star_type_to_num(const string& spec_type, long double luminosity, int run = 1) -> int;
 void logfix(long double, long double, long double, long double, long double &, long double &);
-long double rangeAdjust(long double, long double, long double, long double, long double);
+auto rangeAdjust(long double, long double, long double, long double, long double) -> long double;
 void e_fix(long double, long double, long double, long double, long double &, long double &);
-long double e_trend(long double, long double, long double);
+auto e_trend(long double, long double, long double) -> long double;
 void quadfix(long double, long double, long double, long double, long double, long double, long double &, long double &, long double &);
-long double quintic_trend(long double, long double, long double, long double, long double, long double, long double);
+auto quintic_trend(long double, long double, long double, long double, long double, long double, long double) -> long double;
 
 template <typename T>
-string toString(T val, int decimals = 0);
+auto toString(T val, int decimals = 0) -> string;
 
 template <typename T>
-size_t getNumDecimals(T);
+auto getNumDecimals(T) -> size_t;
 
 template <typename T>
-string replaceStrChar(string, T, T);
+auto replaceStrChar(string, T, T) -> string;
 
 template <typename T>
 void quicksort(vector<T>&, int, int);
 
 template <typename T>
-bool is_close(T a, T b, long double percent = 1);
+auto is_close(T a, T b, long double percent = 1) -> bool;
 
 template <typename T>
 void writeVector(vector<T>& v, const string& separator = "  ");
@@ -72,7 +72,7 @@ template <typename Key, typename T>
 void writeMap(const map<Key,T>& m, const string& separator = "\n");
 
 template <typename T>
-string toString(T val, int decimals)
+auto toString(T val, int decimals) -> string
 {
   stringstream ss;
   string output;
@@ -107,7 +107,7 @@ string toString(T val, int decimals)
 }
 
 template <typename T>
-size_t getNumDecimals(T val)
+auto getNumDecimals(T val) -> size_t
 {
   if (isnan(val))
   {
@@ -143,7 +143,7 @@ size_t getNumDecimals(T val)
 // stuff below this point are algoritms taken from "Data Structors With C++ Using STL (second edition)" by William Ford and William Topp
 // I had to put these here because due to a bug in gcc/g++, they can't be in a .c or .cpp file... *grumble*
 template <typename T>
-int pivotIndex(vector<T>& v, int first, int last)
+auto pivotIndex(vector<T>& v, int first, int last) -> int
 {
   // index for the midpoint of [first,last) and the
   // indices that scan the index range in tandem
@@ -273,14 +273,14 @@ void quicksort(vector<T>& v, int first, int last)
 }
 
 template <typename T>
-string replaceStrChar(string str, T old, T the_new)
+auto replaceStrChar(string str, T old, T the_new) -> string
 {
   replace(str.begin(), str.end(), old, the_new);
   return str;
 }
 
 template <typename T>
-bool is_close(T a, T b, long double percent)
+auto is_close(T a, T b, long double percent) -> bool
 {
   long double decimal = percent / (long double)100;
   long double range = b * decimal;

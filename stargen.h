@@ -51,14 +51,14 @@ using namespace std;
 #define	gfGIF				'.GIF'
 #define gfSVG				'.SVG'
 
-typedef	enum actions {						// Callable StarGen can:
+using actions = enum actions {						// Callable StarGen can:
   aGenerate,								//	- Generate randon system(s)
   aListGases,								//	- List the gas table
   aListCatalog,							//	- List the stars in a catalog
   aListCatalogAsHTML,						//  - For creating a <FORM>
   aSizeCheck,								//  - List sizes of various types
   aListVerbosity,							//  - List values of the -v option
-} actions;
+};
 
 extern int flags_arg_clone;
 extern sun the_sun_clone;
@@ -130,7 +130,7 @@ void init();
 void generate_planet(planet *, int, sun &, bool, string, bool, bool, bool, long double);
 void generate_planets(sun &, bool, string, int, string, bool, bool);
 void generate_stellar_system(sun &, bool, planet *, string, int, string, long double, long double, long double, long double, bool, bool);
-int stargen(actions, string, string, string, string, string, string, long double, long double, long, int, int, catalog&, int, long double, long double, long double, int, int, int);
+auto stargen(actions, string, string, string, string, string, string, long double, long double, long, int, int, catalog&, int, long double, long double, long double, int, int, int) -> int;
 void check_planet(planet *, string, bool);
 void assign_type(sun &, planet *, string, bool, bool, bool);
 #endif

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-typedef enum planet_type
+using planet_type = enum planet_type
 {
   tUnknown,
   tRock,
@@ -27,11 +27,10 @@ typedef enum planet_type
   tIron,
   tCarbon,
   tOil
-}
-planet_type;
+};
 
 class gas;
-ostream &operator<<(ostream &, gas &);
+auto operator<<(ostream &, gas &) -> ostream &;
 
 class gas
 {
@@ -41,12 +40,12 @@ private:
 public:
   gas();
   void setNum(int);
-  int getNum();
+  auto getNum() -> int;
   void setSurfPressure(long double);
-  long double getSurfPressure();
-  bool operator<(gas &);
-  bool operator==(gas &);
-  friend ostream &operator<<(ostream &, gas &);
+  auto getSurfPressure() -> long double;
+  auto operator<(gas &) -> bool;
+  auto operator==(gas &) -> bool;
+  friend auto operator<<(ostream &, gas &) -> ostream &;
 };
 
 class sun
@@ -72,38 +71,38 @@ public:
   sun(sun &);
   sun(const sun&);
   void setLuminosity(long double);
-  long double getLuminosity();
+  auto getLuminosity() -> long double;
   void setMass(long double);
-  long double getMass();
+  auto getMass() -> long double;
   void setEffTemp(long double);
-  long double getEffTemp();
+  auto getEffTemp() -> long double;
   void setSpecType(string);
-  string getSpecType();
-  long double getLife();
+  auto getSpecType() -> string;
+  auto getLife() -> long double;
   void setAge(long double);
-  long double getAge();
+  auto getAge() -> long double;
   void setName(string);
-  string getName();
-  long double getREcosphere(long double);
+  auto getName() -> string;
+  auto getREcosphere(long double) -> long double;
   void setIsCircumbinary(bool);
-  bool getIsCircumbinary();
+  auto getIsCircumbinary() -> bool;
   void setSecondaryMass(long double);
-  long double getSecondaryMass();
+  auto getSecondaryMass() -> long double;
   void setSecondaryLuminosity(long double);
-  long double getSecondaryLuminosity();
+  auto getSecondaryLuminosity() -> long double;
   void setSecondaryEffTemp(long double);
-  long double getSecondaryEffTemp();
+  auto getSecondaryEffTemp() -> long double;
   void setSecondarySpecType(string);
-  string getSecondarySpecType();
-  long double getCombinedLuminosity();
-  long double getCombinedMass();
+  auto getSecondarySpecType() -> string;
+  auto getCombinedLuminosity() -> long double;
+  auto getCombinedMass() -> long double;
   void setSeperation(long double);
-  long double getSeperation();
+  auto getSeperation() -> long double;
   void setEccentricity(long double);
-  long double getEccentricity();
-  long double getSecondaryLife();
-  long double getMinStableDistance();
-  long double getCombinedEffTemp();
+  auto getEccentricity() -> long double;
+  auto getSecondaryLife() -> long double;
+  auto getMinStableDistance() -> long double;
+  auto getCombinedEffTemp() -> long double;
   //sun operator=(sun &);
 };
 
@@ -174,131 +173,131 @@ public:
   planet(int, long double, long double, long double, bool, long double, long double, planet*, planet*);
   ~planet();
   void setPlanetNo(int);
-  int getPlanetNo();
+  auto getPlanetNo() -> int;
   void setA(long double);
-  long double getA();
+  auto getA() -> long double;
   void setE(long double);
-  long double getE();
+  auto getE() -> long double;
   void setAxialTilt(long double);
-  long double getAxialTilt();
-  long double getMass();
+  auto getAxialTilt() -> long double;
+  auto getMass() -> long double;
   void setGasGiant(bool);
-  bool getGasGiant();
+  auto getGasGiant() -> bool;
   void setDustMass(long double);
-  long double getDustMass();
+  auto getDustMass() -> long double;
   void setGasMass(long double);
-  long double getGasMass();
+  auto getGasMass() -> long double;
   void setImf(long double);
-  long double getImf();
+  auto getImf() -> long double;
   void setRmf(long double);
-  long double getRmf();
+  auto getRmf() -> long double;
   void setCmf(long double);
-  long double getCmf();
+  auto getCmf() -> long double;
   void setMoonA(long double);
-  long double getMoonA();
+  auto getMoonA() -> long double;
   void setMoonE(long double);
-  long double getMoonE();
+  auto getMoonE() -> long double;
   void setCoreRadius(long double);
-  long double getCoreRadius();
+  auto getCoreRadius() -> long double;
   void setRadius(long double);
-  long double getRadius();
+  auto getRadius() -> long double;
   void setOrbitZone(int);
-  int getOrbitZone();
+  auto getOrbitZone() -> int;
   void setDensity(long double);
-  long double getDensity();
+  auto getDensity() -> long double;
   void setOrbPeriod(long double);
-  long double getOrbPeriod();
+  auto getOrbPeriod() -> long double;
   void setDay(long double);
-  long double getDay();
+  auto getDay() -> long double;
   void setResonantPeriod(bool);
-  bool getResonantPeriod();
+  auto getResonantPeriod() -> bool;
   void setEscVelocity(long double);
-  long double getEscVelocity();
+  auto getEscVelocity() -> long double;
   void setSurfAccel(long double);
-  long double getSurfAccel();
+  auto getSurfAccel() -> long double;
   void setSurfGrav(long double);
-  long double getSurfGrav();
+  auto getSurfGrav() -> long double;
   void setRmsVelocity(long double);
-  long double getRmsVelocity();
+  auto getRmsVelocity() -> long double;
   void setMolecWeight(long double);
-  long double getMolecWeight();
+  auto getMolecWeight() -> long double;
   void setVolatileGasInventory(long double);
-  long double getVolatileGasInventory();
+  auto getVolatileGasInventory() -> long double;
   void setSurfPressure(long double);
-  long double getSurfPressure();
+  auto getSurfPressure() -> long double;
   void setGreenhouseEffect(bool);
-  bool getGreenhouseEffect();
+  auto getGreenhouseEffect() -> bool;
   void setBoilPoint(long double);
-  long double getBoilPoint();
+  auto getBoilPoint() -> long double;
   void setAlbedo(long double);
-  long double getAlbedo();
+  auto getAlbedo() -> long double;
   void setExosphericTemp(long double);
-  long double getExosphericTemp();
+  auto getExosphericTemp() -> long double;
   void setEstimatedTemp(long double);
-  long double getEstimatedTemp();
+  auto getEstimatedTemp() -> long double;
   void setEstimatedTerrTemp(long double);
-  long double getEstimatedTerrTemp();
+  auto getEstimatedTerrTemp() -> long double;
   void setSurfTemp(long double);
-  long double getSurfTemp();
+  auto getSurfTemp() -> long double;
   void setGreenhsRise(long double);
-  long double getGreenhsRise();
+  auto getGreenhsRise() -> long double;
   void setHighTemp(long double);
-  long double getHighTemp();
+  auto getHighTemp() -> long double;
   void setLowTemp(long double);
-  long double getLowTemp();
+  auto getLowTemp() -> long double;
   void setMaxTemp(long double);
-  long double getMaxTemp();
+  auto getMaxTemp() -> long double;
   void setMinTemp(long double);
-  long double getMinTemp();
+  auto getMinTemp() -> long double;
   void setHydrosphere(long double);
-  long double getHydrosphere();
+  auto getHydrosphere() -> long double;
   void setCloudCover(long double);
-  long double getCloudCover();
+  auto getCloudCover() -> long double;
   void setIceCover(long double);
-  long double getIceCover();
+  auto getIceCover() -> long double;
   void setType(planet_type);
-  planet_type getType();
+  auto getType() -> planet_type;
   void setTheSun(sun &);
-  sun &getTheSun();
-  int getNumGases();
+  auto getTheSun() -> sun &;
+  auto getNumGases() -> int;
   void addGas(gas);
-  gas getGas(int);
+  auto getGas(int) -> gas;
   void setMinorMoons(int);
-  int getMinorMoons();
+  auto getMinorMoons() -> int;
   void setInclination(long double);
-  long double getInclination();
+  auto getInclination() -> long double;
   void setAscendingNode(long double);
-  long double getAscendingNode();
+  auto getAscendingNode() -> long double;
   void setLongitudeOfPericenter(long double);
-  long double getLongitudeOfPericenter();
+  auto getLongitudeOfPericenter() -> long double;
   void setMeanLongitude(long double);
-  long double getMeanLongitude();
+  auto getMeanLongitude() -> long double;
   void clearGases();
   void setHzd(long double);
-  long double getHzd();
+  auto getHzd() -> long double;
   void setHzc(long double);
-  long double getHzc();
+  auto getHzc() -> long double;
   void setHza(long double);
-  long double getHza();
+  auto getHza() -> long double;
   void setEsi(long double);
-  long double getEsi();
+  auto getEsi() -> long double;
   void setSph(long double);
-  long double getSph();
+  auto getSph() -> long double;
   void setOblateness(long double);
-  long double getOblateness();
-  long double getEquatrorialRadius();
-  long double getPolarRadius();
+  auto getOblateness() -> long double;
+  auto getEquatrorialRadius() -> long double;
+  auto getPolarRadius() -> long double;
   //void addMoon(planet *);
   //planet *getMoon(int);
   //int getMoonCount();
   //void deleteMoon(int);
   void setDeletable(bool);
-  bool getDeletable();
+  auto getDeletable() -> bool;
   void setKnownRadius(long double);
-  long double getKnownRadius();
+  auto getKnownRadius() -> long double;
   void sortMoons();
-  bool operator<(planet &);
-  bool operator==(planet &);
+  auto operator<(planet &) -> bool;
+  auto operator==(planet &) -> bool;
   planet *first_moon;
   planet *next_planet;
   planet *reconnect_to;
@@ -316,19 +315,19 @@ public:
   dust();
   ~dust();
   void setInnerEdge(long double);
-  long double getInnerEdge();
+  auto getInnerEdge() -> long double;
   void setOuterEdge(long double);
-  long double getOuterEdge();
+  auto getOuterEdge() -> long double;
   void setDustPresent(bool);
-  bool getDustPresent();
+  auto getDustPresent() -> bool;
   void setGasPresent(bool);
-  bool getGasPresent();
+  auto getGasPresent() -> bool;
   dust *next_band;
 };
 
 class star;
 
-ostream &operator<<(ostream &, star &);
+auto operator<<(ostream &, star &) -> ostream &;
 
 class star
 {
@@ -356,47 +355,47 @@ private:
   long double luminosity2;
 public:
   star()
-  {}
+  = default;
   star(long double, long double, long double, string, long double, long double, long double, long double, long double, planet *, string, bool, string);
   star(star &);
   star(const star &);
   star(star2 &);
   ~star();
   void setExtraSpaces(int);
-  string getName();
-  int getExtraSpaces();
-  long double getInc();
-  long double getAn();
-  planet *getKnownPlanets();
-  bool getInCelestia();
-  long double getMass();
-  long double getLuminosity();
-  long double getEffTemp();
-  string getSpecType();
-  string getDesig();
+  auto getName() -> string;
+  auto getExtraSpaces() -> int;
+  auto getInc() -> long double;
+  auto getAn() -> long double;
+  auto getKnownPlanets() -> planet *;
+  auto getInCelestia() -> bool;
+  auto getMass() -> long double;
+  auto getLuminosity() -> long double;
+  auto getEffTemp() -> long double;
+  auto getSpecType() -> string;
+  auto getDesig() -> string;
   void setDistance(long double);
-  long double getDistance();
+  auto getDistance() -> long double;
   void setEccentricity(long double);
-  long double getEccentricity();
+  auto getEccentricity() -> long double;
   void setMass2(long double);
-  long double getMass2();
+  auto getMass2() -> long double;
   void setLuminosity2(long double);
-  long double getLuminosity2();
+  auto getLuminosity2() -> long double;
   void setEffTemp2(long double);
-  long double getEffTemp2();
+  auto getEffTemp2() -> long double;
   void setSpecType2(string);
-  string getSpecType2();
+  auto getSpecType2() -> string;
   void setIsCircumbinary(bool);
-  bool getIsCircumbinary();
-  star operator=(star &);
+  auto getIsCircumbinary() -> bool;
+  auto operator=(star &) -> star;
   //star operator=(const star);
-  bool operator<(star &);
-  bool operator==(star &);
-  friend ostream &operator<<(ostream &, star &);
+  auto operator<(star &) -> bool;
+  auto operator==(star &) -> bool;
+  friend auto operator<<(ostream &, star &) -> ostream &;
 };
 
 class catalog;
-ostream &operator<<(ostream &, catalog &);
+auto operator<<(ostream &, catalog &) -> ostream &;
 
 class catalog
 {
@@ -410,11 +409,11 @@ public:
   ~catalog();
   void setArg(string);
   void addStar(star &);
-  string getArg();
-  int count();
-  star &operator[](const int &);
-  catalog operator=(catalog &);
-  friend ostream &operator<<(ostream &, catalog &);
+  auto getArg() -> string;
+  auto count() -> int;
+  auto operator[](const int &) -> star &;
+  auto operator=(catalog &) -> catalog;
+  friend auto operator<<(ostream &, catalog &) -> ostream &;
   void sort();
 };
 
@@ -429,7 +428,7 @@ public:
 };
 
 class Chemicle;
-ostream &operator<<(ostream &, Chemicle &);
+auto operator<<(ostream &, Chemicle &) -> ostream &;
 
 class Chemicle
 {
@@ -465,38 +464,38 @@ public:
   Chemicle(Chemicle &);
   Chemicle(const Chemicle &);
   ~Chemicle();
-  int getNum();
-  string getSymbol();
-  string getHtmlSymbol();
-  string getName();
-  long double getWeight();
+  auto getNum() -> int;
+  auto getSymbol() -> string;
+  auto getHtmlSymbol() -> string;
+  auto getName() -> string;
+  auto getWeight() -> long double;
   void setMelt(long double);
-  long double getMelt();
+  auto getMelt() -> long double;
   void setBoil(long double);
-  long double getBoil();
-  long double getDensity();
-  long double getPzero();
-  long double getC();
-  long double getN();
+  auto getBoil() -> long double;
+  auto getDensity() -> long double;
+  auto getPzero() -> long double;
+  auto getC() -> long double;
+  auto getN() -> long double;
   void setAbunde(long double);
-  long double getAbunde();
+  auto getAbunde() -> long double;
   void setAbunds(long double);
-  long double getAbunds();
-  long double getReactivity();
+  auto getAbunds() -> long double;
+  auto getReactivity() -> long double;
   void setMaxIpp(long double);
-  long double getMaxIpp();
+  auto getMaxIpp() -> long double;
   void setMinIpp(long double);
-  long double getMinIpp();
-  int getNameSpaces();
-  int getSymbolSpaces();
-  Chemicle operator=(Chemicle &);
-  bool operator<(Chemicle &);
-  bool operator==(Chemicle &);
-  friend ostream &operator<<(ostream &, Chemicle &);
+  auto getMinIpp() -> long double;
+  auto getNameSpaces() -> int;
+  auto getSymbolSpaces() -> int;
+  auto operator=(Chemicle &) -> Chemicle;
+  auto operator<(Chemicle &) -> bool;
+  auto operator==(Chemicle &) -> bool;
+  friend auto operator<<(ostream &, Chemicle &) -> ostream &;
 };
 
 class ChemTable;
-ostream &operator<<(ostream &, ChemTable &);
+auto operator<<(ostream &, ChemTable &) -> ostream &;
 
 class ChemTable
 {
@@ -504,11 +503,11 @@ private:
   vector<Chemicle> chemicles;
 public:
   ChemTable()
-  {}
+  = default;
   void addChemicle(Chemicle);
-  int count();
-  Chemicle &operator[](const int &);
-  friend ostream &operator<<(ostream &, ChemTable &);
+  auto count() -> int;
+  auto operator[](const int &) -> Chemicle &;
+  friend auto operator<<(ostream &, ChemTable &) -> ostream &;
 };
 
 #endif
