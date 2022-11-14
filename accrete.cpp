@@ -1,4 +1,6 @@
 #include "accrete.h"
+
+#include <math.h>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -18,18 +20,18 @@ long double r_outer;
 long double reduced_mass;
 long double dust_density;
 long double cloud_eccentricity;
-dust *dust_head = NULL;
-planet *planet_head = NULL;
-gen *hist_head = NULL;
-planet *seed_moons = NULL;
+dust *dust_head = nullptr;
+planet *planet_head = nullptr;
+gen *hist_head = nullptr;
+planet *seed_moons = nullptr;
 
 void set_initial_conditions(long double inner_limit_of_dust, long double outer_limit_of_dust)
 {
-  planet_head = NULL;
-  hist_head = NULL;
+  planet_head = nullptr;
+  hist_head = nullptr;
   
   dust_head = new dust();
-  dust_head->next_band = NULL;
+  dust_head->next_band = nullptr;
   dust_head->setOuterEdge(outer_limit_of_dust);
   dust_head->setInnerEdge(inner_limit_of_dust);
   dust_head->setDustPresent(true);
@@ -39,7 +41,7 @@ void set_initial_conditions(long double inner_limit_of_dust, long double outer_l
   cloud_eccentricity = 0.2;
   //	cloud_eccentricity = 0.6;
   
-  gen *hist;
+  gen *hist = nullptr;
   hist = new gen();
   hist->dusts = dust_head;
   hist->planets = planet_head;
@@ -47,42 +49,42 @@ void set_initial_conditions(long double inner_limit_of_dust, long double outer_l
   hist_head = hist;
 }
 
-long double stellar_dust_limit(long double stell_mass_ratio)
+auto stellar_dust_limit(long double stell_mass_ratio) -> long double
 {
   return 200.0 * pow(stell_mass_ratio, 1.0 / 3.0);
 }
 
-long double nearest_planet(long double stell_mass_ratio, long double nearest_planet_factor)
+auto nearest_planet(long double stell_mass_ratio, long double nearest_planet_factor) -> long double
 {
   return nearest_planet_factor * pow(stell_mass_ratio, 1.0 / 3.0);
 }
 
-long double farthest_planet(long double stell_mass_ratio)
+auto farthest_planet(long double stell_mass_ratio) -> long double
 {
   return 50.0 * pow(stell_mass_ratio, 1.0 / 3.0);
 }
 
-long double inner_effect_limit(long double a, long double e, long double mass)
+auto inner_effect_limit(long double a, long double e, long double mass) -> long double
 {
   return a * (1.0 - e) * (1.0 - mass) / (1.0 + cloud_eccentricity);
 }
 
-long double outer_effect_limit(long double a, long double e, long double mass)
+auto outer_effect_limit(long double a, long double e, long double mass) -> long double
 {
   return a * (1.0 + e) * (1.0 + mass) / (1.0 - cloud_eccentricity);
 }
 
-bool dust_available(long double inside_range, long double outside_range)
+auto dust_available(long double inside_range, long double outside_range) -> bool
 {
-  dust *current_dust_band;
-  bool dust_here;
+  dust *current_dust_band = nullptr;
+  bool dust_here = 0;
   
   current_dust_band = dust_head;
-  while (current_dust_band != NULL && current_dust_band->getOuterEdge() < inside_range)
+  while (current_dust_band != nullptr && current_dust_band->getOuterEdge() < inside_range)
   {
     current_dust_band = current_dust_band->next_band;
   }
-  if (current_dust_band == NULL)
+  if (current_dust_band == nullptr)
   {
     dust_here = false;
   }
@@ -90,7 +92,7 @@ bool dust_available(long double inside_range, long double outside_range)
   {
     dust_here = current_dust_band->getDustPresent();
   }
-  while (current_dust_band != NULL && current_dust_band->getInnerEdge() < outside_range)
+  while (current_dust_band != nullptr && current_dust_band->getInnerEdge() < outside_range)
   {
     dust_here = dust_here || current_dust_band->getDustPresent();
     current_dust_band = current_dust_band->next_band;
@@ -100,10 +102,10 @@ bool dust_available(long double inside_range, long double outside_range)
 
 void update_dust_lanes(long double min, long double max, long double mass, long double crit_mass, long double body_inner_bound, long double body_outer_bound)
 {
-  bool gas;
-  dust *node1;
-  dust *node2;
-  dust *node3;
+  bool gas = 0;
+  dust *node1 = nullptr;
+  dust *node2 = nullptr;
+  dust *node3 = nullptr;
   
   dust_left = false;
   if (mass > crit_mass)
@@ -115,7 +117,7 @@ void update_dust_lanes(long double min, long double max, long double mass, long 
     gas = true;
   }
   node1 = dust_head;
-  while (node1 != NULL)
+  while (node1 != nullptr)
   {
     if (node1->getInnerEdge() < min && node1->getOuterEdge() > max)
     {
@@ -209,14 +211,14 @@ void update_dust_lanes(long double min, long double max, long double mass, long 
     }
   }
   node1 = dust_head;
-  while (node1 != NULL)
+  while (node1 != nullptr)
   {
     if (node1->getDustPresent() && node1->getOuterEdge() >= body_inner_bound && node1->getInnerEdge() <= body_outer_bound)
     {
       dust_left = true;
     }
     node2 = node1->next_band;
-    if (node2 != NULL)
+    if (node2 != nullptr)
     {
       if (node1->getDustPresent() == node2->getDustPresent() && node1->getGasPresent() == node2->getGasPresent())
       {
@@ -229,20 +231,20 @@ void update_dust_lanes(long double min, long double max, long double mass, long 
   }
 }
 
-long double collect_dust(long double last_mass, long double &new_dust, long double &new_gas, long double a, long double e,  long double crit_mass, dust *dust_band)
+auto collect_dust(long double last_mass, long double &new_dust, long double &new_gas, long double a, long double e,  long double crit_mass, dust *dust_band) -> long double
 {
   //cout << EM(last_mass) << " " << EM(new_dust) << " " << EM(new_gas) << " " << a << " " << e << " " << EM(crit_mass) << endl;
-  long double mass_density;
-  long double temp1;
-  long double temp2;
-  long double temp;
-  long double temp_density;
-  long double bandwidth;
-  long double width;
-  long double volume;
+  long double mass_density = NAN;
+  long double temp1 = NAN;
+  long double temp2 = NAN;
+  long double temp = NAN;
+  long double temp_density = NAN;
+  long double bandwidth = NAN;
+  long double width = NAN;
+  long double volume = NAN;
   long double gas_density = 0.0;
-  long double new_mass;
-  long double next_mass;
+  long double new_mass = NAN;
+  long double next_mass = NAN;
   long double next_dust = 0;
   long double next_gas = 0;
   
@@ -256,7 +258,7 @@ long double collect_dust(long double last_mass, long double &new_dust, long doub
     r_inner = 0.0;
   }
   
-  if (dust_band == NULL)
+  if (dust_band == nullptr)
   {
     return 0;
   }
@@ -329,10 +331,10 @@ long double collect_dust(long double last_mass, long double &new_dust, long doub
 /*	in units of solar masses.                                               */
 /*------------------------------------------------------------------------------*/
 
-long double critical_limit(long double orb_radius, long double eccentricity, long double stell_luminosity_ratio)
+auto critical_limit(long double orb_radius, long double eccentricity, long double stell_luminosity_ratio) -> long double
 {
-  long double temp;
-  long double perihelion_dist;
+  long double temp = NAN;
+  long double perihelion_dist = NAN;
   
   perihelion_dist = orb_radius - (orb_radius * eccentricity);
   temp = perihelion_dist * sqrt(stell_luminosity_ratio);
@@ -342,7 +344,7 @@ long double critical_limit(long double orb_radius, long double eccentricity, lon
 void accrete_dust(long double &seed_mass, long double &new_dust, long double &new_gas, long double a, long double e, long double crit_mass, long double body_inner_bound, long double body_outer_bound)
 {
   long double new_mass = seed_mass;
-  long double temp_mass, temp_mass2;
+  long double temp_mass = NAN, temp_mass2 = NAN;
   
   do
   {
@@ -367,25 +369,25 @@ void accrete_dust(long double &seed_mass, long double &new_dust, long double &ne
 
 void coalesce_planetesimals(long double a, long double e, long double mass, long double crit_mass, long double dust_mass, long double gas_mass, long double stell_luminosity_ratio, long double body_inner_bound, long double body_outer_bound, bool do_moons)
 {
-  planet *the_planet;
-  planet *next_planet;
-  planet *prev_planet;
-  bool finished;
-  long double temp;
-  long double diff;
-  long double dist1;
-  long double dist2;
+  planet *the_planet = nullptr;
+  planet *next_planet = nullptr;
+  planet *prev_planet = nullptr;
+  bool finished = 0;
+  long double temp = NAN;
+  long double diff = NAN;
+  long double dist1 = NAN;
+  long double dist2 = NAN;
   
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   
   finished = false;
-  prev_planet = NULL;
-  next_planet = NULL;
+  prev_planet = nullptr;
+  next_planet = nullptr;
   
-  int count;
+  int count = 0;
   
   // First we try to find an existing planet with an over-lapping orbit.
-  for (the_planet = planet_head, count = 1; the_planet != NULL; the_planet = the_planet->next_planet, count++)
+  for (the_planet = planet_head, count = 1; the_planet != nullptr; the_planet = the_planet->next_planet, count++)
   {
     //cout << "test2" << count << endl;
     diff = the_planet->getA() - a;
@@ -424,10 +426,10 @@ void coalesce_planetesimals(long double a, long double e, long double mass, long
       {
 	long double existing_mass = 0;
 	
-	if (the_planet->first_moon != NULL)
+	if (the_planet->first_moon != nullptr)
 	{
-	  planet *m;
-	  for (m = the_planet->first_moon; m != NULL; m = m->next_planet)
+	  planet *m = nullptr;
+	  for (m = the_planet->first_moon; m != nullptr; m = m->next_planet)
 	  {
 	    existing_mass += m->getMass();
 	  }
@@ -437,7 +439,7 @@ void coalesce_planetesimals(long double a, long double e, long double mass, long
 	{
 	  if (((mass * SUN_MASS_IN_EARTH_MASSES) < 2.5 && (mass * SUN_MASS_IN_EARTH_MASSES) > .0001 && existing_mass < (the_planet->getMass() * 0.05) ) || is_predefined_planet(the_planet))
 	  {
-	    planet *the_moon;
+	    planet *the_moon = nullptr;
 	    the_moon = new planet();
 	    
 	    the_moon->setDustMass(dust_mass);
@@ -455,7 +457,7 @@ void coalesce_planetesimals(long double a, long double e, long double mass, long
 	      the_moon->setGasMass(temp_gas);
 	    }
 	    
-	    if (the_planet->first_moon == NULL)
+	    if (the_planet->first_moon == nullptr)
 	    {
 	      the_planet->first_moon = the_moon;
 	    }
@@ -525,7 +527,7 @@ void coalesce_planetesimals(long double a, long double e, long double mass, long
 	  the_planet->setGasGiant(true);
 	}
 	
-	while (the_planet->next_planet != NULL && the_planet->next_planet->getA() < new_a)
+	while (the_planet->next_planet != nullptr && the_planet->next_planet->getA() < new_a)
 	{
 	  next_planet = the_planet->next_planet;
 	  
@@ -572,25 +574,25 @@ void coalesce_planetesimals(long double a, long double e, long double mass, long
       the_planet->setGasGiant(false);
     }
     
-    if (planet_head == NULL)
+    if (planet_head == nullptr)
     {
       planet_head = the_planet;
-      the_planet->next_planet = NULL;
+      the_planet->next_planet = nullptr;
     }
     else if (a < planet_head->getA())
     {
       the_planet->next_planet = planet_head;
       planet_head = the_planet;
     }
-    else if (planet_head->next_planet == NULL)
+    else if (planet_head->next_planet == nullptr)
     {
       planet_head->next_planet = the_planet;
-      the_planet->next_planet = NULL;
+      the_planet->next_planet = nullptr;
     }
     else
     {
       next_planet = planet_head;
-      while (next_planet != NULL && next_planet->getA() < a)
+      while (next_planet != nullptr && next_planet->getA() < a)
       {
 	prev_planet = next_planet;
 	next_planet = next_planet->next_planet;
@@ -599,33 +601,33 @@ void coalesce_planetesimals(long double a, long double e, long double mass, long
       prev_planet->next_planet = the_planet;
     }
   }
-  if (hist_head->planets == NULL)
+  if (hist_head->planets == nullptr)
   {
     hist_head->planets = planet_head;
   }
 }
 
-planet* dist_planetary_masses(sun &the_sun, long double inner_dust, long double outer_dust, long double outer_planet_limit, long double dust_density_coeff, long double ecc_coef, long double nearest_planet_factor, planet* seed_system, bool do_moons)
+auto dist_planetary_masses(sun &the_sun, long double inner_dust, long double outer_dust, long double outer_planet_limit, long double dust_density_coeff, long double ecc_coef, long double nearest_planet_factor, planet* seed_system, bool do_moons) -> planet*
 {
   long double stell_mass_ratio = 0;
   long double stell_luminosity_ratio = 0;
-  long double a; 
-  long double e; 
-  long double total_mass;
-  long double dust_mass;
-  long double gas_mass;
-  long double crit_mass; 
-  long double planet_inner_bound; 
-  long double planet_outer_bound;
-  long double temp;
+  long double a = NAN; 
+  long double e = NAN; 
+  long double total_mass = NAN;
+  long double dust_mass = NAN;
+  long double gas_mass = NAN;
+  long double crit_mass = NAN; 
+  long double planet_inner_bound = NAN; 
+  long double planet_outer_bound = NAN;
+  long double temp = NAN;
   
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   planet *seeds = seed_system;
   //planet *seed_moons = NULL;
-  planet *moon = NULL;
-  planet *temp_moons = NULL;
-  planet *new_moon = NULL;
-  planet *prev_moon = NULL;
+  planet *moon = nullptr;
+  planet *temp_moons = nullptr;
+  planet *new_moon = nullptr;
+  planet *prev_moon = nullptr;
   bool is_seed = false;
   int i = 0;
   
@@ -671,21 +673,21 @@ planet* dist_planetary_masses(sun &the_sun, long double inner_dust, long double 
   
   while (dust_left)
   {
-    if (seeds != NULL)
+    if (seeds != nullptr)
     {
       a = seeds->getA();
       e = seeds->getE();
       dust_mass = seeds->getDustMass();
       gas_mass = seeds->getGasMass();
       total_mass = seeds->getMass();
-      if (seeds->first_moon != NULL && do_moons)
+      if (seeds->first_moon != nullptr && do_moons)
       {
-	prev_moon = NULL;
+	prev_moon = nullptr;
 	temp_moons = new planet;
 	seed_moons = temp_moons;
-	for (moon = seeds->first_moon; moon != NULL; moon = moon->next_planet, temp_moons = temp_moons->next_planet)
+	for (moon = seeds->first_moon; moon != nullptr; moon = moon->next_planet, temp_moons = temp_moons->next_planet)
 	{
-	  if (temp_moons == NULL)
+	  if (temp_moons == nullptr)
 	  {
 	    temp_moons = new planet;
 	  }
@@ -697,7 +699,7 @@ planet* dist_planetary_masses(sun &the_sun, long double inner_dust, long double 
 	  }
 	  temp_moons->setDustMass(moon->getDustMass());
 	  temp_moons->setGasMass(moon->getGasMass());
-	  if (prev_moon != NULL)
+	  if (prev_moon != nullptr)
 	  {
 	    prev_moon->next_planet = temp_moons;
 	    prev_moon->reconnect_to = temp_moons;
@@ -707,7 +709,7 @@ planet* dist_planetary_masses(sun &the_sun, long double inner_dust, long double 
       }
       else
       {
-	seed_moons = NULL;
+	seed_moons = nullptr;
       }
       seeds = seeds->next_planet;
       is_seed = true;
@@ -731,7 +733,7 @@ planet* dist_planetary_masses(sun &the_sun, long double inner_dust, long double 
       dust_mass = 0;
       gas_mass = 0;
       is_seed = false;
-      seed_moons = NULL;
+      seed_moons = nullptr;
     }
     
     if (flag_verbose & 0x0200)
@@ -885,10 +887,10 @@ planet* dist_planetary_masses(sun &the_sun, long double inner_dust, long double 
 
 void free_dust(dust* head)
 {
-  dust *node;
-  dust *next = NULL;
+  dust *node = nullptr;
+  dust *next = nullptr;
   
-  for (node = head; node != NULL; node = next)
+  for (node = head; node != nullptr; node = next)
   {
     next = node->next_band;
     delete node;
@@ -898,10 +900,10 @@ void free_dust(dust* head)
 
 void free_planet(planet* head)
 {
-  planet *node;
-  planet *next = NULL;
+  planet *node = nullptr;
+  planet *next = nullptr;
   
-  for (node = head; node != NULL; node = next)
+  for (node = head; node != nullptr; node = next)
   {
     next = node->next_planet;
     delete node;
@@ -911,19 +913,19 @@ void free_planet(planet* head)
 
 void free_generations()
 {
-  gen *node;
-  gen *next = NULL;
+  gen *node = nullptr;
+  gen *next = nullptr;
   
-  for (node = hist_head; node != NULL; node = next)
+  for (node = hist_head; node != nullptr; node = next)
   {
     next = node->next;
     
-    if (node->dusts != NULL)
+    if (node->dusts != nullptr)
     {
       free_dust(node->dusts);
     }
     
-    if (node->planets != NULL)
+    if (node->planets != nullptr)
     {
       free_planet(node->planets);
     }
@@ -933,7 +935,7 @@ void free_generations()
   }
 }
 
-bool is_predified_planet_helper(planet *the_planet, planet *predined_planet)
+auto is_predified_planet_helper(planet *the_planet, planet *predined_planet) -> bool
 {
   //if (the_planet->getA() == predined_planet->getA() && the_planet->getE() == predined_planet->getE())
   if (is_close(the_planet->getA(), predined_planet->getA()) && is_close(the_planet->getE(), predined_planet->getE()))
@@ -943,7 +945,7 @@ bool is_predified_planet_helper(planet *the_planet, planet *predined_planet)
   return false;
 }
 
-bool is_predefined_planet(planet *the_planet)
+auto is_predefined_planet(planet *the_planet) -> bool
 {
   if (is_in_eriEps(the_planet))
   {
@@ -1180,7 +1182,7 @@ bool is_predefined_planet(planet *the_planet)
   return false;
 }
 
-bool is_in_eriEps(planet *the_planet)
+auto is_in_eriEps(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, eriEpsI))
   {
@@ -1189,7 +1191,7 @@ bool is_in_eriEps(planet *the_planet)
   return false;
 }
 
-bool is_in_UMa47(planet *the_planet)
+auto is_in_UMa47(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, UMa47III))
   {
@@ -1206,7 +1208,7 @@ bool is_in_UMa47(planet *the_planet)
   return false;
 }
 
-bool is_in_horIot(planet *the_planet)
+auto is_in_horIot(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, horIotI))
   {
@@ -1215,7 +1217,7 @@ bool is_in_horIot(planet *the_planet)
   return false;
 }
 
-bool is_in_xiumab(planet *the_planet)
+auto is_in_xiumab(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, xiumabb))
   {
@@ -1224,7 +1226,7 @@ bool is_in_xiumab(planet *the_planet)
   return false;
 }
 
-bool is_in_51peg(planet *the_planet)
+auto is_in_51peg(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, Bellerophon))
   {
@@ -1233,7 +1235,7 @@ bool is_in_51peg(planet *the_planet)
   return false;
 }
 
-bool is_in_55can(planet *the_planet)
+auto is_in_55can(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, can55d))
   {
@@ -1258,7 +1260,7 @@ bool is_in_55can(planet *the_planet)
   return false;
 }
 
-bool is_in_UPSAndA(planet *the_planet)
+auto is_in_UPSAndA(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, UPSAndAe))
   {
@@ -1279,7 +1281,7 @@ bool is_in_UPSAndA(planet *the_planet)
   return false;
 }
 
-bool is_in_hd10180(planet *the_planet)
+auto is_in_hd10180(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd10180h))
   {
@@ -1320,7 +1322,7 @@ bool is_in_hd10180(planet *the_planet)
   return false;
 }
 
-bool is_in_gliese581(planet *the_planet)
+auto is_in_gliese581(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, gliese581f))
   {
@@ -1349,7 +1351,7 @@ bool is_in_gliese581(planet *the_planet)
   return false;
 }
 
-bool is_in_hd10647(planet *the_planet)
+auto is_in_hd10647(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd10647b))
   {
@@ -1358,7 +1360,7 @@ bool is_in_hd10647(planet *the_planet)
   return false;
 }
 
-bool is_in_83leoB(planet *the_planet)
+auto is_in_83leoB(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, leo83Bb))
   {
@@ -1371,7 +1373,7 @@ bool is_in_83leoB(planet *the_planet)
   return false;
 }
 
-bool is_in_muari(planet *the_planet)
+auto is_in_muari(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, muarie))
   {
@@ -1392,7 +1394,7 @@ bool is_in_muari(planet *the_planet)
   return false;
 }
 
-bool is_in_hd28185(planet *the_planet)
+auto is_in_hd28185(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd28185b))
   {
@@ -1401,7 +1403,7 @@ bool is_in_hd28185(planet *the_planet)
   return false;
 }
 
-bool is_in_hd40307(planet *the_planet)
+auto is_in_hd40307(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd40307g))
   {
@@ -1430,7 +1432,7 @@ bool is_in_hd40307(planet *the_planet)
   return false;
 }
 
-bool is_in_kepler22(planet *the_planet)
+auto is_in_kepler22(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, kepler22b))
   {
@@ -1439,7 +1441,7 @@ bool is_in_kepler22(planet *the_planet)
   return false;
 }
 
-bool is_in_taucet(planet *the_planet)
+auto is_in_taucet(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, taucetf))
   {
@@ -1464,7 +1466,7 @@ bool is_in_taucet(planet *the_planet)
   return false;
 }
 
-bool is_in_alfcentb(planet *the_planet)
+auto is_in_alfcentb(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, alfcentbb))
   {
@@ -1473,7 +1475,7 @@ bool is_in_alfcentb(planet *the_planet)
   return false;
 }
 
-bool is_in_EPSEri(planet* the_planet)
+auto is_in_EPSEri(planet* the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, EPSEric))
   {
@@ -1486,7 +1488,7 @@ bool is_in_EPSEri(planet* the_planet)
   return false;
 }
 
-bool is_cyteen(planet *the_planet)
+auto is_cyteen(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, cyteen))
   {
@@ -1495,7 +1497,7 @@ bool is_cyteen(planet *the_planet)
   return false;
 }
 
-bool is_in_GL849(planet *the_planet)
+auto is_in_GL849(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, GL849b))
   {
@@ -1504,7 +1506,7 @@ bool is_in_GL849(planet *the_planet)
   return false;
 }
 
-bool is_in_ILAqr(planet *the_planet)
+auto is_in_ILAqr(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, ILAqrb))
   {
@@ -1521,7 +1523,7 @@ bool is_in_ILAqr(planet *the_planet)
   return false;
 }
 
-bool is_in_HD20794(planet *the_planet)
+auto is_in_HD20794(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, HD20794d))
   {
@@ -1538,7 +1540,7 @@ bool is_in_HD20794(planet *the_planet)
   return false;
 }
 
-bool is_in_BETHyi(planet *the_planet)
+auto is_in_BETHyi(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, BETHyib))
   {
@@ -1547,7 +1549,7 @@ bool is_in_BETHyi(planet *the_planet)
   return false;
 }
 
-bool is_in_hd208527(planet *the_planet)
+auto is_in_hd208527(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd208527b))
   {
@@ -1556,7 +1558,7 @@ bool is_in_hd208527(planet *the_planet)
   return false;
 }
 
-bool is_in_kepler11(planet *the_planet)
+auto is_in_kepler11(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, kepler11g))
   {
@@ -1585,7 +1587,7 @@ bool is_in_kepler11(planet *the_planet)
   return false;
 }
 
-bool is_in_bajor(planet *the_planet)
+auto is_in_bajor(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, bajorI))
   {
@@ -1646,7 +1648,7 @@ bool is_in_bajor(planet *the_planet)
   return false;
 }
 
-bool is_in_gliese667C(planet* the_planet)
+auto is_in_gliese667C(planet* the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, gliese667Cb))
   {
@@ -1679,7 +1681,7 @@ bool is_in_gliese667C(planet* the_planet)
   return false;
 }
 
-bool is_in_kepler283(planet* the_planet)
+auto is_in_kepler283(planet* the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, kepler283b))
   {
@@ -1692,7 +1694,7 @@ bool is_in_kepler283(planet* the_planet)
   return false;
 }
 
-bool is_in_kepler62(planet* the_planet)
+auto is_in_kepler62(planet* the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, kepler62b))
   {
@@ -1717,7 +1719,7 @@ bool is_in_kepler62(planet* the_planet)
   return false;
 }
 
-bool is_in_kepler296(planet *the_planet)
+auto is_in_kepler296(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, kepler296b))
   {
@@ -1742,7 +1744,7 @@ bool is_in_kepler296(planet *the_planet)
   return false;
 }
 
-bool is_in_gliese180(planet *the_planet)
+auto is_in_gliese180(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, gliese180b))
   {
@@ -1755,7 +1757,7 @@ bool is_in_gliese180(planet *the_planet)
   return false;
 }
 
-bool is_in_gliese163(planet* the_planet)
+auto is_in_gliese163(planet* the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, gliese163b))
   {
@@ -1772,7 +1774,7 @@ bool is_in_gliese163(planet* the_planet)
   return false;
 }
 
-bool is_in_kepler61(planet *the_planet)
+auto is_in_kepler61(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, kepler61b))
   {
@@ -1781,7 +1783,7 @@ bool is_in_kepler61(planet *the_planet)
   return false;
 }
 
-bool is_in_gliese422(planet *the_planet)
+auto is_in_gliese422(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, gliese422b))
   {
@@ -1790,7 +1792,7 @@ bool is_in_gliese422(planet *the_planet)
   return false;
 }
 
-bool is_in_kepler298(planet *the_planet)
+auto is_in_kepler298(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, kepler298b))
   {
@@ -1807,7 +1809,7 @@ bool is_in_kepler298(planet *the_planet)
   return false;
 }
 
-bool is_in_kepler174(planet *the_planet)
+auto is_in_kepler174(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, kepler174b))
   {
@@ -1824,7 +1826,7 @@ bool is_in_kepler174(planet *the_planet)
   return false;
 }
 
-bool is_in_gliese682(planet *the_planet)
+auto is_in_gliese682(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, gliese682b))
   {
@@ -1837,7 +1839,7 @@ bool is_in_gliese682(planet *the_planet)
   return false;
 }
 
-bool is_in_hd38529(planet *the_planet)
+auto is_in_hd38529(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd38529b))
   {
@@ -1850,7 +1852,7 @@ bool is_in_hd38529(planet *the_planet)
   return false;
 }
 
-bool is_in_hd202206(planet *the_planet)
+auto is_in_hd202206(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd202206b))
   {
@@ -1863,7 +1865,7 @@ bool is_in_hd202206(planet *the_planet)
   return false;
 }
 
-bool is_in_hd8673(planet *the_planet)
+auto is_in_hd8673(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd8673b))
   {
@@ -1872,7 +1874,7 @@ bool is_in_hd8673(planet *the_planet)
   return false;
 }
 
-bool is_in_hd22781(planet *the_planet)
+auto is_in_hd22781(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd22781b))
   {
@@ -1881,7 +1883,7 @@ bool is_in_hd22781(planet *the_planet)
   return false;
 }
 
-bool is_in_hd217786(planet *the_planet)
+auto is_in_hd217786(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd217786b))
   {
@@ -1890,7 +1892,7 @@ bool is_in_hd217786(planet *the_planet)
   return false;
 }
 
-bool is_in_hd106270(planet *the_planet)
+auto is_in_hd106270(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd106270b))
   {
@@ -1899,7 +1901,7 @@ bool is_in_hd106270(planet *the_planet)
   return false;
 }
 
-bool is_in_hd38801(planet *the_planet)
+auto is_in_hd38801(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd38801b))
   {
@@ -1908,7 +1910,7 @@ bool is_in_hd38801(planet *the_planet)
   return false;
 }
 
-bool is_in_hd39091(planet *the_planet)
+auto is_in_hd39091(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd39091b))
   {
@@ -1917,7 +1919,7 @@ bool is_in_hd39091(planet *the_planet)
   return false;
 }
 
-bool is_in_hd141937(planet *the_planet)
+auto is_in_hd141937(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd141937b))
   {
@@ -1926,7 +1928,7 @@ bool is_in_hd141937(planet *the_planet)
   return false;
 }
 
-bool is_in_hd33564(planet *the_planet)
+auto is_in_hd33564(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd33564b))
   {
@@ -1935,7 +1937,7 @@ bool is_in_hd33564(planet *the_planet)
   return false;
 }
 
-bool is_in_hd23596(planet *the_planet)
+auto is_in_hd23596(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd23596b))
   {
@@ -1944,7 +1946,7 @@ bool is_in_hd23596(planet *the_planet)
   return false;
 }
 
-bool is_in_hd222582(planet *the_planet)
+auto is_in_hd222582(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd222582b))
   {
@@ -1953,7 +1955,7 @@ bool is_in_hd222582(planet *the_planet)
   return false;
 }
 
-bool is_in_hd86264(planet *the_planet)
+auto is_in_hd86264(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd86264b))
   {
@@ -1962,7 +1964,7 @@ bool is_in_hd86264(planet *the_planet)
   return false;
 }
 
-bool is_in_hd196067(planet *the_planet)
+auto is_in_hd196067(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd196067b))
   {
@@ -1971,7 +1973,7 @@ bool is_in_hd196067(planet *the_planet)
   return false;
 }
 
-bool is_in_hd10697(planet *the_planet)
+auto is_in_hd10697(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd10697b))
   {
@@ -1980,7 +1982,7 @@ bool is_in_hd10697(planet *the_planet)
   return false;
 }
 
-bool is_in_hd132406(planet *the_planet)
+auto is_in_hd132406(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd132406b))
   {
@@ -1989,7 +1991,7 @@ bool is_in_hd132406(planet *the_planet)
   return false;
 }
 
-bool is_in_hd13908(planet *the_planet)
+auto is_in_hd13908(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd13908b))
   {
@@ -2002,7 +2004,7 @@ bool is_in_hd13908(planet *the_planet)
   return false;
 }
 
-bool is_in_hd2039(planet *the_planet)
+auto is_in_hd2039(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd2039b))
   {
@@ -2011,7 +2013,7 @@ bool is_in_hd2039(planet *the_planet)
   return false;
 }
 
-bool is_in_hd82943(planet* the_planet)
+auto is_in_hd82943(planet* the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd82943b))
   {
@@ -2028,7 +2030,7 @@ bool is_in_hd82943(planet* the_planet)
   return false;
 }
 
-bool is_in_moa2011blg293l(planet *the_planet)
+auto is_in_moa2011blg293l(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, moa2011blg293lb))
   {
@@ -2037,7 +2039,7 @@ bool is_in_moa2011blg293l(planet *the_planet)
   return false;
 }
 
-bool is_in_hd213240(planet *the_planet)
+auto is_in_hd213240(planet *the_planet) -> bool
 {
   if (is_predified_planet_helper(the_planet, hd213240b))
   {
@@ -2046,7 +2048,7 @@ bool is_in_hd213240(planet *the_planet)
   return false;
 }
 
-long double calcPerihelion(long double a, long double e)
+auto calcPerihelion(long double a, long double e) -> long double
 {
   return a * (1.0 - e);
 }

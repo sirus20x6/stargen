@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <gsl/gsl_multifit.h>
+#include <cmath>
 #include <string>
 #include "const.h"
 #include "enviro.h"
@@ -16,7 +17,7 @@ long jseed = 0;
 long ifrst = 0;
 long nextn = 0;
 
-bool compare_string_char(string& a_string, int place, const char *a_character, int length)
+auto compare_string_char(string& a_string, int place, const char *a_character, int length) -> bool
 {
   if (a_string.compare(place, length, a_character) == 0)
   {
@@ -45,7 +46,7 @@ bool compare_string_char(string& a_string, int place, const char *a_character, i
  * Written by Lukás Chmela
  * Released under GPLv3.
  */
-char* my_itoa(int value, char* result, int base)
+auto my_itoa(int value, char* result, int base) -> char*
 {
   // check that the base if valid
   if (base < 2 || base > 36)
@@ -54,8 +55,8 @@ char* my_itoa(int value, char* result, int base)
     return result;
   }
   
-  char* ptr = result, *ptr1 = result, tmp_char;
-  int tmp_value;
+  char* ptr = result, *ptr1 = result, tmp_char = 0;
+  int tmp_value = 0;
   
   do
   {
@@ -80,14 +81,14 @@ char* my_itoa(int value, char* result, int base)
   return result;
 }
 
-string float_to_string(long double number)
+auto float_to_string(long double number) -> string
 {
   return lexical_cast<string>(number);
 }
 
-long double random_number(long double inner, long double outer)
+auto random_number(long double inner, long double outer) -> long double
 {
-  long double range;
+  long double range = NAN;
   
   range = outer - inner;
   return (((long double)rand()) / (long double)(RAND_MAX)) * range + inner;
@@ -98,14 +99,14 @@ long double random_number(long double inner, long double outer)
 /* exact value given it in 'value'.                                */
 /*-----------------------------------------------------------------*/
 
-long double about(long double value, long double variation)
+auto about(long double value, long double variation) -> long double
 {
   return(value + (value * random_number(-variation,variation)));
 }
 
-long double random_eccentricity(long double ecc_coef)
+auto random_eccentricity(long double ecc_coef) -> long double
 {
-  long double e;
+  long double e = NAN;
   e = 1.0 - pow(random_number(0.0, 1.0), ecc_coef);
   
   if (e > .99) // Note that this coresponds to a random number less than 10E-26. It happens with GNU C for -S254 -W27
@@ -121,9 +122,9 @@ long double random_eccentricity(long double ecc_coef)
 // using Box-Muller transform
 // ref: http://en.literateprograms.org/Box-Muller_transform_%28C%29
 
-long double gaussian(long double sigma)
+auto gaussian(long double sigma) -> long double
 {
-  long double x,y,r;
+  long double x = NAN,y = NAN,r = NAN;
   do
   {
     x = random_number(-1.0, 1.0);
@@ -142,7 +143,7 @@ long double gaussian(long double sigma)
  * NOTE: use m > 0
  * ==================================================
  */
-long poisson(long double m)
+auto poisson(long double m) -> long
 {
   long double t = 0.0;
   long x = 0;
@@ -163,35 +164,35 @@ long poisson(long double m)
  * NOTE: use m > 0.0
  * =========================================================
  */
-long double exponential(long double m)
+auto exponential(long double m) -> long double
 {
   return (-1.0 * m) * log(1.0 - random_number(0.0,1.0));
 }
 
-long double quad_trend(long double a, long double b, long double c, long double x)
+auto quad_trend(long double a, long double b, long double c, long double x) -> long double
 {
   return (a * pow2(x)) + (b * x) + c;
 }
 
-long double ln_trend(long double a, long double b, long double x)
+auto ln_trend(long double a, long double b, long double x) -> long double
 {
   return a + (b * log(x));
 }
 
-long double logistal_trend(long double a, long double b, long double c, long double x)
+auto logistal_trend(long double a, long double b, long double c, long double x) -> long double
 {
   return c / (1 + (a * exp(-1.0 * b * x)));
 }
 
 // code from http://rosettacode.org/wiki/Polynomial_regression#C
-bool polynomialfit(int obs, int degree, double *dx, double *dy, double *store) /* n, p */
+auto polynomialfit(int obs, int degree, double *dx, double *dy, double *store) -> bool /* n, p */
 {
-  gsl_multifit_linear_workspace *ws;
-  gsl_matrix *cov, *X;
-  gsl_vector *y, *c;
-  double chisq;
+  gsl_multifit_linear_workspace *ws = nullptr;
+  gsl_matrix *cov = nullptr, *X = nullptr;
+  gsl_vector *y = nullptr, *c = nullptr;
+  double chisq = NAN;
   
-  int i, j;
+  int i = 0, j = 0;
   
   X = gsl_matrix_alloc(obs, degree);
   y = gsl_vector_alloc(obs);
@@ -226,31 +227,31 @@ bool polynomialfit(int obs, int degree, double *dx, double *dy, double *store) /
   to know if the fit is "good" */
 }
 
-long double soft(long double v, long double max, long double min)
+auto soft(long double v, long double max, long double min) -> long double
 {
   long double dv = v - min;
   long double dm = max - min;
   return (lim(2.0 * dv / dm - 1.0) + 1.0) / 2.0 * dm + min;
 }
 
-long double lim(long double x)
+auto lim(long double x) -> long double
 {
   return x / pow1_4(1 + x * x * x * x);
 }
 
-string remove_spaces(string str)
+auto remove_spaces(string str) -> string
 {
   erase_all(str, " ");
   return str;
 }
 
-double randf()
+auto randf() -> double
 {
   long mplier = 16807;
   long modlus = 2147483647;
   long mobymp = 127773;
   long momdmp = 2836;
-  long hvlue, lvlue, testv;
+  long hvlue = 0, lvlue = 0, testv = 0;
   
   if (ifrst == 0)
   {
@@ -280,7 +281,7 @@ void srandf(long a_seed)
   ifrst = 0;
 }
 
-long double fix_inclination(long double inclination)
+auto fix_inclination(long double inclination) -> long double
 {
   // we can't have a negative number
   inclination = abs(inclination);
@@ -289,15 +290,15 @@ long double fix_inclination(long double inclination)
   return inclination;
 }
 
-long double linear_trend(long double m, long double b, long double x)
+auto linear_trend(long double m, long double b, long double x) -> long double
 {
   return (m * x) + b;
 }
 
-string my_strtoupper(string the_string)
+auto my_strtoupper(const string& the_string) -> string
 {
   const char *temp = the_string.c_str();
-  char temp2;
+  char temp2 = 0;
   stringstream ss;
   string output;
   
@@ -312,16 +313,16 @@ string my_strtoupper(string the_string)
   return output;
 }
 
-int star_type_to_num(string spec_type, long double luminosity, int run)
+auto star_type_to_num(const string& spec_type, long double luminosity, int run) -> int
 {
   stringstream ss;
   string arr[] = {"blada", "O0", "O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8", "O9", "B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "K0", "K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "M0", "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9"};
   int arrSize = sizeof(arr) / sizeof(string);
   vector<string> star_types(arr, arr + arrSize);
   int num = 0;
-  bool found;
+  bool found = false;
   string new_spec_type;
-  long double temperature;
+  long double temperature = NAN;
   
   for (int i = 0; i < star_types.size(); i++)
   {
@@ -365,7 +366,7 @@ void logfix(long double x, long double y, long double w, long double z, long dou
   b = (z - y) / (log(w) - log(x));
 }
 
-long double rangeAdjust(long double x, long double y1, long double y2, long double lower, long double upper)
+auto rangeAdjust(long double x, long double y1, long double y2, long double lower, long double upper) -> long double
 {
   long double range = upper - lower;
   long double upper_fraction = (x - lower) / range;
@@ -380,7 +381,7 @@ void e_fix(long double x, long double y, long double w, long double z, long doub
   b = (y - z) / (exp(x) - exp(w));
 }
 
-long double e_trend(long double a, long double b, long double x)
+auto e_trend(long double a, long double b, long double x) -> long double
 {
   return a + (b * exp(x));
 }
@@ -392,7 +393,7 @@ void quadfix(long double x, long double y, long double w, long double z, long do
   c = ((q * w * x * (w - x)) + (p * ((p * w * y) - (pow2(w) * y) - (p * x * z) + (pow2(x) * z)))) / ((p - w) * (p - x) * (w - x));
 }
 
-long double quintic_trend(long double a, long double b, long double c, long double d, long double e, long double f, long double x)
+auto quintic_trend(long double a, long double b, long double c, long double d, long double e, long double f, long double x) -> long double
 {
   return (a * pow(x, 5.0)) + (b * pow4(x)) + (c * pow3(x)) + (d * pow2(x)) + (e * x) + f;
 }
