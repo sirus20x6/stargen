@@ -332,27 +332,27 @@ auto operator<<(ostream &, star &) -> ostream &;
 class star
 {
 private:
-  long double luminosity;
-  long double mass;
-  long double eff_temp;
+  long double luminosity{};
+  long double mass{};
+  long double eff_temp{};
   string spec_type;
-  long double mass2;
-  long double eccentricity;
-  long double distance;
-  long double inc;
-  long double an;
-  planet *known_planets;
+  long double mass2{};
+  long double eccentricity{};
+  long double distance{};
+  long double inc{};
+  long double an{};
+  planet *known_planets{};
   string desig;
-  bool in_celestia;
+  bool in_celestia{};
   string name;
-  int extra_spaces;
+  int extra_spaces{};
   void calcLuminosity();
   void calcMass();
   void calcEffTemp();
-  bool isCircumbinary;
-  long double eff_temp2;
+  bool isCircumbinary{};
+  long double eff_temp2{};
   string spec_type2;
-  long double luminosity2;
+  long double luminosity2{};
 public:
   star()
   = default;

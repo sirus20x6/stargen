@@ -147,7 +147,7 @@ auto pivotIndex(vector<T>& v, int first, int last) -> int
 {
   // index for the midpoint of [first,last) and the
   // indices that scan the index range in tandem
-  int mid, scanUp, scanDown;
+  int mid = 0, scanUp = 0, scanDown = 0;
   // pivot value and object used for exchanges
   T pivot, temp;
   
@@ -223,7 +223,7 @@ template <typename T>
 void quicksort(vector<T>& v, int first, int last)
 {
   // index of the pivot
-  int pivotLoc;
+  int pivotLoc = 0;
   // temp used for an exchange when [first,last) has
   // two elements
   T temp;
@@ -296,7 +296,7 @@ template <typename T>
 void writeVector(vector<T>& v, const string& separator)
 {
   // capture the size of the vector in n
-  int i, n = v.size();
+  int i = 0, n = v.size();
   
   for(i = 0; i < n; i++)
   {

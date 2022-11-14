@@ -1,4 +1,6 @@
 #include "stargen.h"
+
+#include <math.h>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
@@ -343,7 +345,7 @@ auto stargen(actions action, const string& flag_char, string path, const string&
     
     if (filename_arg.size() > 0)
     {
-      char *ptr;
+      char *ptr = nullptr;
       
       cleaned_arg = filename_arg;
     }
@@ -361,13 +363,13 @@ auto stargen(actions action, const string& flag_char, string path, const string&
     string system_name;
     string designation;
     string cp;
-    long double outer_limit;
-    long double inner_dust_limit;
-    int sys_no;
+    long double outer_limit = NAN;
+    long double inner_dust_limit = NAN;
+    int sys_no = 0;
     bool has_known_planets = false;
     planet *seed_planets = nullptr;
-    bool use_seed_system;
-    bool in_celestia;
+    bool use_seed_system = 0;
+    bool in_celestia = 0;
     
     init();
     
@@ -585,8 +587,8 @@ auto stargen(actions action, const string& flag_char, string path, const string&
     the_sun_clone = the_sun;
     generate_stellar_system(the_sun, use_seed_system, seed_planets, flag_char, sys_no, system_name, inner_dust_limit, outer_limit, ecc_coef_arg, inner_planet_factor_arg, do_gases, do_moons);
     
-    planet *a_planet;
-    int counter;
+    planet *a_planet = nullptr;
+    int counter = 0;
     int wt_type_count = type_count;
     int norm_type_count = 0;
     
@@ -787,7 +789,7 @@ void init()
 {
   if (!flag_seed)
   {
-    time_t temp_time;
+    time_t temp_time = 0;
     auto seed = (unsigned)(time(&temp_time));
     srand(seed);
     flag_seed = rand();
@@ -803,7 +805,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system, planet *seed_sy
   do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   system_counter++;
-  long double outer_dust_limit;
+  long double outer_dust_limit = NAN;
   
   if (!the_sun.getIsCircumbinary())
   {
@@ -880,9 +882,9 @@ void generate_planets(sun &the_sun, bool random_tilt, const string& flag_char, i
 {
   do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
-  planet *the_planet;
+  planet *the_planet = nullptr;
   int planet_no = 0;
-  planet *moon;
+  planet *moon = nullptr;
   int moons = 0;
   
   for (the_planet = innermost_planet, planet_no = 1; the_planet != nullptr; the_planet = the_planet->next_planet, planet_no++)
@@ -932,9 +934,9 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 {
   do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
-  long double tmp;
+  long double tmp = NAN;
   long double ecc_coef = 0.077;
-  long double lambda;
+  long double lambda = NAN;
   long double the_fudged_radius = 0.0;
   
   if (do_moons && !is_moon)
@@ -1162,7 +1164,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
   {
     bool skip_minor_moons = false;
     long double moon_mass = 0.0;
-    int n;
+    int n = 0;
     stringstream ss;
     string moon_id;
     long double temp_hill_sphere = 0;
@@ -1215,7 +1217,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	if ((roche_limit * 1.5) < (hill_sphere / 3.0) && (hill_sphere / 3.0) > (the_planet->getRadius() * 2.5))
 	{
 	  bool done = false;
-	  bool bad_place;
+	  bool bad_place = 0;
 	  bool to_many_tries = false;
 	  planet *the_moon = nullptr;
 	  long double hill_sphere2 = 0;
@@ -1372,17 +1374,17 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
     
     if (the_planet->getMinorMoons() > 0)
     {
-      long double max_total_moon_mass;
-      long double remaining_moon_mass;
-      long double new_moon_mass;
-      long double new_moon_gas_mass;
+      long double max_total_moon_mass = NAN;
+      long double remaining_moon_mass = NAN;
+      long double new_moon_mass = NAN;
+      long double new_moon_gas_mass = NAN;
       long double min_new_moon_mass = 1.0 / 100000000000.0;
       planet *tmp = nullptr;
       planet *ref = nullptr;
       int attempts = 0;
       bool done2 = false;
       bool too_many_tries = false;
-      bool bad_place2;
+      bool bad_place2 = 0;
       long double hill_sphere3 = 0;
       long double hill_sphere4 = 0;
       long double roche_limit2 = 0;
@@ -1484,8 +1486,8 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	new_moon->setRadius(radius_improved(new_moon->getMass(), new_moon->getImf(), new_moon->getRmf(), new_moon->getCmf(), false, new_moon->getOrbitZone(), new_moon));
 	new_moon->setDensity(volume_density(new_moon->getMass(), new_moon->getRadius()));
 	
-	long double distance2;
-	long double eccentricity2;
+	long double distance2 = NAN;
+	long double eccentricity2 = NAN;
 	
 	roche_limit2 = 2.44 * the_planet->getRadius() * pow(the_planet->getDensity() / new_moon->getDensity(), 1.0 / 3.0);
 	if ((roche_limit2 * 1.5) >= (hill_sphere3 / 3.0))
@@ -1705,7 +1707,7 @@ void check_planet(planet* the_planet, const string& planet_id, bool is_moon)
   
   ++type_counts[tIndex];
   
-  unsigned int breathe;
+  unsigned int breathe = 0;
   
   //if (breathe == BREATHABLE && the_planet->getA() > habitable_zone_distance(the_planet->getTheSun(), RECENT_VENUS) && the_planet->getA() < habitable_zone_distance(the_planet->getTheSun(), EARLY_MARS))
   total_worlds++;
