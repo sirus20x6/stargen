@@ -3,7 +3,7 @@
 #include "const.h"
 #include "enviro.h"
 #include "radius_tables.h"
-#include "stargen.h";
+#include "stargen.h"
 #include "utils.h"
 
 using namespace std;
