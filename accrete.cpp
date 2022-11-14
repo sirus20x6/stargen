@@ -1,6 +1,5 @@
 #include "accrete.h"
-
-#include <math.h>
+#include <cmath>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -77,7 +76,7 @@ auto outer_effect_limit(long double a, long double e, long double mass) -> long 
 auto dust_available(long double inside_range, long double outside_range) -> bool
 {
   dust *current_dust_band = nullptr;
-  bool dust_here = 0;
+  bool dust_here = false;
   
   current_dust_band = dust_head;
   while (current_dust_band != nullptr && current_dust_band->getOuterEdge() < inside_range)
@@ -102,7 +101,7 @@ auto dust_available(long double inside_range, long double outside_range) -> bool
 
 void update_dust_lanes(long double min, long double max, long double mass, long double crit_mass, long double body_inner_bound, long double body_outer_bound)
 {
-  bool gas = 0;
+  bool gas = false;
   dust *node1 = nullptr;
   dust *node2 = nullptr;
   dust *node3 = nullptr;
@@ -372,7 +371,7 @@ void coalesce_planetesimals(long double a, long double e, long double mass, long
   planet *the_planet = nullptr;
   planet *next_planet = nullptr;
   planet *prev_planet = nullptr;
-  bool finished = 0;
+  bool finished = false;
   long double temp = NAN;
   long double diff = NAN;
   long double dist1 = NAN;
