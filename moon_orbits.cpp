@@ -1,11 +1,7 @@
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
-  
-  return EXIT_SUCCESS;
-}
+auto main(int argc, char **argv) -> int { return EXIT_SUCCESS; }

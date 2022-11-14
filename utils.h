@@ -97,7 +97,7 @@ auto toString(T val, int decimals) -> string {
   } else {
     if (decimals == 0) {
       // ss << showpoint << fixed << setprecision(getNumDecimals(val));
-      output = float_to_string(val);
+      output = std::to_string(val);
     } else {
       ss << showpoint << fixed << setprecision(decimals);
       ss << val;

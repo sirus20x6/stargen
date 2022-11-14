@@ -1,5 +1,7 @@
 #include "enviro.h"
 
+#include <math.h>
+
 #include <boost/concept_check.hpp>
 #include <cstdlib>
 #include <cstring>
@@ -24,7 +26,7 @@ string breathability_phrase[4] = {"none", "breathable", "unbreathable",
 
 map<map<long double, long double>, vector<long double> > polynomial_cache;
 
-long double mass_to_luminosity(long double mass) {
+auto mass_to_luminosity(long double mass) -> long double {
   if (mass <= 0.6224) {
     return 0.3815 * pow(mass, 2.5185);
   } else if (mass <= 1.0) {
@@ -38,7 +40,13 @@ long double mass_to_luminosity(long double mass) {
   }
 }
 
-long double luminosity_to_mass(long double luminosity) {
+/**
+ * @brief 
+ * 
+ * @param luminosity 
+ * @return long double 
+ */
+auto luminosity_to_mass(long double luminosity) -> long double {
   long double a = luminosity;
   if (a <= (0.3815 * pow(0.6224, 2.5185))) {
     return 1.46613 * pow(a, 0.3970617431010522);
@@ -53,35 +61,35 @@ long double luminosity_to_mass(long double luminosity) {
   }
 }
 
-int getLumIndex(string spec_type) {
-  const char *strPtr;
+auto getLumIndex(const string& spec_type) -> int {
+  const char *strPtr = nullptr;
 
   strPtr = strstr(spec_type.c_str(), "Ia0");
-  if (strPtr != NULL) {
+  if (strPtr != nullptr) {
     return 2;
   } else {
     strPtr = strstr(spec_type.c_str(), "Ia");
-    if (strPtr != NULL) {
+    if (strPtr != nullptr) {
       return 2;
     } else {
       strPtr = strstr(spec_type.c_str(), "Ib");
-      if (strPtr != NULL) {
+      if (strPtr != nullptr) {
         return 2;
       } else {
         strPtr = strstr(spec_type.c_str(), "III");
-        if (strPtr != NULL) {
+        if (strPtr != nullptr) {
           return 1;
         } else {
           strPtr = strstr(spec_type.c_str(), "II");
-          if (strPtr != NULL) {
+          if (strPtr != nullptr) {
             return 2;
           } else {
             strPtr = strstr(spec_type.c_str(), "IV");
-            if (strPtr != NULL) {
+            if (strPtr != nullptr) {
               return 1;
             } else {
               strPtr = strstr(spec_type.c_str(), "VI");
-              if (strPtr != NULL) {
+              if (strPtr != nullptr) {
                 return 0;
               } else {
                 return 0;
@@ -94,113 +102,113 @@ int getLumIndex(string spec_type) {
   }
 }
 
-string getStarType(string spec_type) {
+auto getStarType(string spec_type) -> string {
   spec_type = my_strtoupper(spec_type);
-  const char *strPtr;
+  const char *strPtr = nullptr;
 
   strPtr = strstr(spec_type.c_str(), "DA");
-  if (strPtr != NULL) {
+  if (strPtr != nullptr) {
     return "WD";
   } else {
     strPtr = strstr(spec_type.c_str(), "DB");
-    if (strPtr != NULL) {
+    if (strPtr != nullptr) {
       return "WD";
     } else {
       strPtr = strstr(spec_type.c_str(), "DC");
-      if (strPtr != NULL) {
+      if (strPtr != nullptr) {
         return "WD";
       } else {
         strPtr = strstr(spec_type.c_str(), "DO");
-        if (strPtr != NULL) {
+        if (strPtr != nullptr) {
           return "WD";
         } else {
           strPtr = strstr(spec_type.c_str(), "DQ");
-          if (strPtr != NULL) {
+          if (strPtr != nullptr) {
             return "WD";
           } else {
             strPtr = strstr(spec_type.c_str(), "DZ");
-            if (strPtr != NULL) {
+            if (strPtr != nullptr) {
               return "WD";
             } else {
               strPtr = strstr(spec_type.c_str(), "WN");
-              if (strPtr != NULL) {
+              if (strPtr != nullptr) {
                 return "WN";
               } else {
                 strPtr = strstr(spec_type.c_str(), "WC");
-                if (strPtr != NULL) {
+                if (strPtr != nullptr) {
                   return "WC";
                 } else {
                   strPtr = strstr(spec_type.c_str(), "O");
-                  if (strPtr != NULL) {
+                  if (strPtr != nullptr) {
                     return "O";
                   } else {
                     strPtr = strstr(spec_type.c_str(), "B");
-                    if (strPtr != NULL) {
+                    if (strPtr != nullptr) {
                       return "B";
                     } else {
                       strPtr = strstr(spec_type.c_str(), "A");
-                      if (strPtr != NULL) {
+                      if (strPtr != nullptr) {
                         return "A";
                       } else {
                         strPtr = strstr(spec_type.c_str(), "F");
-                        if (strPtr != NULL) {
+                        if (strPtr != nullptr) {
                           return "F";
                         } else {
                           strPtr = strstr(spec_type.c_str(), "G");
-                          if (strPtr != NULL) {
+                          if (strPtr != nullptr) {
                             return "G";
                           } else {
                             strPtr = strstr(spec_type.c_str(), "K");
-                            if (strPtr != NULL) {
+                            if (strPtr != nullptr) {
                               return "K";
                             } else {
                               strPtr = strstr(spec_type.c_str(), "M");
-                              if (strPtr != NULL) {
+                              if (strPtr != nullptr) {
                                 return "M";
                               } else {
                                 strPtr = strstr(spec_type.c_str(), "L");
-                                if (strPtr != NULL) {
+                                if (strPtr != nullptr) {
                                   return "L";
                                 } else {
                                   strPtr = strstr(spec_type.c_str(), "T");
-                                  if (strPtr != NULL) {
+                                  if (strPtr != nullptr) {
                                     return "T";
                                   } else {
                                     strPtr = strstr(spec_type.c_str(), "Y");
-                                    if (strPtr != NULL) {
+                                    if (strPtr != nullptr) {
                                       return "Y";
                                     } else {
                                       strPtr = strstr(spec_type.c_str(), "H");
-                                      if (strPtr != NULL) {
+                                      if (strPtr != nullptr) {
                                         return "H";
                                       } else {
                                         strPtr = strstr(spec_type.c_str(), "E");
-                                        if (strPtr != NULL) {
+                                        if (strPtr != nullptr) {
                                           return "E";
                                         } else {
                                           strPtr =
                                               strstr(spec_type.c_str(), "I");
-                                          if (strPtr != NULL) {
+                                          if (strPtr != nullptr) {
                                             return "I";
                                           } else {
                                             strPtr =
                                                 strstr(spec_type.c_str(), "R");
-                                            if (strPtr != NULL) {
+                                            if (strPtr != nullptr) {
                                               return "K";
                                             } else {
                                               strPtr = strstr(spec_type.c_str(),
                                                               "S");
-                                              if (strPtr != NULL) {
+                                              if (strPtr != nullptr) {
                                                 return "M";
                                               } else {
                                                 strPtr = strstr(
                                                     spec_type.c_str(), "N");
-                                                if (strPtr != NULL) {
+                                                if (strPtr != nullptr) {
                                                   return "M";
                                                 } else {
                                                   strPtr = strstr(
                                                       spec_type.c_str(), "C");
-                                                  if (strPtr != NULL) {
+                                                  if (strPtr != nullptr) {
                                                     return "M";
                                                   } else {
                                                     // cerr << "test1" << endl;
@@ -208,7 +216,7 @@ string getStarType(string spec_type) {
                                                             "type: "
                                                          << spec_type << endl;
                                                     exit(EXIT_FAILURE);
-                                                    return NULL;
+                                                    return nullptr;
                                                   }
                                                 }
                                               }
@@ -236,8 +244,8 @@ string getStarType(string spec_type) {
   }
 }
 
-int getSubType(string spec_type) {
-  int total_chars;
+auto getSubType(string spec_type) -> int {
+  int total_chars = 0;
   // total_chars = spec_type.size();
   string buffer;
 
@@ -250,13 +258,13 @@ int getSubType(string spec_type) {
   return 0;
 }
 
-long double spec_type_to_eff_temp(string spec_type) {
+auto spec_type_to_eff_temp(const string& spec_type) -> long double {
   if (spec_type.empty()) {
     return 0;
   }
   string star_type;
-  int lumIndex;
-  int sub_type;
+  int lumIndex = 0;
+  int sub_type = 0;
 
   // cout << "test3" << endl;
   star_type = getStarType(spec_type);
@@ -306,18 +314,18 @@ long double spec_type_to_eff_temp(string spec_type) {
   }
 }
 
-string eff_temp_to_spec_type(long double eff_temp, long double luminosity) {
+auto eff_temp_to_spec_type(long double eff_temp, long double luminosity) -> string {
   string clums[] = {"I-a0", "I-a", "I-b", "II", "III", "IV"};
   long double rlums[] = {200000.0, 20000.0, 3000.0, 400.0, 11.5, 4.0};
   string classes[] = {"x", "O", "B", "A", "F", "G", "K", "M", "L", "T", "Y"};
   long double tclass[] = {52000,  30000.0, 10000.0, 7500.0, 6000.0, 5000.0,
                           3500.0, 2000.0,  1300.0,  700.0,  0.0};
 
-  int at;
-  long double csiz, cdel, cfrac, dt;
+  int at = 0;
+  long double csiz = NAN, cdel = NAN, cfrac = NAN, dt = NAN;
   string aclass, ac, clum;
   char temp[33];
-  long double xmag;
+  long double xmag = NAN;
   string output;
 
   if (luminosity == 0) {
@@ -479,7 +487,7 @@ string eff_temp_to_spec_type(long double eff_temp, long double luminosity) {
 /*	 the orbital 'zone' of the particle.                                */
 /*--------------------------------------------------------------------------*/
 
-int orb_zone(long double ecosphere_radius, long double orb_radius) {
+auto orbital_zone(long double ecosphere_radius, long double orb_radius) -> int {
   if (orb_radius < (4.0 * ecosphere_radius)) {
     return 1;
   } else if (orb_radius < (15.0 * ecosphere_radius)) {
@@ -494,8 +502,8 @@ int orb_zone(long double ecosphere_radius, long double orb_radius) {
 /* of grams/cc.  The radius returned is in units of km.              */
 /*-------------------------------------------------------------------*/
 
-long double volume_radius(long double mass, long double density) {
-  long double volume;
+auto volume_radius(long double mass, long double density) -> long double {
+  long double volume = NAN;
 
   mass = mass * SOLAR_MASS_IN_GRAMS;
   volume = mass / density;
@@ -507,9 +515,9 @@ long double volume_radius(long double mass, long double density) {
 /* is in units of AU. The density is returned in units of grams/cc.       */
 /*------------------------------------------------------------------------*/
 
-long double empirical_density(long double mass, long double orb_radius,
-                              long double r_ecosphere, bool gas_giant) {
-  long double temp;
+auto empirical_density(long double mass, long double orb_radius,
+                              long double r_ecosphere, bool gas_giant) -> long double {
+  long double temp = NAN;
 
   temp = pow(mass * SUN_MASS_IN_EARTH_MASSES, 1.0 / 8.0);
   temp = temp * pow1_4(r_ecosphere / orb_radius);
@@ -525,8 +533,8 @@ long double empirical_density(long double mass, long double orb_radius,
 /* radius is in km.  The density is returned in units of grams/cc.    */
 /*--------------------------------------------------------------------*/
 
-long double volume_density(long double mass, long double equat_radius) {
-  long double volume;
+auto volume_density(long double mass, long double equat_radius) -> long double {
+  long double volume = NAN;
 
   mass = mass * SOLAR_MASS_IN_GRAMS;
   equat_radius = equat_radius * CM_PER_KM;
@@ -539,9 +547,9 @@ long double volume_density(long double mass, long double equat_radius) {
 /* masses. The period returned is in terms of Earth days.                  */
 /*-------------------------------------------------------------------------*/
 
-long double period(long double separation, long double small_mass,
-                   long double large_mass) {
-  long double period_in_years;
+auto period(long double separation, long double small_mass,
+                   long double large_mass) -> long double {
+  long double period_in_years = NAN;
 
   period_in_years = sqrt(pow3(separation) / (small_mass + large_mass));
   return period_in_years * DAYS_IN_A_YEAR;
@@ -564,8 +572,8 @@ long double period(long double separation, long double small_mass,
 /* The length of the day is returned in units of hours.                     */
 /*--------------------------------------------------------------------------*/
 
-long double day_length(planet *the_planet, long double parent_mass,
-                       bool is_moon) {
+auto day_length(planet *the_planet, long double parent_mass,
+                       bool is_moon) -> long double {
   long double planetary_mass_in_grams =
       the_planet->getMass() * SOLAR_MASS_IN_GRAMS;
   long double equatorial_radius_in_cm = the_planet->getRadius() * CM_PER_KM;
@@ -574,12 +582,12 @@ long double day_length(planet *the_planet, long double parent_mass,
   the_planet->getType() == tGasGiant || the_planet->getType() == tBrownDwarf ||
       the_planet->getType() == tSubGasGiant ||
       the_planet->getType() == tSubSubGasGiant;
-  long double k2;
-  long double base_angular_velocity;
-  long double change_in_angular_velocity;
-  long double ang_velocity;
-  long double spin_resonance_factor;
-  long double day_in_hours;
+  long double k2 = NAN;
+  long double base_angular_velocity = NAN;
+  long double change_in_angular_velocity = NAN;
+  long double ang_velocity = NAN;
+  long double spin_resonance_factor = NAN;
+  long double day_in_hours = NAN;
 
   bool stopped = false;
 
@@ -648,7 +656,7 @@ long double day_length(planet *the_planet, long double parent_mass,
 /* Inclination is returned in units of degrees. (seb: real)            */
 /*---------------------------------------------------------------------*/
 
-long double inclination(long double orb_radius, long double parent_mass) {
+auto inclination(long double orb_radius, long double parent_mass) -> long double {
   // seb: Earth's obliquity is not a good test
   // a. want real result, not integer
   // b. obliquity of planets near stars is erroded by tidal heating
@@ -656,7 +664,7 @@ long double inclination(long double orb_radius, long double parent_mass) {
   // Tidal obliquity evolution of potentialy habitable planets
   // Heller et al. (2011)
 
-  long double temp;
+  long double temp = NAN;
   temp = fabs(gaussian(33.3));
   temp = pow(orb_radius / 50.0, 0.2) * temp;
   if (orb_radius < parent_mass) {
@@ -673,8 +681,8 @@ long double inclination(long double orb_radius, long double parent_mass) {
 /* velocity returned is in cm/sec.                                       */
 /*-----------------------------------------------------------------------*/
 
-long double escape_vel(long double mass, long double radius) {
-  long double mass_in_grams, radius_in_cm;
+auto escape_vel(long double mass, long double radius) -> long double {
+  long double mass_in_grams = NAN, radius_in_cm = NAN;
 
   mass_in_grams = mass * SOLAR_MASS_IN_GRAMS;
   radius_in_cm = radius * CM_PER_KM;
@@ -688,12 +696,12 @@ long double escape_vel(long double mass, long double radius) {
 /* Orbital radius is in A.U.(ie: in units of the earth's orbital radius). */
 /*------------------------------------------------------------------------*/
 
-long double rms_vel(long double molecular_weight, long double exospheric_temp) {
+auto rms_vel(long double molecular_weight, long double exospheric_temp) -> long double {
   return sqrt((3.0 * MOLAR_GAS_CONST * exospheric_temp) / molecular_weight) *
          CM_PER_METER;
 }
 
-long double min_molec_weight(planet *the_planet) {
+auto min_molec_weight(planet *the_planet) -> long double {
   long double mass = the_planet->getMass();
   long double radius = the_planet->getRadius();
   long double temp = the_planet->getExosphericTemp();
@@ -745,8 +753,8 @@ long double min_molec_weight(planet *the_planet) {
 /* kilometers.                                                            */
 /*------------------------------------------------------------------------*/
 
-long double molecule_limit(long double mass, long double equat_radius,
-                           long double exospheric_temp) {
+auto molecule_limit(long double mass, long double equat_radius,
+                           long double exospheric_temp) -> long double {
   long double esc_velocity = escape_vel(mass, equat_radius);
 
   return (3.0 * MOLAR_GAS_CONST * exospheric_temp) /
@@ -759,7 +767,7 @@ long double molecule_limit(long double mass, long double equat_radius,
 /* acceleration is returned in units of cm/sec2.                        */
 /*----------------------------------------------------------------------*/
 
-long double acceleration(long double mass, long double radius) {
+auto acceleration(long double mass, long double radius) -> long double {
   return GRAV_CONSTANT * (mass * SOLAR_MASS_IN_GRAMS) /
          pow2(radius * CM_PER_KM);
 }
@@ -770,7 +778,7 @@ long double acceleration(long double mass, long double radius) {
 /* units of Earth gravities.                                           */
 /*---------------------------------------------------------------------*/
 
-long double gravity(long double acceleration) {
+auto gravity(long double acceleration) -> long double {
   return (acceleration / EARTH_ACCELERATION);
 }
 
@@ -778,10 +786,10 @@ long double gravity(long double acceleration) {
 /*	This implements Fogg's eq.17.  The 'inventory' returned is unitless. */
 /*---------------------------------------------------------------------------*/
 
-long double vol_inventory(long double mass, long double escape_vel,
+auto vol_inventory(long double mass, long double escape_vel,
                           long double rms_vel, long double stellar_mass,
-                          int zone, bool greenhouse_effect, bool accreted_gas) {
-  long double velocity_ratio, proportion_const, temp1, temp2, earth_units;
+                          int zone, bool greenhouse_effect, bool accreted_gas) -> long double {
+  long double velocity_ratio = NAN, proportion_const = NAN, temp1 = NAN, temp2 = NAN, earth_units = NAN;
 
   velocity_ratio = escape_vel / rms_vel;
   if (velocity_ratio >= GAS_RETENTION_THRESHOLD || accreted_gas) {
@@ -827,8 +835,8 @@ long double vol_inventory(long double mass, long double escape_vel,
  */
 /*------------------------------------------------------------------------------*/
 
-long double pressure(long double volatile_gas_inventory,
-                     long double equat_radius, long double gravity) {
+auto pressure(long double volatile_gas_inventory,
+                     long double equat_radius, long double gravity) -> long double {
   equat_radius = KM_EARTH_RADIUS / equat_radius;
   return volatile_gas_inventory * gravity *
          (EARTH_SURF_PRES_IN_MILLIBARS / 1000.0) / pow2(equat_radius);
@@ -840,8 +848,8 @@ long double pressure(long double volatile_gas_inventory,
 /* returned in units of Kelvin.  This is Fogg's eq.21.                       */
 /*---------------------------------------------------------------------------*/
 
-long double boiling_point(long double surf_pressure) {
-  long double surface_pressure_in_bars;
+auto boiling_point(long double surf_pressure) -> long double {
+  long double surface_pressure_in_bars = NAN;
 
   surface_pressure_in_bars = surf_pressure / MILLIBARS_PER_BAR;
   return 1.0 / ((log(surface_pressure_in_bars) / -5050.5) + (1.0 / 373.0));
@@ -855,9 +863,9 @@ long double boiling_point(long double surf_pressure) {
 /* surface covered by water is 71%, not 75% as Fogg used.                     */
 /*----------------------------------------------------------------------------*/
 
-long double hydro_fraction(long double volatile_gas_inventory,
-                           long double planet_radius) {
-  long double temp;
+auto hydro_fraction(long double volatile_gas_inventory,
+                           long double planet_radius) -> long double {
+  long double temp = NAN;
 
   temp = (0.71 * volatile_gas_inventory / 1000.0) *
          pow2(KM_EARTH_RADIUS / planet_radius);
@@ -879,11 +887,11 @@ long double hydro_fraction(long double volatile_gas_inventory,
 /* covered by one Kg. of cloud.                                          */
 /*-----------------------------------------------------------------------*/
 
-long double cloud_fraction(long double surf_temp,
+auto cloud_fraction(long double surf_temp,
                            long double smallest_MW_retained,
                            long double equat_radius,
-                           long double hydro_fraction) {
-  long double water_vapor_in_kg, fraction, surf_area, hydro_mass;
+                           long double hydro_fraction) -> long double {
+  long double water_vapor_in_kg = NAN, fraction = NAN, surf_area = NAN, hydro_mass = NAN;
 
   if (smallest_MW_retained > WATER_VAPOR) {
     return 0.0;
@@ -911,8 +919,8 @@ long double cloud_fraction(long double surf_temp,
 /* is approximatly .016 (=1.6%). */
 /*------------------------------------------------------------------------------*/
 
-long double ice_fraction(long double hydro_fraction, long double surf_temp) {
-  long double temp;
+auto ice_fraction(long double hydro_fraction, long double surf_temp) -> long double {
+  long double temp = NAN;
 
   if (surf_temp > 328.0) {
     surf_temp = 328.0;
@@ -932,14 +940,14 @@ long double ice_fraction(long double hydro_fraction, long double surf_temp) {
 /* This is Fogg's eq.19.  The ecosphere radius is given in AU, the orbital  */
 /* radius in AU, and the temperature returned is in Kelvin.                 */
 /*--------------------------------------------------------------------------*/
-long double eff_temp(long double ecosphere_radius, long double orb_radius,
-                     long double albedo) {
+auto eff_temp(long double ecosphere_radius, long double orb_radius,
+                     long double albedo) -> long double {
   return sqrt(ecosphere_radius / orb_radius) *
          pow1_4((1.0 - albedo) / (1.0 - EARTH_ALBEDO)) * EARTH_EFFECTIVE_TEMP;
 }
 
-long double est_temp(long double ecosphere_radius, long double orb_radius,
-                     long double albedo) {
+auto est_temp(long double ecosphere_radius, long double orb_radius,
+                     long double albedo) -> long double {
   return sqrt(ecosphere_radius / orb_radius) *
          pow1_4((1.0 - albedo) / (1.0 - EARTH_ALBEDO)) * EARTH_AVERAGE_KELVIN;
 }
@@ -960,7 +968,7 @@ long double est_temp(long double ecosphere_radius, long double orb_radius,
 /* Neither zone, nor r_greenhouse are used in this version. JLB           */
 /*------------------------------------------------------------------------*/
 
-bool grnhouse(long double r_ecosphere, long double orb_radius) {
+auto grnhouse(long double r_ecosphere, long double orb_radius) -> bool {
   long double temp =
       eff_temp(r_ecosphere, orb_radius, GREENHOUSE_TRIGGER_ALBEDO);
 
@@ -979,8 +987,8 @@ bool grnhouse(long double r_ecosphere, long double orb_radius) {
 /* I tuned this by changing a pow(x,.25) to pow(x,.4) to match Venus - JLB */
 /*-------------------------------------------------------------------------*/
 
-long double green_rise(long double optical_depth, long double effective_temp,
-                       long double surf_pressure) {
+auto green_rise(long double optical_depth, long double effective_temp,
+                       long double surf_pressure) -> long double {
   long double convection_factor =
       EARTH_CONVECTION_FACTOR *
       pow(surf_pressure / EARTH_SURF_PRES_IN_MILLIBARS, 0.4);
@@ -1000,10 +1008,10 @@ long double green_rise(long double optical_depth, long double effective_temp,
 /* of the three major components of albedo that lie below the clouds. */
 /*--------------------------------------------------------------------*/
 
-long double planet_albedo(planet *the_planet) {
-  long double water_fraction, cloud_fraction, ice_fraction, surf_pressure,
-      rock_fraction, cloud_adjustment, components, cloud_part, rock_part,
-      water_part, ice_part;
+auto planet_albedo(planet *the_planet) -> long double {
+  long double water_fraction = NAN, cloud_fraction = NAN, ice_fraction = NAN, surf_pressure = NAN,
+      rock_fraction = NAN, cloud_adjustment = NAN, components = NAN, cloud_part = NAN, rock_part = NAN,
+      water_part = NAN, ice_part = NAN;
 
   sun the_sun = the_planet->getTheSun();
   water_fraction = the_planet->getHydrosphere();
@@ -1072,8 +1080,8 @@ long double planet_albedo(planet *the_planet) {
 /* planet.                                                             */
 /*---------------------------------------------------------------------*/
 
-long double opacity(long double molecular_weight, long double surf_pressure) {
-  long double optical_depth;
+auto opacity(long double molecular_weight, long double surf_pressure) -> long double {
+  long double optical_depth = NAN;
 
   optical_depth = 0.0;
   if (molecular_weight >= 0.0 && molecular_weight < 10.0) {
@@ -1120,7 +1128,7 @@ long double opacity(long double molecular_weight, long double surf_pressure) {
  *	from a planet's atmosphere.
  *	Taken from Dole p. 34. He cites Jeans (1916) & Jones (1923)
  */
-long double gas_life(long double molecular_weight, planet *the_planet) {
+auto gas_life(long double molecular_weight, planet *the_planet) -> long double {
   long double v = rms_vel(molecular_weight, the_planet->getExosphericTemp());
   long double g = the_planet->getSurfGrav() * EARTH_ACCELERATION;
   long double r = the_planet->getRadius() * CM_PER_KM;
@@ -1151,10 +1159,10 @@ void calculate_surface_temp(planet *the_planet, bool first,
                             long double last_water, long double last_clouds,
                             long double last_ice, long double last_temp,
                             long double last_albedo, bool do_gasses) {
-  long double effective_temp;
-  long double water_raw;
-  long double clouds_raw;
-  long double greenhouse_temp;
+  long double effective_temp = NAN;
+  long double water_raw = NAN;
+  long double clouds_raw = NAN;
+  long double greenhouse_temp = NAN;
   bool boil_off = false;
   sun the_sun = the_planet->getTheSun();
   long double the_fudged_radius = fudged_radius(
@@ -1388,8 +1396,8 @@ void iterate_surface_temp(planet *the_planet, bool do_gasses) {
 /* air in the nasal passage and throat This formula is on Dole's p. 14  */
 /*----------------------------------------------------------------------*/
 
-long double inspired_partial_pressure(long double surf_pressure,
-                                      long double gas_pressure) {
+auto inspired_partial_pressure(long double surf_pressure,
+                                      long double gas_pressure) -> long double {
   long double pH2O = (H20_ASSUMED_PRESSURE);
   long double fraction = gas_pressure / surf_pressure;
 
@@ -1403,7 +1411,7 @@ long double inspired_partial_pressure(long double surf_pressure,
 /* of the planet's atmosphere. JLB                                        */
 /*------------------------------------------------------------------------*/
 
-unsigned int breathability(planet *the_planet) {
+auto breathability(planet *the_planet) -> unsigned int {
   bool nitrogen_ok = false;
   bool oxygen_ok = false;
   bool co2_ok = false;
@@ -1477,7 +1485,7 @@ void set_temp_range(planet *the_planet) {
   the_planet->setMinTemp(soft(wl, max, min));
 }
 
-long double getSpinResonanceFactor(long double eccentricity) {
+auto getSpinResonanceFactor(long double eccentricity) -> long double {
   long double top = 1.0 - eccentricity;
   long double bottom = 1.0 + eccentricity;
   long double fraction = top / bottom;
@@ -1546,9 +1554,9 @@ long double getSpinResonanceFactor(long double eccentricity) {
   }
 }
 
-long double radius_improved(long double mass, long double imf, long double rmf,
+auto radius_improved(long double mass, long double imf, long double rmf,
                             long double cmf, bool giant, int zone,
-                            planet *the_planet) {
+                            planet *the_planet) -> long double {
   long double non_ice_rock_radius = 0.0;
   ;
   long double ice_rock_radius = 0.0;
@@ -1559,7 +1567,7 @@ long double radius_improved(long double mass, long double imf, long double rmf,
   map<long double, long double> non_ice_rock_radii;
   map<long double, long double> ice_rock_radii;
   map<long double, long double> ice_iron_radii;
-  long double range, upper_fraction, lower_fraction;
+  long double range = NAN, upper_fraction = NAN, lower_fraction = NAN;
   long double half_mass_factor = 0.0;
   long double iron_ratio = 0.0;
   if (imf < 1.0) {
@@ -1669,11 +1677,11 @@ long double radius_improved(long double mass, long double imf, long double rmf,
   return radius;
 }
 
-long double fudged_radius(long double mass, long double imf, long double rmf,
+auto fudged_radius(long double mass, long double imf, long double rmf,
                           long double cmf, bool giant, int zone,
-                          planet *the_planet) {
-  long double range, upper_fraction, lower_fraction, non_ice_rock_radius,
-      ice_rock_radius, radius;
+                          planet *the_planet) -> long double {
+  long double range = NAN, upper_fraction = NAN, lower_fraction = NAN, non_ice_rock_radius = NAN,
+      ice_rock_radius = NAN, radius = NAN;
   mass *= SUN_MASS_IN_EARTH_MASSES;
   if (rmf <= 0.5) {
     range = 0.5 - 0.0;
@@ -1731,9 +1739,9 @@ long double fudged_radius(long double mass, long double imf, long double rmf,
   return radius;
 }
 
-long double gas_radius(long double temperature, long double core_mass,
+auto gas_radius(long double temperature, long double core_mass,
                        long double total_mass, long double star_age,
-                       planet *the_planet) {
+                       planet *the_planet) -> long double {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -1742,7 +1750,7 @@ long double gas_radius(long double temperature, long double core_mass,
   long double lower_fraction = 0.0;
   long double upper_fraction = 0.0;
   long double range = 0.0;
-  long double radius;
+  long double radius = NAN;
   map<int, long double> age_radii;
   age_radii[300.0E6] = gas_radius_300Myr(temperature, core_earth_masses,
                                          total_earth_masses, the_planet);
@@ -1820,11 +1828,11 @@ long double gas_radius(long double temperature, long double core_mass,
   return radius;
 }
 
-long double round_threshold(long double density) {
+auto round_threshold(long double density) -> long double {
   return (170.0 * sqrt(ultimateStrength(density)) * pow(density, -1.0)) / 2.0;
 }
 
-long double ultimateStrength(long double density) {
+auto ultimateStrength(long double density) -> long double {
   if (density < 2.5) {
     return 1.046601879 * pow(4.294487989, density);
   } else {
@@ -1832,23 +1840,23 @@ long double ultimateStrength(long double density) {
   }
 }
 
-long double calc_stellar_flux(long double a, long double b, long double c,
+auto calc_stellar_flux(long double a, long double b, long double c,
                               long double d, long double seff,
-                              long double star_temp, long double star_lum) {
+                              long double star_temp, long double star_lum) -> long double {
   long double t = star_temp - 5780.0;
   // cout << star_temp << endl;
   return (seff) + (a * t) + (b * pow(t, 2.0)) + (c * pow(t, 3.0)) +
          (d * pow(t, 4.0));
 }
 
-long double habitable_zone_distance_helper(long double effTemp,
+auto habitable_zone_distance_helper(long double effTemp,
                                            long double luminosity, int mode,
-                                           long double mass) {
+                                           long double mass) -> long double {
   long double stellar_flux = 0;
-  long double a, b, c, d, seff;
-  long double stellar_flux_green1, stellar_flux_green2, stellar_flux_moist1,
-      stellar_flux_earth1, stellar_flux_max1, stellar_flux_max2, diff, percent,
-      temp;
+  long double a = NAN, b = NAN, c = NAN, d = NAN, seff = NAN;
+  long double stellar_flux_green1 = NAN, stellar_flux_green2 = NAN, stellar_flux_moist1 = NAN,
+      stellar_flux_earth1 = NAN, stellar_flux_max1 = NAN, stellar_flux_max2 = NAN, diff = NAN, percent = NAN,
+      temp = NAN;
 
   if (mass < 0.1) {
     mass = 0.1;
@@ -1975,7 +1983,7 @@ long double habitable_zone_distance_helper(long double effTemp,
   return stellar_flux;
 }
 
-long double habitable_zone_distance(sun &the_sun, int mode, long double mass) {
+auto habitable_zone_distance(sun &the_sun, int mode, long double mass) -> long double {
   long double stellar_flux = 0;
   // long double stellar_flux2 = 0;
   // long double combined_stellar_flux = 0;
@@ -2056,22 +2064,22 @@ long double habitable_zone_distance(sun &the_sun, int mode, long double mass) {
   return 0;
 }
 
-long double calcLambda(long double distance, long double mass) {
+auto calcLambda(long double distance, long double mass) -> long double {
   return (pow(mass, 2.0) / pow(distance, 3.0 / 2.0)) * 1.7E16;
 }
 
 void gas_giant_temperature_albedo(planet *the_planet, long double parent_mass,
                                   bool is_moon) {
-  long double temp1;
-  long double temp2;
-  long double temp3;
-  long double temp4;
-  long double temp5;
-  long double temp6;
-  long double new_albedo;
-  long double new_radius;
-  long double new_day;
-  long double new_obleteness;
+  long double temp1 = NAN;
+  long double temp2 = NAN;
+  long double temp3 = NAN;
+  long double temp4 = NAN;
+  long double temp5 = NAN;
+  long double temp6 = NAN;
+  long double new_albedo = NAN;
+  long double new_radius = NAN;
+  long double new_day = NAN;
+  long double new_obleteness = NAN;
   int loops = 0;
   if (the_planet->getTheSun().getAge() == 0.0) {
     the_planet->setTheSun(the_sun_clone);
@@ -2165,8 +2173,8 @@ void gas_giant_temperature_albedo(planet *the_planet, long double parent_mass,
   the_planet->setOblateness(temp6);
 }
 
-long double getGasGiantAlbedo(string sudusky_class, string star_type,
-                              long double luminosity) {
+auto getGasGiantAlbedo(const string& sudusky_class, const string& star_type,
+                              long double luminosity) -> long double {
   int num = star_type_to_num(star_type, luminosity);
 
   if (sudusky_class == "I") {
@@ -2197,7 +2205,7 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
       the_sun.getAge() > 0) {
     // cout << "test 1" << endl;
     // cout << planet_id << endl;
-    long double *amount = NULL;
+    long double *amount = nullptr;
     long double totalamount = 0;
     long double pressure = the_planet->getSurfPressure() / MILLIBARS_PER_BAR;
     amount = new long double[gases.count()];
@@ -2303,7 +2311,7 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
       }
     }
 
-    long double original_total;
+    long double original_total = NAN;
     long double increase_factor = 1.0;
     // long double pressure = 0.0;
     map<int, long double> new_values;
@@ -2475,7 +2483,7 @@ void assign_composition(planet *the_planet, sun &the_sun, bool is_moon) {
       ((the_planet->getDustMass() * SUN_MASS_IN_EARTH_MASSES) > 0.005 &&
        is_moon)) {
     if (the_planet->getImf() == 0 && the_planet->getRmf() == 0) {
-      long double rock_max;
+      long double rock_max = NAN;
       the_planet->setImf(0);
       if (the_planet->getOrbitZone() == 2) {
         the_planet->setImf(random_number(0, 0.5));
@@ -2496,7 +2504,7 @@ void assign_composition(planet *the_planet, sun &the_sun, bool is_moon) {
       the_planet->setCmf(pow(random_number(0, 1), 8.0));
     }
   } else {
-    long double rand;
+    long double rand = NAN;
     rand = random_number(0.0, 100.0);
     if (the_planet->getOrbitZone() == 1) {
       if (the_planet->getRmf() == 0) {
@@ -2550,7 +2558,7 @@ void assign_composition(planet *the_planet, sun &the_sun, bool is_moon) {
   }
 }
 
-bool is_gas_planet(planet *the_planet) {
+auto is_gas_planet(planet *the_planet) -> bool {
   if (the_planet->getGasMass() == 0) {
     return false;
   }
@@ -2563,7 +2571,7 @@ bool is_gas_planet(planet *the_planet) {
   return false;
 }
 
-bool is_earth_like_size(planet *the_planet) {
+auto is_earth_like_size(planet *the_planet) -> bool {
   if (((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) >= 0.5 &&
        (the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) <= 2.0) ||
       ((convert_km_to_eu(the_planet->getRadius())) >= 0.8 &&
@@ -2573,7 +2581,7 @@ bool is_earth_like_size(planet *the_planet) {
   return false;
 }
 
-bool is_earth_like(planet *the_planet) {
+auto is_earth_like(planet *the_planet) -> bool {
   long double rel_temp = (the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER) -
                          EARTH_AVERAGE_CELSIUS;
   long double seas = the_planet->getHydrosphere() * 100.0;
@@ -2643,7 +2651,7 @@ bool is_earth_like(planet *the_planet) {
   return true;
 }
 
-bool is_habitable_jovian_conservative(planet *the_planet) {
+auto is_habitable_jovian_conservative(planet *the_planet) -> bool {
   if (!is_habitable_jovian(the_planet)) {
     return false;
   } else if (the_planet->getA() <
@@ -2659,7 +2667,7 @@ bool is_habitable_jovian_conservative(planet *the_planet) {
   return true;
 }
 
-bool is_habitable_jovian(planet *the_planet) {
+auto is_habitable_jovian(planet *the_planet) -> bool {
   sun the_sun = the_planet->getTheSun();
 
   // if (is_gas_planet(the_planet) && the_planet->getEstimatedTerrTemp() >=
@@ -2673,7 +2681,7 @@ bool is_habitable_jovian(planet *the_planet) {
   return true;
 }
 
-bool is_terrestrial(planet *the_planet) {
+auto is_terrestrial(planet *the_planet) -> bool {
   if (the_planet->getType() == tTerrestrial ||
       the_planet->getType() == tWater ||
       ((the_planet->getType() == t1Face || the_planet->getType() == tIce ||
@@ -2689,7 +2697,7 @@ bool is_terrestrial(planet *the_planet) {
   return false;
 }
 
-long double calcOblateness(planet *the_planet) {
+auto calcOblateness(planet *the_planet) -> long double {
   long double multiplier = 0;
   long double oblateness = 0;
   long double mass_in_eu = 0;
@@ -2726,12 +2734,12 @@ long double calcOblateness(planet *the_planet) {
   return oblateness;
 }
 
-long double calcPhlPressure(planet *the_planet) {
+auto calcPhlPressure(planet *the_planet) -> long double {
   return (100 * 0.87 * pow2(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)) /
          (87.0 * pow3(convert_km_to_eu(the_planet->getRadius())));
 }
 
-bool is_habitable_optimistic(planet *the_planet) {
+auto is_habitable_optimistic(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_optimistic(the_planet)) {
     return false;
   } else if (breathability(the_planet) != BREATHABLE) {
@@ -2740,7 +2748,7 @@ bool is_habitable_optimistic(planet *the_planet) {
   return true;
 }
 
-long double calcHzd(planet *the_planet) {
+auto calcHzd(planet *the_planet) -> long double {
   sun the_sun = the_planet->getTheSun();
   long double inner_edge = habitable_zone_distance(
       the_sun, RECENT_VENUS, the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES);
@@ -2750,12 +2758,12 @@ long double calcHzd(planet *the_planet) {
          (outer_edge - inner_edge);
 }
 
-long double calcHzcHelper(long double m1, long double r1, long double k1,
-                          long double k2, long double k3, long double m) {
+auto calcHzcHelper(long double m1, long double r1, long double k1,
+                          long double k2, long double k3, long double m) -> long double {
   return r1 * pow(10.0, k1 + (log10(m / m1) / 3.0) - (k2 * pow(m / m1, k3)));
 }
 
-long double calcHzc(planet *the_planet) {
+auto calcHzc(planet *the_planet) -> long double {
   // long double ro = calcHzcHelper(5.52, 4.43, -0.209396, 0.0807, 0.375,
   // the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES); long double ri =
   // calcHzcHelper(5.80, 2.52, -0.209490, 0.0804, 0.394, the_planet->getMass() *
@@ -2770,9 +2778,9 @@ long double calcHzc(planet *the_planet) {
   return ((2.0 * r) - ro - ri) / (ro - ri);
 }
 
-long double calcV(long double t, long double m) { return sqrt((2E-2 * t) / m); }
+auto calcV(long double t, long double m) -> long double { return sqrt((2E-2 * t) / m); }
 
-long double calcHza(planet *the_planet) {
+auto calcHza(planet *the_planet) -> long double {
   long double veh = calcV(the_planet->getEstimatedTerrTemp(), 1.0);
   long double ven = calcV(the_planet->getEstimatedTerrTemp(), 14.0);
   return ((2.0 * sqrt((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) /
@@ -2781,12 +2789,12 @@ long double calcHza(planet *the_planet) {
          (veh - ven);
 }
 
-long double calcEsiHelper(long double value, long double ref_value,
-                          long double weight, long double n) {
+auto calcEsiHelper(long double value, long double ref_value,
+                          long double weight, long double n) -> long double {
   return pow(1.0 - fabs((value - ref_value) / (value + ref_value)), weight / n);
 }
 
-long double calcEsi(planet *the_planet) {
+auto calcEsi(planet *the_planet) -> long double {
   long double esir =
       calcEsiHelper(convert_km_to_eu(the_planet->getRadius()), 1.0, 0.57);
   long double esid =
@@ -2798,8 +2806,8 @@ long double calcEsi(planet *the_planet) {
   return esir * esid * esiv * esit;
 }
 
-long double calcSphHelper(long double min, long double max, long double opt,
-                          long double x, long double w) {
+auto calcSphHelper(long double min, long double max, long double opt,
+                          long double x, long double w) -> long double {
   if (x > min && x < max) {
     return pow(fabs(((x - min) * (x - max)) /
                     (((x - min) * (x - max)) - pow(x - opt, 2.0))),
@@ -2809,7 +2817,7 @@ long double calcSphHelper(long double min, long double max, long double opt,
   }
 }
 
-long double calcSph(planet *the_planet) {
+auto calcSph(planet *the_planet) -> long double {
   long double ht =
       calcSphHelper(-8.3, 39.0, 24.1,
                     the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER, 3.0);
@@ -2819,7 +2827,7 @@ long double calcSph(planet *the_planet) {
   return ht * hrh;
 }
 
-bool is_potentialy_habitable_optimistic_size(planet *the_planet) {
+auto is_potentialy_habitable_optimistic_size(planet *the_planet) -> bool {
   /*if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 10.0 ||
    (the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) < 0.1) // The Plantary
    Habitablity Laboratory believes habitable planets have to be in the range of
@@ -2842,7 +2850,7 @@ bool is_potentialy_habitable_optimistic_size(planet *the_planet) {
   return false;
 }
 
-bool is_potentialy_habitable_optimistic(planet *the_planet) {
+auto is_potentialy_habitable_optimistic(planet *the_planet) -> bool {
   sun the_sun = the_planet->getTheSun();
   string spec_type = the_sun.getSpecType();
   if (compare_string_char(spec_type, 1, "?")) {
@@ -2894,9 +2902,9 @@ bool is_potentialy_habitable_optimistic(planet *the_planet) {
   return true;
 }
 
-long double calcRelHumidity(planet *the_planet) {
-  long double surf_area, hydro_mass, staturated_mass, water_vapor_in_kg,
-      max_possible_water_vapor_in_kg;
+auto calcRelHumidity(planet *the_planet) -> long double {
+  long double surf_area = NAN, hydro_mass = NAN, staturated_mass = NAN, water_vapor_in_kg = NAN,
+      max_possible_water_vapor_in_kg = NAN;
   if (the_planet->getMolecWeight() > WATER_VAPOR) {
     return 0.0;
   } else {
@@ -2914,7 +2922,7 @@ long double calcRelHumidity(planet *the_planet) {
   }
 }
 
-long double getPlantLifeAlbedo(string star_type, long double luminosity) {
+auto getPlantLifeAlbedo(const string& star_type, long double luminosity) -> long double {
   int num = star_type_to_num(star_type, luminosity);
 
   if (num >= 31 && num <= 33) {
@@ -2935,7 +2943,7 @@ long double getPlantLifeAlbedo(string star_type, long double luminosity) {
   return ROCKY_ALBEDO;
 }
 
-long double calcFlux(long double temperature, long double wavelength) {
+auto calcFlux(long double temperature, long double wavelength) -> long double {
   wavelength /= 1000.0;
   wavelength /= 1000000.0;
   long double first = 2.0 * (long double)H * pow((long double)C, 2.0);
@@ -2952,24 +2960,24 @@ long double calcFlux(long double temperature, long double wavelength) {
   return (first / second) * (1.0 / seventh);
 }
 
-long double calculate_moment_of_inertia_coeffient(planet *the_planet) {
-  long double result;
+auto calculate_moment_of_inertia_coeffient(planet *the_planet) -> long double {
+  long double result = NAN;
   result = calculate_moment_of_inertia(the_planet) /
            (the_planet->getMass() * pow2(the_planet->getRadius()));
   return result;
 }
 
-long double calculate_moment_of_inertia(planet *the_planet) {
-  long double result;
+auto calculate_moment_of_inertia(planet *the_planet) -> long double {
+  long double result = NAN;
   result = (2.0 / 5.0) * the_planet->getMass() * pow2(the_planet->getRadius());
   return result;
 }
 
-long double calcOblateness_improved(long double angular_velocity,
+auto calcOblateness_improved(long double angular_velocity,
                                     long double planetary_mass_in_grams,
                                     long double equatorial_radius_in_cm,
-                                    long double k2) {
-  long double result;
+                                    long double k2) -> long double {
+  long double result = NAN;
   result =
       ((pow2(angular_velocity) * pow3(equatorial_radius_in_cm)) /
        (GRAV_CONSTANT * planetary_mass_in_grams)) *
@@ -2977,7 +2985,7 @@ long double calcOblateness_improved(long double angular_velocity,
   return result;
 }
 
-long double calcLuminosity(planet *the_planet) {
+auto calcLuminosity(planet *the_planet) -> long double {
   long double star_luminosity = the_planet->getTheSun().getLuminosity();
   if (star_luminosity == 0.0) {
     the_planet->setTheSun(the_sun_clone);
@@ -2986,8 +2994,8 @@ long double calcLuminosity(planet *the_planet) {
   return pow2(1.0 / the_planet->getA()) * star_luminosity;
 }
 
-long double calcGasRadius(planet *the_planet) {
-  long double lower, upper, result, density;
+auto calcGasRadius(planet *the_planet) -> long double {
+  long double lower = NAN, upper = NAN, result = NAN, density = NAN;
   if (the_planet->getCoreRadius() <= 0.0) {
     the_planet->setCoreRadius(radius_improved(
         the_planet->getDustMass(), the_planet->getImf(), the_planet->getRmf(),
@@ -3031,15 +3039,15 @@ long double calcGasRadius(planet *the_planet) {
   return result;
 }
 
-long double calcSolidRadius(planet *the_planet) {
+auto calcSolidRadius(planet *the_planet) -> long double {
   return radius_improved(the_planet->getMass(), the_planet->getImf(),
                          the_planet->getRmf(), the_planet->getCmf(),
                          the_planet->getGasGiant(), the_planet->getOrbitZone(),
                          the_planet);
 }
 
-long double calcRadius(planet *the_planet) {
-  long double result;
+auto calcRadius(planet *the_planet) -> long double {
+  long double result = NAN;
   if (the_planet->getCoreRadius() <= 0.0) {
     the_planet->setCoreRadius(radius_improved(
         the_planet->getDustMass(), the_planet->getImf(), the_planet->getRmf(),
@@ -3055,10 +3063,10 @@ long double calcRadius(planet *the_planet) {
   return result;
 }
 
-long double planet_radius_helper(long double planet_mass, long double mass1,
+auto planet_radius_helper(long double planet_mass, long double mass1,
                                  long double radius1, long double mass2,
                                  long double radius2, long double mass3,
-                                 long double radius3, bool use_cache) {
+                                 long double radius3, bool use_cache) -> long double {
   // some imput validation for debuging purposes
   bool show_debug = false;
   if (mass1 != 0.0 && radius1 == 0.0) {
@@ -3113,8 +3121,8 @@ long double planet_radius_helper(long double planet_mass, long double mass1,
       while (!coeff_cache.empty()) {
         coeff_cache.pop_back();
       }
-      for (int i = 0; i < 3; i++) {
-        coeff_cache.push_back(coeff[i]);
+      for (long double & i : coeff) {
+        coeff_cache.push_back(i);
       }
       polynomial_cache[cache_name] = coeff_cache;
     }
@@ -3125,9 +3133,9 @@ long double planet_radius_helper(long double planet_mass, long double mass1,
   return radius;
 }
 
-long double planet_radius_helper2(long double planet_mass, long double mass1,
+auto planet_radius_helper2(long double planet_mass, long double mass1,
                                   long double radius1, long double mass2,
-                                  long double radius2) {
+                                  long double radius2) -> long double {
   long double radius = 0.0;
   long double a = 0.0;
   long double b = 0.0;
@@ -3136,14 +3144,14 @@ long double planet_radius_helper2(long double planet_mass, long double mass1,
   return radius;
 }
 
-long double planet_radius_helper3(long double temperature,
+auto planet_radius_helper3(long double temperature,
                                   long double temperature1, long double radius1,
                                   long double temperature2,
-                                  long double radius2) {
+                                  long double radius2) -> long double {
   long double a = 0.0;
   long double b = 0.0;
   long double radius = 0.0;
-  long double adjusted_temperature;
+  long double adjusted_temperature = NAN;
   long double adjusted_temperature1 = temperature1 / 1000.0;
   long double adjusted_temperature2 = temperature2 / 1000.0;
   e_fix(adjusted_temperature1, radius1, adjusted_temperature2, radius2, a, b);
@@ -3153,13 +3161,13 @@ long double planet_radius_helper3(long double temperature,
 
 // these should be in utils.cpp but because of a some sort of class between
 // const.h and the boost libary, it is here instead.
-long double convert_su_to_eu(long double mass) {
+auto convert_su_to_eu(long double mass) -> long double {
   return mass * SUN_MASS_IN_EARTH_MASSES;
 }
 
-long double convert_au_to_km(long double au) { return au * KM_PER_AU; }
+auto convert_au_to_km(long double au) -> long double { return au * KM_PER_AU; }
 
-bool is_potentialy_habitable_conservative_size(planet *the_planet) {
+auto is_potentialy_habitable_conservative_size(planet *the_planet) -> bool {
   if (((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) >= 0.5 &&
        (the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) <= 5.0) ||
       ((convert_km_to_eu(the_planet->getRadius())) >= 0.8 &&
@@ -3169,7 +3177,7 @@ bool is_potentialy_habitable_conservative_size(planet *the_planet) {
   return false;
 }
 
-bool is_potentialy_habitable_conservative(planet *the_planet) {
+auto is_potentialy_habitable_conservative(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_optimistic(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
     // potentionally habitable by optimistic" << endl;
@@ -3193,7 +3201,7 @@ bool is_potentialy_habitable_conservative(planet *the_planet) {
   return true;
 }
 
-bool is_habitable_conservative(planet *the_planet) {
+auto is_habitable_conservative(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_conservative(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
     // potentionally habitable by conservative" << endl;
@@ -3206,7 +3214,7 @@ bool is_habitable_conservative(planet *the_planet) {
   return true;
 }
 
-bool is_potentialy_habitable_extended_size(planet *the_planet) {
+auto is_potentialy_habitable_extended_size(planet *the_planet) -> bool {
   if (((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) >= 0.1 &&
        (the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) <= 10.0) ||
       ((convert_km_to_eu(the_planet->getRadius())) >= 0.5 &&
@@ -3216,7 +3224,7 @@ bool is_potentialy_habitable_extended_size(planet *the_planet) {
   return false;
 }
 
-bool is_potentialy_habitable_extended(planet *the_planet) {
+auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
   sun the_sun = the_planet->getTheSun();
   string star_type = the_sun.getSpecType();
   if (!is_potentialy_habitable_extended_size(the_planet)) {
@@ -3269,7 +3277,7 @@ bool is_potentialy_habitable_extended(planet *the_planet) {
   return true;
 }
 
-bool is_habitable_extended(planet *the_planet) {
+auto is_habitable_extended(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_extended(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
     // potentionally extended" << endl;
@@ -3282,7 +3290,7 @@ bool is_habitable_extended(planet *the_planet) {
   return true;
 }
 
-bool is_potentialy_habitable_earth_like(planet *the_planet) {
+auto is_potentialy_habitable_earth_like(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_conservative(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
     // potentionally habitable by conservative" << endl;
@@ -3299,7 +3307,7 @@ bool is_potentialy_habitable_earth_like(planet *the_planet) {
   return true;
 }
 
-bool is_habitable_earth_like(planet *the_planet) {
+auto is_habitable_earth_like(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_earth_like(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
     // potentialy earth-like" << endl;
@@ -3312,7 +3320,7 @@ bool is_habitable_earth_like(planet *the_planet) {
   return true;
 }
 
-bool is_potentialy_habitable(planet *the_planet) {
+auto is_potentialy_habitable(planet *the_planet) -> bool {
   if (is_potentialy_habitable_earth_like(the_planet)) {
     return true;
   } else if (is_potentialy_habitable_conservative(the_planet)) {
@@ -3325,7 +3333,7 @@ bool is_potentialy_habitable(planet *the_planet) {
   return false;
 }
 
-bool is_habitable(planet *the_planet) {
+auto is_habitable(planet *the_planet) -> bool {
   if (is_habitable_earth_like(the_planet)) {
     return true;
   } else if (is_habitable_conservative(the_planet)) {
@@ -3338,9 +3346,9 @@ bool is_habitable(planet *the_planet) {
   return false;
 }
 
-long double convert_km_to_eu(long double km) { return km / KM_EARTH_RADIUS; }
+auto convert_km_to_eu(long double km) -> long double { return km / KM_EARTH_RADIUS; }
 
-void makeHabitable(sun &the_sun, planet *the_planet, string planet_id,
+void makeHabitable(sun &the_sun, planet *the_planet, const string& planet_id,
                    bool is_moon, bool do_gases) {
   // cout << planet_id << " " << the_planet->getA() << endl;
   if (!is_gas_planet(the_planet) && is_potentialy_habitable(the_planet) &&

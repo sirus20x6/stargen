@@ -78,10 +78,6 @@ auto my_itoa(int value, char *result, int base) -> char * {
   return result;
 }
 
-auto float_to_string(long double number) -> string {
-  return lexical_cast<string>(number);
-}
-
 auto random_number(long double inner, long double outer) -> long double {
   long double range = NAN;
 
