@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <utility>
 #include <vector>
 #include "accrete.h"
 #include "const.h"
@@ -102,7 +103,7 @@ long system_seed = 0;
 
 string stargen_revision = "$Revision: 2.0 $";
 
-auto stargen(actions action, string flag_char, string path, string url_path_arg, string filename_arg, string sys_name_arg, string prognam, long double mass_arg, long double luminosity_arg, long seed_arg, int count_arg, int incr_arg, catalog &cat_arg, int sys_no_arg, long double ratio_arg, long double ecc_coef_arg, long double inner_planet_factor_arg, int flags_arg, int out_format, int graphic_format) -> int
+auto stargen(actions action, const string& flag_char, string path, const string& url_path_arg, const string& filename_arg, const string& sys_name_arg, string prognam, long double mass_arg, long double luminosity_arg, long seed_arg, int count_arg, int incr_arg, catalog &cat_arg, int sys_no_arg, long double ratio_arg, long double ecc_coef_arg, long double inner_planet_factor_arg, int flags_arg, int out_format, int graphic_format) -> int
 {
   sun the_sun;
   long double min_mass = 0.4;
@@ -195,12 +196,12 @@ auto stargen(actions action, string flag_char, string path, string url_path_arg,
   }
   
   // Find the last sub-dir in the path
-  ss << path.substr(path.find_last_of(DIRSEP) + 1) << DIRSEP;
+  ss << path.substr(path.find_last_of('/') + 1) << DIRSEP;
   subdir = ss.str();
   ss.str("");
   //cout << subdir << endl;
   
-  if (path.find_last_of(DIRSEP) != path.size())
+  if (path.find_last_of('/') != path.size())
   {
     path.append(DIRSEP);
   }
@@ -872,10 +873,10 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system, planet *seed_sy
     the_sun.setAge(random_number(min_age, max_age));
   }
   //cout << "test" << system_counter << endl;
-  generate_planets(the_sun, !use_seed_system, flag_char, sys_no, system_name, do_gases, do_moons);
+  generate_planets(the_sun, !use_seed_system, std::move(flag_char), sys_no, std::move(system_name), do_gases, do_moons);
 }
 
-void generate_planets(sun &the_sun, bool random_tilt, string flag_char, int sys_no, string system_name, bool do_gases, bool do_moons)
+void generate_planets(sun &the_sun, bool random_tilt, const string& flag_char, int sys_no, const string& system_name, bool do_gases, bool do_moons)
 {
   do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
@@ -927,7 +928,7 @@ void generate_planets(sun &the_sun, bool random_tilt, string flag_char, int sys_
   }
 }
 
-void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool random_tilt, string planet_id, bool do_gases, bool do_moons, bool is_moon, long double parent_mass)
+void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool random_tilt, const string& planet_id, bool do_gases, bool do_moons, bool is_moon, long double parent_mass)
 {
   do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
@@ -1628,7 +1629,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
   }
 }
 
-void check_planet(planet* the_planet, string planet_id, bool is_moon)
+void check_planet(planet* the_planet, const string& planet_id, bool is_moon)
 {
   int tIndex = 0;
   
@@ -2112,7 +2113,7 @@ void check_planet(planet* the_planet, string planet_id, bool is_moon)
   }
 }
 
-void assign_type(sun &the_sun, planet *the_planet, string planet_id, bool is_moon, bool do_gases, bool second_time)
+void assign_type(sun &the_sun, planet *the_planet, const string& planet_id, bool is_moon, bool do_gases, bool second_time)
 {
   if (the_planet->getSurfPressure() < 1.0)
   {

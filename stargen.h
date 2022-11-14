@@ -127,10 +127,10 @@ extern string stargen_revision;
 extern long flag_seed;
 
 void init();
-void generate_planet(planet *, int, sun &, bool, string, bool, bool, bool, long double);
-void generate_planets(sun &, bool, string, int, string, bool, bool);
+void generate_planet(planet *, int, sun &, bool, const string&, bool, bool, bool, long double);
+void generate_planets(sun &, bool, const string&, int, const string&, bool, bool);
 void generate_stellar_system(sun &, bool, planet *, string, int, string, long double, long double, long double, long double, bool, bool);
-auto stargen(actions, string, string, string, string, string, string, long double, long double, long, int, int, catalog&, int, long double, long double, long double, int, int, int) -> int;
-void check_planet(planet *, string, bool);
-void assign_type(sun &, planet *, string, bool, bool, bool);
+auto stargen(actions, const string&, string, const string&, const string&, const string&, string, long double, long double, long, int, int, catalog&, int, long double, long double, long double, int, int, int) -> int;
+void check_planet(planet *, const string&, bool);
+void assign_type(sun &, planet *, const string&, bool, bool, bool);
 #endif
