@@ -2389,11 +2389,11 @@ void gas_giant_temperature_albedo(planet* the_planet, long double parent_mass, b
   temp1 = est_temp(the_planet->getTheSun().getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES), the_planet->getA(), the_planet->getAlbedo());
   the_planet->setEstimatedTemp(temp1);
   //temp4 = new_radius = gas_radius(temp1, the_planet->getDustMass(), the_planet->getMass(), the_planet->getTheSun().getAge(), the_planet);
-  temp4 = new_radius = calcRadius(the_planet);
+  temp4 = calcRadius(the_planet);
   the_planet->setRadius(temp4);
-  temp5 = new_day = day_length(the_planet, parent_mass, is_moon);
+  temp5 = day_length(the_planet, parent_mass, is_moon);
   //the_planet->setDay(temp5);
-  temp6 = new_obleteness = calcOblateness(the_planet);
+  temp6 = calcOblateness(the_planet);
   while (true)
   {
     if (loops >= 1000)
@@ -2513,7 +2513,7 @@ void calculate_gases(sun &the_sun, planet* the_planet, string planet_id)
     long double totalamount = 0;
     long double pressure  = the_planet->getSurfPressure() / MILLIBARS_PER_BAR;
     amount = new long double[gases.count()];
-    int n;
+    int n = 0;
     //vector<gas> temp_vector; // just incase for what ever reason, it doesn't replace the gases in the atmosphere
     
     if (the_planet->getNumGases() > 0)
@@ -2601,7 +2601,7 @@ void calculate_gases(sun &the_sun, planet* the_planet, string planet_id)
       }
     }
     
-    long double original_total = totalamount;
+    long double original_total;
     long double increase_factor = 1.0;
     //long double pressure = 0.0;
     map<int, long double> new_values;
@@ -2615,8 +2615,6 @@ void calculate_gases(sun &the_sun, planet* the_planet, string planet_id)
     {
       do
       {
-	original_total = totalamount;
-	increase_factor = 1.0;
 	for (int i = 0; i < gases.count(); i++)
 	{
 	  new_values[i] = 0;
@@ -2633,7 +2631,6 @@ void calculate_gases(sun &the_sun, planet* the_planet, string planet_id)
 	    if (the_planet->getSurfPressure() >= (1.2 * MIN_O2_IPP) && the_planet->getSurfPressure() <= MAX_HABITABLE_PRESSURE)
 	    {
 	      //the_amount = the_planet->getSurfPressure() * amount[i] / original_total;
-	      the_amount = amount[i];
 	      pressure = the_planet->getSurfPressure() * (amount[i] / totalamount);
 	      ipp = inspired_partial_pressure(the_planet->getSurfPressure(), pressure);
 	      if (ipp > gases[i].getMaxIpp())
@@ -2680,7 +2677,7 @@ void calculate_gases(sun &the_sun, planet* the_planet, string planet_id)
 	    }
 	  }
 	}
-	original_total = totalamount;
+
 	long double old_amount = 0.0;
 	for (int i = 0, n = 0; i < gases.count(); i++)
 	{
@@ -3481,7 +3478,7 @@ long double planet_radius_helper3(long double temperature, long double temperatu
   long double a = 0.0;
   long double b = 0.0;
   long double radius = 0.0;
-  long double adjusted_temperature = temperature / 1000.0;
+  long double adjusted_temperature;
   long double adjusted_temperature1 = temperature1 / 1000.0;
   long double adjusted_temperature2 = temperature2 / 1000.0;
   e_fix(adjusted_temperature1, radius1, adjusted_temperature2, radius2, a, b);

@@ -17,7 +17,7 @@ long double water_radius(long double mass, planet *the_planet, map<long double, 
   long double radius2;
   if (mass <= 0.04663)
   {
-    adjust_for_carbon = false;
+    //adjust_for_carbon = false;
     radius1 = fraction_radius(mass, 1.0, 0, 0);
     radius2 = planet_radius_helper(mass, 0.04663, mass_radii[0.04663], 0.06174, mass_radii[0.06174], 0.08208, mass_radii[0.08208]);
     radius = rangeAdjust(mass, radius1, radius2, 0.0, 0.04663);
@@ -1122,7 +1122,7 @@ long double rock_radius(long double mass, long double cmf, planet *the_planet, m
     adjust_for_carbon = false;
     radius1 = fraction_radius(mass, 0, 1, cmf);
     radius2 = planet_radius_helper(mass, 0.00623, mass_radii[0.00623], 0.008748, mass_radii[0.008748], 0.01227, mass_radii[0.01227]);
-    radius = radius = rangeAdjust(mass, radius1, radius2, 0.0, 0.00623);
+    radius = rangeAdjust(mass, radius1, radius2, 0.0, 0.00623);
   }
   else if (mass <= 0.008748)
   {
@@ -2205,7 +2205,6 @@ long double iron_radius(long double mass, planet *the_planet, map<long double, l
 long double solid_0point953_iron_0point047_water_radius(long double mass, planet *the_planet, map<long double, long double> &mass_radii)
 {
   long double radius, radius1, radius2;
-  radius = radius1 = radius2 = 0.0;
   if (mass <= 0.1)
   {
     radius1 = fraction_radius(mass, 0, 0, 0);
@@ -2460,7 +2459,6 @@ long double solid_0point953_iron_0point047_water_radius(long double mass, planet
 long double solid_0point51_iron_0point49_water_radius(long double mass, planet *the_planet, map<long double, long double> &mass_radii)
 {
   long double radius, radius1, radius2;
-  radius = radius1 = radius2 = 0.0;
   if (mass <= 0.1)
   {
     radius1 = fraction_radius(mass, 0, 0, 0);
@@ -2714,8 +2712,7 @@ long double solid_0point51_iron_0point49_water_radius(long double mass, planet *
 
 long double solid_0point264_iron_0point736_water_radius(long double mass, planet *the_planet, map<long double, long double> &mass_radii)
 {
-  long double radius, radius1, radius2;	
-  radius = radius1 = radius2 = 0.0;
+  long double radius, radius1, radius2;
   if (mass <= 0.1)
   {
     radius1 = fraction_radius(mass, 0, 0, 0);
