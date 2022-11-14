@@ -1004,10 +1004,10 @@ sun::sun(long double l, long double m, long double t, string s, long double a, s
   {
     mass = luminosity_to_mass(luminosity);
   }
-  if (effTemp == 0)
-  {
-    effTemp == spec_type_to_eff_temp(specType);
-  }
+  // if (effTemp == 0)
+  // {
+  //   effTemp == spec_type_to_eff_temp(specType);
+  // }
   if (specType.empty())
   {
     specType = eff_temp_to_spec_type(effTemp, luminosity);
@@ -1038,10 +1038,10 @@ sun::sun(sun& right)
   {
     mass = luminosity_to_mass(luminosity);
   }
-  if (effTemp == 0)
-  {
-    effTemp == spec_type_to_eff_temp(specType);
-  }
+  // if (effTemp == 0)
+  // {
+  //   effTemp == spec_type_to_eff_temp(specType);
+  // }
   if (specType.empty())
   {
     specType = eff_temp_to_spec_type(effTemp, luminosity);
@@ -1072,10 +1072,10 @@ sun::sun(const sun& right)
   {
     mass = luminosity_to_mass(luminosity);
   }
-  if (effTemp == 0)
-  {
-    effTemp == spec_type_to_eff_temp(specType);
-  }
+  // if (effTemp == 0)
+  // {
+  //   effTemp == spec_type_to_eff_temp(specType);
+  // }
   if (specType.empty())
   {
     specType = eff_temp_to_spec_type(effTemp, luminosity);
@@ -1321,7 +1321,9 @@ long double sun::getCombinedEffTemp()
   {
     //effTemp = 5800;
     //secondaryEffTemp = 4400;
-    f1 = f2 = prev = curr = peak = 0;
+    curr = peak = 0;
+    //todo this is bad. figure out what accuracy for peak is
+    //then change the loop counter to not be a long double.
     for (long double i = 0; i < 1500.0; i += ACCURACY_FOR_PEAK)
     {
       prev = curr;
@@ -2122,8 +2124,6 @@ void planet::setInclination(long double in)
 void planet::setKnownRadius(long double k)
 {
   long double water_min, water_max, rock_min, rock_max;
-  water_min = rock_min = 0.0;
-  water_max = rock_max = 1.0;
   knownRadius = k;
   estimateMass();
   if (dustMass > EM(2.0))

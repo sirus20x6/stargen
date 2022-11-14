@@ -353,7 +353,7 @@ string getStarType(string spec_type)
 int getSubType(string spec_type)
 {
   int total_chars;
-  total_chars = spec_type.size();
+  //total_chars = spec_type.size();
   string buffer;
   
   for (string::iterator it = spec_type.begin(); it < spec_type.end(); it++)
@@ -480,7 +480,7 @@ string eff_temp_to_spec_type(long double eff_temp, long double luminosity)
   
   // determine spectral clas
   output = aclass = "????";
-  at = 0;
+  //at = 0;
   for (int i = 1; i <= 10; i++)
   {
     if (eff_temp > tclass[i])
@@ -838,7 +838,8 @@ long double day_length(planet *the_planet, long double parent_mass, bool is_moon
   long double planetary_mass_in_grams = the_planet->getMass() * SOLAR_MASS_IN_GRAMS;
   long double equatorial_radius_in_cm = the_planet->getRadius() * CM_PER_KM;
   long double year_in_hours = the_planet->getOrbPeriod() * 24.0;
-  bool giant = the_planet->getType() == tGasGiant || the_planet->getType() == tBrownDwarf || the_planet->getType() == tSubGasGiant || the_planet->getType() == tSubSubGasGiant;
+  //bool giant; maybe this used to be used
+  the_planet->getType() == tGasGiant || the_planet->getType() == tBrownDwarf || the_planet->getType() == tSubGasGiant || the_planet->getType() == tSubSubGasGiant;
   long double k2;
   long double base_angular_velocity;
   long double change_in_angular_velocity;
@@ -903,7 +904,7 @@ long double day_length(planet *the_planet, long double parent_mass, bool is_moon
     else
     {
       the_planet->setAxialTilt(0);
-      return day_in_hours = year_in_hours;
+      return year_in_hours;
     }
   }
   
@@ -1013,7 +1014,7 @@ long double min_molec_weight(planet *the_planet)
     }
   }
   
-  life = gas_life(guess_2, the_planet);
+  //life = gas_life(guess_2, the_planet);
   
   return guess_2;
 }
@@ -1077,7 +1078,7 @@ long double vol_inventory(long double mass, long double escape_vel, long double 
 	proportion_const = 250.0;
 	break;
       default:
-	proportion_const = 0.0;
+
 	cout << "Error: orbital zone not initialized correctly!" << endl;
 	exit(EXIT_FAILURE);
 	return EXIT_FAILURE;
@@ -1085,7 +1086,6 @@ long double vol_inventory(long double mass, long double escape_vel, long double 
     }
     earth_units = mass * SUN_MASS_IN_EARTH_MASSES;
     temp1 = (proportion_const * earth_units) / stellar_mass;
-    temp2 = about(temp1, 0.2);
     temp2 = temp1;
     if (greenhouse_effect || accreted_gas)
     {
@@ -2145,7 +2145,6 @@ long double habitable_zone_distance_helper(long double effTemp, long double lumi
     mass = 10.0;
   }
   
-  a = b = c = d = seff = 0.0;
   if (mode == RECENT_VENUS)
   {
     //stellar_flux = calc_stellar_flux(1.4316E-4, 2.9875E-9, -7.5702E-12, -1.1635E-15, 1.7753, effTemp, luminosity);

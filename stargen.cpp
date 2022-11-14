@@ -415,7 +415,7 @@ int stargen(actions action, string flag_char, string path, string url_path_arg, 
 	use_seed_system = false;
       }
     
-      in_celestia = cat_arg[sys_no].getInCelestia();
+      //in_celestia = cat_arg[sys_no].getInCelestia();
       
       //cout << cat_arg[sys_no].getMass() << " " << cat_arg[sys_no].getLuminosity() << " " << cat_arg[sys_no].getEffTemp() << " " << cat_arg[sys_no].getSpecType() << endl;
 
@@ -1278,7 +1278,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 		node->next_planet = node->reconnect_to;
 		n = 0;
 		the_planet->first_moon = the_planet->first_moon_backup;
-		ptr = the_planet->first_moon;
+		//ptr = the_planet->first_moon;
 		dont_break = true;
 		continue;
 	      }
@@ -1343,9 +1343,9 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	    else
 	    {
 	      node->next_planet = node->reconnect_to;
-	      n = 0;
+	      //n = 0;
 	      the_planet->first_moon = the_planet->first_moon_backup;
-	      ptr = the_planet->first_moon;
+	      //ptr = the_planet->first_moon;
 	      continue;
 	    }
 	  }
@@ -1704,7 +1704,7 @@ void check_planet(planet* the_planet, string planet_id, bool is_moon)
   
   ++type_counts[tIndex];
   
-  unsigned int breathe = breathability(the_planet);
+  unsigned int breathe;
   
   //if (breathe == BREATHABLE && the_planet->getA() > habitable_zone_distance(the_planet->getTheSun(), RECENT_VENUS) && the_planet->getA() < habitable_zone_distance(the_planet->getTheSun(), EARLY_MARS))
   total_worlds++;
@@ -2086,9 +2086,9 @@ void check_planet(planet* the_planet, string planet_id, bool is_moon)
   }
   
   long double rel_temp = (the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER) - EARTH_AVERAGE_CELSIUS;
-  long double seas = the_planet->getHydrosphere() * 100.0;
-  long double clouds = the_planet->getCloudCover() * 100.0;
-  long double pressure = the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS;
+  //long double seas = the_planet->getHydrosphere() * 100.0;
+  //long double clouds = the_planet->getCloudCover() * 100.0;
+  //long double pressure = the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS;
   long double ice = the_planet->getIceCover() * 100.0;
   long double gravity = the_planet->getSurfGrav();
   //unsigned int breathe = breathability(the_planet);

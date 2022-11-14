@@ -13,7 +13,7 @@ using namespace std;
 
 void text_describe_system(planet* innermost_planet, bool do_gases, long int seed, bool do_moons)
 {
-  do_gases = (flags_arg_clone & fDoGases) != 0;
+  //do_gases = (flags_arg_clone & fDoGases) != 0;
   planet *the_planet;
   sun the_sun = innermost_planet->getTheSun();
   int counter;
@@ -338,6 +338,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name, st
     long double em_scale = 5;
     long double x;
     
+    //todo: fix loop counter
     for (x = floor; x <= ceiling; x += 1.0)
     {
       float n;
@@ -374,6 +375,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name, st
     output << "<g stroke='black' stroke-width='1'>\n";
     output << "    <line x1='" << ((offset + mult) + (min_log * mult)) << "' y1='" << (max_y - margin) << "' x2='" << ((offset + mult) + (max_log * mult)) << "' y2='" << (max_y - margin) << "' />\n";
   
+    //todo: fix loop counter
     for (x = floor; x <= ceiling; x += 1.0)
     {
       float n;
@@ -410,6 +412,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name, st
     output << "   font-style='normal' font-weight='normal'\n";
     output << "   fill='black' text-anchor='middle'>\n";
     
+    //todo: fix loop counter
     for (x = floor; x <= ceiling; x += 1.0)
     {
       if (min_log <= x && max_log >= x)
@@ -1646,8 +1649,8 @@ void celestia_describe_system(planet* innermost_planet, string designation, stri
 void celestia_describe_world(planet *the_planet, string designation, string system_name, long int seed, long double inc, long double an, int counter, sun& the_sun, bool is_moon, int planet_num)
 {
   long double tmp, local_inc, mean_long;
-  long double min_r_ecosphere = habitable_zone_distance(the_sun, RECENT_VENUS, 1.0);
-  long double max_r_ecosphere = habitable_zone_distance(the_sun, EARLY_MARS, 1.0);
+  long double min_r_ecosphere; // = habitable_zone_distance(the_sun, RECENT_VENUS, 1.0);
+  long double max_r_ecosphere; // = habitable_zone_distance(the_sun, EARLY_MARS, 1.0);
   string typeString;
   stringstream ss;
   string parent;

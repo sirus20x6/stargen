@@ -3128,7 +3128,8 @@ long double gas_radius_1Gyr_1960K_50core_mass(long double total_earth_masses, pl
   else
   {
     //jupiter_radii = ln_trend(1.697749577, -0.0625074216, total_earth_masses);
-    jupiter_radii2 = planet_radius_helper2(total_earth_masses, 2154.0, mass_radii[2154], 3594.0, mass_radii[3594]);
+    //this was set but never used
+    //jupiter_radii2 = planet_radius_helper2(total_earth_masses, 2154.0, mass_radii[2154], 3594.0, mass_radii[3594]);
   }
   if (flag_verbose & 0x80000)
   {
@@ -3646,7 +3647,8 @@ long double gas_radius_1Gyr_1300K_50core_mass(long double total_earth_masses, pl
   else
   {
     //jupiter_radii = ln_trend(1.6547261, -0.0683674924, total_earth_masses);
-    jupiter_radii1 = planet_radius_helper2(total_earth_masses, 2154.0, mass_radii[2154], 3594.0, mass_radii[3594]);
+    //this was set but never used
+    //jupiter_radii1 = planet_radius_helper2(total_earth_masses, 2154.0, mass_radii[2154], 3594.0, mass_radii[3594]);
   }
   if (flag_verbose & 0x80000)
   {
@@ -6002,7 +6004,9 @@ long double gas_radius_4point5Gyr_1300K_10core_mass(long double total_earth_mass
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  mass_radii[10] = jupiter_radii = radius_improved(10.0 / SUN_MASS_IN_EARTH_MASSES, the_planet->getImf(), the_planet->getRmf(), the_planet->getCmf(), the_planet->getGasGiant(), the_planet->getOrbitZone(), the_planet) / KM_JUPITER_RADIUS;
+  //pretty sure this is wrong
+  //mass_radii[10] = jupiter_radii = radius_improved(10.0 / SUN_MASS_IN_EARTH_MASSES, the_planet->getImf(), the_planet->getRmf(), the_planet->getCmf(), the_planet->getGasGiant(), the_planet->getOrbitZone(), the_planet) / KM_JUPITER_RADIUS;
+  mass_radii[10] = radius_improved(10.0 / SUN_MASS_IN_EARTH_MASSES, the_planet->getImf(), the_planet->getRmf(), the_planet->getCmf(), the_planet->getGasGiant(), the_planet->getOrbitZone(), the_planet) / KM_JUPITER_RADIUS;
   if (total_earth_masses < 10.0)
   {
     //jupiter_radii = radius_improved(the_planet->getMass(), the_planet->getImf(), the_planet->getRmf(), the_planet->getCmf(), the_planet->getGasGiant(), the_planet->getOrbitZone(), the_planet) / KM_JUPITER_RADIUS;
