@@ -102,7 +102,7 @@ long system_seed = 0;
 
 string stargen_revision = "$Revision: 2.0 $";
 
-int stargen(actions action, string flag_char, string path, string url_path_arg, string filename_arg, string sys_name_arg, string prognam, long double mass_arg, long double luminosity_arg, long seed_arg, int count_arg, int incr_arg, catalog &cat_arg, int sys_no_arg, long double ratio_arg, long double ecc_coef_arg, long double inner_planet_factor_arg, int flags_arg, int out_format, int graphic_format)
+auto stargen(actions action, string flag_char, string path, string url_path_arg, string filename_arg, string sys_name_arg, string prognam, long double mass_arg, long double luminosity_arg, long seed_arg, int count_arg, int incr_arg, catalog &cat_arg, int sys_no_arg, long double ratio_arg, long double ecc_coef_arg, long double inner_planet_factor_arg, int flags_arg, int out_format, int graphic_format) -> int
 {
   sun the_sun;
   long double min_mass = 0.4;
@@ -364,7 +364,7 @@ int stargen(actions action, string flag_char, string path, string url_path_arg, 
     long double inner_dust_limit;
     int sys_no;
     bool has_known_planets = false;
-    planet *seed_planets = NULL;
+    planet *seed_planets = nullptr;
     bool use_seed_system;
     bool in_celestia;
     
@@ -395,7 +395,7 @@ int stargen(actions action, string flag_char, string path, string url_path_arg, 
       sys_inc = cat_arg[sys_no].getInc();
       sys_an = cat_arg[sys_no].getAn();
       
-      if (cat_arg[sys_no].getKnownPlanets() != NULL)
+      if (cat_arg[sys_no].getKnownPlanets() != nullptr)
       {
 	has_known_planets = true;
       }
@@ -411,7 +411,7 @@ int stargen(actions action, string flag_char, string path, string url_path_arg, 
       }
       else
       {
-	seed_planets = NULL;
+	seed_planets = nullptr;
 	use_seed_system = false;
       }
     
@@ -566,7 +566,7 @@ int stargen(actions action, string flag_char, string path, string url_path_arg, 
 	use_seed_system = false;
 	if (!use_known_planets)
 	{
-	  seed_planets = NULL;
+	  seed_planets = nullptr;
 	}
 	if (has_known_planets && use_known_planets && no_generate)
 	{
@@ -575,9 +575,9 @@ int stargen(actions action, string flag_char, string path, string url_path_arg, 
       }
     }
     
-    for (int i = 0; i < 16; i++)
+    for (int & type_count : type_counts)
     {
-      type_counts[i] = 0;
+      type_count = 0;
     }
     type_count = 0;
     //cout << index << endl;
@@ -638,7 +638,7 @@ int stargen(actions action, string flag_char, string path, string url_path_arg, 
       wt_type_count += 10; // 1-Face
     }
     
-    for (a_planet = innermost_planet, counter = 0; a_planet != NULL; a_planet = a_planet->next_planet, counter++);
+    for (a_planet = innermost_planet, counter = 0; a_planet != nullptr; a_planet = a_planet->next_planet, counter++);
     
     norm_type_count = wt_type_count - (counter - type_count);
     
@@ -720,17 +720,17 @@ int stargen(actions action, string flag_char, string path, string url_path_arg, 
     }
     else
     {
-      planet *ptr = NULL;
-      planet *node = NULL;
-      planet *next = NULL;
-      for (ptr = innermost_planet; ptr != NULL; ptr = ptr->next_planet)
+      planet *ptr = nullptr;
+      planet *node = nullptr;
+      planet *next = nullptr;
+      for (ptr = innermost_planet; ptr != nullptr; ptr = ptr->next_planet)
       {
 	ptr->setImf(0);
 	ptr->setRmf(0);
 	ptr->setCmf(0);
 	if (do_moons)
 	{
-	  for (node = ptr->first_moon; node != NULL; node = next)
+	  for (node = ptr->first_moon; node != nullptr; node = next)
 	  {
 	    next = node->next_planet;
 	    if (node->getDeletable())
@@ -787,7 +787,7 @@ void init()
   if (!flag_seed)
   {
     time_t temp_time;
-    unsigned seed = (unsigned)(time(&temp_time));
+    auto seed = (unsigned)(time(&temp_time));
     srand(seed);
     flag_seed = rand();
   }
@@ -884,7 +884,7 @@ void generate_planets(sun &the_sun, bool random_tilt, string flag_char, int sys_
   planet *moon;
   int moons = 0;
   
-  for (the_planet = innermost_planet, planet_no = 1; the_planet != NULL; the_planet = the_planet->next_planet, planet_no++)
+  for (the_planet = innermost_planet, planet_no = 1; the_planet != nullptr; the_planet = the_planet->next_planet, planet_no++)
   {
     string planet_id;
     stringstream ss;
@@ -913,7 +913,7 @@ void generate_planets(sun &the_sun, bool random_tilt, string flag_char, int sys_
     
     if (do_moons)
     {
-      for (moon = the_planet->first_moon, moons = 1; moon != NULL; moon = moon->next_planet, moons++)
+      for (moon = the_planet->first_moon, moons = 1; moon != nullptr; moon = moon->next_planet, moons++)
       {
 	string moon_id;
 	
@@ -1107,7 +1107,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
       {
 	string planet_type, moon_string;
 	planet_type = type_string(the_planet);
-	if (the_planet->first_moon != NULL)
+	if (the_planet->first_moon != nullptr)
 	{
 	  moon_string = " WITH MOON";
 	}
@@ -1166,11 +1166,11 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
     string moon_id;
     long double temp_hill_sphere = 0;
     long double min_rand_distance = 0;
-    if (the_planet->first_moon != NULL)
+    if (the_planet->first_moon != nullptr)
     {
-      planet *ptr = NULL;
-      planet *prev = NULL;
-      planet *next_moon = NULL;
+      planet *ptr = nullptr;
+      planet *prev = nullptr;
+      planet *next_moon = nullptr;
       
       // reset moon distances for predefined moons
       /*for (n = 0, ptr = the_planet->first_moon; ptr != NULL; ptr = next_moon)
@@ -1184,7 +1184,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
       
       hill_sphere = the_planet->getA() * KM_PER_AU * pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
       
-      for (n = 0, ptr = the_planet->first_moon; ptr != NULL; ptr = next_moon)
+      for (n = 0, ptr = the_planet->first_moon; ptr != nullptr; ptr = next_moon)
       //for (n = 0; n < the_planet->getMoonCount(); n++)
       {
 	next_moon = ptr->next_planet;
@@ -1216,7 +1216,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	  bool done = false;
 	  bool bad_place;
 	  bool to_many_tries = false;
-	  planet *the_moon = NULL;
+	  planet *the_moon = nullptr;
 	  long double hill_sphere2 = 0;
 	  int tries = 0;
 	  while (!done)
@@ -1240,7 +1240,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	    
 	    distance = random_number(min_rand_distance, hill_sphere / 3.0);
 	    eccentricity = random_number(0, 0.01); // I know I should use random_eccentricity here but I want to prevent orbits from crossing each other
-	    for (the_moon = the_planet->first_moon; the_moon != NULL; the_moon = the_moon->next_planet)
+	    for (the_moon = the_planet->first_moon; the_moon != nullptr; the_moon = the_moon->next_planet)
 	    {
 	      hill_sphere2 = the_moon->getMoonA() * KM_PER_AU * pow(the_moon->getMass() / (3.0 * the_planet->getMass()), 1.0 / 3.0);
 	      temp_hill_sphere = distance * pow(ptr->getMass() / (3.0 * the_planet->getMass()), 1.0 / 3.0);
@@ -1264,9 +1264,9 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	      cerr << "  " << planet_id << ": can't fit anymore moons!" << endl;
 	    }
 	    skip_minor_moons = true;
-	    planet *node = NULL;
-	    planet *next = NULL;
-	    for (node = ptr; node != NULL; node = next)
+	    planet *node = nullptr;
+	    planet *next = nullptr;
+	    for (node = ptr; node != nullptr; node = next)
 	    {
 	      next = node->next_planet;
 	      if (node->getDeletable())
@@ -1283,13 +1283,13 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 		continue;
 	      }
 	    }
-	    if (prev != NULL)
+	    if (prev != nullptr)
 	    {
-	      prev->next_planet = NULL;
+	      prev->next_planet = nullptr;
 	    }
 	    else
 	    {
-	      the_planet->first_moon = NULL;
+	      the_planet->first_moon = nullptr;
 	    }
 	    /*for (int m = n; m < the_planet->getMoonCount(); m++)
 	    {
@@ -1331,9 +1331,9 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	  }
 	  skip_minor_moons = true;
 	  // delete moons
-	  planet *node = NULL;
-	  planet *next = NULL;
-	  for (node = the_planet->first_moon; node != NULL; node = next)
+	  planet *node = nullptr;
+	  planet *next = nullptr;
+	  for (node = the_planet->first_moon; node != nullptr; node = next)
 	  {
 	    next = node->next_planet;
 	    if (node->getDeletable())
@@ -1350,7 +1350,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	    }
 	  }
 	  n = 0;
-	  the_planet->first_moon = NULL;
+	  the_planet->first_moon = nullptr;
 	  /*for (int m = 0; m < the_planet->getMoonCount(); m++)
 	   *	    {
 	   *	      the_planet->deleteMoon(m);
@@ -1376,8 +1376,8 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
       long double new_moon_mass;
       long double new_moon_gas_mass;
       long double min_new_moon_mass = 1.0 / 100000000000.0;
-      planet *tmp = NULL;
-      planet *ref = NULL;
+      planet *tmp = nullptr;
+      planet *ref = nullptr;
       int attempts = 0;
       bool done2 = false;
       bool too_many_tries = false;
@@ -1414,12 +1414,12 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
       remaining_moon_mass = max_total_moon_mass - moon_mass;
       
       // get the pointer to the last moon in the list
-      if (the_planet->first_moon != NULL)
+      if (the_planet->first_moon != nullptr)
       {
 	tmp = the_planet->first_moon;
 	while (true)
 	{
-	  if (tmp->next_planet == NULL)
+	  if (tmp->next_planet == nullptr)
 	  {
 	    break;
 	  }
@@ -1428,7 +1428,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
       }
       else
       {
-	tmp = NULL;
+	tmp = nullptr;
       }
       
       n++;
@@ -1445,7 +1445,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	{
 	  break;
 	}
-	planet *new_moon = NULL;
+	planet *new_moon = nullptr;
 	new_moon = new planet();
 	new_moon->setPlanetNo(n);
 	new_moon->setOrbitZone(the_planet->getOrbitZone());
@@ -1509,7 +1509,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	    cerr << "  " << planet_id << ": Attempting to add moon (" << toString(new_moon->getMass() * SUN_MASS_IN_EARTH_MASSES) << " EU) at " << toString(distance2) << " km with eccentricity of " << toString(eccentricity2) << endl;
 	  }
 	  
-	  for (ref = the_planet->first_moon; ref != NULL; ref = ref->next_planet)
+	  for (ref = the_planet->first_moon; ref != nullptr; ref = ref->next_planet)
 	  {
 	    hill_sphere4 = ref->getMoonA() * KM_PER_AU * pow(ref->getMass() / (3.0 * the_planet->getMass()), 1.0 / 3.0);
 	    temp_hill_sphere = distance2 * pow(new_moon->getMass() / (3.0 * the_planet->getMass()), 1.0 / 3.0);
@@ -1548,7 +1548,7 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	{
 	  attempts = 0;
 	  generate_planet(new_moon, n, the_sun, random_tilt, moon_id, do_gases, do_moons, true, the_planet->getMass());
-	  if (tmp != NULL)
+	  if (tmp != nullptr)
 	  {
 	    tmp->next_planet = new_moon;
 	    tmp = tmp->next_planet;
@@ -1578,14 +1578,14 @@ void generate_planet(planet* the_planet, int planet_no, sun& the_sun, bool rando
 	}
       }
       
-      if (the_planet->first_moon != NULL)
+      if (the_planet->first_moon != nullptr)
       {
 	// reorder the moons
 	the_planet->sortMoons();
 	
 	// make some modifications to the moons
 	int moon_number = 0;
-	for (tmp = the_planet->first_moon, moon_number = 1; tmp != NULL; tmp = tmp->next_planet, moon_number++)
+	for (tmp = the_planet->first_moon, moon_number = 1; tmp != nullptr; tmp = tmp->next_planet, moon_number++)
 	{
 	  tmp->setPlanetNo(moon_number);
 	  ss.str("");
