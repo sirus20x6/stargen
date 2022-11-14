@@ -127,10 +127,10 @@ extern string stargen_revision;
 extern long flag_seed;
 
 void init();
-void generate_planet(planet *, int, sun &, bool, const string&, bool, bool, bool, long double);
-void generate_planets(sun &, bool, const string&, int, const string&, bool, bool);
-void generate_stellar_system(sun &, bool, planet *, string, int, string, long double, long double, long double, long double, bool, bool);
-auto stargen(actions, const string&, string, const string&, const string&, const string&, string, long double, long double, long, int, int, catalog&, int, long double, long double, long double, int, int, int) -> int;
-void check_planet(planet *, const string&, bool);
-void assign_type(sun &, planet *, const string&, bool, bool, bool);
+void generate_planet(planet * /*the_planet*/, int /*planet_no*/, sun & /*the_sun*/, bool /*random_tilt*/, const string& /*planet_id*/, bool /*do_gases*/, bool /*do_moons*/, bool /*is_moon*/, long double /*parent_mass*/);
+void generate_planets(sun & /*the_sun*/, bool /*random_tilt*/, const string& /*flag_char*/, int /*sys_no*/, const string& /*system_name*/, bool /*do_gases*/, bool /*do_moons*/);
+void generate_stellar_system(sun & /*the_sun*/, bool /*use_seed_system*/, planet * /*seed_system*/, string /*flag_char*/, int /*sys_no*/, string /*system_name*/, long double /*inner_dust_limit*/, long double /*outer_planet_limit*/, long double /*ecc_coef*/, long double /*inner_planet_factor*/, bool /*do_gases*/, bool /*do_moons*/);
+auto stargen(actions /*action*/, const string& /*flag_char*/, string /*path*/, const string& /*url_path_arg*/, const string& /*filename_arg*/, const string& /*sys_name_arg*/, string /*prognam*/, long double /*mass_arg*/, long double /*luminosity_arg*/, long /*seed_arg*/, int /*count_arg*/, int /*incr_arg*/, catalog& /*cat_arg*/, int /*sys_no_arg*/, long double /*ratio_arg*/, long double /*ecc_coef_arg*/, long double /*inner_planet_factor_arg*/, int /*flags_arg*/, int /*out_format*/, int /*graphic_format*/) -> int;
+void check_planet(planet * /*the_planet*/, const string& /*planet_id*/, bool /*is_moon*/);
+void assign_type(sun & /*the_sun*/, planet * /*the_planet*/, const string& /*planet_id*/, bool /*is_moon*/, bool /*do_gases*/, bool /*second_time*/);
 #endif

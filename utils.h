@@ -52,13 +52,13 @@ template <typename T>
 auto toString(T val, int decimals = 0) -> string;
 
 template <typename T>
-auto getNumDecimals(T) -> size_t;
+auto getNumDecimals(T /*val*/) -> size_t;
 
 template <typename T>
-auto replaceStrChar(string, T, T) -> string;
+auto replaceStrChar(string /*str*/, T /*old*/, T /*the_new*/) -> string;
 
 template <typename T>
-void quicksort(vector<T>&, int, int);
+void quicksort(vector<T>& /*v*/, int /*first*/, int /*last*/);
 
 template <typename T>
 auto is_close(T a, T b, long double percent = 1) -> bool;
@@ -147,16 +147,19 @@ auto pivotIndex(vector<T>& v, int first, int last) -> int
 {
   // index for the midpoint of [first,last) and the
   // indices that scan the index range in tandem
-  int mid = 0, scanUp = 0, scanDown = 0;
+  int mid = 0;
+  int scanUp = 0;
+  int scanDown = 0;
   // pivot value and object used for exchanges
-  T pivot, temp;
+  T pivot;
+  T temp;
   
   if (first == last)
   {
     //cout << "returing last" << endl;
     return last;
   }
-  else if (first == (last - 1))
+  if (first == (last - 1))
   {
     //cout << "returing first" << endl;
     return first;
@@ -285,18 +288,15 @@ auto is_close(T a, T b, long double percent) -> bool
   long double decimal = percent / (long double)100;
   long double range = b * decimal;
   
-  if (a > (b - decimal) && a < (b + decimal))
-  {
-    return true;
-  }
-  return false;
+  return static_cast<bool>(a > (b - decimal) && a < (b + decimal));
 }
 
 template <typename T>
 void writeVector(vector<T>& v, const string& separator)
 {
   // capture the size of the vector in n
-  int i = 0, n = v.size();
+  int i = 0;
+  int n = v.size();
   
   for(i = 0; i < n; i++)
   {
