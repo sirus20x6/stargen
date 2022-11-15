@@ -364,13 +364,13 @@ void accrete_dust(long double &seed_mass, long double &new_dust,
   long double temp_mass = NAN, temp_mass2 = NAN;
 
   do {
-    // cout << "test1" << endl;
+    // cout << "test1\n";
     temp_mass = new_mass;
     // fixed point algorithm: accumulate more mass until the difference is less 
     // than .01% of the old mass
     new_mass =
         collect_dust(new_mass, new_dust, new_gas, a, e, crit_mass, dust_head);
-    // cout << "test2" << endl;
+    // cout << "test2\n";
     // cout << "Old mass: " << (temp_mass * SUN_MASS_IN_EARTH_MASSES) << endl;
     // cout << "New mass: " << (new_mass * SUN_MASS_IN_EARTH_MASSES) << endl;
     if (new_mass < temp_mass) {
@@ -384,7 +384,7 @@ void accrete_dust(long double &seed_mass, long double &new_dust,
   // update the dust lanes with the new seed mass
   update_dust_lanes(r_inner, r_outer, seed_mass, crit_mass, body_inner_bound,
                     body_outer_bound);
-  // cout << "test" << endl;
+  // cout << "test\n";
 }
 
 void coalesce_planetesimals(long double a, long double e, long double mass,
@@ -497,7 +497,7 @@ void coalesce_planetesimals(long double a, long double e, long double mass,
                    << " AU ("
                    << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
                    << " EM) <- " << toString(mass * SUN_MASS_IN_EARTH_MASSES)
-                   << " EM" << endl;
+                   << " EM\n";
             }
           } else {
             if (flag_verbose & 0x0100) {
@@ -709,7 +709,7 @@ auto dist_planetary_masses(sun &the_sun, long double inner_dust,
                  << toString(total_mass * SUN_MASS_IN_EARTH_MASSES)
                  << " EM) <- "
                  << toString(temp_moons->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                 << " EM" << endl;
+                 << " EM\n";
           }
           temp_moons->setDustMass(moon->getDustMass());
           temp_moons->setGasMass(moon->getGasMass());
@@ -744,26 +744,26 @@ auto dist_planetary_masses(sun &the_sun, long double inner_dust,
     }
 
     if (flag_verbose & 0x0200) {
-      cerr << "Checking " << toString(a) << " AU." << endl;
+      cerr << "Checking " << toString(a) << " AU.\n";
     }
     // if we have dust inside the limits...
     if (dust_available(inner_effect_limit(a, e, total_mass),
                        outer_effect_limit(a, e, total_mass))) {
       if (flag_verbose & 0x0100) {
-        cerr << "Injecting protoplanet at " << toString(a) << " AU." << endl;
+        cerr << "Injecting protoplanet at " << toString(a) << " AU.\n";
       }
 
       dust_density = dust_density_coeff * sqrt(stell_mass_ratio) *
                      exp(-ALPHA * pow(a, 1.0 / N));
       crit_mass = critical_limit(a, e, stell_luminosity_ratio);
       if (total_mass == PROTOPLANET_MASS && is_seed == false) {
-        // cout << "test1" << endl;
+        // cout << "test1\n";
         // cout << total_mass << " " << dust_mass << " " << gas_mass << " " << a
         // << " " << e << " " << crit_mass << " " << planet_inner_bound << " "
         // << planet_outer_bound << endl;
         accrete_dust(total_mass, dust_mass, gas_mass, a, e, crit_mass,
                      planet_inner_bound, planet_outer_bound);
-        // cout << "test2" << endl;
+        // cout << "test2\n";
         dust_mass += PROTOPLANET_MASS;
       }
 
@@ -844,16 +844,16 @@ auto dist_planetary_masses(sun &the_sun, long double inner_dust,
                  << " AU with eccentricity of " << toString(e) << endl;
           }
         }
-        // cout << "test 1" << endl;
+        // cout << "test 1\n";
         coalesce_planetesimals(a, e, total_mass, crit_mass, dust_mass, gas_mass,
                                stell_luminosity_ratio, planet_inner_bound,
                                planet_outer_bound, do_moons);
-        // cout << "test 2" << endl;
+        // cout << "test 2\n";
       } else if (flag_verbose & 0x0100) {
-        cerr << ".. failed due to large neighbor." << endl;
+        cerr << ".. failed due to large neighbor.\n";
       }
     } else if (flag_verbose & 0x0200) {
-      cerr << ".. failed." << endl;
+      cerr << ".. failed.\n";
     }
 
     if (is_seed) {
@@ -868,7 +868,7 @@ auto dist_planetary_masses(sun &the_sun, long double inner_dust,
       update_dust_lanes(r_inner, r_outer, total_mass, crit_mass,
                         planet_inner_bound, planet_outer_bound);
     }
-    // cout << "test 3" << endl;
+    // cout << "test 3\n";
   }
   return planet_head;
 }
@@ -880,7 +880,7 @@ void free_dust(dust *head) {
   for (node = head; node != nullptr; node = next) {
     next = node->next_band;
     delete node;
-    // cout << "Deleted Dust" << endl;
+    // cout << "Deleted Dust\n";
   }
 }
 
@@ -891,7 +891,7 @@ void free_planet(planet *head) {
   for (node = head; node != nullptr; node = next) {
     next = node->next_planet;
     delete node;
-    // cout << "Deleted World" << endl;
+    // cout << "Deleted World\n";
   }
 }
 
@@ -911,7 +911,7 @@ void free_generations() {
     }
 
     delete node;
-    // cout << "Deleted Generation" << endl;
+    // cout << "Deleted Generation\n";
   }
 }
 

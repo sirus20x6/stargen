@@ -218,7 +218,7 @@ auto stargen(actions action, const string &flag_char, string path,
         }
         // cout << " " << gases[i].getNum() << ": " << gases[i].getSymbol() << "
         // - " << gases[i].getName() << " " << toString(gases[i].getMinIpp()) <<
-        // " mb - " << toString(gases[i].getMaxIpp()) << " mb" << endl;
+        // " mb - " << toString(gases[i].getMaxIpp()) << " mb\n";
       }
       cout << gases;
       cout << "Total Max ipp: " << toString(total) << endl;
@@ -234,7 +234,7 @@ auto stargen(actions action, const string &flag_char, string path,
       int count = cat_arg.count();
       for (int i = 0; i < count; i++) {
         cout << "\t<option value=" << i << ">" << cat_arg[i].getName()
-             << "</option>" << endl;
+             << "</option>\n";
       }
       return EXIT_SUCCESS;
     }
@@ -251,40 +251,40 @@ auto stargen(actions action, const string &flag_char, string path,
       cout << "Earth Eff Temp: " << toString(tempE) << " K, "
            << toString(tempE - FREEZING_POINT_OF_WATER)
            << " C, Earth rel: " << toString(tempE - EARTH_AVERAGE_KELVIN)
-           << " C" << endl;
-      cout << "Jupiter Eff Temp: " << toString(tempJ) << " K" << endl;
-      cout << "Saturn Eff Temp: " << toString(tempS) << " K" << endl;
-      cout << "Uranus Eff Temp: " << toString(tempU) << " K" << endl;
-      cout << "Neptune Eff Temp: " << toString(tempN) << " K" << endl;
+           << " C\n";
+      cout << "Jupiter Eff Temp: " << toString(tempJ) << " K\n";
+      cout << "Saturn Eff Temp: " << toString(tempS) << " K\n";
+      cout << "Uranus Eff Temp: " << toString(tempU) << " K\n";
+      cout << "Neptune Eff Temp: " << toString(tempN) << " K\n";
       return EXIT_SUCCESS;
     }
     case aListVerbosity: {
       cout << "Stargen " << stargen_revision << endl;
-      cout << "Verbosity flags are hexidecimal numbers:" << endl;
-      cout << "\t0001\tEarthlike count" << endl;
-      cout << "\t0002\tTrace Min/Max" << endl;
-      cout << "\t0004\tList Habitable" << endl;
-      cout << "\t0008\tList Earthlike & Sphinxlike" << endl;
+      cout << "Verbosity flags are hexidecimal numbers:\n";
+      cout << "\t0001\tEarthlike count\n";
+      cout << "\t0002\tTrace Min/Max\n";
+      cout << "\t0004\tList Habitable\n";
+      cout << "\t0008\tList Earthlike & Sphinxlike\n";
       cout << endl;
-      cout << "\t0010\tList Gases" << endl;
-      cout << "\t0020\tTrace temp iterations" << endl;
-      cout << "\t0040\tGas lifetimes" << endl;
-      cout << "\t0080\tList loss of accreted gas mass" << endl;
+      cout << "\t0010\tList Gases\n";
+      cout << "\t0020\tTrace temp iterations\n";
+      cout << "\t0040\tGas lifetimes\n";
+      cout << "\t0080\tList loss of accreted gas mass\n";
       cout << endl;
-      cout << "\t0100\tInjecting, collision" << endl;
-      cout << "\t0200\tChecking..., Failed..." << endl;
-      cout << "\t0400\tList binary info" << endl;
-      cout << "\t0800\tList accreted atmospheres" << endl;
+      cout << "\t0100\tInjecting, collision\n";
+      cout << "\t0200\tChecking..., Failed...\n";
+      cout << "\t0400\tList binary info\n";
+      cout << "\t0800\tList accreted atmospheres\n";
       cout << endl;
-      cout << "\t1000\tMoons (experimental)" << endl;
-      cout << "\t2000\tOxygen poisoned (experimental)" << endl;
-      cout << "\t4000\tTrace gas percentages" << endl;
-      cout << "\t8000\tList Jovians in the ecosphere" << endl;
+      cout << "\t1000\tMoons (experimental)\n";
+      cout << "\t2000\tOxygen poisoned (experimental)\n";
+      cout << "\t4000\tTrace gas percentages\n";
+      cout << "\t8000\tList Jovians in the ecosphere\n";
       cout << endl;
-      cout << "\t10000\tList type diversity" << endl;
-      cout << "\t20000\tTrace Surface temp interations" << endl;
-      cout << "\t40000\tDisplay Roche Limits and Hill Sphere distances" << endl;
-      cout << "\t80000\tDisplay mass-radius maps" << endl;
+      cout << "\t10000\tList type diversity\n";
+      cout << "\t20000\tTrace Surface temp interations\n";
+      cout << "\t40000\tDisplay Roche Limits and Hill Sphere distances\n";
+      cout << "\t80000\tDisplay mass-radius maps\n";
       return EXIT_SUCCESS;
     }
     case aGenerate:
@@ -593,7 +593,7 @@ auto stargen(actions action, const string &flag_char, string path,
       cerr << "System " << flag_seed << " - " << system_name << " (-s"
            << flag_seed << " -" << flag_char << sys_no << ") has " << type_count
            << " types out of " << counter << " planets. [" << norm_type_count
-           << "]" << endl;
+           << "]\n";
     }
 
     total_habitable += habitable;
@@ -672,7 +672,7 @@ auto stargen(actions action, const string &flag_char, string path,
       if (habitable > 1 && ((flag_verbose & 0x0001) != 0)) {
         cerr << "System " << flag_seed << " - " << system_name << " (-s"
              << flag_seed << " -" << flag_char << sys_no << ") has "
-             << habitable << " planets with breathable atmospheres." << endl;
+             << habitable << " planets with breathable atmospheres.\n";
       }
     }
 
@@ -707,7 +707,7 @@ auto stargen(actions action, const string &flag_char, string path,
               node->setCmf(0);
               node->next_planet = node->reconnect_to;
             }
-            // cout << "Deleted World" << endl;
+            // cout << "Deleted World\n";
           }
           ptr->first_moon = ptr->first_moon_backup;
         }
@@ -735,7 +735,7 @@ auto stargen(actions action, const string &flag_char, string path,
          << toString(max_breathable_terrestrial_l) << endl;
     cerr << "Max moon mass: "
          << toString(max_moon_mass * SUN_MASS_IN_EARTH_MASSES)
-         << " Earth Masses" << endl;
+         << " Earth Masses\n";
   }
 
   if (system_count > 1) {
@@ -1026,7 +1026,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
         cerr << planet_id << "\tLosing gas: H2: "
              << toString(h2_loss * SUN_MASS_IN_EARTH_MASSES)
              << " EM, He: " << toString(he_loss * SUN_MASS_IN_EARTH_MASSES)
-             << " EM" << endl;
+             << " EM\n";
       }
     }
   }
@@ -1092,7 +1092,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
              << moon_string << " with earth-like temperature ("
              << toString(temp - FREEZING_POINT_OF_WATER) << " C, "
              << toString(32.0 + ((temp - FREEZING_POINT_OF_WATER) * 1.8))
-             << " F, " << (temp - EARTH_AVERAGE_KELVIN) << " C Earth)." << endl;
+             << " F, " << (temp - EARTH_AVERAGE_KELVIN) << " C Earth).\n";
       }
     }
   } else {
@@ -1255,7 +1255,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
           if (to_many_tries) {
             bool dont_break = false;
             if ((flag_verbose & 0x1000) != 0) {
-              cerr << "  " << planet_id << ": can't fit anymore moons!" << endl;
+              cerr << "  " << planet_id << ": can't fit anymore moons!\n";
             }
             skip_minor_moons = true;
             planet *node = nullptr;
@@ -1300,13 +1300,13 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                    << toString(the_planet->getRadius())
                    << ", rM = " << toString(the_planet->getDensity())
                    << ", rm = " << toString(ptr->getDensity()) << " -> "
-                   << toString(roche_limit) << " km" << endl;
+                   << toString(roche_limit) << " km\n";
               cerr << "   Hill Sphere: a = "
                    << toString(the_planet->getA() * KM_PER_AU) << ", m = "
                    << toString(the_planet->getMass() * SOLAR_MASS_IN_KILOGRAMS)
                    << ", M = "
                    << toString(the_sun.getMass() * SOLAR_MASS_IN_KILOGRAMS)
-                   << " -> " << toString(hill_sphere) << " km" << endl;
+                   << " -> " << toString(hill_sphere) << " km\n";
               cerr << moon_id << " Moon orbit: a = "
                    << toString(ptr->getMoonA() * KM_PER_AU)
                    << " km, e = " << toString(ptr->getMoonE()) << endl;
@@ -1317,14 +1317,14 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                    << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
                    << " EM) " << n << " "
                    << toString(ptr->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                   << " EM" << endl;
+                   << " EM\n";
             }
             prev = ptr;
           }
         } else {
           if ((flag_verbose & 0x1000) != 0) {
             cerr << "  " << planet_id
-                 << " lost moons due to gravity of the sun!" << endl;
+                 << " lost moons due to gravity of the sun!\n";
           }
           skip_minor_moons = true;
           // delete moons
@@ -1474,7 +1474,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
             pow(the_planet->getDensity() / new_moon->getDensity(), 1.0 / 3.0);
         if ((roche_limit2 * 1.5) >= (hill_sphere3 / 3.0)) {
           if ((flag_verbose & 0x1000) != 0) {
-            cerr << "  " << planet_id << ": Can't add anymore moons!" << endl;
+            cerr << "  " << planet_id << ": Can't add anymore moons!\n";
           }
           delete new_moon;
           break;
@@ -1516,7 +1516,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                  distance2 <= ((ref->getMoonA() * KM_PER_AU) + hill_sphere4))) {
               bad_place2 = true;
               if ((flag_verbose & 0x1000) != 0) {
-                cerr << "  Failed due to neighboring moon." << endl;
+                cerr << "  Failed due to neighboring moon.\n";
               }
               break;
             }
@@ -1534,7 +1534,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
           delete new_moon;
           attempts++;
           if ((flag_verbose & 0x1000) != 0) {
-            cerr << "  Failed to add moon." << endl;
+            cerr << "  Failed to add moon.\n";
           }
         } else {
           attempts = 0;
@@ -1557,13 +1557,13 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
             cerr << "   Roche limit: R = " << toString(the_planet->getRadius())
                  << ", rM = " << toString(the_planet->getDensity())
                  << ", rm = " << toString(new_moon->getDensity()) << " -> "
-                 << toString(roche_limit2) << " km" << endl;
+                 << toString(roche_limit2) << " km\n";
             cerr << "   Hill Sphere: a = "
                  << toString(the_planet->getA() * KM_PER_AU) << ", m = "
                  << toString(the_planet->getMass() * SOLAR_MASS_IN_KILOGRAMS)
                  << ", M = "
                  << toString(the_sun.getMass() * SOLAR_MASS_IN_KILOGRAMS)
-                 << " -> " << toString(hill_sphere3) << " km" << endl;
+                 << " -> " << toString(hill_sphere3) << " km\n";
             cerr << moon_id << " Moon orbit: a = "
                  << toString(new_moon->getMoonA() * KM_PER_AU)
                  << " km, e = " << toString(new_moon->getMoonE()) << endl;
@@ -1574,7 +1574,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                  << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
                  << " EM) " << n << " "
                  << toString(new_moon->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                 << " EM" << endl;
+                 << " EM\n";
           }
         }
       }
@@ -2036,7 +2036,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
            << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
            << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN) << "\t"
-           << habitable << " " << planet_id << "\tEarth-like" << endl;
+           << habitable << " " << planet_id << "\tEarth-like\n";
     }
   } else if (breathe == BREATHABLE && gravity > 1.3 && rel_temp < -2.0 &&
              ice < 10.0 && habitable > 1) {
@@ -2046,7 +2046,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
            << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
            << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN) << "\t"
-           << habitable << " " << planet_id << "\tSphinx-like" << endl;
+           << habitable << " " << planet_id << "\tSphinx-like\n";
     }
   }
 }

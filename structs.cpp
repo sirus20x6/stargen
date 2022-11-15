@@ -314,7 +314,7 @@ void catalog::addStar(star& the_star) {
 
 star& catalog::operator[](const int& sub) {
   if (sub < 0 || sub > (stars.size() - 1)) {
-    cerr << "Non existant star!" << endl;
+    cerr << "Non existant star!\n";
     exit(EXIT_FAILURE);
   }
   return stars[sub];
@@ -343,7 +343,7 @@ ostream& operator<<(ostream& strm, catalog& obj) {
   int total_stars = obj.count();
   strm << setw(14) << "Name" << setw(37 + obj.extra_spaces) << "Mass"
        << setw(12) << "Luminosity" << setw(13) << "Temperature" << setw(11)
-       << "Star Type" << endl;
+       << "Star Type\n";
   strm << fixed;
 
   for (int i = 0; i < total_stars; i++) {
@@ -703,7 +703,7 @@ int ChemTable::count() { return chemicles.size(); }
 
 Chemicle& ChemTable::operator[](const int& index) {
   if (index < 0 || index >= chemicles.size()) {
-    cerr << "ERROR: Subscript out of range." << endl;
+    cerr << "ERROR: Subscript out of range.\n";
     exit(EXIT_FAILURE);
   }
   return chemicles[index];
@@ -712,7 +712,7 @@ Chemicle& ChemTable::operator[](const int& index) {
 ostream& operator<<(ostream& strm, ChemTable& obj) {
   cout << "Num\t" << setw(6) << "Symbol" << setw(13) << "Name" << setw(24)
        << "Weight" << setw(22) << "Min breathable IPP" << setw(20)
-       << "Max Breathable IPP" << setw(15) << "Abund" << endl;
+       << "Max Breathable IPP" << setw(15) << "Abund\n";
   strm << fixed;
   for (int i = 0; i < obj.count(); i++) {
     strm << setprecision(0) << obj[i] << endl;
@@ -1369,7 +1369,7 @@ long double planet::getOblateness() {
     equatorial_radius_in_cm = radius * CM_PER_KM;
     k2 = calculate_moment_of_inertia_coeffient(the_planet);
     while (day == 0) {
-      cerr << "Error! The day is 0 hours long!" << endl;
+      cerr << "Error! The day is 0 hours long!\n";
       exit(EXIT_FAILURE);
     }
     ang_velocity = RADIANS_PER_ROTATION / (SECONDS_PER_HOUR * day);

@@ -211,7 +211,7 @@ auto getStarType(string spec_type) -> string {
                                                   if (strPtr != nullptr) {
                                                     return "M";
                                                   } else {
-                                                    // cerr << "test1" << endl;
+                                                    // cerr << "test1\n";
                                                     cerr << "Unsupported star "
                                                             "type: "
                                                          << spec_type << endl;
@@ -266,9 +266,9 @@ auto spec_type_to_eff_temp(const string& spec_type) -> long double {
   int lumIndex = 0;
   int sub_type = 0;
 
-  // cout << "test3" << endl;
+  // cout << "test3\n";
   star_type = getStarType(spec_type);
-  // cout << "test4" << endl;
+  // cout << "test4\n";
   sub_type = getSubType(spec_type);
   lumIndex = getLumIndex(spec_type);
 
@@ -307,7 +307,7 @@ auto spec_type_to_eff_temp(const string& spec_type) -> long double {
   } else if (strcmp(star_type.c_str(), "E") == 0) {
     return tempE[sub_type];
   } else {
-    // cerr << "test2" << endl;
+    // cerr << "test2\n";
     cerr << "Unsupported star type: " << star_type << endl;
     exit(EXIT_FAILURE);
     return EXIT_FAILURE;
@@ -805,7 +805,7 @@ auto vol_inventory(long double mass, long double escape_vel,
         break;
       default:
 
-        cout << "Error: orbital zone not initialized correctly!" << endl;
+        cout << "Error: orbital zone not initialized correctly!\n";
         exit(EXIT_FAILURE);
         return EXIT_FAILURE;
         break;
@@ -1194,7 +1194,7 @@ void calculate_surface_temp(planet *the_planet, bool first,
       cerr << "Deluge: " << the_planet->getTheSun().getName() << " "
            << the_planet->getPlanetNo() << " max ("
            << toString(the_planet->getMaxTemp()) << ") < boil ("
-           << toString(the_planet->getBoilPoint()) << ")" << endl;
+           << toString(the_planet->getBoilPoint()) << ")\n";
     }
 
     the_planet->setGreenhouseEffect(false);
@@ -1325,7 +1325,7 @@ void calculate_surface_temp(planet *the_planet, bool first,
          << ") C: " << toString(the_planet->getCloudCover()) << " ("
          << toString(clouds_raw)
          << ") I: " << toString(the_planet->getIceCover()) << " A: ("
-         << toString(the_planet->getAlbedo()) << "))" << endl;
+         << toString(the_planet->getAlbedo()) << "))\n";
   }
 }
 
@@ -1349,7 +1349,7 @@ void iterate_surface_temp(planet *the_planet, bool do_gasses) {
          << toString(the_planet->getTheSun().getREcosphere(
                 the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES))
          << " re " << toString(the_planet->getA()) << " a "
-         << toString(the_planet->getAlbedo()) << " alb]" << endl;
+         << toString(the_planet->getAlbedo()) << " alb]\n";
   }
 
   if (flag_verbose & 0x0040) {
@@ -1387,7 +1387,7 @@ void iterate_surface_temp(planet *the_planet, bool do_gasses) {
          << toString(the_planet->getTheSun().getREcosphere(
                 the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES))
          << " re " << toString(the_planet->getA()) << " a "
-         << toString(the_planet->getAlbedo()) << " alb]" << endl;
+         << toString(the_planet->getAlbedo()) << " alb]\n";
   }
 }
 
@@ -1594,7 +1594,7 @@ auto radius_improved(long double mass, long double imf, long double rmf,
                                              ice_rock_radii[0.5], 0.75,
                                              ice_rock_radii[0.75], false);
     } else if (imf < 0.75) {
-      // cout << "test1" << endl;
+      // cout << "test1\n";
       // cout << toString(mass) << endl;
       radius1 = planet_radius_helper(imf, 0.0, ice_rock_radii[0.0], 0.5,
                                      ice_rock_radii[0.5], 0.75,
@@ -1604,7 +1604,7 @@ auto radius_improved(long double mass, long double imf, long double rmf,
                                      ice_rock_radii[1.0], false);
       ice_rock_radius = rangeAdjust(imf, radius1, radius2, 0.5, 0.75);
     } else {
-      // cout << "test2" << endl;
+      // cout << "test2\n";
       // cout << toString(mass) << endl;
       radius1 = planet_radius_helper(imf, 0.5, ice_rock_radii[0.5], 0.75,
                                      ice_rock_radii[0.75], 1.0,
@@ -1997,7 +1997,7 @@ auto habitable_zone_distance(sun &the_sun, int mode, long double mass) -> long d
     }
 
     if (stellar_flux <= 0) {
-      cerr << "Error! Program caluclated an invalid stellar flux!" << endl;
+      cerr << "Error! Program caluclated an invalid stellar flux!\n";
       cerr << "Star Name: " << the_sun.getName() << endl;
       cerr << "Star Mass: " << toString(the_sun.getMass()) << endl;
       cerr << "Star Luminosity: " << toString(the_sun.getLuminosity()) << endl;
@@ -2019,7 +2019,7 @@ auto habitable_zone_distance(sun &the_sun, int mode, long double mass) -> long d
       } else if (mode == EARLY_MARS) {
         cerr << "Early Mars";
       } else if (mode == TWO_AU_CLOUD_LIMIT) {
-        cerr << "Two AU Cloud Limit" << endl;
+        cerr << "Two AU Cloud Limit\n";
       }
       cerr << endl;
       cerr << "Stellar Flux: " << toString(stellar_flux) << endl;
@@ -2153,7 +2153,7 @@ void gas_giant_temperature_albedo(planet *the_planet, long double parent_mass,
     new_obleteness = calcOblateness(the_planet);
     temp6 = (temp6 + (new_obleteness * 2.0)) / 3.0;
     if (temp1 > 900 && temp1 < 1400) {
-      // cout << "blada" << endl;
+      // cout << "blada\n";
       if (fabs(temp1 - temp2) < 0.0025 &&
           fabs(the_planet->getAlbedo() - new_albedo) < 0.001) {
         break;
@@ -2193,7 +2193,7 @@ auto getGasGiantAlbedo(const string& sudusky_class, const string& star_type,
     return logistal_trend(0.0205970047, -0.0332241697, 0.6005902693,
                           (long double)num);
   } else {
-    cout << "Error!" << endl;
+    cout << "Error!\n";
     exit(EXIT_FAILURE);
     return EXIT_FAILURE;
   }
@@ -2203,7 +2203,7 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
   the_sun = the_planet->getTheSun();
   if ((the_planet->getSurfPressure() > 0 || the_planet->getGasGiant()) &&
       the_sun.getAge() > 0) {
-    // cout << "test 1" << endl;
+    // cout << "test 1\n";
     // cout << planet_id << endl;
     long double *amount = nullptr;
     long double totalamount = 0;
@@ -2292,7 +2292,7 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
                << " * f " << toString(fract) << "\t("
                << toString(100.0 *
                            (the_planet->getGasMass() / the_planet->getMass()))
-               << "%)" << endl;
+               << "%)\n";
         }
 
         totalamount += amount[i];
@@ -2432,7 +2432,7 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
 
       for (int i = 0, n = 0; i < gases.count(); i++) {
         if (amount[i] > 0.0) {
-          // cout << "test 2" << endl;
+          // cout << "test 2\n";
           // cout << planet_id << endl;
           gas substance;
           substance.setNum(gases[i].getNum());
@@ -2451,7 +2451,7 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
                     the_planet->getSurfPressure(),
                     the_planet->getGas(n).getSurfPressure()) >
                     gases[i].getMaxIpp()) {
-              cerr << planet_id << "\t Poisoned by O2" << endl;
+              cerr << planet_id << "\t Poisoned by O2\n";
             }
           }
         }
@@ -2471,7 +2471,7 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
     if (the_planet->getNumGases() && (the_planet->getSurfPressure() /
                                       EARTH_SURF_PRES_IN_MILLIBARS) > 0.001) {
       // cerr << "We have a serious air! The atmosphere of " << planet_id << "
-      // contains no gases!" << endl;
+      // contains no gases!\n";
     }
   }
 }
@@ -2595,7 +2595,7 @@ auto is_earth_like(planet *the_planet) -> bool {
 
   if (!is_habitable(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
-    // habitable" << endl;
+    // habitable\n";
     return false;
   } else if (!is_earth_like_size(the_planet)) {
     return false;
@@ -2605,35 +2605,35 @@ auto is_earth_like(planet *the_planet) -> bool {
     return false;
   } else if (the_planet->getImf() > 0.0) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Has too much
-    // ice" << endl;
+    // ice\n";
     return false;
   } else if (iron < 20 || iron > 60) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too big or
-    // too small a core" << endl;
+    // too small a core\n";
     return false;
   } else if (gravity < 0.8 || gravity > 1.2) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too low or
-    // too high gravity" << endl;
+    // too high gravity\n";
     return false;
   } else if (rel_temp < -2.0 || rel_temp > 3.0) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too cold or
-    // too hot" << endl;
+    // too hot\n";
     return false;
   } else if (seas < 50.0 || seas > 80.0) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too dry or
-    // too wet" << endl;
+    // too wet\n";
     return false;
   } else if (ice > 10) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too much
-    // surface ice" << endl;
+    // surface ice\n";
     return false;
   } else if (clouds < 40.0 || clouds > 80.0) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too few or
-    // too many clouds" << endl;
+    // too many clouds\n";
     return false;
   } else if (pressure < 0.5 || pressure > 2.0) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too low or
-    // too high a surface pressure" << endl;
+    // too high a surface pressure\n";
     return false;
   } else if (the_planet->getType() == tWater) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Water world!"
@@ -2641,11 +2641,11 @@ auto is_earth_like(planet *the_planet) -> bool {
     return false;
   } else if (the_planet->getType() == tOil) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Carbon
-    // planet!" << endl;
+    // planet!\n";
     return false;
   } else if (the_planet->getMaxTemp() >= the_planet->getBoilPoint()) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Sometime too
-    // hot!" << endl;
+    // hot!\n";
     return false;
   }
   return true;
@@ -2720,7 +2720,7 @@ auto calcOblateness(planet *the_planet) -> long double {
     equatorial_radius_in_cm = the_planet->getRadius() * CM_PER_KM;
     k2 = calculate_moment_of_inertia_coeffient(the_planet);
     while (the_planet->getDay() == 0) {
-      cerr << "Error! The day is 0 hours long!" << endl;
+      cerr << "Error! The day is 0 hours long!\n";
       exit(EXIT_FAILURE);
     }
     ang_velocity =
@@ -3084,7 +3084,7 @@ auto planet_radius_helper(long double planet_mass, long double mass1,
     cout << "Please send an email to omega13a@yahoo.com of this problem with "
             "the following debug info: "
          << endl;
-    cout << "Input was:" << endl;
+    cout << "Input was:\n";
     cout << "planet_mass = " << planet_mass << endl;
     cout << "mass1 = " << toString((long double)mass1) << endl;
     cout << "radius1 = " << toString((long double)radius1) << endl;
@@ -3180,11 +3180,11 @@ auto is_potentialy_habitable_conservative_size(planet *the_planet) -> bool {
 auto is_potentialy_habitable_conservative(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_optimistic(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
-    // potentionally habitable by optimistic" << endl;
+    // potentionally habitable by optimistic\n";
     return false;
   } else if (!is_potentialy_habitable_conservative_size(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
-    // conservative size" << endl;
+    // conservative size\n";
     return false;
   } else if (the_planet->getA() <
                  habitable_zone_distance(
@@ -3195,7 +3195,7 @@ auto is_potentialy_habitable_conservative(planet *the_planet) -> bool {
                      the_sun_clone, MAXIMUM_GREENHOUSE,
                      the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong
-    // distance for extended" << endl;
+    // distance for extended\n";
     return false;
   }
   return true;
@@ -3204,11 +3204,11 @@ auto is_potentialy_habitable_conservative(planet *the_planet) -> bool {
 auto is_habitable_conservative(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_conservative(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
-    // potentionally habitable by conservative" << endl;
+    // potentionally habitable by conservative\n";
     return false;
   } else if (breathability(the_planet) != BREATHABLE) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
-    // breathable for conservative" << endl;
+    // breathable for conservative\n";
     return false;
   }
   return true;
@@ -3229,7 +3229,7 @@ auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
   string star_type = the_sun.getSpecType();
   if (!is_potentialy_habitable_extended_size(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not extended
-    // size" << endl;
+    // size\n";
     return false;
   } else if (the_sun.getMass() <
              0.3)  // the Plantary Habitablity Laboratory feels that stars less
@@ -3238,7 +3238,7 @@ auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
                    // stablize.
   {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": too small a
-    // star for extended" << endl;
+    // star for extended\n";
     return false;
   } else if (star_type == "O" || star_type == "B" ||
              star_type == "A")  // Types O, B, and A don't live long enough to
@@ -3246,21 +3246,21 @@ auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
                                 // for photosysisis to occure.
   {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong star
-    // for extended" << endl;
+    // for extended\n";
     return false;
   } else if (fabs(the_planet->getHzc()) >
              1.0)  // The planet can't have too much iron or too much water or
                    // gas making up its mass.
   {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong
-    // composition for extended" << endl;
+    // composition for extended\n";
     return false;
   } else if (fabs(the_planet->getHza()) >
              1.0)  // The planet can't have the potential of having a too thick
                    // or too thin atmosphere.
   {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": potential for
-    // too thick or thin an atmosphere for extended" << endl;
+    // too thick or thin an atmosphere for extended\n";
     return false;
   } else if (the_planet->getA() <
                  habitable_zone_distance(
@@ -3271,7 +3271,7 @@ auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
                      the_sun_clone, TWO_AU_CLOUD_LIMIT,
                      the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong
-    // distance for extended" << endl;
+    // distance for extended\n";
     return false;
   }
   return true;
@@ -3280,11 +3280,11 @@ auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
 auto is_habitable_extended(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_extended(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
-    // potentionally extended" << endl;
+    // potentionally extended\n";
     return false;
   } else if (breathability(the_planet) != BREATHABLE) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
-    // breathable for extended" << endl;
+    // breathable for extended\n";
     return false;
   }
   return true;
@@ -3293,15 +3293,15 @@ auto is_habitable_extended(planet *the_planet) -> bool {
 auto is_potentialy_habitable_earth_like(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_conservative(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
-    // potentionally habitable by conservative" << endl;
+    // potentionally habitable by conservative\n";
     return false;
   } else if (!is_earth_like_size(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
-    // earth-like size" << endl;
+    // earth-like size\n";
     return false;
   } else if (the_planet->getEsi() < 0.8) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": too low esi
-    // for earth-like" << endl;
+    // for earth-like\n";
     return false;
   }
   return true;
@@ -3310,11 +3310,11 @@ auto is_potentialy_habitable_earth_like(planet *the_planet) -> bool {
 auto is_habitable_earth_like(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_earth_like(the_planet)) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
-    // potentialy earth-like" << endl;
+    // potentialy earth-like\n";
     return false;
   } else if (breathability(the_planet) != BREATHABLE) {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
-    // breathable for earth-like" << endl;
+    // breathable for earth-like\n";
     return false;
   }
   return true;

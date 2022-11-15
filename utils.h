@@ -154,11 +154,11 @@ auto pivotIndex(vector<T>& v, int first, int last) -> int {
   T temp;
 
   if (first == last) {
-    // cout << "returing last" << endl;
+    // cout << "returing last\n";
     return last;
   }
   if (first == (last - 1)) {
-    // cout << "returing first" << endl;
+    // cout << "returing first\n";
     return first;
   } else {
     mid = (last + first) / 2;
@@ -178,7 +178,7 @@ auto pivotIndex(vector<T>& v, int first, int last) -> int {
       // move up lower sublist; stop when scanUp enters
       // upper sublist or identifies an element >= pivot
       while (scanUp <= scanDown && v[scanUp] < pivot) {
-        // cout << "scanning up " << pivot << " as pivot point." << endl;
+        // cout << "scanning up " << pivot << " as pivot point.\n";
         scanUp++;
       }
 
@@ -192,7 +192,7 @@ auto pivotIndex(vector<T>& v, int first, int last) -> int {
 
       // if indices are not in their sublists, partition complete
       if (scanUp >= scanDown) {
-        // cout << "stoped scanning" << endl;
+        // cout << "stoped scanning\n";
         break;
       }
 
@@ -224,39 +224,39 @@ void quicksort(vector<T>& v, int first, int last) {
 
   // if the range is not at least two elements, return
   if ((last - first) <= 1) {
-    // cout << "test1" << endl;
+    // cout << "test1\n";
     // return;
   }
   // if sublist has two elements, compare v[first] and
   // v[last-1] and exchange if necessary
   else if ((last - first) == 2) {
-    // cout << "test2" << endl;
+    // cout << "test2\n";
     if (v[last - 1] < v[first]) {
-      // cout << "test3" << endl;
+      // cout << "test3\n";
       temp = v[last - 1];
       v[last - 1] = v[first];
       v[first] = temp;
     }
-    // cout << "test4" << endl;
+    // cout << "test4\n";
     // return;
   } else {
-    // cout << "before pivot index call." << endl;
+    // cout << "before pivot index call.\n";
 
     pivotLoc = pivotIndex(v, first, last);
 
-    // cout << "before first recursive call." << endl;
+    // cout << "before first recursive call.\n";
     // writeVector(v, "\n");
 
     // make the recursive call
     quicksort(v, first, pivotLoc);
 
-    // cout << "before second recursive call." << endl;
+    // cout << "before second recursive call.\n";
     // writeVector(v, "\n");
 
     // make the recursive call
     quicksort(v, pivotLoc + 1, last);
 
-    // cout << "after second recursive call." << endl;
+    // cout << "after second recursive call.\n";
     // writeVector(v, "\n");
   }
 }

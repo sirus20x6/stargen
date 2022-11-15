@@ -21,31 +21,29 @@ void text_describe_system(planet* innermost_planet, bool do_gases,
   int counter;
 
   cout << "Stargen - V" << stargen_revision << "; seed=" << seed << endl;
-  cout << "                          SYSTEM  CHARACTERISTICS" << endl;
+  cout << "                          SYSTEM  CHARACTERISTICS\n";
   if (!the_sun.getIsCircumbinary()) {
-    cout << "Stellar mass: " << toString(the_sun.getMass()) << " solar masses"
-         << endl;
+    cout << "Stellar mass: " << toString(the_sun.getMass()) << " solar masses\n";
     cout << "Stellar luminosity: " << toString(the_sun.getLuminosity()) << endl;
   } else {
     cout << "Mass of Primary: " << toString(the_sun.getMass())
-         << " solar masses" << endl;
+         << " solar masses\n";
     cout << "Luminosity of Primary: " << toString(the_sun.getLuminosity())
          << endl;
     cout << "Mass of Secondary: " << toString(the_sun.getSecondaryMass())
-         << " solar masses" << endl;
+         << " solar masses\n";
     cout << "Luminosity of Primary: "
          << toString(the_sun.getSecondaryLuminosity()) << endl;
   }
   cout << "Age: " << toString(the_sun.getAge() / 1.0E9)
        << " billion years	("
        << toString((the_sun.getAge() - the_sun.getLife()) / 1.0E9)
-       << " billion left on main sequence)" << endl;
+       << " billion left on main sequence)\n";
   cout << "Habitable ecosphere radius: "
        << toString(AVE(habitable_zone_distance(the_sun, RECENT_VENUS, 1.0),
                        habitable_zone_distance(the_sun, EARLY_MARS, 1.0)))
-       << " AU" << endl;
-  cout << endl;
-  cout << "Planets present at:" << endl;
+       << " AU\n\n";
+  cout << "Planets present at:\n";
   for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
        the_planet = the_planet->next_planet, counter++) {
     cout << counter << "\t" << toString(the_planet->getA()) << " AU\t"
@@ -70,25 +68,24 @@ void text_describe_system(planet* innermost_planet, bool do_gases,
     }
     cout << endl;
     if ((int)the_planet->getDay() == (int)(the_planet->getOrbPeriod() * 24.0)) {
-      cout << "Planet is tidally locked with one face to star." << endl;
+      cout << "Planet is tidally locked with one face to star.\n";
     } else if (the_planet->getResonantPeriod()) {
-      cout << "Planet's rotation is in a resonant spin lock with the star."
-           << endl;
+      cout << "Planet's rotation is in a resonant spin lock with the star.\n";
     }
     cout << "   Distance from primary star:\t" << toString(the_planet->getA())
-         << " AU" << endl;
+         << " AU\n";
     cout << "   Eccentricity of orbit:\t" << toString(the_planet->getE())
          << endl;
     cout << "   Length of year:\t\t" << toString(the_planet->getOrbPeriod())
-         << " days" << endl;
+         << " days\n";
     cout << "   Length of day:\t\t" << toString(the_planet->getDay())
-         << " hours" << endl;
+         << " hours\n";
     cout << "   Mass:\t\t\t"
          << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
-         << " Earth masses" << endl;
+         << " Earth masses\n";
     if (!is_gas_planet(the_planet)) {
       cout << "   Surface gravity:\t\t" << toString(the_planet->getSurfGrav())
-           << " Earth gees" << endl;
+           << " Earth gees\n";
       cout << "   Surface pressure:\t\t"
            << toString(the_planet->getSurfPressure() /
                        EARTH_SURF_PRES_IN_MILLIBARS)
@@ -100,30 +97,29 @@ void text_describe_system(planet* innermost_planet, bool do_gases,
       cout << endl;
       cout << "   Surface temperature:\t\t"
            << toString(the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER)
-           << " degrees Celcius" << endl;
+           << " degrees Celcius\n";
       cout << "   Boiling point of water:\t"
            << toString(the_planet->getBoilPoint() - FREEZING_POINT_OF_WATER)
-           << " degrees Celcius" << endl;
+           << " degrees Celcius\n";
       cout << "   Hydrosphere percentage:\t"
-           << toString(the_planet->getHydrosphere() * 100.0) << "%" << endl;
+           << toString(the_planet->getHydrosphere() * 100.0) << "%\n";
       cout << "   Cloud cover percentage:\t"
-           << toString(the_planet->getCloudCover() * 100.0) << "%" << endl;
+           << toString(the_planet->getCloudCover() * 100.0) << "%\n";
       cout << "   Ice cover percentage:\t"
-           << toString(the_planet->getIceCover() * 100.0) << "%" << endl;
+           << toString(the_planet->getIceCover() * 100.0) << "%\n";
     }
     cout << "   Equatorial radius:\t\t" << toString(the_planet->getRadius())
-         << " Km" << endl;
+         << " Km\n";
     cout << "   Density:\t\t\t" << toString(the_planet->getDensity())
-         << " grams/cc" << endl;
+         << " grams/cc\n";
     cout << "   Escape Velocity:\t\t"
-         << toString(the_planet->getEscVelocity() / CM_PER_KM) << " Km/sec"
-         << endl;
+         << toString(the_planet->getEscVelocity() / CM_PER_KM) << " Km/sec\n";
     cout << "   Molecular weight retained:\t"
-         << toString(the_planet->getMolecWeight()) << " and above" << endl;
+         << toString(the_planet->getMolecWeight()) << " and above\n";
     cout << "   Surface acceleration:\t" << toString(the_planet->getSurfAccel())
-         << "cm/sec2" << endl;
+         << "cm/sec2\n";
     cout << "   Axial tilt:\t\t\t" << toString(the_planet->getAxialTilt())
-         << " degrees" << endl;
+         << " degrees\n";
     cout << "   Planetary albedo:\t\t" << toString(the_planet->getAlbedo())
          << endl;
     cout << endl << endl;
@@ -405,8 +401,8 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
     long double min_log = floor;
     long double ceiling = (int)(log10(outer_edge) + 1.0);
     long double max_log = 0.0;
-    long double mult = max_x / (max_log - min_log);
-    long double offset = -mult * (1.0 + min_log);
+    long double mult;
+    long double offset;
     long double em_scale = 5;
     long double x;
 
@@ -949,7 +945,7 @@ void html_thumbnails(planet* innermost_planet, fstream& the_file,
   string planet_id;
 
   if (!the_file) {
-    cout << "We have a serious error!" << endl;
+    cout << "We have a serious error!\n";
     exit(EXIT_FAILURE);
   }
 
@@ -1870,21 +1866,19 @@ void celestia_describe_system(planet* innermost_planet, string designation,
       habitable_zone_distance(the_sun, EARLY_MARS, 1.0);
 
   cout << "# Stargen - " << stargen_revision << "; seed=" << seed << endl;
-  cout << "#" << endl;
+  cout << "#\n";
   cout << "# " << designation << ", " << system_name << endl;
-  cout << "#" << endl;
-  cout << "# Stellar mass: " << toString(the_sun.getMass()) << " solar masses"
-       << endl;
+  cout << "#\n";
+  cout << "# Stellar mass: " << toString(the_sun.getMass()) << " solar masses\n";
   cout << "# Stellar luminosity: " << toString(the_sun.getLuminosity()) << endl;
   cout << "# Stellar temperature: " << toString(the_sun.getEffTemp())
-       << " Kelvin" << endl;
+       << " Kelvin\n";
   cout << "# Age: " << toString(the_sun.getAge() / 1.0E9)
        << "  billion years\t("
        << toString((the_sun.getLife() - the_sun.getAge()) / 1.0E9)
-       << " billion left on main sequence)" << endl;
+       << " billion left on main sequence)\n";
   cout << "# Habitable ecosphere: " << toString(min_r_ecosphere) << " AU to "
-       << toString(max_r_ecosphere) << " AU" << endl;
-  cout << endl;
+       << toString(max_r_ecosphere) << " AU\n\n";
   for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
        the_planet = the_planet->next_planet, counter++) {
     celestia_describe_world(the_planet, designation, system_name, seed, inc, an,
@@ -1928,19 +1922,19 @@ void celestia_describe_world(planet* the_planet, string designation,
   }
   parent = ss.str();
 
-  cout << "\t" << name << "\" \"" << parent << "\"" << endl;
-  cout << "{" << endl;
+  cout << "\t" << name << "\" \"" << parent << "\"\n";
+  cout << "{\n";
   if (!is_moon) {
     if (the_planet->getType() == tAsteroids ||
         the_planet->getRadius() < round_threshold(the_planet->getDensity())) {
-      cout << "\tClass \"asteroid\"" << endl;
+      cout << "\tClass \"asteroid\"\n";
     } else if (calcLambda(the_planet->getA(), the_planet->getMass()) < 1.0) {
-      cout << "\tClass \"dwarfplanet\"" << endl;
+      cout << "\tClass \"dwarfplanet\"\n";
     } else {
-      cout << "\tClass \"planet\"" << endl;
+      cout << "\tClass \"planet\"\n";
     }
   } else {
-    cout << "\tClass \"moon\"" << endl;
+    cout << "\tClass \"moon\"\n";
   }
   cout << "\tRadius " << toString(the_planet->getEquatrorialRadius()) << endl;
   cout << "\tMass "
@@ -1954,40 +1948,40 @@ void celestia_describe_world(planet* the_planet, string designation,
 
     if (the_planet->getEstimatedTemp() < tn)  // Neptune est temp = 48.1
     {
-      cout << "\tTexture \"tgasgiant.*\"" << endl;
-      cout << "\tColor [ 0.37 0.5 0.87 ]" << endl;
-      cout << "\tBlendTexture true" << endl;
+      cout << "\tTexture \"tgasgiant.*\"\n";
+      cout << "\tColor [ 0.37 0.5 0.87 ]\n";
+      cout << "\tBlendTexture true\n";
     } else if (the_planet->getEstimatedTemp() < tu)  // Uranus est temp = 60.3
     {
-      cout << "\tTexture \"tgasgiant.*\"" << endl;
+      cout << "\tTexture \"tgasgiant.*\"\n";
       assignTemperatureColors(the_planet, tu, 0.58, 0.69, 0.74, tn, 0.37, 0.5,
                               0.87);
     } else if (the_planet->getEstimatedTemp() < ts)  // Saturn est temp = 85.5
     {
-      cout << "\tTexture \"tgasgiant.*\"" << endl;
+      cout << "\tTexture \"tgasgiant.*\"\n";
       assignTemperatureColors(the_planet, ts, 0.91, 0.87, 0.76, tu, 0.58, 0.69,
                               0.74);
     } else if (the_planet->getEstimatedTemp() < TEMPERATURE_CLASS_II) {
-      cout << "\tTexture \"exo-class1.*\"" << endl;
+      cout << "\tTexture \"exo-class1.*\"\n";
       assignTemperatureColors(the_planet, TEMPERATURE_CLASS_II, 1, 1, 1, ts,
                               0.91, 0.87, 0.76);
     } else if (the_planet->getEstimatedTemp() < TEMPERATURE_SULFUR_GIANT) {
-      cout << "\tTexture \"exo-class2.*\"" << endl;
+      cout << "\tTexture \"exo-class2.*\"\n";
     } else if (the_planet->getEstimatedTemp() < TEMPERATURE_CLASS_III) {
-      cout << "\tTexture \"venus.jpg\"" << endl;
+      cout << "\tTexture \"venus.jpg\"\n";
     } else if (the_planet->getEstimatedTemp() < TEMPERATURE_CLASS_IV) {
-      cout << "\tTexture \"exo-class3.*\"" << endl;
+      cout << "\tTexture \"exo-class3.*\"\n";
     } else if (the_planet->getEstimatedTemp() < TEMPERATURE_CLASS_V) {
-      cout << "\tTexture \"exo-class4.*\"" << endl;
-      cout << "\tNightTexture \"exo-class4night.*\"" << endl;
+      cout << "\tTexture \"exo-class4.*\"\n";
+      cout << "\tNightTexture \"exo-class4night.*\"\n";
     } else if (the_planet->getEstimatedTemp() < TEMPERATURE_CARBON_GIANT) {
-      cout << "\tTexture \"exo-class5.*\"" << endl;
-      cout << "\tNightTexture \"exo-class5night.*\"" << endl;
+      cout << "\tTexture \"exo-class5.*\"\n";
+      cout << "\tNightTexture \"exo-class5night.*\"\n";
     } else {
-      cout << "\tTexture \"exo-class4night.*\"" << endl;
-      cout << "\tNightTexture \"exo-class4night.*\"" << endl;
-      cout << "\tColor [ 0 0 0 ]" << endl;
-      cout << "\tBlendTexture true" << endl;
+      cout << "\tTexture \"exo-class4night.*\"\n";
+      cout << "\tNightTexture \"exo-class4night.*\"\n";
+      cout << "\tColor [ 0 0 0 ]\n";
+      cout << "\tBlendTexture true\n";
     }
   } else if (the_planet->getType() == tIce) {
     cout << "# Hydrosphere percentage: "
@@ -1996,12 +1990,12 @@ void celestia_describe_world(planet* the_planet, string designation,
          << toString(the_planet->getIceCover() * 100.0) << endl;
     cout << endl;
     int ranItex = random_number(1.5, 5.5);
-    cout << "\tTexture \"tice" << ranItex << ".*\"" << endl;
-    cout << "\tSpecularColor [ 0.1 0.1 0.13 ]" << endl;
-    cout << "\tSpecularPower 25.0" << endl;
-    cout << "\tBumpMap \"tice" << ranItex << "-bump.*\"" << endl;
-    cout << "\tBumpHeight 3.5" << endl;
-    cout << "\tColor [ 1.0 0.9 0.75 ]" << endl;
+    cout << "\tTexture \"tice" << ranItex << ".*\"\n";
+    cout << "\tSpecularColor [ 0.1 0.1 0.13 ]\n";
+    cout << "\tSpecularPower 25.0\n";
+    cout << "\tBumpMap \"tice" << ranItex << "-bump.*\"\n";
+    cout << "\tBumpHeight 3.5\n";
+    cout << "\tColor [ 1.0 0.9 0.75 ]\n";
   } else if (the_planet->getType() == tWater) {
     cout << "# Hydrosphere percentage: "
          << toString(the_planet->getHydrosphere() * 100.0) << endl;
@@ -2009,10 +2003,10 @@ void celestia_describe_world(planet* the_planet, string designation,
          << toString(the_planet->getIceCover() * 100.0) << endl;
     cout << endl;
     int ranWtex = random_number(1.5, 5.5);
-    cout << "\tTexture \"twater" << ranWtex << ".*\"" << endl;
-    cout << "\tSpecularColor [ 0.5 0.5 0.55 ]" << endl;
-    cout << "\tSpecularPower 25.0" << endl;
-    cout << "\tColor [ 0.75 0.75 1.0 ]" << endl;
+    cout << "\tTexture \"twater" << ranWtex << ".*\"\n";
+    cout << "\tSpecularColor [ 0.5 0.5 0.55 ]\n";
+    cout << "\tSpecularPower 25.0\n";
+    cout << "\tColor [ 0.75 0.75 1.0 ]\n";
   } else if (the_planet->getType() == tCarbon ||
              the_planet->getType() == tIron || the_planet->getType() == tOil ||
              the_planet->getType() == tRock) {
@@ -2024,9 +2018,9 @@ void celestia_describe_world(planet* the_planet, string designation,
       cout << endl;
     }
     int ranRtex = random_number(1.5, 5.5);
-    cout << "\tTexture \"trock" << ranRtex << ".*\"" << endl;
-    cout << "\tBumpMap \"trock" << ranRtex << "-bump.*\"" << endl;
-    cout << "\tBumpHeight 3.5" << endl;
+    cout << "\tTexture \"trock" << ranRtex << ".*\"\n";
+    cout << "\tBumpMap \"trock" << ranRtex << "-bump.*\"\n";
+    cout << "\tBumpHeight 3.5\n";
 
     if (the_planet->getType() != tOil) {
       assignDistanceColors(the_planet, 0.52, 0.47, 0.42);
@@ -2038,26 +2032,26 @@ void celestia_describe_world(planet* the_planet, string designation,
          << toString(the_planet->getIceCover() * 100.0) << endl;
     cout << endl;
     int ran1tex = random_number(1.5, 5.5);
-    cout << "\tTexture \"t1face" << ran1tex << ".*\"" << endl;
-    cout << "\tSpecularTexture \"t1face" << ran1tex << "-spec.*\"" << endl;
-    cout << "\tSpecularColor [ 0.1 0.1 0.13 ]" << endl;
-    cout << "\tSpecularPower 25.0" << endl;
-    cout << "\tBumpMap \"t1face" << ran1tex << "-bump.*\"" << endl;
-    cout << "\tBumpHeight 3.5" << endl;
-    cout << "\tColor [ 0.52 0.47 0.42 ]" << endl;
+    cout << "\tTexture \"t1face" << ran1tex << ".*\"\n";
+    cout << "\tSpecularTexture \"t1face" << ran1tex << "-spec.*\"\n";
+    cout << "\tSpecularColor [ 0.1 0.1 0.13 ]\n";
+    cout << "\tSpecularPower 25.0\n";
+    cout << "\tBumpMap \"t1face" << ran1tex << "-bump.*\"\n";
+    cout << "\tBumpHeight 3.5\n";
+    cout << "\tColor [ 0.52 0.47 0.42 ]\n";
   } else if (the_planet->getType() == tVenusian) {
     int ranVtex = random_number(1.5, 5.5);
-    cout << "\tTexture \"tvenus" << ranVtex << ".*\"" << endl;
-    cout << "\tBumpMap \"tvenus" << ranVtex << "-bump.*\"" << endl;
-    cout << "\tBumpHeight 3.5" << endl;
+    cout << "\tTexture \"tvenus" << ranVtex << ".*\"\n";
+    cout << "\tBumpMap \"tvenus" << ranVtex << "-bump.*\"\n";
+    cout << "\tBumpHeight 3.5\n";
   } else if (the_planet->getType() == tMartian) {
     cout << "# Ice cover percentage:   "
          << toString(the_planet->getIceCover() * 100.0) << endl;
     cout << endl;
     int ranMtex = random_number(1.5, 5.5);
-    cout << "\tTexture \"tmars" << ranMtex << ".*\"" << endl;
-    cout << "\tBumpMap \"tmars" << ranMtex << "-bump.*\"" << endl;
-    cout << "\tBumpHeight 3.5" << endl;
+    cout << "\tTexture \"tmars" << ranMtex << ".*\"\n";
+    cout << "\tBumpMap \"tmars" << ranMtex << "-bump.*\"\n";
+    cout << "\tBumpHeight 3.5\n";
 
     assignDistanceColors(the_planet, 1, 0.75, 0.7);
   } else if (the_planet->getType() == tTerrestrial) {
@@ -2067,31 +2061,31 @@ void celestia_describe_world(planet* the_planet, string designation,
          << toString(the_planet->getIceCover() * 100.0) << endl;
     cout << endl;
     int ranEtex = random_number(1.5, 5.5);
-    cout << "\tTexture \"tearth" << ranEtex << ".*\"" << endl;
-    cout << "\tSpecularTexture \"tearth" << ranEtex << "-spec.*\"" << endl;
-    cout << "\tSpecularColor [ 0.8 0.8 0.85 ]" << endl;
-    cout << "\tSpecularPower 25.0" << endl;
-    cout << "\tBumpMap \"tearth" << ranEtex << "-bump.*\"" << endl;
-    cout << "\tBumpHeight 3.5" << endl;
-    cout << "\tColor [ 0.9 0.9 0.95 ]" << endl;
+    cout << "\tTexture \"tearth" << ranEtex << ".*\"\n";
+    cout << "\tSpecularTexture \"tearth" << ranEtex << "-spec.*\"\n";
+    cout << "\tSpecularColor [ 0.8 0.8 0.85 ]\n";
+    cout << "\tSpecularPower 25.0\n";
+    cout << "\tBumpMap \"tearth" << ranEtex << "-bump.*\"\n";
+    cout << "\tBumpHeight 3.5\n";
+    cout << "\tColor [ 0.9 0.9 0.95 ]\n";
   } else if (the_planet->getType() == tAsteroids) {
     int ranAtex = random_number(1.5, 3.5);
-    cout << "\tTexture \"tasteroid.*\"" << endl;
+    cout << "\tTexture \"tasteroid.*\"\n";
     if (the_planet->getRadius() <
         (round_threshold(the_planet->getDensity()) * (2.0 / 3.0))) {
-      cout << "\tMesh \"asteroid.cms\"" << endl;
+      cout << "\tMesh \"asteroid.cms\"\n";
     } else {
-      cout << "\tBumpMap \"tasteroid-bump.*\"" << endl;
-      cout << "\tBumpHeight 3.5" << endl;
+      cout << "\tBumpMap \"tasteroid-bump.*\"\n";
+      cout << "\tBumpHeight 3.5\n";
     }
     if (ranAtex == 1) {
-      cout << "\tColor   [ 0.52 0.46 0.43 ]" << endl;
+      cout << "\tColor   [ 0.52 0.46 0.43 ]\n";
     } else if (ranAtex == 2) {
-      cout << "\tColor   [ 0.37 0.37 0.37 ]" << endl;
+      cout << "\tColor   [ 0.37 0.37 0.37 ]\n";
     } else {
-      cout << "\tColor   [ 0.7 0.7 0.7 ]" << endl;
+      cout << "\tColor   [ 0.7 0.7 0.7 ]\n";
     }
-    cout << "\tBlendTexture true" << endl;
+    cout << "\tBlendTexture true\n";
   } else {
     cout << "\tTexture \"" << texture_name(the_planet->getType()) << "\""
          << endl;
@@ -2105,26 +2099,26 @@ void celestia_describe_world(planet* the_planet, string designation,
   cout << "#   SPH:\t\t\t" << toString(the_planet->getSph()) << endl;
   cout << "#   ESI:\t\t\t" << toString(the_planet->getEsi()) << endl;
   cout << "#   Density:\t\t\t" << toString(the_planet->getDensity())
-       << "\tgrams/cc" << endl;
+       << "\tgrams/cc\n";
   cout << "#   Escape Velocity:\t\t"
        << toString(the_planet->getEscVelocity() / CM_PER_KM) << "\tKm/sec"
        << endl;
   cout << "#   Surface acceleration:\t" << toString(the_planet->getSurfAccel())
-       << "\tcm/sec2" << endl;
+       << "\tcm/sec2\n";
   cout << "#   Surface gravity:\t\t" << toString(the_planet->getSurfGrav())
-       << "\tEarth gees" << endl;
+       << "\tEarth gees\n";
   cout << "#   Surface temperature:\t"
        << toString(the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER)
-       << "\tdegrees Celcius" << endl;
+       << "\tdegrees Celcius\n";
   cout << "#   Estimated temperature:\t"
        << toString(the_planet->getEstimatedTemp() - FREEZING_POINT_OF_WATER)
-       << "\tdegrees Celcius" << endl;
+       << "\tdegrees Celcius\n";
   cout << "#   Estimated terrestrial temperature:\t"
        << toString(the_planet->getEstimatedTerrTemp() - FREEZING_POINT_OF_WATER)
-       << "\tdegrees Celcius" << endl;
+       << "\tdegrees Celcius\n";
   cout << "#   Boiling point of water:\t"
        << toString(the_planet->getBoilPoint() - FREEZING_POINT_OF_WATER)
-       << "\tdegrees Celcius" << endl;
+       << "\tdegrees Celcius\n";
   cout << "#   Surface pressure:\t\t"
        << toString(the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS)
        << "\tEarth atmospheres";
@@ -2134,7 +2128,7 @@ void celestia_describe_world(planet* the_planet, string designation,
   }
   cout << endl;
   cout << "#   Molecular weight retained:\t"
-       << toString(the_planet->getMolecWeight()) << " and above" << endl;
+       << toString(the_planet->getMolecWeight()) << " and above\n";
 
   if (the_planet->getNumGases() > 0) {
     for (int i = 0; i < the_planet->getNumGases(); i++) {
@@ -2179,112 +2173,112 @@ void celestia_describe_world(planet* the_planet, string designation,
 
   switch (the_planet->getType()) {
     case t1Face:
-      cout << "\tHazeColor [ 1 1 1 ]" << endl;
-      cout << "\tHazeDensity 0.3" << endl;
+      cout << "\tHazeColor [ 1 1 1 ]\n";
+      cout << "\tHazeDensity 0.3\n";
       cout << endl;
-      cout << "\tAtmosphere {" << endl;
-      cout << "\t\tHeight 30" << endl;
-      cout << "\t\tLower [ 0.8 0.4 0.1 ]" << endl;
-      cout << "\t\tUpper [ 0.0 0.0 0.9 ]" << endl;
-      cout << "\t\tSky [ 0.8 0.4 0.1 ]" << endl;
-      cout << "\t\tSunset [ 0.8 0.5 0.2 ]" << endl;
+      cout << "\tAtmosphere {\n";
+      cout << "\t\tHeight 30\n";
+      cout << "\t\tLower [ 0.8 0.4 0.1 ]\n";
+      cout << "\t\tUpper [ 0.0 0.0 0.9 ]\n";
+      cout << "\t\tSky [ 0.8 0.4 0.1 ]\n";
+      cout << "\t\tSunset [ 0.8 0.5 0.2 ]\n";
       display_clouds(the_planet);
-      cout << "\t}" << endl;
+      cout << "\t}\n";
       cout << endl;
       break;
     case tIce:
-      cout << "\tHazeColor [ 0.2 0.5 1 ]" << endl;
-      cout << "\tHazeDensity 1" << endl;
+      cout << "\tHazeColor [ 0.2 0.5 1 ]\n";
+      cout << "\tHazeDensity 1\n";
       cout << endl;
-      cout << "\tAtmosphere {" << endl;
-      cout << "\t\tHeight 60" << endl;
-      cout << "\t\tLower [ 0.8 0.4 0.1 ]" << endl;
-      cout << "\t\tUpper [ 0.0 0.0 0.9 ]" << endl;
-      cout << "\t\tSky [ 0.8 0.4 0.1 ]" << endl;
-      cout << "\t\tSunset [ 0.8 0.5 0.2 ]" << endl;
+      cout << "\tAtmosphere {\n";
+      cout << "\t\tHeight 60\n";
+      cout << "\t\tLower [ 0.8 0.4 0.1 ]\n";
+      cout << "\t\tUpper [ 0.0 0.0 0.9 ]\n";
+      cout << "\t\tSky [ 0.8 0.4 0.1 ]\n";
+      cout << "\t\tSunset [ 0.8 0.5 0.2 ]\n";
       display_clouds(the_planet);
-      cout << "\t}" << endl;
+      cout << "\t}\n";
       cout << endl;
       break;
     case tMartian:
-      cout << "\tHazeColor [ 1 1 1 ]" << endl;
-      cout << "\tHazeDensity 0.45" << endl;
+      cout << "\tHazeColor [ 1 1 1 ]\n";
+      cout << "\tHazeDensity 0.45\n";
       cout << endl;
-      cout << "\tAtmosphere {" << endl;
-      cout << "\t\tHeight 30" << endl;
-      cout << "\t\tLower [ 0.8 0.6 0.6 ]" << endl;
-      cout << "\t\tUpper [ 0.7 0.3 0.3 ]" << endl;
-      cout << "\t\tSky [ 0.83 0.75 0.65 ]" << endl;
-      cout << "\t\tSunset [ 0.7 0.7 0.8 ]" << endl;
+      cout << "\tAtmosphere {\n";
+      cout << "\t\tHeight 30\n";
+      cout << "\t\tLower [ 0.8 0.6 0.6 ]\n";
+      cout << "\t\tUpper [ 0.7 0.3 0.3 ]\n";
+      cout << "\t\tSky [ 0.83 0.75 0.65 ]\n";
+      cout << "\t\tSunset [ 0.7 0.7 0.8 ]\n";
       display_clouds(the_planet);
-      cout << "\t}" << endl;
+      cout << "\t}\n";
       cout << endl;
       break;
     case tTerrestrial:
-      cout << "\tHazeColor [ 1 1 1 ]" << endl;
-      cout << "\tHazeDensity 0.3" << endl;
+      cout << "\tHazeColor [ 1 1 1 ]\n";
+      cout << "\tHazeDensity 0.3\n";
       cout << endl;
-      cout << "\tAtmosphere {" << endl;
-      cout << "\t\tHeight 60" << endl;
-      cout << "\t\tLower [ 0.5 0.5 0.65 ]" << endl;
-      cout << "\t\tUpper [ 0.3 0.3 0.6 ]" << endl;
-      cout << "\t\tSky [ 0.3 0.6 0.9 ]" << endl;
-      cout << "\t\tSunset [ 1.0 0.6 0.2 ]" << endl;
+      cout << "\tAtmosphere {\n";
+      cout << "\t\tHeight 60\n";
+      cout << "\t\tLower [ 0.5 0.5 0.65 ]\n";
+      cout << "\t\tUpper [ 0.3 0.3 0.6 ]\n";
+      cout << "\t\tSky [ 0.3 0.6 0.9 ]\n";
+      cout << "\t\tSunset [ 1.0 0.6 0.2 ]\n";
       display_clouds(the_planet);
-      cout << "\t}" << endl;
+      cout << "\t}\n";
       cout << endl;
       break;
     case tWater:
-      cout << "\tHazeColor [ 1 1 1 ]" << endl;
-      cout << "\tHazeDensity 0.3" << endl;
+      cout << "\tHazeColor [ 1 1 1 ]\n";
+      cout << "\tHazeDensity 0.3\n";
       cout << endl;
-      cout << "\tAtmosphere {" << endl;
-      cout << "\t\tHeight 90" << endl;
-      cout << "\t\tLower [ 0.4 0.4 0.7 ]" << endl;
-      cout << "\t\tUpper [ 0.2 0.2 0.6 ]" << endl;
-      cout << "\t\tSky [ 0.4 0.7 0.9 ]" << endl;
-      cout << "\t\tSunset [ 1.0 0.6 0.2 ]" << endl;
+      cout << "\tAtmosphere {\n";
+      cout << "\t\tHeight 90\n";
+      cout << "\t\tLower [ 0.4 0.4 0.7 ]\n";
+      cout << "\t\tUpper [ 0.2 0.2 0.6 ]\n";
+      cout << "\t\tSky [ 0.4 0.7 0.9 ]\n";
+      cout << "\t\tSunset [ 1.0 0.6 0.2 ]\n";
       display_clouds(the_planet);
-      cout << "\t}" << endl;
+      cout << "\t}\n";
       cout << endl;
       break;
     case tOil:
     case tVenusian:
-      cout << "\tHazeColor [ 0.5 0.35 0.2 ]" << endl;
-      cout << "\tHazeDensity 0.35" << endl;
+      cout << "\tHazeColor [ 0.5 0.35 0.2 ]\n";
+      cout << "\tHazeDensity 0.35\n";
       cout << endl;
-      cout << "\tAtmosphere {" << endl;
-      cout << "\t\tHeight 60" << endl;
-      cout << "\t\tLower [ 0.8 0.8 0.5 ]" << endl;
-      cout << "\t\tUpper [ 0.6 0.6 0.6 ]" << endl;
-      cout << "\t\tSky [ 0.8 0.8 0.5 ]" << endl;
+      cout << "\tAtmosphere {\n";
+      cout << "\t\tHeight 60\n";
+      cout << "\t\tLower [ 0.8 0.8 0.5 ]\n";
+      cout << "\t\tUpper [ 0.6 0.6 0.6 ]\n";
+      cout << "\t\tSky [ 0.8 0.8 0.5 ]\n";
       display_clouds(the_planet);
-      cout << "\t}" << endl;
+      cout << "\t}\n";
       cout << endl;
       break;
     case tSubSubGasGiant:
     case tSubGasGiant:
       cout << "\tOblateness " << toString(the_planet->getOblateness()) << endl;
-      cout << "\tHazeColor [ 0.5 0.8 1.0 ]" << endl;
-      cout << "\tHazeDensity 0.2" << endl;
+      cout << "\tHazeColor [ 0.5 0.8 1.0 ]\n";
+      cout << "\tHazeDensity 0.2\n";
       break;
     case tGasGiant:
       cout << "\tOblateness " << toString(the_planet->getOblateness()) << endl;
-      cout << "\tHazeColor [ 0.4 0.45 0.5 ]" << endl;
-      cout << "\tHazeDensity 0.3" << endl;
+      cout << "\tHazeColor [ 0.4 0.45 0.5 ]\n";
+      cout << "\tHazeDensity 0.3\n";
       break;
     case tBrownDwarf:
-      cout << "\tHazeColor [ 0.5 0.45 0.45 ]" << endl;
-      cout << "\tHazeDensity 0.3" << endl;
+      cout << "\tHazeColor [ 0.5 0.45 0.45 ]\n";
+      cout << "\tHazeDensity 0.3\n";
       break;
   }
-  // cout << "\tOrbitFrame { EclipticJ2000{} }" << endl;
-  cout << "\tOrbitFrame { " << endl;
-  cout << "\t\tBodyFixed { " << endl;
-  cout << "\t\t\tCenter \"" << parent << "\"" << endl;
-  cout << "\t\t}" << endl;
-  cout << "\t}" << endl;
-  cout << "\tEllipticalOrbit {" << endl;
+  // cout << "\tOrbitFrame { EclipticJ2000{} }\n";
+  cout << "\tOrbitFrame { \n";
+  cout << "\t\tBodyFixed { \n";
+  cout << "\t\t\tCenter \"" << parent << "\"\n";
+  cout << "\t\t}\n";
+  cout << "\t}\n";
+  cout << "\tEllipticalOrbit {\n";
   if (!is_moon) {
     cout << "\t\tPeriod            "
          << toString(the_planet->getOrbPeriod() / DAYS_IN_A_YEAR) << " # Years"
@@ -2294,9 +2288,9 @@ void celestia_describe_world(planet* the_planet, string designation,
     cout << "\t\tEccentricity      " << toString(the_planet->getE()) << endl;
   } else {
     cout << "\t\tPeriod            " << toString(the_planet->getOrbPeriod())
-         << " # Days" << endl;
+         << " # Days\n";
     cout << "\t\tSemiMajorAxis     "
-         << toString(the_planet->getMoonA() * KM_PER_AU) << " # Km" << endl;
+         << toString(the_planet->getMoonA() * KM_PER_AU) << " # Km\n";
     cout << "\t\tEccentricity      " << toString(the_planet->getMoonE())
          << endl;
   }
@@ -2308,19 +2302,19 @@ void celestia_describe_world(planet* the_planet, string designation,
        << toString(the_planet->getLongitudeOfPericenter()) << endl;
   cout << "\t\tMeanLongitude     " << toString(the_planet->getMeanLongitude())
        << endl;
-  cout << "\t}" << endl;
+  cout << "\t}\n";
   cout << endl;
 
-  // cout << "\tBodyFrame { EclipticJ2000{} }" << endl;
-  cout << "\tBodyFrame { " << endl;
-  cout << "\t\tBodyFixed { " << endl;
-  cout << "\t\t\tCenter \"" << parent << "\"" << endl;
-  cout << "\t\t\tMeanEquator {" << endl;
-  cout << "\t\t\t\t\"" << parent << "\"" << endl;
-  cout << "\t\t\t}" << endl;
-  cout << "\t\t}" << endl;
-  cout << "\t}" << endl;
-  cout << "\tUniformRotation {" << endl;
+  // cout << "\tBodyFrame { EclipticJ2000{} }\n";
+  cout << "\tBodyFrame { \n";
+  cout << "\t\tBodyFixed { \n";
+  cout << "\t\t\tCenter \"" << parent << "\"\n";
+  cout << "\t\t\tMeanEquator {\n";
+  cout << "\t\t\t\t\"" << parent << "\"\n";
+  cout << "\t\t\t}\n";
+  cout << "\t\t}\n";
+  cout << "\t}\n";
+  cout << "\tUniformRotation {\n";
   if (the_planet->getResonantPeriod()) {
     if (!is_moon) {
       cout << "# Planet's rotation is in a resonant spin lock with the star"
@@ -2340,9 +2334,9 @@ void celestia_describe_world(planet* the_planet, string designation,
   if ((int)the_planet->getDay() == (int)(the_planet->getOrbPeriod() * 24.0) &&
       !the_planet->getResonantPeriod()) {
     if (!is_moon) {
-      cout << "# Planet is tidally locked with one face to star." << endl;
+      cout << "# Planet is tidally locked with one face to star.\n";
     } else {
-      cout << "# Moon is tidally locked with one face to planet." << endl;
+      cout << "# Moon is tidally locked with one face to planet.\n";
     }
     cout << "\t\tInclination\t" << toString(local_inc) << endl;
   } else {
@@ -2354,10 +2348,10 @@ void celestia_describe_world(planet* the_planet, string designation,
   cout << "\t\tAscendingNode\t" << toString(an) << endl;
   cout << "\t\tMeridianAngle\t" << toString(the_planet->getMeanLongitude())
        << endl;
-  cout << "\t}" << endl;
+  cout << "\t}\n";
   cout << endl;
   cout << "\tAlbedo            " << toString(the_planet->getAlbedo()) << endl;
-  cout << "}" << endl;
+  cout << "}\n";
   cout << endl;
 }
 
@@ -2374,11 +2368,11 @@ string system_name, long int seed)
   long double mass = 0;
   long double total_moon_mass = 0;
 
-  cout << "#! /bin/sh -x" << endl;
+  cout << "#! /bin/sh -x\n";
   cout << "# Stargen - " << stargen_revision << "; seed=" << seed << endl;
-  cout << "#" << endl;
+  cout << "#\n";
   cout << "# Script to generate moons for some planets in the system " <<
-designation << " (" << system_name << ")" << endl; cout << "#" << endl;
+designation << " (" << system_name << ")\n"; cout << "#\n";
 
   for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
 the_planet = the_planet->next_planet, counter++)
@@ -2560,23 +2554,23 @@ string texture_name(planet_type type) {
 void display_clouds(planet* the_planet) {
   int ranCtex = random_number(1.5, 5.5);
   cout << "# Cloud cover percentage: " << (the_planet->getCloudCover() * 100.0)
-       << "%" << endl;
+       << "%\n";
   if (the_planet->getCloudCover() > 0.25) {
     cout << endl;
-    cout << "\t\tCloudHeight 7" << endl;
+    cout << "\t\tCloudHeight 7\n";
     if (the_planet->getDay() > (14.0 * 24.0)) {
-      cout << "\t\tCloudSpeed 300" << endl;
+      cout << "\t\tCloudSpeed 300\n";
     } else if (the_planet->getDay() > (4.0 * 24.0)) {
-      cout << "\t\tCloudSpeed 130" << endl;
+      cout << "\t\tCloudSpeed 130\n";
     } else {
-      cout << "\t\tCloudSpeed 65" << endl;
+      cout << "\t\tCloudSpeed 65\n";
     }
   }
 
   if (the_planet->getCloudCover() > 0.75) {
-    cout << "\t\tCloudMap \"t100-clouds" << ranCtex << ".*\"" << endl;
+    cout << "\t\tCloudMap \"t100-clouds" << ranCtex << ".*\"\n";
   } else if (the_planet->getCloudCover() > 0.25) {
-    cout << "\t\tCloudMap \"t50-clouds" << ranCtex << ".*\"" << endl;
+    cout << "\t\tCloudMap \"t50-clouds" << ranCtex << ".*\"\n";
   }
 }
 
@@ -2612,8 +2606,8 @@ void assignDistanceColors(planet* the_planet, long double r0, long double g0,
     b = 1.0;
   }
   cout << "\tColor [ " << toString(r) << " " << toString(g) << " "
-       << toString(b) << " ]" << endl;
-  cout << "\tBlendTexture true" << endl;
+       << toString(b) << " ]\n";
+  cout << "\tBlendTexture true\n";
 }
 
 void assignTemperatureColors(planet* the_planet, long double t0, long double r0,
@@ -2628,6 +2622,6 @@ void assignTemperatureColors(planet* the_planet, long double t0, long double r0,
   b = b0 + ((b1 - b0) * ((te - t0) / (t1 - t0)));
 
   cout << "\tColor [ " << toString(r) << " " << toString(g) << " "
-       << toString(b) << " ]" << endl;
-  cout << "\tBlendTexture true" << endl;
+       << toString(b) << " ]\n";
+  cout << "\tBlendTexture true\n";
 }

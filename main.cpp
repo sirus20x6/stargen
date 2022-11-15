@@ -243,7 +243,7 @@ int main(int argc, char **argv) {
             atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (ratio_arg <= 0.0) {
           cout << "Accrete dust density coefficient -A (" << ratio_arg
-               << ") must be > 0.0" << endl;
+               << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
@@ -252,7 +252,7 @@ int main(int argc, char **argv) {
             atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (ecc_coef_arg <= 0.0) {
           cout << "Accrete eccentricity coeffecient -Q (" << ecc_coef_arg
-               << ") must be > 0.0" << endl;
+               << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
@@ -261,7 +261,7 @@ int main(int argc, char **argv) {
             atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (inner_planet_factor_arg <= 0.0) {
           cout << "Accrete inner dust boundary -q (" << inner_planet_factor_arg
-               << ") must be > 0.0" << endl;
+               << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
@@ -270,7 +270,7 @@ int main(int argc, char **argv) {
             atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (compainion_mass_arg <= 0.0) {
           cout << "Mass of compainion object -w (" << compainion_mass_arg
-               << ") must be > 0.0" << endl;
+               << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
@@ -279,7 +279,7 @@ int main(int argc, char **argv) {
             atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (compainion_eccentricity_arg <= 0.0) {
           cout << "Eccentritiy of compainion object's orbit ("
-               << compainion_eccentricity_arg << ") must be > 0.0" << endl;
+               << compainion_eccentricity_arg << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
@@ -288,7 +288,7 @@ int main(int argc, char **argv) {
             atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (compainion_distant_arg <= 0.0) {
           cout << "Distance of compainion object -d (" << compainion_distant_arg
-               << ") must be > 0.0" << endl;
+               << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
@@ -309,7 +309,7 @@ int main(int argc, char **argv) {
             atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (compainion_lum_arg <= 0.0) {
           cout << "Luminosity of companion star j (" << compainion_lum_arg
-               << ") must be > 0.0" << endl;
+               << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
@@ -318,7 +318,7 @@ int main(int argc, char **argv) {
             atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (compainion_eff_arg <= 0.0) {
           cout << "Temperature of companion star X (" << compainion_lum_arg
-               << ") must be > 0.0" << endl;
+               << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
@@ -347,7 +347,7 @@ int main(int argc, char **argv) {
     }
   }
 
-  // cout << arg_name << " blada" << endl;
+  // cout << arg_name << " blada\n";
 
   /*for (index = 0; index < argc; index++)
   {
@@ -413,12 +413,12 @@ void initData() {
 }
 
 void usage(string program) {
-  cout << "Usage: " << program << " [options] [system name]" << endl;
-  cout << "  Options:" << endl;
-  cout << "Seed values:" << endl;
-  cout << "    -s#  Set random number seed [default: from time]" << endl;
-  cout << "    -i#  Number to increment each random seed [default: 1]" << endl;
-  cout << "    -n#  Specify number of systems [default: 1]" << endl;
+  cout << "Usage: " << program << " [options] [system name]\n";
+  cout << "  Options:\n";
+  cout << "Seed values:\n";
+  cout << "    -s#  Set random number seed [default: from time]\n";
+  cout << "    -i#  Number to increment each random seed [default: 1]\n";
+  cout << "    -n#  Specify number of systems [default: 1]\n";
   cout << "    -A#  set accretion dust density ratio_arg to # [default: 0.0]"
        << endl;
   cout << "    -q#  set accretion inner dust border to # [default: 0.3]"
@@ -426,15 +426,15 @@ void usage(string program) {
   cout << "    -Q#  set accretion planetesimal seed eccentricity coefficient "
           "to # [default: 0.077]"
        << endl;
-  cout << "Preset seeds:" << endl;
+  cout << "Preset seeds:\n";
   cout << "    -k   Use known planets as planitesimal seeds [from internal "
           "tables]"
        << endl;
-  cout << "    -K   Generate only known planets [from internal tables]" << endl;
-  cout << "    -x   Use the Solar System's masses/orbits" << endl;
-  cout << "    -a   Use the Solar System's masses/orbits varying Earth" << endl;
-  cout << "Stars:" << endl;
-  cout << "  For a custom star:" << endl;
+  cout << "    -K   Generate only known planets [from internal tables]\n";
+  cout << "    -x   Use the Solar System's masses/orbits\n";
+  cout << "    -a   Use the Solar System's masses/orbits varying Earth\n";
+  cout << "Stars:\n";
+  cout << "  For a custom star:\n";
   cout << "    Please note that for a custom star, you need to specify a mass "
           "and/or a luminosity as well as a spectral type and/or a "
           "temperature. Other wise the program will not work."
@@ -445,11 +445,11 @@ void usage(string program) {
   cout << "    -y#  Specify stellar luminosity # [fraction of Sun's "
           "luminosity] (optional if -m is used)"
        << endl;
-  cout << "    -Y#  Specify minimum age for star (years) (optional)" << endl;
-  cout << "    -MY# Specify maximum age for star (years) (optional)" << endl;
+  cout << "    -Y#  Specify minimum age for star (years) (optional)\n";
+  cout << "    -MY# Specify maximum age for star (years) (optional)\n";
   cout << "    -b#  The temperature of the star (optional if -B is used)"
        << endl;
-  cout << "    -B   Spectral type of the star (optional if -b is used)" << endl;
+  cout << "    -B   Spectral type of the star (optional if -b is used)\n";
   cout << "    -CB  Make this a circumbinary system like Tatoonine in Star "
           "Wars (optional)"
        << endl;
@@ -471,44 +471,44 @@ void usage(string program) {
   cout << "    -f#  The eccentricity of the orbit of the companion star "
           "(optional and required if the -CB option is used)"
        << endl;
-  cout << "  For a predefined star:" << endl;
+  cout << "  For a predefined star:\n";
   cout << "    -D   Use all of Dole's " << dole.count() << " nearby stars"
        << endl;
-  cout << "    -D#  Use Dole's system #" << endl;
-  cout << "    -F   Use all " << jimb.count() << " AU systems" << endl;
-  cout << "    -F#  Use AU system #" << endl;
+  cout << "    -D#  Use Dole's system #\n";
+  cout << "    -F   Use all " << jimb.count() << " AU systems\n";
+  cout << "    -F#  Use AU system #\n";
   cout << "    -W   Use all " << solstation.count()
-       << " nearby stars taken from the Web" << endl;
-  cout << "    -W#  Use Web system #" << endl;
+       << " nearby stars taken from the Web\n";
+  cout << "    -W#  Use Web system #\n";
   cout << "    -O   Use all " << omega_galaxy.count()
-       << " fictious stars in the fictious Omega Galaxy" << endl;
-  cout << "    -O#  Use Omega Galaxy system #" << endl;
+       << " fictious stars in the fictious Omega Galaxy\n";
+  cout << "    -O#  Use Omega Galaxy system #\n";
   cout << "    -R   Use all " << ring_universe.count()
-       << " fictious stars in the fictious Ring Universe galaxy" << endl;
-  cout << "    -R#  Use Ring Universe system #" << endl;
+       << " fictious stars in the fictious Ring Universe galaxy\n";
+  cout << "    -R#  Use Ring Universe system #\n";
   cout << "    -I   Use all " << ic3094.count()
-       << " fictious stars in IC 3094 that cham generated" << endl;
-  cout << "    -I#  Use IC 3094 system #" << endl;
+       << " fictious stars in IC 3094 that cham generated\n";
+  cout << "    -I#  Use IC 3094 system #\n";
   cout << "    -U   Use all " << andromeda.count()
-       << " fictious stars in the Andromeda Galaxy that cham generated" << endl;
-  cout << "    -U#  Use Andromeda Galaxy system #" << endl;
+       << " fictious stars in the Andromeda Galaxy that cham generated\n";
+  cout << "    -U#  Use Andromeda Galaxy system #\n";
   cout << "    -G   Use the " << star_trek.count()
-       << " predefined stars from Star Trek" << endl;
-  cout << "    -G#  Use Star Trek system #" << endl;
+       << " predefined stars from Star Trek\n";
+  cout << "    -G#  Use Star Trek system #\n";
   cout << "    -PHL Use the " << phl.count()
        << " predefined stars listed at the Planetary Habitability Library"
        << endl;
-  cout << "    -PHL#Use potentially habitable system #" << endl;
-  cout << "    -l   List stars of selected table and exit" << endl;
-  cout << "    -L   List stars of selected table as HTML and exit" << endl;
-  cout << "Filters:" << endl;
+  cout << "    -PHL#Use potentially habitable system #\n";
+  cout << "    -l   List stars of selected table and exit\n";
+  cout << "    -L   List stars of selected table as HTML and exit\n";
+  cout << "Filters:\n";
   cout << "    Please note that these options are only usefull if you are "
           "making a large batch of systems and only want to save certain ones."
        << endl;
-  cout << "    -E   Only systems with earthlike planets" << endl;
-  cout << "    -H   Only systems with habitable planets" << endl;
-  cout << "    -2   Only systems with 2 or more habitable planets" << endl;
-  cout << "    -3   Only systems with 3 or more habitable planets" << endl;
+  cout << "    -E   Only systems with earthlike planets\n";
+  cout << "    -H   Only systems with habitable planets\n";
+  cout << "    -2   Only systems with 2 or more habitable planets\n";
+  cout << "    -3   Only systems with 3 or more habitable planets\n";
   cout << "    -T   Only systems with habitable planets more than 2 Earth "
           "Masses in size"
        << endl;
@@ -517,14 +517,14 @@ void usage(string program) {
        << endl;
   cout << "    -J   Only systems with Jovian planets in habitable region"
        << endl;
-  cout << "    -g   Include atmospheric gases" << endl;
-  cout << "    -v   List verbosities [hex values] and exit" << endl;
-  cout << "    -v#  Set output verbosity [hex value]" << endl;
-  cout << "    -V   Use vector graphics [SVG] images [default: GIF]" << endl;
-  cout << "    -z   Do numeric size check and exit" << endl;
-  cout << "    -Z   Dump tables used for gases and exit" << endl;
-  cout << "File specs:" << endl;
-  cout << "    --   use stdout" << endl;
+  cout << "    -g   Include atmospheric gases\n";
+  cout << "    -v   List verbosities [hex values] and exit\n";
+  cout << "    -v#  Set output verbosity [hex value]\n";
+  cout << "    -V   Use vector graphics [SVG] images [default: GIF]\n";
+  cout << "    -z   Do numeric size check and exit\n";
+  cout << "    -Z   Dump tables used for gases and exit\n";
+  cout << "File specs:\n";
+  cout << "    --   use stdout\n";
   cout << "    -o   Name for the output file(s) [default: taken from star name]"
        << endl;
   cout << "    -p   Path for where the output file(s) are saved [default: "
@@ -532,21 +532,21 @@ void usage(string program) {
        << endl;
   cout << "    -u   Internet URL path for/in the output file(s) [default: none]"
        << endl;
-  cout << "Output formats: (only one is generated)" << endl;
-  cout << "(default) HTML to file" << endl;
-  cout << "    -c   Celestia .ssc to stdout" << endl;
-  cout << "    -C   Excel .csv [dl: no thumbnail html] to file" << endl;
-  cout << "    -e   Excel .csv to file" << endl;
-  cout << "    -S   Vector graphics (SVG) to file" << endl;
-  cout << "    -t   Text to stdout" << endl;
-  cout << "    -sn# Number of decimal places for numbers" << endl;
-  cout << "Other:" << endl;
+  cout << "Output formats: (only one is generated)\n";
+  cout << "(default) HTML to file\n";
+  cout << "    -c   Celestia .ssc to stdout\n";
+  cout << "    -C   Excel .csv [dl: no thumbnail html] to file\n";
+  cout << "    -e   Excel .csv to file\n";
+  cout << "    -S   Vector graphics (SVG) to file\n";
+  cout << "    -t   Text to stdout\n";
+  cout << "    -sn# Number of decimal places for numbers\n";
+  cout << "Other:\n";
   cout << "    -M   Generate moons (highly experimental and incomplete)"
        << endl;
   cout << "    -r   Allow planet migration after forming. (highly experimental)"
        << endl;
   cout << endl;
-  cout << "Examples:" << endl;
+  cout << "Examples:\n";
   cout << "10000 systems with 1 as the seed for the first system around a "
           "custom star with moons and migrated planets and only save ones with "
           "an earthlike planet:"
@@ -564,7 +564,7 @@ void usage(string program) {
   cout << "10000 systems with 1 as the seed for the first system around a "
           "predefined star:"
        << endl;
-  cout << program << " -W73 -M -r -s1 -n10000 -E" << endl;
+  cout << program << " -W73 -M -r -s1 -n10000 -E\n";
   cout << "10000 systems with 1 as the seed for the first system around a "
           "custom star with a distant companion star with moons and migrated "
           "planets and only save ones with an earthlike planet:"
@@ -574,14 +574,14 @@ void usage(string program) {
           "-n10000 -E"
        << endl;
   cout << endl;
-  cout << "        Web systems (-W) taken from" << endl;
+  cout << "        Web systems (-W) taken from\n";
   cout << "          http://www.solstation.com/stars.htm, Wikipedia, and "
           "various research papers"
        << endl;
-  cout << "        AU systems (-F) taken from" << endl;
-  cout << "          stories by C.J. Cherryh" << endl;
-  cout << "        Manticore systems (-B) taken from" << endl;
-  cout << "          stories by David Weber" << endl;
+  cout << "        AU systems (-F) taken from\n";
+  cout << "          stories by C.J. Cherryh\n";
+  cout << "        Manticore systems (-B) taken from\n";
+  cout << "          stories by David Weber\n";
   cout << endl;
   cout << "        StarGen: " << stargen_revision << endl;
   cout << endl;

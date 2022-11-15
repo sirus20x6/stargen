@@ -125,13 +125,13 @@ void radiusDebug(const string &text, planet *the_planet,
          << endl;
   } else {
     cerr << "Moon's parent's distance: " << toString(the_planet->getA())
-         << " AU" << endl;
+         << " AU\n";
     cerr << "Moon's distance: "
-         << toString(convert_au_to_km(the_planet->getMoonA())) << " km" << endl;
+         << toString(convert_au_to_km(the_planet->getMoonA())) << " km\n";
   }
   cerr << "Core composition: " << toString(the_planet->getImf() * 100.0, 4)
        << "% ice, " << toString(the_planet->getRmf() * 100.0, 4) << "% rock ("
-       << toString(the_planet->getCmf() * 100.0, 4) << "% carbon)" << endl;
+       << toString(the_planet->getCmf() * 100.0, 4) << "% carbon)\n";
   cerr << "Mass: " << toString(convert_su_to_eu(the_planet->getMass())) << " EU"
        << endl;
   if (the_planet->getGasGiant()) {
