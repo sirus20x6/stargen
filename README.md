@@ -20,3 +20,6 @@ tip use
 make -jx
 ```
 where x is number of threads +1 to compile faster
+
+
+I believe it would also be good to get rid of all the hard coded start catalogs and just add support for importing stars through json
