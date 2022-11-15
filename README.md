@@ -1,3 +1,5 @@
+![CI](https://github.com/sirus20x6/stargen/actions/workflows/main.yml/badge.svg)
+
 This is a fork of a version of stargen from https://github.com/omega13a/stargen
 
 My goal is to update and modernize the code, and then add features in that order. I had found an older version of accrete/accrete2 written in K&R C that had been partially updated to ANSI C. I added JSON exporting to that before stumbling on this newer fork. I have been going back and forth between modernizing by hand and using static analyzers to improve the code, but some of it is so old the analyzers have trouble.
