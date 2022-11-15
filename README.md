@@ -84,7 +84,8 @@ Stars:
     -l   List stars of selected table and exit
     -L   List stars of selected table as HTML and exit
 Filters:
-    Please note that these options are only usefull if you are making a large batch of systems and only want to save certain ones.
+    Please note that these options are only usefull if you are 
+making a large batch of systems and only want to save certain ones.
     -E   Only systems with earthlike planets
     -H   Only systems with habitable planets
     -2   Only systems with 2 or more habitable planets
@@ -114,25 +115,6 @@ Output formats: (only one is generated)
 Other:
     -M   Generate moons (highly experimental and incomplete)
     -r   Allow planet migration after forming. (highly experimental)
-
-Examples:
-10000 systems with 1 as the seed for the first system around a custom star with moons and migrated planets and only save ones with an earthlike planet:
-stargen -m1.09 -y1.12609 -BG0V -b6215 -M -r -s1 -n10000 -E
-10000 systems with 1 as the seed for the first system around a custom star in a circumbinary system with moons and migrated planets and only save ones with an earthlike planet:
-stargen -m1.09 -y1.12609 -BG0V -b6215 -CB -w0.75 -j0.178473 -X4493 -NK3V -d0.11146 -f0.011 -M -r -s1 -n10000 -E
-10000 systems with 1 as the seed for the first system around a predefined star:
-stargen -W73 -M -r -s1 -n10000 -E
-10000 systems with 1 as the seed for the first system around a custom star with a distant companion star with moons and migrated planets and only save ones with an earthlike planet:
-stargen -m1.09 -y1.12609 -BG0V -b6215 -w0.75 -d1114.6 -f0.011 -M -r -s1 -n10000 -E
-
-        Web systems (-W) taken from
-          http://www.solstation.com/stars.htm, Wikipedia, and various research papers
-        AU systems (-F) taken from
-          stories by C.J. Cherryh
-        Manticore systems (-B) taken from
-          stories by David Weber
-
-        StarGen: $Revision: 2.0 $
-
-
+    -ak  Print acknowledgement
+    -ex  Print examples
 ```
