@@ -1,6 +1,6 @@
 #include "stargen.h"
 
-#include <math.h>
+#include <cmath>
 
 #include <cstdlib>
 #include <cstring>
@@ -764,8 +764,8 @@ void init() {
 int system_counter = 0;
 
 void generate_stellar_system(sun &the_sun, bool use_seed_system,
-                             planet *seed_system, string flag_char, int sys_no,
-                             string system_name, long double inner_dust_limit,
+                             planet *seed_system, const string& flag_char, int sys_no,
+                             const string& system_name, long double inner_dust_limit,
                              long double outer_planet_limit,
                              long double ecc_coef,
                              long double inner_planet_factor, bool do_gases,
@@ -830,8 +830,8 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
     the_sun.setAge(random_number(min_age, max_age));
   }
   // cout << "test" << system_counter << endl;
-  generate_planets(the_sun, !use_seed_system, std::move(flag_char), sys_no,
-                   std::move(system_name), do_gases, do_moons);
+  generate_planets(the_sun, !use_seed_system, flag_char, sys_no,
+                   system_name, do_gases, do_moons);
 }
 
 void generate_planets(sun &the_sun, bool random_tilt, const string &flag_char,
@@ -901,7 +901,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
 
   the_planet->setTheSun(the_sun);
 
-  the_planet->setOrbitZone(orb_zone(
+  the_planet->setOrbitZone(orbital_zone(
       the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
       the_planet->getA()));
 
