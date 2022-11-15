@@ -449,108 +449,108 @@ void initData() {
 }
 
 void usage(string program) {
-  cout << "Usage: " << program << " [options] [system name]\n";
-  cout << "  Options:\n";
-  cout << "Seed values:\n";
-  cout << "    -s#  Set random number seed [default: from time]\n";
-  cout << "    -i#  Number to increment each random seed [default: 1]\n";
-  cout << "    -n#  Specify number of systems [default: 1]\n";
-  cout << "    -A#  set accretion dust density ratio_arg to # [default: 0.0]\n";
-  cout << "    -q#  set accretion inner dust border to # [default: 0.3]\n";
-  cout << "    -Q#  set accretion planetesimal seed eccentricity coefficient "
-          "to # [default: 0.077]\n";
-  cout << "Preset seeds:\n";
-  cout << "    -k   Use known planets as planitesimal seeds [from internal "
-          "tables]\n";
-  cout << "    -K   Generate only known planets [from internal tables]\n";
-  cout << "    -x   Use the Solar System's masses/orbits\n";
-  cout << "    -a   Use the Solar System's masses/orbits varying Earth\n";
-  cout << "Stars:\n";
-  cout << "\tPlease note that for a custom star, you need to specify a mass "
-          "and/or a luminosity\n\tas well as a spectral type and/or a temperature. Other wise the program will not work.\n";
-  cout << "    -m#  Specify stellar mass # [fraction of Sun's mass] (optional "
-          "if -y is used)\n";
-  cout << "    -y#  Specify stellar luminosity # [fraction of Sun's "
-          "luminosity] (optional if -m is used)\n";
-  cout << "    -Y#  Specify minimum age for star (years) (optional)\n";
-  cout << "    -MY# Specify maximum age for star (years) (optional)\n";
-  cout << "    -b#  The temperature of the star (optional if -B is used)\n";
-  cout << "    -B   Spectral type of the star (optional if -b is used)\n";
-  cout << "    -CB  Make this a circumbinary system like Tatoonine in Star "
-          "Wars (optional)\n";
-  cout << "    -w#  The mass of a companion star (optional and required if the "
-          "-CB option is used)\n";
-  cout << "    -j#  The luminosity of a companion star (optional and required "
-          "if the -CB option is used)\n";
-  cout << "    -X#  The temperature of a companion star (optional and required "
-          "if the -CB option is used)\n";
-  cout << "    -N   Spectral type of the companion star (optional and required "
-          "if the -CB option is used)\n";
-  cout << "    -d#  The distance to a companion star (optional and required if "
-          "the -CB option is used)\n";
-  cout << "    -f#  The eccentricity of the orbit of the companion star "
-          "(optional and required if the -CB option is used)\n";
-  cout << "  For a predefined star:\n";
-  cout << "    -D   Use all of Dole's " << dole.count() << " nearby stars\n";
-  cout << "    -D#  Use Dole's system #\n";
-  cout << "    -F   Use all " << jimb.count() << " AU systems\n";
-  cout << "    -F#  Use AU system #\n";
-  cout << "    -W   Use all " << solstation.count()
-       << " nearby stars taken from the Web\n";
-  cout << "    -W#  Use Web system #\n";
-  cout << "    -O   Use all " << omega_galaxy.count()
-       << " fictious stars in the fictious Omega Galaxy\n";
-  cout << "    -O#  Use Omega Galaxy system #\n";
-  cout << "    -R   Use all " << ring_universe.count()
-       << " fictious stars in the fictious Ring Universe galaxy\n";
-  cout << "    -R#  Use Ring Universe system #\n";
-  cout << "    -I   Use all " << ic3094.count()
-       << " fictious stars in IC 3094 that cham generated\n";
-  cout << "    -I#  Use IC 3094 system #\n";
-  cout << "    -U   Use all " << andromeda.count()
-       << " fictious stars in the Andromeda Galaxy that cham generated\n";
-  cout << "    -U#  Use Andromeda Galaxy system #\n";
-  cout << "    -G   Use the " << star_trek.count()
-       << " predefined stars from Star Trek\n";
-  cout << "    -G#  Use Star Trek system #\n";
-  cout << "    -PHL Use the " << phl.count()
-       << " predefined stars listed at the Planetary Habitability Library\n";
-  cout << "    -PHL#Use potentially habitable system #\n";
-  cout << "    -l   List stars of selected table and exit\n";
-  cout << "    -L   List stars of selected table as HTML and exit\n";
-  cout << "Filters:\n";
-  cout << "    Please note that these options are only usefull if you are making\n"
-          "\ta large batch of systems and only want to save certain ones.\n";
-  cout << "    -E   Only systems with earthlike planets\n";
-  cout << "    -H   Only systems with habitable planets\n";
-  cout << "    -2   Only systems with 2 or more habitable planets\n";
-  cout << "    -3   Only systems with 3 or more habitable planets\n";
-  cout << "    -T   Only systems with habitable planets more than 2 Earth "
-          "Masses in size\n";
-  cout << "    -P   Only systems with planets habitable by the Planetary "
-          "Habitability Laboratory's criteria\n";
-  cout << "    -J   Only systems with Jovian planets in habitable region\n";
-  cout << "    -g   Include atmospheric gases\n";
-  cout << "    -v   List verbosities [hex values] and exit\n";
-  cout << "    -v#  Set output verbosity [hex value]\n";
-  cout << "    -V   Use vector graphics [SVG] images [default: GIF]\n";
-  cout << "    -z   Do numeric size check and exit\n";
-  cout << "    -Z   Dump tables used for gases and exit\n";
-  cout << "File specs:\n";
-  cout << "    --   use stdout\n";
-  cout << "    -o   Name for the output file(s) [default: taken from star name]\n";
-  cout << "    -p   Path for where the output file(s) are saved [default: ./html]\n";
-  cout << "    -u   Internet URL path for/in the output file(s) [default: none]\n";
-  cout << "Output formats: (only one is generated) default HTML to file\n";
-  cout << "    -c   Celestia .ssc to stdout\n";
-  cout << "    -C   Excel .csv [dl: no thumbnail html] to file\n";
-  cout << "    -e   Excel .csv to file\n";
-  cout << "    -S   Vector graphics (SVG) to file\n";
-  cout << "    -t   Text to stdout\n";
-  cout << "    -sn# Number of decimal places for numbers\n";
-  cout << "Other:\n";
-  cout << "    -M   Generate moons (highly experimental and incomplete)\n";
-  cout << "    -r   Allow planet migration after forming. (highly experimental)\n";
-  cout << "    -ak  Acknowledgement\n";
-  cout << "    -ex  Examples\n";
+  cout << "Usage: " << program << " [options] [system name]\n"
+  "  Options:\n"
+  "Seed values:\n"
+  "    -s#  Set random number seed [default: from time]\n"
+  "    -i#  Number to increment each random seed [default: 1]\n"
+  "    -n#  Specify number of systems [default: 1]\n"
+  "    -A#  set accretion dust density ratio_arg to # [default: 0.0]\n"
+  "    -q#  set accretion inner dust border to # [default: 0.3]\n"
+  "    -Q#  set accretion planetesimal seed eccentricity coefficient "
+          "to # [default: 0.077]\n"
+  "Preset seeds:\n"
+  "    -k   Use known planets as planitesimal seeds [from internal "
+          "tables]\n"
+  "    -K   Generate only known planets [from internal tables]\n"
+  "    -x   Use the Solar System's masses/orbits\n"
+  "    -a   Use the Solar System's masses/orbits varying Earth\n"
+  "Stars:\n"
+  "\tPlease note that for a custom star, you need to specify a mass "
+  "and/or a luminosity\n\tas well as a spectral type and/or a temperature. Other wise the program will not work.\n"
+  "    -m#  Specify stellar mass # [fraction of Sun's mass] (optional "
+  "if -y is used)\n"
+  "    -y#  Specify stellar luminosity # [fraction of Sun's "
+  "luminosity] (optional if -m is used)\n"
+  "    -Y#  Specify minimum age for star (years) (optional)\n"
+  "    -MY# Specify maximum age for star (years) (optional)\n"
+  "    -b#  The temperature of the star (optional if -B is used)\n"
+  "    -B   Spectral type of the star (optional if -b is used)\n"
+  "    -CB  Make this a circumbinary system like Tatoonine in Star "
+  "Wars (optional)\n"
+  "    -w#  The mass of a companion star (optional and required if the "
+  "-CB option is used)\n"
+  "    -j#  The luminosity of a companion star (optional and required "
+  "if the -CB option is used)\n"
+  "    -X#  The temperature of a companion star (optional and required "
+  "if the -CB option is used)\n"
+  "    -N   Spectral type of the companion star (optional and required "
+  "if the -CB option is used)\n"
+  "    -d#  The distance to a companion star (optional and required if "
+  "the -CB option is used)\n"
+  "    -f#  The eccentricity of the orbit of the companion star "
+  "(optional and required if the -CB option is used)\n"
+  "  For a predefined star:\n"
+  "    -D   Use all of Dole's " << dole.count() << " nearby stars\n"
+  "    -D#  Use Dole's system #\n"
+  "    -F   Use all " << jimb.count() << " AU systems\n"
+  "    -F#  Use AU system #\n"
+  "    -W   Use all " << solstation.count() <<
+  " nearby stars taken from the Web\n"
+  "    -W#  Use Web system #\n"
+  "    -O   Use all " << omega_galaxy.count() <<
+  " fictious stars in the fictious Omega Galaxy\n"
+  "    -O#  Use Omega Galaxy system #\n"
+  "    -R   Use all " << ring_universe.count() <<
+  " fictious stars in the fictious Ring Universe galaxy\n"
+  "    -R#  Use Ring Universe system #\n"
+  "    -I   Use all " << ic3094.count() <<
+  " fictious stars in IC 3094 that cham generated\n"
+  "    -I#  Use IC 3094 system #\n"
+  "    -U   Use all " << andromeda.count() <<
+  " fictious stars in the Andromeda Galaxy that cham generated\n"
+  "    -U#  Use Andromeda Galaxy system #\n"
+  "    -G   Use the " << star_trek.count() <<
+  " predefined stars from Star Trek\n"
+  "    -G#  Use Star Trek system #\n"
+  "    -PHL Use the " << phl.count() <<
+  " predefined stars listed at the Planetary Habitability Library\n"
+  "    -PHL#Use potentially habitable system #\n"
+  "    -l   List stars of selected table and exit\n"
+  "    -L   List stars of selected table as HTML and exit\n"
+  "Filters:\n"
+  "    Please note that these options are only usefull if you are making\n"
+  "\ta large batch of systems and only want to save certain ones.\n"
+  "    -E   Only systems with earthlike planets\n"
+  "    -H   Only systems with habitable planets\n"
+  "    -2   Only systems with 2 or more habitable planets\n"
+  "    -3   Only systems with 3 or more habitable planets\n"
+  "    -T   Only systems with habitable planets more than 2 Earth "
+  "Masses in size\n"
+  "    -P   Only systems with planets habitable by the Planetary "
+  "Habitability Laboratory's criteria\n"
+  "    -J   Only systems with Jovian planets in habitable region\n"
+  "    -g   Include atmospheric gases\n"
+  "    -v   List verbosities [hex values] and exit\n"
+  "    -v#  Set output verbosity [hex value]\n"
+  "    -V   Use vector graphics [SVG] images [default: GIF]\n"
+  "    -z   Do numeric size check and exit\n"
+  "    -Z   Dump tables used for gases and exit\n"
+  "File specs:\n"
+  "    --   use stdout\n"
+  "    -o   Name for the output file(s) [default: taken from star name]\n"
+  "    -p   Path for where the output file(s) are saved [default: ./html]\n"
+  "    -u   Internet URL path for/in the output file(s) [default: none]\n"
+  "Output formats: (only one is generated) default HTML to file\n"
+  "    -c   Celestia .ssc to stdout\n"
+  "    -C   Excel .csv [dl: no thumbnail html] to file\n"
+  "    -e   Excel .csv to file\n"
+  "    -S   Vector graphics (SVG) to file\n"
+  "    -t   Text to stdout\n"
+  "    -sn# Number of decimal places for numbers\n"
+  "Other:\n"
+  "    -M   Generate moons (highly experimental and incomplete)\n"
+  "    -r   Allow planet migration after forming. (highly experimental)\n"
+  "    -ak  Acknowledgement\n"
+  "    -ex  Examples\n";
 }
