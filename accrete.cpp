@@ -561,7 +561,9 @@ void coalesce_planetesimals(long double a, long double e, long double mass,
           if (the_planet == planet_head) {
             planet_head = next_planet;
           } else {
-            prev_planet->next_planet = next_planet;
+            if (prev_planet) {
+              prev_planet->next_planet = next_planet;
+            }
           }
 
           the_planet->next_planet = next_planet->next_planet;
@@ -609,7 +611,9 @@ void coalesce_planetesimals(long double a, long double e, long double mass,
         next_planet = next_planet->next_planet;
       }
       the_planet->next_planet = next_planet;
-      prev_planet->next_planet = the_planet;
+      if (prev_planet) {
+        prev_planet->next_planet = the_planet;
+      }
     }
   }
   if (hist_head->planets == nullptr) {
