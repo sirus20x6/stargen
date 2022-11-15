@@ -466,10 +466,8 @@ void usage(string program) {
   cout << "    -x   Use the Solar System's masses/orbits\n";
   cout << "    -a   Use the Solar System's masses/orbits varying Earth\n";
   cout << "Stars:\n";
-  cout << "  For a custom star:\n";
-  cout << "    Please note that for a custom star, you need to specify a mass "
-          "and/or a luminosity as well as a spectral type and/or a "
-          "temperature. Other wise the program will not work.\n";
+  cout << "\tPlease note that for a custom star, you need to specify a mass "
+          "and/or a luminosity\n\tas well as a spectral type and/or a temperature. Other wise the program will not work.\n";
   cout << "    -m#  Specify stellar mass # [fraction of Sun's mass] (optional "
           "if -y is used)\n";
   cout << "    -y#  Specify stellar luminosity # [fraction of Sun's "
@@ -521,8 +519,8 @@ void usage(string program) {
   cout << "    -l   List stars of selected table and exit\n";
   cout << "    -L   List stars of selected table as HTML and exit\n";
   cout << "Filters:\n";
-  cout << "    Please note that these options are only usefull if you are \n"
-          "making a large batch of systems and only want to save certain ones.\n";
+  cout << "    Please note that these options are only usefull if you are making\n"
+          "\ta large batch of systems and only want to save certain ones.\n";
   cout << "    -E   Only systems with earthlike planets\n";
   cout << "    -H   Only systems with habitable planets\n";
   cout << "    -2   Only systems with 2 or more habitable planets\n";
@@ -543,8 +541,7 @@ void usage(string program) {
   cout << "    -o   Name for the output file(s) [default: taken from star name]\n";
   cout << "    -p   Path for where the output file(s) are saved [default: ./html]\n";
   cout << "    -u   Internet URL path for/in the output file(s) [default: none]\n";
-  cout << "Output formats: (only one is generated)\n";
-  cout << "(default) HTML to file\n";
+  cout << "Output formats: (only one is generated) default HTML to file\n";
   cout << "    -c   Celestia .ssc to stdout\n";
   cout << "    -C   Excel .csv [dl: no thumbnail html] to file\n";
   cout << "    -e   Excel .csv to file\n";
@@ -554,6 +551,6 @@ void usage(string program) {
   cout << "Other:\n";
   cout << "    -M   Generate moons (highly experimental and incomplete)\n";
   cout << "    -r   Allow planet migration after forming. (highly experimental)\n";
-  cout << "    -ak  Print acknowledgement\n";
-  cout << "    -ex  Print examples\n";
+  cout << "    -ak  Acknowledgement\n";
+  cout << "    -ex  Examples\n";
 }
