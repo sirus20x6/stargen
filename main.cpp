@@ -25,6 +25,33 @@ using namespace std;
 void initData();
 void usage(string);
 
+void  printAknowledgement() {
+  cout << "Web systems (-W) taken from\n";
+  cout << "\thttp://www.solstation.com/stars.htm, Wikipedia, and various research papers\n";
+  cout << "AU systems (-F) taken from stories by C.J. Cherry\n";
+  cout << "Manticore systems (-B) taken from stories by David Weber\n";
+  cout << "StarGen: " << stargen_revision << endl;
+}
+
+void printExamples() {
+  cout << "Examples:\n";
+  cout << "10000 systems with 1 as the seed for the first system around a\n"
+          "custom star with moons and migrated planets and only save ones with "
+          "an earthlike planet:\n\n";
+  cout << "stargen -m1.09 -y1.12609 -BG0V -b6215 -M -r -s1 -n10000 -E\n\n";
+  cout << "10000 systems with 1 as the seed for the first system around a\n"
+          "custom star in a circumbinary system with moons and migrated "
+          "planets and only save ones with an earthlike planet:\n\n";
+  cout << "stargen -m1.09 -y1.12609 -BG0V -b6215 -CB -w0.75 -j0.178473 -X4493 -NK3V "
+          "-d0.11146 -f0.011 -M -r -s1 -n10000 -E\n\n";
+  cout << "10000 systems with 1 as the seed for the first system around a predefined star:\n\n";
+  cout << "stargen -W73 -M -r -s1 -n10000 -E\n\n";
+  cout << "10000 systems with 1 as the seed for the first system around a\n"
+          "custom star with a distant companion star with moons and migrated "
+          "planets and only save ones with an earthlike planet:\n\n";
+  cout << "stargen -m1.09 -y1.12609 -BG0V -b6215 -w0.75 -d1114.6 -f0.011 -M -r -s1 -n10000 -E\n\n";
+}
+
 int main(int argc, char **argv) {
   actions action = aGenerate;
   string flag_char = "?";
@@ -132,7 +159,8 @@ int main(int argc, char **argv) {
         flag_char = temp_string.substr(1, 1).c_str();
         flags_arg |= fUseSolarsystem;
         if (mass_arg == 0.0) mass_arg = 1.0;
-      } else if (compare_string_char(temp_string, 1, "a")) {
+      } else if (compare_string_char(temp_string, 1, "a") && 
+          !compare_string_char(temp_string, 2, "k")) {
         flag_char = temp_string.substr(1, 1).c_str();
         flags_arg |= fReuseSolarsystem;
         break;
@@ -175,8 +203,13 @@ int main(int argc, char **argv) {
         skip = true;
       } else if (compare_string_char(temp_string, 1, "t")) {
         out_format = ffTEXT;
-      } else if (compare_string_char(temp_string, 1, "e")) {
+      } else if (compare_string_char(temp_string, 1, "ex", 2)) {
+        printExamples();
+        return 0;
+      } else if (compare_string_char(temp_string, 1, "e") &&
+      !compare_string_char(temp_string, 2, "x")) {
         out_format = ffCSV;
+        cout <<"wtfmate";
       } else if (compare_string_char(temp_string, 1, "C")) {
         out_format = ffCSVdl;
       } else if (compare_string_char(temp_string, 1, "c")) {
@@ -226,6 +259,9 @@ int main(int argc, char **argv) {
         flags_arg |= fDoMoons;
       } else if (compare_string_char(temp_string, 1, "r")) {
         flags_arg |= fDoMigration;
+      } else if (compare_string_char(temp_string, 1, "ak", 2)) {
+        printAknowledgement();
+        return 0;
       } else if (compare_string_char(temp_string, 1, "H")) {
         flags_arg |= fDoGases | fOnlyHabitable;
       } else if (compare_string_char(temp_string, 1, "2")) {
@@ -517,28 +553,7 @@ void usage(string program) {
   cout << "    -sn# Number of decimal places for numbers\n";
   cout << "Other:\n";
   cout << "    -M   Generate moons (highly experimental and incomplete)\n";
-  cout << "    -r   Allow planet migration after forming. (highly experimental)\n\n";
-  cout << "Examples:\n";
-  cout << "10000 systems with 1 as the seed for the first system around a\n"
-          "custom star with moons and migrated planets and only save ones with "
-          "an earthlike planet:\n\n";
-  cout << program << " -m1.09 -y1.12609 -BG0V -b6215 -M -r -s1 -n10000 -E\n\n";
-  cout << "10000 systems with 1 as the seed for the first system around a\n"
-          "custom star in a circumbinary system with moons and migrated "
-          "planets and only save ones with an earthlike planet:\n\n";
-  cout << program
-       << " -m1.09 -y1.12609 -BG0V -b6215 -CB -w0.75 -j0.178473 -X4493 -NK3V "
-          "-d0.11146 -f0.011 -M -r -s1 -n10000 -E\n\n";
-  cout << "10000 systems with 1 as the seed for the first system around a predefined star:\n\n";
-  cout << program << " -W73 -M -r -s1 -n10000 -E\n\n";
-  cout << "10000 systems with 1 as the seed for the first system around a\n"
-          "custom star with a distant companion star with moons and migrated "
-          "planets and only save ones with an earthlike planet:\n\n";
-  cout << program
-       << " -m1.09 -y1.12609 -BG0V -b6215 -w0.75 -d1114.6 -f0.011 -M -r -s1 -n10000 -E\n\n";
-  cout << "\tWeb systems (-W) taken from\n";
-  cout << "\t\thttp://www.solstation.com/stars.htm, Wikipedia, and various research papers\n";
-  cout << "\tAU systems (-F) taken from stories by C.J. Cherry\n";
-  cout << "\tManticore systems (-B) taken from stories by David Weber\n";
-  cout << "\tStarGen: " << stargen_revision << endl << endl;
+  cout << "    -r   Allow planet migration after forming. (highly experimental)\n";
+  cout << "    -ak  Print acknowledgement\n";
+  cout << "    -ex  Print examples\n";
 }
