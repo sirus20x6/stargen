@@ -136,6 +136,3 @@ stargen -m1.09 -y1.12609 -BG0V -b6215 -w0.75 -d1114.6 -f0.011 -M -r -s1 -n10000 
 
 
 ```
-
-
-I believe it would also be good to get rid of all the hard coded start catalogs and just add support for importing stars through json
