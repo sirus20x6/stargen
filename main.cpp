@@ -419,17 +419,13 @@ void usage(string program) {
   cout << "    -s#  Set random number seed [default: from time]\n";
   cout << "    -i#  Number to increment each random seed [default: 1]\n";
   cout << "    -n#  Specify number of systems [default: 1]\n";
-  cout << "    -A#  set accretion dust density ratio_arg to # [default: 0.0]"
-       << endl;
-  cout << "    -q#  set accretion inner dust border to # [default: 0.3]"
-       << endl;
+  cout << "    -A#  set accretion dust density ratio_arg to # [default: 0.0]\n";
+  cout << "    -q#  set accretion inner dust border to # [default: 0.3]\n";
   cout << "    -Q#  set accretion planetesimal seed eccentricity coefficient "
-          "to # [default: 0.077]"
-       << endl;
+          "to # [default: 0.077]\n";
   cout << "Preset seeds:\n";
   cout << "    -k   Use known planets as planitesimal seeds [from internal "
-          "tables]"
-       << endl;
+          "tables]\n";
   cout << "    -K   Generate only known planets [from internal tables]\n";
   cout << "    -x   Use the Solar System's masses/orbits\n";
   cout << "    -a   Use the Solar System's masses/orbits varying Earth\n";
@@ -437,43 +433,31 @@ void usage(string program) {
   cout << "  For a custom star:\n";
   cout << "    Please note that for a custom star, you need to specify a mass "
           "and/or a luminosity as well as a spectral type and/or a "
-          "temperature. Other wise the program will not work."
-       << endl;
+          "temperature. Other wise the program will not work.\n";
   cout << "    -m#  Specify stellar mass # [fraction of Sun's mass] (optional "
-          "if -y is used)"
-       << endl;
+          "if -y is used)\n";
   cout << "    -y#  Specify stellar luminosity # [fraction of Sun's "
-          "luminosity] (optional if -m is used)"
-       << endl;
+          "luminosity] (optional if -m is used)\n";
   cout << "    -Y#  Specify minimum age for star (years) (optional)\n";
   cout << "    -MY# Specify maximum age for star (years) (optional)\n";
-  cout << "    -b#  The temperature of the star (optional if -B is used)"
-       << endl;
+  cout << "    -b#  The temperature of the star (optional if -B is used)\n";
   cout << "    -B   Spectral type of the star (optional if -b is used)\n";
   cout << "    -CB  Make this a circumbinary system like Tatoonine in Star "
-          "Wars (optional)"
-       << endl;
+          "Wars (optional)\n";
   cout << "    -w#  The mass of a companion star (optional and required if the "
-          "-CB option is used)"
-       << endl;
+          "-CB option is used)\n";
   cout << "    -j#  The luminosity of a companion star (optional and required "
-          "if the -CB option is used)"
-       << endl;
+          "if the -CB option is used)\n";
   cout << "    -X#  The temperature of a companion star (optional and required "
-          "if the -CB option is used)"
-       << endl;
+          "if the -CB option is used)\n";
   cout << "    -N   Spectral type of the companion star (optional and required "
-          "if the -CB option is used)"
-       << endl;
+          "if the -CB option is used)\n";
   cout << "    -d#  The distance to a companion star (optional and required if "
-          "the -CB option is used)"
-       << endl;
+          "the -CB option is used)\n";
   cout << "    -f#  The eccentricity of the orbit of the companion star "
-          "(optional and required if the -CB option is used)"
-       << endl;
+          "(optional and required if the -CB option is used)\n";
   cout << "  For a predefined star:\n";
-  cout << "    -D   Use all of Dole's " << dole.count() << " nearby stars"
-       << endl;
+  cout << "    -D   Use all of Dole's " << dole.count() << " nearby stars\n";
   cout << "    -D#  Use Dole's system #\n";
   cout << "    -F   Use all " << jimb.count() << " AU systems\n";
   cout << "    -F#  Use AU system #\n";
@@ -496,27 +480,22 @@ void usage(string program) {
        << " predefined stars from Star Trek\n";
   cout << "    -G#  Use Star Trek system #\n";
   cout << "    -PHL Use the " << phl.count()
-       << " predefined stars listed at the Planetary Habitability Library"
-       << endl;
+       << " predefined stars listed at the Planetary Habitability Library\n";
   cout << "    -PHL#Use potentially habitable system #\n";
   cout << "    -l   List stars of selected table and exit\n";
   cout << "    -L   List stars of selected table as HTML and exit\n";
   cout << "Filters:\n";
-  cout << "    Please note that these options are only usefull if you are "
-          "making a large batch of systems and only want to save certain ones."
-       << endl;
+  cout << "    Please note that these options are only usefull if you are \n"
+          "making a large batch of systems and only want to save certain ones.\n";
   cout << "    -E   Only systems with earthlike planets\n";
   cout << "    -H   Only systems with habitable planets\n";
   cout << "    -2   Only systems with 2 or more habitable planets\n";
   cout << "    -3   Only systems with 3 or more habitable planets\n";
   cout << "    -T   Only systems with habitable planets more than 2 Earth "
-          "Masses in size"
-       << endl;
+          "Masses in size\n";
   cout << "    -P   Only systems with planets habitable by the Planetary "
-          "Habitability Laboratory's criteria"
-       << endl;
-  cout << "    -J   Only systems with Jovian planets in habitable region"
-       << endl;
+          "Habitability Laboratory's criteria\n";
+  cout << "    -J   Only systems with Jovian planets in habitable region\n";
   cout << "    -g   Include atmospheric gases\n";
   cout << "    -v   List verbosities [hex values] and exit\n";
   cout << "    -v#  Set output verbosity [hex value]\n";
@@ -525,13 +504,9 @@ void usage(string program) {
   cout << "    -Z   Dump tables used for gases and exit\n";
   cout << "File specs:\n";
   cout << "    --   use stdout\n";
-  cout << "    -o   Name for the output file(s) [default: taken from star name]"
-       << endl;
-  cout << "    -p   Path for where the output file(s) are saved [default: "
-          "./html]"
-       << endl;
-  cout << "    -u   Internet URL path for/in the output file(s) [default: none]"
-       << endl;
+  cout << "    -o   Name for the output file(s) [default: taken from star name]\n";
+  cout << "    -p   Path for where the output file(s) are saved [default: ./html]\n";
+  cout << "    -u   Internet URL path for/in the output file(s) [default: none]\n";
   cout << "Output formats: (only one is generated)\n";
   cout << "(default) HTML to file\n";
   cout << "    -c   Celestia .ssc to stdout\n";
@@ -541,48 +516,29 @@ void usage(string program) {
   cout << "    -t   Text to stdout\n";
   cout << "    -sn# Number of decimal places for numbers\n";
   cout << "Other:\n";
-  cout << "    -M   Generate moons (highly experimental and incomplete)"
-       << endl;
-  cout << "    -r   Allow planet migration after forming. (highly experimental)"
-       << endl;
-  cout << endl;
+  cout << "    -M   Generate moons (highly experimental and incomplete)\n";
+  cout << "    -r   Allow planet migration after forming. (highly experimental)\n\n";
   cout << "Examples:\n";
-  cout << "10000 systems with 1 as the seed for the first system around a "
+  cout << "10000 systems with 1 as the seed for the first system around a\n"
           "custom star with moons and migrated planets and only save ones with "
-          "an earthlike planet:"
-       << endl;
-  cout << program << " -m1.09 -y1.12609 -BG0V -b6215 -M -r -s1 -n10000 -E"
-       << endl;
-  cout << "10000 systems with 1 as the seed for the first system around a "
+          "an earthlike planet:\n\n";
+  cout << program << " -m1.09 -y1.12609 -BG0V -b6215 -M -r -s1 -n10000 -E\n\n";
+  cout << "10000 systems with 1 as the seed for the first system around a\n"
           "custom star in a circumbinary system with moons and migrated "
-          "planets and only save ones with an earthlike planet:"
-       << endl;
+          "planets and only save ones with an earthlike planet:\n\n";
   cout << program
        << " -m1.09 -y1.12609 -BG0V -b6215 -CB -w0.75 -j0.178473 -X4493 -NK3V "
-          "-d0.11146 -f0.011 -M -r -s1 -n10000 -E"
-       << endl;
-  cout << "10000 systems with 1 as the seed for the first system around a "
-          "predefined star:"
-       << endl;
-  cout << program << " -W73 -M -r -s1 -n10000 -E\n";
-  cout << "10000 systems with 1 as the seed for the first system around a "
+          "-d0.11146 -f0.011 -M -r -s1 -n10000 -E\n\n";
+  cout << "10000 systems with 1 as the seed for the first system around a predefined star:\n\n";
+  cout << program << " -W73 -M -r -s1 -n10000 -E\n\n";
+  cout << "10000 systems with 1 as the seed for the first system around a\n"
           "custom star with a distant companion star with moons and migrated "
-          "planets and only save ones with an earthlike planet:"
-       << endl;
+          "planets and only save ones with an earthlike planet:\n\n";
   cout << program
-       << " -m1.09 -y1.12609 -BG0V -b6215 -w0.75 -d1114.6 -f0.011 -M -r -s1 "
-          "-n10000 -E"
-       << endl;
-  cout << endl;
-  cout << "        Web systems (-W) taken from\n";
-  cout << "          http://www.solstation.com/stars.htm, Wikipedia, and "
-          "various research papers"
-       << endl;
-  cout << "        AU systems (-F) taken from\n";
-  cout << "          stories by C.J. Cherryh\n";
-  cout << "        Manticore systems (-B) taken from\n";
-  cout << "          stories by David Weber\n";
-  cout << endl;
-  cout << "        StarGen: " << stargen_revision << endl;
-  cout << endl;
+       << " -m1.09 -y1.12609 -BG0V -b6215 -w0.75 -d1114.6 -f0.011 -M -r -s1 -n10000 -E\n\n";
+  cout << "\tWeb systems (-W) taken from\n";
+  cout << "\t\thttp://www.solstation.com/stars.htm, Wikipedia, and various research papers\n";
+  cout << "\tAU systems (-F) taken from stories by C.J. Cherry\n";
+  cout << "\tManticore systems (-B) taken from stories by David Weber\n";
+  cout << "\tStarGen: " << stargen_revision << endl << endl;
 }
