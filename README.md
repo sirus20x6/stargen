@@ -8,7 +8,7 @@ Then I found comments from this old sister fork https://github.com/fusiongyro/st
 Strangly some of the code in that fork is more modular / object oriented / better despite having fewer features. I may steal some of it for refactoring
 
 Build instructions
-```
+```bash
 git clone https://github.com/sirus20x6/stargen.git
 cd stargen
 cmake ./CMakeLists.txt
