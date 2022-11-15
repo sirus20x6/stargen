@@ -404,10 +404,9 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
     long double mult;
     long double offset;
     long double em_scale = 5;
-    long double x;
-
+    
     // todo: fix loop counter
-    for (x = floor; x <= ceiling; x += 1.0) {
+    for (int x = floor; x <= ceiling; x++) {
       float n;
 
       for (n = 1.0; n < 9.9; n++) {
@@ -447,7 +446,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
            << (max_y - margin) << "' />\n";
 
     // todo: fix loop counter
-    for (x = floor; x <= ceiling; x += 1.0) {
+    for (int x = floor; x <= ceiling; x++) {
       float n;
 
       for (n = 1.0; n < 9.9; n++) {
@@ -496,7 +495,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
     output << "   fill='black' text-anchor='middle'>\n";
 
     // todo: fix loop counter
-    for (x = floor; x <= ceiling; x += 1.0) {
+    for (int x = floor; x <= ceiling; x++) {
       if (min_log <= x && max_log >= x) {
         output << "    <text x='" << ((offset + mult) + (x * mult))
                << "' y='120'> " << pow(10.0, x) << " AU </text>\n";
