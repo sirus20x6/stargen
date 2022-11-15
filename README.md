@@ -6,3 +6,17 @@ My goal is to update and modernize the code, and then add features in that order
 Then I found comments from this old sister fork https://github.com/fusiongyro/starform I'm trying to bring over the appropriate comments one by one in a painstakingly manual way, while updating them to doxygen style. the code diverges from whats in this branch so it's not always easy to find where to shoe horn it in.
 
 Strangly some of the code in that fork is more modular / object oriented / better despite having fewer features. I may steal some of it for refactoring
+
+```
+Build instructions
+git clone https://github.com/sirus20x6/stargen.git
+cd stargen
+cmake ./CMakeLists.txt
+make
+```
+
+tip use 
+```
+make -jx
+```
+where x is number of threads +1 to compile faster
