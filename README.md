@@ -16,7 +16,7 @@ make
 ```
 
 tip use 
-```
+```bash
 make -jx
 ```
 where x is number of threads +1 to compile faster
