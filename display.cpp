@@ -2172,74 +2172,74 @@ void celestia_describe_world(planet* the_planet, string designation,
 
   switch (the_planet->getType()) {
     case t1Face:
-      cout << "\tHazeColor [ 1 1 1 ]\n";
-      cout << "\tHazeDensity 0.3\n\n";
-      cout << "\tAtmosphere {\n";
-      cout << "\t\tHeight 30\n";
-      cout << "\t\tLower [ 0.8 0.4 0.1 ]\n";
-      cout << "\t\tUpper [ 0.0 0.0 0.9 ]\n";
-      cout << "\t\tSky [ 0.8 0.4 0.1 ]\n";
-      cout << "\t\tSunset [ 0.8 0.5 0.2 ]\n";
+      cout << "\tHazeColor [ 1 1 1 ]\n"
+      "\tHazeDensity 0.3\n\n"
+      "\tAtmosphere {\n"
+      "\t\tHeight 30\n"
+      "\t\tLower [ 0.8 0.4 0.1 ]\n"
+      "\t\tUpper [ 0.0 0.0 0.9 ]\n"
+      "\t\tSky [ 0.8 0.4 0.1 ]\n"
+      "\t\tSunset [ 0.8 0.5 0.2 ]\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
     case tIce:
-      cout << "\tHazeColor [ 0.2 0.5 1 ]\n";
-      cout << "\tHazeDensity 1\n\n";
-      cout << "\tAtmosphere {\n";
-      cout << "\t\tHeight 60\n";
-      cout << "\t\tLower [ 0.8 0.4 0.1 ]\n";
-      cout << "\t\tUpper [ 0.0 0.0 0.9 ]\n";
-      cout << "\t\tSky [ 0.8 0.4 0.1 ]\n";
-      cout << "\t\tSunset [ 0.8 0.5 0.2 ]\n";
+      cout << "\tHazeColor [ 0.2 0.5 1 ]\n"
+      "\tHazeDensity 1\n\n"
+      "\tAtmosphere {\n"
+      "\t\tHeight 60\n"
+      "\t\tLower [ 0.8 0.4 0.1 ]\n"
+      "\t\tUpper [ 0.0 0.0 0.9 ]\n"
+      "\t\tSky [ 0.8 0.4 0.1 ]\n"
+      "\t\tSunset [ 0.8 0.5 0.2 ]\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
     case tMartian:
-      cout << "\tHazeColor [ 1 1 1 ]\n";
-      cout << "\tHazeDensity 0.45\n\n";
-      cout << "\tAtmosphere {\n";
-      cout << "\t\tHeight 30\n";
-      cout << "\t\tLower [ 0.8 0.6 0.6 ]\n";
-      cout << "\t\tUpper [ 0.7 0.3 0.3 ]\n";
-      cout << "\t\tSky [ 0.83 0.75 0.65 ]\n";
-      cout << "\t\tSunset [ 0.7 0.7 0.8 ]\n";
+      cout << "\tHazeColor [ 1 1 1 ]\n"
+      "\tHazeDensity 0.45\n\n"
+      "\tAtmosphere {\n"
+      "\t\tHeight 30\n"
+      "\t\tLower [ 0.8 0.6 0.6 ]\n"
+      "\t\tUpper [ 0.7 0.3 0.3 ]\n"
+      "\t\tSky [ 0.83 0.75 0.65 ]\n"
+      "\t\tSunset [ 0.7 0.7 0.8 ]\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
     case tTerrestrial:
-      cout << "\tHazeColor [ 1 1 1 ]\n";
-      cout << "\tHazeDensity 0.3\n\n";
-      cout << "\tAtmosphere {\n";
-      cout << "\t\tHeight 60\n";
-      cout << "\t\tLower [ 0.5 0.5 0.65 ]\n";
-      cout << "\t\tUpper [ 0.3 0.3 0.6 ]\n";
-      cout << "\t\tSky [ 0.3 0.6 0.9 ]\n";
-      cout << "\t\tSunset [ 1.0 0.6 0.2 ]\n";
+      cout << "\tHazeColor [ 1 1 1 ]\n"
+      "\tHazeDensity 0.3\n\n"
+      "\tAtmosphere {\n"
+      "\t\tHeight 60\n"
+      "\t\tLower [ 0.5 0.5 0.65 ]\n"
+      "\t\tUpper [ 0.3 0.3 0.6 ]\n"
+      "\t\tSky [ 0.3 0.6 0.9 ]\n"
+      "\t\tSunset [ 1.0 0.6 0.2 ]\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
     case tWater:
-      cout << "\tHazeColor [ 1 1 1 ]\n";
-      cout << "\tHazeDensity 0.3\n\n";
-      cout << "\tAtmosphere {\n";
-      cout << "\t\tHeight 90\n";
-      cout << "\t\tLower [ 0.4 0.4 0.7 ]\n";
-      cout << "\t\tUpper [ 0.2 0.2 0.6 ]\n";
-      cout << "\t\tSky [ 0.4 0.7 0.9 ]\n";
-      cout << "\t\tSunset [ 1.0 0.6 0.2 ]\n";
+      cout << "\tHazeColor [ 1 1 1 ]\n"
+      "\tHazeDensity 0.3\n\n"
+      "\tAtmosphere {\n"
+      "\t\tHeight 90\n"
+      "\t\tLower [ 0.4 0.4 0.7 ]\n"
+      "\t\tUpper [ 0.2 0.2 0.6 ]\n"
+      "\t\tSky [ 0.4 0.7 0.9 ]\n"
+      "\t\tSunset [ 1.0 0.6 0.2 ]\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
     case tOil:
     case tVenusian:
-      cout << "\tHazeColor [ 0.5 0.35 0.2 ]\n";
-      cout << "\tHazeDensity 0.35\n\n";
-      cout << "\tAtmosphere {\n";
-      cout << "\t\tHeight 60\n";
-      cout << "\t\tLower [ 0.8 0.8 0.5 ]\n";
-      cout << "\t\tUpper [ 0.6 0.6 0.6 ]\n";
-      cout << "\t\tSky [ 0.8 0.8 0.5 ]\n";
+      cout << "\tHazeColor [ 0.5 0.35 0.2 ]\n"
+      "\tHazeDensity 0.35\n\n"
+      "\tAtmosphere {\n"
+      "\t\tHeight 60\n"
+      "\t\tLower [ 0.8 0.8 0.5 ]\n"
+      "\t\tUpper [ 0.6 0.6 0.6 ]\n"
+      "\t\tSky [ 0.8 0.8 0.5 ]\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
@@ -2262,12 +2262,12 @@ void celestia_describe_world(planet* the_planet, string designation,
       break;
   }
   // cout << "\tOrbitFrame { EclipticJ2000{} }\n";
-  cout << "\tOrbitFrame { \n";
-  cout << "\t\tBodyFixed { \n";
-  cout << "\t\t\tCenter \"" << parent << "\"\n";
-  cout << "\t\t}\n";
-  cout << "\t}\n";
-  cout << "\tEllipticalOrbit {\n";
+  cout << "\tOrbitFrame { \n"
+  "\t\tBodyFixed { \n"
+  "\t\t\tCenter \"" << parent << "\"\n"
+  "\t\t}\n"
+  "\t}\n"
+  "\tEllipticalOrbit {\n";
   if (!is_moon) {
     cout << "\t\tPeriod            "
          << toString(the_planet->getOrbPeriod() / DAYS_IN_A_YEAR) << " # Years"
