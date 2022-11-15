@@ -1,4 +1,4 @@
-project(stargen_2014 DESCRIPTION "A program for generating solar systems" LANGUAGES CXX)
+project(stargen_2014 DESCRIPTION "A program for generating solar systems")
 
 cmake_minimum_required(VERSION 3.9)
 
@@ -7,7 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 find_package(GSL REQUIRED)
 include_directories(${GSL_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${GSL_LIBRARIES})
-find_package(Boost 1.79.0) 
+find_package(Boost) 
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
