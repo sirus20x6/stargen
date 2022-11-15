@@ -2258,6 +2258,8 @@ void celestia_describe_world(planet* the_planet, string designation,
       cout << "\tHazeColor [ 0.5 0.45 0.45 ]\n";
       cout << "\tHazeDensity 0.3\n";
       break;
+    default:
+      break;
   }
   // cout << "\tOrbitFrame { EclipticJ2000{} }\n";
   cout << "\tOrbitFrame { \n";
