@@ -9,6 +9,13 @@ Then I found comments from this old sister fork https://github.com/fusiongyro/st
 
 Strangly some of the code in that fork is more modular / object oriented / better despite having fewer features. I may steal some of it for refactoring
 
+##TODO
+- Json support for export
+- Convert existing data in the code over to JSON
+- Remove all global variables
+- Make the code more modular and compliant with modern C++ code
+- Add multithreading probably through OpenMP
+
 Build instructions
 ```bash
 git clone https://github.com/sirus20x6/stargen.git
