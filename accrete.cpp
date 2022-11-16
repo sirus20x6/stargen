@@ -36,7 +36,7 @@ void accrete::set_initial_conditions(long double inner_limit_of_dust,
 }
 
 auto accrete::stellar_dust_limit(long double stell_mass_ratio) -> long double {
-  return 200.0 * std::pow(stell_mass_ratio, 1.0 / 3.0);
+  return 200.0 * std::pow(stell_mass_ratio, (long double) 1.0 / 3.0);
 }
 
 /**
@@ -48,7 +48,7 @@ auto accrete::stellar_dust_limit(long double stell_mass_ratio) -> long double {
  */
 auto accrete::nearest_planet(long double stell_mass_ratio,
                     long double nearest_planet_factor) -> long double {
-  return nearest_planet_factor * std::pow(stell_mass_ratio, 1.0 / 3.0);
+  return nearest_planet_factor * std::pow(stell_mass_ratio, (long double) 1.0 / 3.0);
 }
 
 /**
@@ -58,7 +58,7 @@ auto accrete::nearest_planet(long double stell_mass_ratio,
  * @return long double 
  */
 auto accrete::farthest_planet(long double stell_mass_ratio) -> long double {
-  return 50.0 * std::pow(stell_mass_ratio, 1.0 / 3.0);
+  return 50.0 * std::pow(stell_mass_ratio, (long double) 1.0 / 3.0);
 }
 
 /**

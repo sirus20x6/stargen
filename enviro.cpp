@@ -26,6 +26,12 @@ string breathability_phrase[4] = {"none", "breathable", "unbreathable",
 
 map<map<long double, long double>, vector<long double> > polynomial_cache;
 
+/**
+ * @brief mass to luminosity
+ * 
+ * @param mass 
+ * @return long double 
+ */
 auto mass_to_luminosity(long double mass) -> long double {
   if (mass <= 0.6224) {
     return 0.3815 * std::pow(mass, 2.5185);
@@ -41,7 +47,7 @@ auto mass_to_luminosity(long double mass) -> long double {
 }
 
 /**
- * @brief 
+ * @brief luminosity to mass
  * 
  * @param luminosity 
  * @return long double 
@@ -61,6 +67,12 @@ auto luminosity_to_mass(long double luminosity) -> long double {
   }
 }
 
+/**
+ * @brief Get the Lum Index
+ * 
+ * @param spec_type 
+ * @return int 
+ */
 auto getLumIndex(const string& spec_type) -> int {
   const char *strPtr = nullptr;
 
@@ -102,6 +114,12 @@ auto getLumIndex(const string& spec_type) -> int {
   }
 }
 
+/**
+ * @brief Get the Star Type
+ * 
+ * @param spec_type 
+ * @return string 
+ */
 auto getStarType(string spec_type) -> string {
   spec_type = my_strtoupper(spec_type);
   const char *strPtr = nullptr;
@@ -244,6 +262,12 @@ auto getStarType(string spec_type) -> string {
   }
 }
 
+/**
+ * @brief Get the star Sub Type
+ * 
+ * @param spec_type 
+ * @return int 
+ */
 auto getSubType(string spec_type) -> int {
   int total_chars = 0;
   // total_chars = spec_type.size();
@@ -258,6 +282,12 @@ auto getSubType(string spec_type) -> int {
   return 0;
 }
 
+/**
+ * @brief spec type to eff temp
+ * 
+ * @param spec_type 
+ * @return long double 
+ */
 auto spec_type_to_eff_temp(const string& spec_type) -> long double {
   if (spec_type.empty()) {
     return 0;
@@ -314,6 +344,13 @@ auto spec_type_to_eff_temp(const string& spec_type) -> long double {
   }
 }
 
+/**
+ * @brief eff temp to spec type
+ * 
+ * @param eff_temp 
+ * @param luminosity 
+ * @return string 
+ */
 auto eff_temp_to_spec_type(long double eff_temp, long double luminosity) -> string {
   string clums[] = {"I-a0", "I-a", "I-b", "II", "III", "IV"};
   long double rlums[] = {200000.0, 20000.0, 3000.0, 400.0, 11.5, 4.0};
@@ -482,11 +519,14 @@ auto eff_temp_to_spec_type(long double eff_temp, long double luminosity) -> stri
   return output;
 }
 
-/*--------------------------------------------------------------------------*/
-/*	 This function, given the orbital radius of a planet in AU, returns */
-/*	 the orbital 'zone' of the particle.                                */
-/*--------------------------------------------------------------------------*/
-
+/**
+ * @brief This function, given the orbital radius of a planet in AU, returns
+ * the orbital 'zone' of the particle.
+ * 
+ * @param ecosphere_radius 
+ * @param orb_radius 
+ * @return int 
+ */
 auto orbital_zone(long double ecosphere_radius, long double orb_radius) -> int {
   if (orb_radius < (4.0 * ecosphere_radius)) {
     return 1;
@@ -497,10 +537,14 @@ auto orbital_zone(long double ecosphere_radius, long double orb_radius) -> int {
   }
 }
 
-/*-------------------------------------------------------------------*/
-/* The mass is in units of solar masses, and the density is in units */
-/* of grams/cc.  The radius returned is in units of km.              */
-/*-------------------------------------------------------------------*/
+/**
+ * @brief The mass is in units of solar masses, and the density is in units
+ * of grams/cc.  The radius returned is in units of km.
+ * 
+ * @param mass 
+ * @param density 
+ * @return long double 
+ */
 
 auto volume_radius(long double mass, long double density) -> long double {
   long double volume = NAN;
@@ -510,11 +554,16 @@ auto volume_radius(long double mass, long double density) -> long double {
   return std::pow((3.0 * volume) / (4.0 * PI), (1.0 / 3.0)) / CM_PER_KM;
 }
 
-/*------------------------------------------------------------------------*/
-/* The mass passed in is in units of solar masses, and the orbital radius */
-/* is in units of AU. The density is returned in units of grams/cc.       */
-/*------------------------------------------------------------------------*/
-
+/**
+ * @brief The mass passed in is in units of solar masses, and the orbital radius
+ * is in units of AU. The density is returned in units of grams/cc.
+ * 
+ * @param mass 
+ * @param orb_radius 
+ * @param r_ecosphere 
+ * @param gas_giant 
+ * @return long double 
+ */
 auto empirical_density(long double mass, long double orb_radius,
                               long double r_ecosphere, bool gas_giant) -> long double {
   long double temp = NAN;
@@ -528,11 +577,14 @@ auto empirical_density(long double mass, long double orb_radius,
   }
 }
 
-/*--------------------------------------------------------------------*/
-/* The mass passed in is in units of solar masses, and the equatorial */
-/* radius is in km.  The density is returned in units of grams/cc.    */
-/*--------------------------------------------------------------------*/
-
+/**
+ * @brief The mass passed in is in units of solar masses, and the equatorial
+ * radius is in km.  The density is returned in units of grams/cc.
+ * 
+ * @param mass 
+ * @param equat_radius 
+ * @return long double 
+ */
 auto volume_density(long double mass, long double equat_radius) -> long double {
   long double volume = NAN;
 
@@ -542,11 +594,15 @@ auto volume_density(long double mass, long double equat_radius) -> long double {
   return mass / volume;
 }
 
-/*-------------------------------------------------------------------------*/
-/* The separation is in units of AU, and both masses are in units of solar */
-/* masses. The period returned is in terms of Earth days.                  */
-/*-------------------------------------------------------------------------*/
-
+/**
+ * @brief The separation is in units of AU, and both masses are in units of solar
+ * masses. The period returned is in terms of Earth days.
+ * 
+ * @param separation 
+ * @param small_mass 
+ * @param large_mass 
+ * @return long double 
+ */
 auto period(long double separation, long double small_mass,
                    long double large_mass) -> long double {
   long double period_in_years = NAN;
@@ -555,23 +611,29 @@ auto period(long double separation, long double small_mass,
   return period_in_years * DAYS_IN_A_YEAR;
 }
 
-/*--------------------------------------------------------------------------*/
-/* Fogg's information for this routine came from Dole "Habitable Planets    */
-/* for Man", Blaisdell Publishing Company, NY, 1964.  From this, he came    */
-/* up with his eq.12, which is the equation for the 'base_angular_velocity' */
-/* below.  He then used an equation for the change in angular velocity per  */
-/* time (dw/dt) from P. Goldreich and S. Soter's paper "Q in the Solar      */
-/* System" in Icarus, vol 5, pp.375-389 (1966).	 Using as a comparison the  */
-/* change in angular velocity for the Earth, Fogg has come up with an       */
-/* approximation for our new planet (his eq.13) and take that into account. */
-/* This is used to find 'change_in_angular_velocity' below.                 */
-/*                                                                          */
-/* Input parameters are mass (in solar masses), radius (in Km), orbital     */
-/* period (in days), orbital radius (in AU), density (in g/cc),             */
-/* eccentricity, and whether it is a gas giant or not.                      */
-/* The length of the day is returned in units of hours.                     */
-/*--------------------------------------------------------------------------*/
 
+
+
+/**
+ * @brief Fogg's information for this routine came from Dole "Habitable Planets
+ * for Man", Blaisdell Publishing Company, NY, 1964.  From this, he came
+ * up with his eq.12, which is the equation for the 'base_angular_velocity'
+ * below.  He then used an equation for the change in angular velocity per
+ * time (dw/dt) from P. Goldreich and S. Soter's paper "Q in the Solar
+ * System" in Icarus, vol 5, pp.375-389 (1966).	 Using as a comparison the
+ * change in angular velocity for the Earth, Fogg has come up with an
+ * approximation for our new planet (his eq.13) and take that into account
+ * This is used to find 'change_in_angular_velocity' below.
+ * Input parameters are mass (in solar masses), radius (in Km), orbital
+ * period (in days), orbital radius (in AU), density (in g/cc),
+ * eccentricity, and whether it is a gas giant or not.
+ * The length of the day is returned in units of hours.
+ * 
+ * @param the_planet 
+ * @param parent_mass 
+ * @param is_moon 
+ * @return long double 
+ */
 auto day_length(planet *the_planet, long double parent_mass,
                        bool is_moon) -> long double {
   long double planetary_mass_in_grams =
@@ -579,9 +641,7 @@ auto day_length(planet *the_planet, long double parent_mass,
   long double equatorial_radius_in_cm = the_planet->getRadius() * CM_PER_KM;
   long double year_in_hours = the_planet->getOrbPeriod() * 24.0;
   // bool giant; maybe this used to be used
-  the_planet->getType() == tGasGiant || the_planet->getType() == tBrownDwarf ||
-      the_planet->getType() == tSubGasGiant ||
-      the_planet->getType() == tSubSubGasGiant;
+  //bool giant = the_planet->getType() == tGasGiant || the_planet->getType() == tBrownDwarf || the_planet->getType() == tSubGasGiant || the_planet->getType() == tSubSubGasGiant;
   long double k2 = NAN;
   long double base_angular_velocity = NAN;
   long double change_in_angular_velocity = NAN;
@@ -651,11 +711,14 @@ auto day_length(planet *the_planet, long double parent_mass,
   return day_in_hours;
 }
 
-/*---------------------------------------------------------------------*/
-/* The orbital radius is expected in units of Astronomical Units (AU). */
-/* Inclination is returned in units of degrees. (seb: real)            */
-/*---------------------------------------------------------------------*/
-
+/**
+ * @brief The orbital radius is expected in units of Astronomical Units (AU).
+ * Inclination is returned in units of degrees. (seb: real)
+ * 
+ * @param orb_radius 
+ * @param parent_mass 
+ * @return long double 
+ */
 auto inclination(long double orb_radius, long double parent_mass) -> long double {
   // seb: Earth's obliquity is not a good test
   // a. want real result, not integer
@@ -674,13 +737,16 @@ auto inclination(long double orb_radius, long double parent_mass) -> long double
   return temp;
 }
 
-/*-----------------------------------------------------------------------*/
-/* This function implements the escape velocity calculation. Note that   */
-/* it appears that Fogg's eq.15 is incorrect.                            */
-/* The mass is in units of solar mass, the radius in kilometers, and the */
-/* velocity returned is in cm/sec.                                       */
-/*-----------------------------------------------------------------------*/
-
+/**
+ * @brief This function implements the escape velocity calculation. Note that
+ * it appears that Fogg's eq.15 is incorrect.
+ * The mass is in units of solar mass, the radius in kilometers, and the
+ * velocity returned is in cm/sec.
+ * 
+ * @param mass 
+ * @param radius 
+ * @return long double 
+ */
 auto escape_vel(long double mass, long double radius) -> long double {
   long double mass_in_grams = NAN, radius_in_cm = NAN;
 
@@ -1751,7 +1817,7 @@ auto gas_radius(long double temperature, long double core_mass,
   long double upper_fraction = 0.0;
   long double range = 0.0;
   long double radius = NAN;
-  map<int, long double> age_radii;
+  map<double, long double> age_radii;
   age_radii[300.0E6] = gas_radius_300Myr(temperature, core_earth_masses,
                                          total_earth_masses, the_planet);
   age_radii[1.0E9] = gas_radius_1Gyr(temperature, core_earth_masses,
@@ -3069,6 +3135,7 @@ auto planet_radius_helper(long double planet_mass, long double mass1,
                                  long double radius3, bool use_cache) -> long double {
   // some imput validation for debuging purposes
   bool show_debug = false;
+
   if (mass1 != 0.0 && radius1 == 0.0) {
     cout << "invalid radius for " << mass1 << endl;
     show_debug = true;

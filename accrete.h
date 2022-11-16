@@ -31,13 +31,10 @@ class accrete {
     auto inner_effect_limit(long double, long double, long double) -> long double;
     auto outer_effect_limit(long double, long double, long double) -> long double;
     auto dust_available(long double, long double) -> bool;
-    void update_dust_lanes(long double, long double, long double, long double,
-                        long double, long double);
-    auto collect_dust(long double, long double &, long double &, long double,
-                    long double, long double, dust *) -> long double;
+    void update_dust_lanes(long double, long double, long double, long double, long double, long double);
+    auto collect_dust(long double, long double &, long double &, long double, long double, long double, dust *) -> long double;
     auto critical_limit(long double, long double, long double) -> long double;
-    void accrete_dust(long double &, long double &, long double &, long double,
-                    long double, long double, long double, long double);
+    void accrete_dust(long double &, long double &, long double &, long double, long double, long double, long double, long double);
     void coalesce_planetesimals(long double, long double, long double, long double,
                                 long double, long double, long double, long double,
                                 long double, bool);
