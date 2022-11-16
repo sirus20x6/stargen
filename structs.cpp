@@ -1002,7 +1002,7 @@ long double sun::getCombinedEffTemp() {
     a = 0.0;
     m = 1000000000.0;
     b = 1.0;
-    peak = pow((peak - a) / m, 1 / b);
+    peak = std::pow((peak - a) / m, 1 / b);
     temperature = (0.0028977685 / peak) - 273.15;
     a = 273.15;
     m = 1.0;
@@ -1363,7 +1363,7 @@ long double planet::getOblateness() {
     } else if (type == tGasGiant) {
       multiplier = 5.56E-12;
     }
-    result = multiplier * (pow(radius, 3.0) / (mass_in_eu * pow(day, 2.0)));
+    result = multiplier * (pow(radius, 3.0) / (mass_in_eu * std::pow(day, 2.0)));
   } else {
     planetary_mass_in_grams = getMass() * SOLAR_MASS_IN_GRAMS;
     equatorial_radius_in_cm = radius * CM_PER_KM;
@@ -1590,9 +1590,9 @@ void planet::sortMoons() {
     // we shouldn't have to do this here but some moons that shouldn't
     // be possible somehow slip throw the cracks...
     hill_sphere =
-        a * KM_PER_AU * pow(getMass() / (3.0 * theSun.getMass()), 1.0 / 3.0);
+        a * KM_PER_AU * std::pow(getMass() / (3.0 * theSun.getMass()), 1.0 / 3.0);
     roche_limit =
-        2.44 * radius * pow(density / temp_vector[i]->getDensity(), 1.0 / 3.0);
+        2.44 * radius * std::pow(density / temp_vector[i]->getDensity(), 1.0 / 3.0);
     if ((roche_limit * 1.5) >= (hill_sphere / 3.0)) {
       delete temp_vector[i];
     } else if ((temp_vector[i]->getMoonA() * KM_PER_AU) < (roche_limit * 1.5)) {

@@ -11588,9 +11588,9 @@ long double mini_neptune_radius(planet *the_planet) {
   flux = calcLuminosity(
       the_planet);  // I'm guessing this how to calculate the flux...
   env_radius_eu =
-      2.06 * pow(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES, -0.21) *
-      pow((the_planet->getGasMass() / the_planet->getMass()) / 0.05, 0.59) *
-      pow(flux, 0.044) * pow(the_planet->getTheSun().getAge() / 5.0E9, -0.18);
+      2.06 * std::pow(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES, -0.21) *
+      std::pow((the_planet->getGasMass() / the_planet->getMass()) / 0.05, 0.59) *
+      std::pow(flux, 0.044) * std::pow(the_planet->getTheSun().getAge() / 5.0E9, -0.18);
   total_radius_eu = core_radius_eu + env_radius_eu;
   total_radius = total_radius_eu * KM_EARTH_RADIUS;
   return total_radius;

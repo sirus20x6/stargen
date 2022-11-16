@@ -96,7 +96,7 @@ auto about(long double value, long double variation) -> long double {
 
 auto random_eccentricity(long double ecc_coef) -> long double {
   long double e = NAN;
-  e = 1.0 - pow(random_number(0.0, 1.0), ecc_coef);
+  e = 1.0 - std::pow(random_number(0.0, 1.0), ecc_coef);
 
   if (e > .99)  // Note that this coresponds to a random number less than
                 // 10E-26. It happens with GNU C for -S254 -W27
@@ -186,7 +186,7 @@ auto polynomialfit(int obs, int degree, double *dx, double *dy, double *store)
   for (i = 0; i < obs; i++) {
     gsl_matrix_set(X, i, 0, 1.0);
     for (j = 0; j < degree; j++) {
-      gsl_matrix_set(X, i, j, pow(dx[i], j));
+      gsl_matrix_set(X, i, j, std::pow(dx[i], j));
     }
     gsl_vector_set(y, i, dy[i]);
   }
@@ -372,6 +372,6 @@ void quadfix(long double x, long double y, long double w, long double z,
 
 auto quintic_trend(long double a, long double b, long double c, long double d,
                    long double e, long double f, long double x) -> long double {
-  return (a * pow(x, 5.0)) + (b * pow4(x)) + (c * pow3(x)) + (d * pow2(x)) +
+  return (a * std::pow(x, 5.0)) + (b * pow4(x)) + (c * pow3(x)) + (d * pow2(x)) +
          (e * x) + f;
 }

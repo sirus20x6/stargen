@@ -1162,7 +1162,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
 
       hill_sphere =
           the_planet->getA() * KM_PER_AU *
-          pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
+          std::pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
 
       for (n = 0, ptr = the_planet->first_moon; ptr != nullptr; ptr = next_moon)
       // for (n = 0; n < the_planet->getMoonCount(); n++)
@@ -1194,7 +1194,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
 
         roche_limit =
             2.44 * the_planet->getRadius() *
-            pow(the_planet->getDensity() / ptr->getDensity(), 1.0 / 3.0);
+            std::pow(the_planet->getDensity() / ptr->getDensity(), 1.0 / 3.0);
 
         if ((roche_limit * 1.5) < (hill_sphere / 3.0) &&
             (hill_sphere / 3.0) > (the_planet->getRadius() * 2.5)) {
@@ -1226,10 +1226,10 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                  the_moon = the_moon->next_planet) {
               hill_sphere2 =
                   the_moon->getMoonA() * KM_PER_AU *
-                  pow(the_moon->getMass() / (3.0 * the_planet->getMass()),
+                  std::pow(the_moon->getMass() / (3.0 * the_planet->getMass()),
                       1.0 / 3.0);
               temp_hill_sphere =
-                  distance * pow(ptr->getMass() / (3.0 * the_planet->getMass()),
+                  distance * std::pow(ptr->getMass() / (3.0 * the_planet->getMass()),
                                  1.0 / 3.0);
               if (((the_moon->getMoonA() * KM_PER_AU) >=
                        (distance - temp_hill_sphere) &&
@@ -1375,7 +1375,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
 
       hill_sphere3 =
           the_planet->getA() * KM_PER_AU *
-          pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
+          std::pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
       if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 1000.0) {
         max_total_moon_mass =
             the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.05;
@@ -1467,7 +1467,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
 
         roche_limit2 =
             2.44 * the_planet->getRadius() *
-            pow(the_planet->getDensity() / new_moon->getDensity(), 1.0 / 3.0);
+            std::pow(the_planet->getDensity() / new_moon->getDensity(), 1.0 / 3.0);
         if ((roche_limit2 * 1.5) >= (hill_sphere3 / 3.0)) {
           if ((flag_verbose & 0x1000) != 0) {
             cerr << "  " << planet_id << ": Can't add anymore moons!\n";
@@ -1496,10 +1496,10 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                ref = ref->next_planet) {
             hill_sphere4 =
                 ref->getMoonA() * KM_PER_AU *
-                pow(ref->getMass() / (3.0 * the_planet->getMass()), 1.0 / 3.0);
+                std::pow(ref->getMass() / (3.0 * the_planet->getMass()), 1.0 / 3.0);
             temp_hill_sphere =
                 distance2 *
-                pow(new_moon->getMass() / (3.0 * the_planet->getMass()),
+                std::pow(new_moon->getMass() / (3.0 * the_planet->getMass()),
                     1.0 / 3.0);
             // cout << toString(distance2) << " " << toString(distance2 -
             // temp_hill_sphere) << " " << toString(distance2 +
@@ -1592,7 +1592,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
           long double fdist =
               (tmp->getMoonA() * KM_PER_AU) / (hill_sphere3 / 3.0);
           long double fmass =
-              pow(moon_mass / (tmp->getMass() * SUN_MASS_IN_EARTH_MASSES), 0.2);
+              std::pow(moon_mass / (tmp->getMass() * SUN_MASS_IN_EARTH_MASSES), 0.2);
           tmp->setInclination(fdist * fmass * tmp->getInclination());
 
           if (tmp->getGasMass() == 0) {

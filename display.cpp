@@ -410,11 +410,11 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
       float n;
 
       for (n = 1.0; n < 9.9; n++) {
-        if (inner_edge > pow(10.0, x + log10(n))) {
+        if (inner_edge > std::pow(10.0, x + log10(n))) {
           min_log = x + log10(n);
         }
 
-        if (max_log == 0.0 && outer_edge < pow(10.0, x + log10(n))) {
+        if (max_log == 0.0 && outer_edge < std::pow(10.0, x + log10(n))) {
           max_log = x + log10(n);
         }
       }
@@ -498,7 +498,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
     for (int x = floor; x <= ceiling; x++) {
       if (min_log <= x && max_log >= x) {
         output << "    <text x='" << ((offset + mult) + (x * mult))
-               << "' y='120'> " << pow(10.0, x) << " AU </text>\n";
+               << "' y='120'> " << std::pow(10.0, x) << " AU </text>\n";
       }
     }
 
@@ -508,7 +508,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
          a_planet = a_planet->next_planet) {
       long double x = (offset + mult) + (log10(a_planet->getA()) * mult);
       long double r =
-          pow((a_planet->getMass() * SUN_MASS_IN_EARTH_MASSES), 1.0 / 3.0) *
+          std::pow((a_planet->getMass() * SUN_MASS_IN_EARTH_MASSES), 1.0 / 3.0) *
           em_scale;
       long double x1 =
           (offset + mult) +

@@ -28,15 +28,15 @@ map<map<long double, long double>, vector<long double> > polynomial_cache;
 
 auto mass_to_luminosity(long double mass) -> long double {
   if (mass <= 0.6224) {
-    return 0.3815 * pow(mass, 2.5185);
+    return 0.3815 * std::pow(mass, 2.5185);
   } else if (mass <= 1.0) {
-    return pow(mass, 4.551);
+    return std::pow(mass, 4.551);
   } else if (mass <= 3.1623) {
-    return pow(mass, 4.351);
+    return std::pow(mass, 4.351);
   } else if (mass <= 16.0) {
-    return 2.7563 * pow(mass, 3.4704);
+    return 2.7563 * std::pow(mass, 3.4704);
   } else {
-    return 42.321 * pow(mass, 2.4853);
+    return 42.321 * std::pow(mass, 2.4853);
   }
 }
 
@@ -48,16 +48,16 @@ auto mass_to_luminosity(long double mass) -> long double {
  */
 auto luminosity_to_mass(long double luminosity) -> long double {
   long double a = luminosity;
-  if (a <= (0.3815 * pow(0.6224, 2.5185))) {
-    return 1.46613 * pow(a, 0.3970617431010522);
+  if (a <= (0.3815 * std::pow(0.6224, 2.5185))) {
+    return 1.46613 * std::pow(a, 0.3970617431010522);
   } else if (a <= 1) {
-    return pow(a, 0.2197319270490002);
-  } else if (a <= pow(3.1623, 4.351)) {
-    return pow(a, 0.2298322224775914);
-  } else if (a <= (2.7563 * pow(16, 3.4704))) {
-    return 0.746654 * pow(a, 0.2881512217611803);
+    return std::pow(a, 0.2197319270490002);
+  } else if (a <= std::pow(3.1623, 4.351)) {
+    return std::pow(a, 0.2298322224775914);
+  } else if (a <= (2.7563 * std::pow(16, 3.4704))) {
+    return 0.746654 * std::pow(a, 0.2881512217611803);
   } else {
-    return 0.221579 * pow(a, 0.4023659115599726);
+    return 0.221579 * std::pow(a, 0.4023659115599726);
   }
 }
 
@@ -507,7 +507,7 @@ auto volume_radius(long double mass, long double density) -> long double {
 
   mass = mass * SOLAR_MASS_IN_GRAMS;
   volume = mass / density;
-  return pow((3.0 * volume) / (4.0 * PI), (1.0 / 3.0)) / CM_PER_KM;
+  return std::pow((3.0 * volume) / (4.0 * PI), (1.0 / 3.0)) / CM_PER_KM;
 }
 
 /*------------------------------------------------------------------------*/
@@ -519,7 +519,7 @@ auto empirical_density(long double mass, long double orb_radius,
                               long double r_ecosphere, bool gas_giant) -> long double {
   long double temp = NAN;
 
-  temp = pow(mass * SUN_MASS_IN_EARTH_MASSES, 1.0 / 8.0);
+  temp = std::pow(mass * SUN_MASS_IN_EARTH_MASSES, 1.0 / 8.0);
   temp = temp * pow1_4(r_ecosphere / orb_radius);
   if (gas_giant) {
     return temp * 1.2;
@@ -614,13 +614,13 @@ auto day_length(planet *the_planet, long double parent_mass,
         CHANGE_IN_EARTH_ANG_VEL * (the_planet->getDensity() / EARTH_DENSITY) *
         (equatorial_radius_in_cm / EARTH_RADIUS) *
         (EARTH_MASS_IN_GRAMS / planetary_mass_in_grams) *
-        pow(parent_mass, 2.0) * (1.0 / pow(the_planet->getA(), 6.0));
+        std::pow(parent_mass, 2.0) * (1.0 / std::pow(the_planet->getA(), 6.0));
   } else {
     change_in_angular_velocity =
         CHANGE_IN_EARTH_ANG_VEL * (the_planet->getDensity() / EARTH_DENSITY) *
         (equatorial_radius_in_cm / EARTH_RADIUS) *
         (EARTH_MASS_IN_GRAMS / planetary_mass_in_grams) *
-        pow(parent_mass, 2.0) * (1.0 / pow(the_planet->getMoonA(), 6.0));
+        std::pow(parent_mass, 2.0) * (1.0 / std::pow(the_planet->getMoonA(), 6.0));
   }
   ang_velocity = base_angular_velocity + (change_in_angular_velocity *
                                           the_planet->getTheSun().getAge());
@@ -666,7 +666,7 @@ auto inclination(long double orb_radius, long double parent_mass) -> long double
 
   long double temp = NAN;
   temp = fabs(gaussian(33.3));
-  temp = pow(orb_radius / 50.0, 0.2) * temp;
+  temp = std::pow(orb_radius / 50.0, 0.2) * temp;
   if (orb_radius < parent_mass) {
     temp = (orb_radius / parent_mass) * temp;
   }
@@ -925,7 +925,7 @@ auto ice_fraction(long double hydro_fraction, long double surf_temp) -> long dou
   if (surf_temp > 328.0) {
     surf_temp = 328.0;
   }
-  temp = pow(((328.0 - surf_temp) / 90.0), 5.0);
+  temp = std::pow(((328.0 - surf_temp) / 90.0), 5.0);
   if (temp > (1.5 * hydro_fraction)) {
     temp = 1.5 * hydro_fraction;
   }
@@ -984,14 +984,14 @@ auto grnhouse(long double r_ecosphere, long double orb_radius) -> bool {
 /* Earth's Atmosphere" article.  The effective temperature given is in     */
 /* units of Kelvin, as is the rise in temperature produced by the          */
 /* greenhouse effect, which is returned.                                   */
-/* I tuned this by changing a pow(x,.25) to pow(x,.4) to match Venus - JLB */
+/* I tuned this by changing a std::pow(x,.25) to std::pow(x,.4) to match Venus - JLB */
 /*-------------------------------------------------------------------------*/
 
 auto green_rise(long double optical_depth, long double effective_temp,
                        long double surf_pressure) -> long double {
   long double convection_factor =
       EARTH_CONVECTION_FACTOR *
-      pow(surf_pressure / EARTH_SURF_PRES_IN_MILLIBARS, 0.4);
+      std::pow(surf_pressure / EARTH_SURF_PRES_IN_MILLIBARS, 0.4);
   long double rise = (pow1_4(1.0 + 0.75 * optical_depth) - 1.0) *
                      effective_temp * convection_factor;
 
@@ -1460,14 +1460,14 @@ void set_temp_range(planet *the_planet) {
       1 / sqrt(1 + 20 * the_planet->getSurfPressure() / 1000.0);
   long double ppmod = 1 / sqrt(10 + 5 * the_planet->getSurfPressure() / 1000.0);
   long double tiltmod = fabs(cos(the_planet->getAxialTilt() * PI / 180) *
-                             pow(1 + the_planet->getE(), 2));
+                             std::pow(1 + the_planet->getE(), 2));
   long double daymod = 1 / (200 / the_planet->getDay() + 1);
-  long double mh = pow(1 + daymod, pressmod);
-  long double ml = pow(1 - daymod, pressmod);
+  long double mh = std::pow(1 + daymod, pressmod);
+  long double ml = std::pow(1 - daymod, pressmod);
   long double hi = mh * the_planet->getSurfTemp();
   long double lo = ml * the_planet->getSurfTemp();
-  long double sh = hi + pow((100 + hi) * tiltmod, sqrt(ppmod));
-  long double wl = lo - pow((150 + lo) * tiltmod, sqrt(ppmod));
+  long double sh = hi + std::pow((100 + hi) * tiltmod, sqrt(ppmod));
+  long double wl = lo - std::pow((150 + lo) * tiltmod, sqrt(ppmod));
   long double max =
       the_planet->getSurfTemp() + sqrt(the_planet->getSurfTemp()) * 10;
   long double min = the_planet->getSurfTemp() / sqrt(the_planet->getDay() + 24);
@@ -1829,14 +1829,14 @@ auto gas_radius(long double temperature, long double core_mass,
 }
 
 auto round_threshold(long double density) -> long double {
-  return (170.0 * sqrt(ultimateStrength(density)) * pow(density, -1.0)) / 2.0;
+  return (170.0 * sqrt(ultimateStrength(density)) * std::pow(density, -1.0)) / 2.0;
 }
 
 auto ultimateStrength(long double density) -> long double {
   if (density < 2.5) {
-    return 1.046601879 * pow(4.294487989, density);
+    return 1.046601879 * std::pow(4.294487989, density);
   } else {
-    return 13.50087381 * pow(1.54411359, density);
+    return 13.50087381 * std::pow(1.54411359, density);
   }
 }
 
@@ -1845,8 +1845,8 @@ auto calc_stellar_flux(long double a, long double b, long double c,
                               long double star_temp, long double star_lum) -> long double {
   long double t = star_temp - 5780.0;
   // cout << star_temp << endl;
-  return (seff) + (a * t) + (b * pow(t, 2.0)) + (c * pow(t, 3.0)) +
-         (d * pow(t, 4.0));
+  return (seff) + (a * t) + (b * std::pow(t, 2.0)) + (c * std::pow(t, 3.0)) +
+         (d * std::pow(t, 4.0));
 }
 
 auto habitable_zone_distance_helper(long double effTemp,
@@ -2065,7 +2065,7 @@ auto habitable_zone_distance(sun &the_sun, int mode, long double mass) -> long d
 }
 
 auto calcLambda(long double distance, long double mass) -> long double {
-  return (pow(mass, 2.0) / pow(distance, 3.0 / 2.0)) * 1.7E16;
+  return (pow(mass, 2.0) / std::pow(distance, 3.0 / 2.0)) * 1.7E16;
 }
 
 void gas_giant_temperature_albedo(planet *the_planet, long double parent_mass,
@@ -2235,7 +2235,7 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
         long double vrms =
             rms_vel(gases[i].getWeight(), the_planet->getExosphericTemp());
         long double pvrms =
-            pow(1.0 / (1.0 + vrms / the_planet->getEscVelocity()),
+            std::pow(1.0 / (1.0 + vrms / the_planet->getEscVelocity()),
                 the_sun.getAge() / 1e9);
         long double abund = gases[i].getAbunds();
         long double react = 1.0;
@@ -2248,7 +2248,7 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
           abund = abund *
                   (0.001 + (the_planet->getGasMass() / the_planet->getMass()));
           pres2 = (0.75 + pressure);
-          react = pow(1.0 / (1.0 + gases[i].getReactivity()),
+          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
                       the_sun.getAge() / 2e9 * pres2);
         } else if ((gases[i].getSymbol() == "O" ||
                     gases[i].getSymbol() == "O2") &&
@@ -2257,19 +2257,19 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
                     (the_planet->getSurfTemp() > 270 &&
                      the_planet->getSurfTemp() < 400))) {
           pres2 = (0.89 + pressure / 4);
-          react = pow(1.0 / (1.0 + gases[i].getReactivity()),
-                      pow(the_sun.getAge() / 2e9, 0.25) * pres2);
+          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
+                      std::pow(the_sun.getAge() / 2e9, 0.25) * pres2);
         } else if (gases[i].getSymbol() == "CO2" && the_sun.getAge() > 2e9 &&
                    (the_planet->getGasGiant() ||
                     (the_planet->getSurfTemp() > 270 &&
                      the_planet->getSurfTemp() < 400))) {
           pres2 = (0.75 + pressure);
-          react = pow(1.0 / (1.0 + gases[i].getReactivity()),
-                      pow(the_sun.getAge() / 2e9, 0.5) * pres2);
+          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
+                      std::pow(the_sun.getAge() / 2e9, 0.5) * pres2);
           react *= 1.5;
         } else {
           pres2 = (0.75 + pressure);
-          react = pow(1.0 / (1.0 + gases[i].getReactivity()),
+          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
                       the_sun.getAge() / 2e9 * pres2);
         }
 
@@ -2527,7 +2527,7 @@ void assign_composition(planet *the_planet, sun &the_sun, bool is_moon) {
           the_planet->setImf(random_number(0.5, 1.0));
         } else {
           the_planet->setImf(
-              pow(random_number(0, pow(0.5, 1.0 / 8.0)), 1.0 / 8.0));
+              std::pow(random_number(0, std::pow(0.5, 1.0 / 8.0)), 1.0 / 8.0));
         }
       }
       if (the_planet->getRmf() == 0) {
@@ -2546,7 +2546,7 @@ void assign_composition(planet *the_planet, sun &the_sun, bool is_moon) {
           the_planet->setCmf(random_number(0.75, 1.0));
         } else {
           the_planet->setCmf(
-              pow(random_number(0.0, pow(0.75, 1.0 / 8.0)), 8.0));
+              std::pow(random_number(0.0, std::pow(0.75, 1.0 / 8.0)), 8.0));
         }
       }
     }
@@ -2714,7 +2714,7 @@ auto calcOblateness(planet *the_planet) -> long double {
       multiplier = 5.56E-12;
     }
     oblateness = multiplier * (pow(the_planet->getRadius(), 3.0) /
-                               (mass_in_eu * pow(the_planet->getDay(), 2.0)));
+                               (mass_in_eu * std::pow(the_planet->getDay(), 2.0)));
   } else {
     planetary_mass_in_grams = the_planet->getMass() * SOLAR_MASS_IN_GRAMS;
     equatorial_radius_in_cm = the_planet->getRadius() * CM_PER_KM;
@@ -2760,7 +2760,7 @@ auto calcHzd(planet *the_planet) -> long double {
 
 auto calcHzcHelper(long double m1, long double r1, long double k1,
                           long double k2, long double k3, long double m) -> long double {
-  return r1 * pow(10.0, k1 + (log10(m / m1) / 3.0) - (k2 * pow(m / m1, k3)));
+  return r1 * std::pow(10.0, k1 + (log10(m / m1) / 3.0) - (k2 * std::pow(m / m1, k3)));
 }
 
 auto calcHzc(planet *the_planet) -> long double {
@@ -2791,7 +2791,7 @@ auto calcHza(planet *the_planet) -> long double {
 
 auto calcEsiHelper(long double value, long double ref_value,
                           long double weight, long double n) -> long double {
-  return pow(1.0 - fabs((value - ref_value) / (value + ref_value)), weight / n);
+  return std::pow(1.0 - fabs((value - ref_value) / (value + ref_value)), weight / n);
 }
 
 auto calcEsi(planet *the_planet) -> long double {
@@ -2809,8 +2809,8 @@ auto calcEsi(planet *the_planet) -> long double {
 auto calcSphHelper(long double min, long double max, long double opt,
                           long double x, long double w) -> long double {
   if (x > min && x < max) {
-    return pow(fabs(((x - min) * (x - max)) /
-                    (((x - min) * (x - max)) - pow(x - opt, 2.0))),
+    return std::pow(fabs(((x - min) * (x - max)) /
+                    (((x - min) * (x - max)) - std::pow(x - opt, 2.0))),
                w);
   } else {
     return 0;
@@ -2946,8 +2946,8 @@ auto getPlantLifeAlbedo(const string& star_type, long double luminosity) -> long
 auto calcFlux(long double temperature, long double wavelength) -> long double {
   wavelength /= 1000.0;
   wavelength /= 1000000.0;
-  long double first = 2.0 * (long double)H * pow((long double)C, 2.0);
-  long double second = pow(wavelength, 5);
+  long double first = 2.0 * (long double)H * std::pow((long double)C, 2.0);
+  long double second = std::pow(wavelength, 5);
   long double third = (long double)H * (long double)C;
   long double fourth = wavelength * (long double)KB * temperature;
   long double fifth = third / fourth;
@@ -2981,7 +2981,7 @@ auto calcOblateness_improved(long double angular_velocity,
   result =
       ((pow2(angular_velocity) * pow3(equatorial_radius_in_cm)) /
        (GRAV_CONSTANT * planetary_mass_in_grams)) *
-      pow((5.0 / 2.0) * pow2(1.0 - ((3.0 / 2.0) * k2)) + (2.0 / 5.0), -1.0);
+      std::pow((5.0 / 2.0) * pow2(1.0 - ((3.0 / 2.0) * k2)) + (2.0 / 5.0), -1.0);
   return result;
 }
 

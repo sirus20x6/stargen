@@ -11,8 +11,6 @@
 #include "stargen.h"
 #include "utils.h"
 
-using namespace std;
-
 /* Now for some variables global to the accretion process:	    */
 bool dust_left;
 long double r_inner;
@@ -50,7 +48,7 @@ void set_initial_conditions(long double inner_limit_of_dust,
 }
 
 auto stellar_dust_limit(long double stell_mass_ratio) -> long double {
-  return 200.0 * pow(stell_mass_ratio, 1.0 / 3.0);
+  return 200.0 * std::pow(stell_mass_ratio, 1.0 / 3.0);
 }
 
 /**
@@ -62,7 +60,7 @@ auto stellar_dust_limit(long double stell_mass_ratio) -> long double {
  */
 auto nearest_planet(long double stell_mass_ratio,
                     long double nearest_planet_factor) -> long double {
-  return nearest_planet_factor * pow(stell_mass_ratio, 1.0 / 3.0);
+  return nearest_planet_factor * std::pow(stell_mass_ratio, 1.0 / 3.0);
 }
 
 /**
@@ -72,7 +70,7 @@ auto nearest_planet(long double stell_mass_ratio,
  * @return long double 
  */
 auto farthest_planet(long double stell_mass_ratio) -> long double {
-  return 50.0 * pow(stell_mass_ratio, 1.0 / 3.0);
+  return 50.0 * std::pow(stell_mass_ratio, 1.0 / 3.0);
 }
 
 /**
@@ -285,7 +283,7 @@ auto collect_dust(long double last_mass, long double &new_dust,
   long double next_gas = 0;
 
   temp = last_mass / (1.0 + last_mass);
-  reduced_mass = pow(temp, 1.0 / 4.0);
+  reduced_mass = std::pow(temp, 1.0 / 4.0);
   r_inner = inner_effect_limit(a, e, reduced_mass);
   r_outer = outer_effect_limit(a, e, reduced_mass);
 
@@ -341,7 +339,7 @@ auto collect_dust(long double last_mass, long double &new_dust,
       width = width - temp2;
 
       // calculate the area of a cross-section, and the volume
-      temp = 4.0 * PI * pow(a, 2.0) * reduced_mass *
+      temp = 4.0 * PI * std::pow(a, 2.0) * reduced_mass *
              (1.0 - e * (temp1 - temp2) / bandwidth);
       volume = temp * width;
 
@@ -381,7 +379,7 @@ auto critical_limit(long double orb_radius, long double eccentricity,
 
   perihelion_dist = orb_radius - (orb_radius * eccentricity);
   temp = perihelion_dist * sqrt(stell_luminosity_ratio);
-  return B * pow(temp, -0.75);
+  return B * std::pow(temp, -0.75);
 }
 
 /**
@@ -478,14 +476,14 @@ void coalesce_planetesimals(long double a, long double e, long double mass,
       dist1 = (a * (1.0 + e) * (1.0 + reduced_mass)) - a;
       /* x aphelion */
       reduced_mass =
-          pow(the_planet->getMass() / (1.0 + the_planet->getMass()), 1.0 / 4.0);
+          std::pow(the_planet->getMass() / (1.0 + the_planet->getMass()), 1.0 / 4.0);
       dist2 = the_planet->getA() -
               (the_planet->getA() * (1.0 - the_planet->getE()) *
                (1.0 - reduced_mass));
     } else {
       dist1 = a - (a * (1.0 - e) * (1.0 - reduced_mass));
       /* x perihelion */
-      reduced_mass = pow(
+      reduced_mass = std::pow(
           (the_planet->getMass() / (1.0 + the_planet->getMass())), 1.0 / 4.0);
       dist2 = (the_planet->getA() * (1.0 + the_planet->getE()) *
                (1.0 + reduced_mass)) -
@@ -500,10 +498,10 @@ void coalesce_planetesimals(long double a, long double e, long double mass,
           ((the_planet->getMass() / the_planet->getA()) + (mass / a));
 
       temp = the_planet->getMass() * sqrt(the_planet->getA()) *
-             sqrt(1.0 - pow(the_planet->getE(), 2.0));
-      temp = temp + (mass * sqrt(a) * sqrt(sqrt(1.0 - pow(e, 2.0))));
+             sqrt(1.0 - std::pow(the_planet->getE(), 2.0));
+      temp = temp + (mass * sqrt(a) * sqrt(sqrt(1.0 - std::pow(e, 2.0))));
       temp = temp / ((the_planet->getMass() + mass) * sqrt(new_a));
-      temp = 1.0 - pow(temp, 2.0);
+      temp = 1.0 - std::pow(temp, 2.0);
       if (temp < 0.0 || temp >= 1.0) {
         temp = 0.0;
       }
@@ -826,7 +824,7 @@ auto dist_planetary_masses(sun &the_sun, long double inner_dust,
       }
 
       dust_density = dust_density_coeff * sqrt(stell_mass_ratio) *
-                     exp(-ALPHA * pow(a, 1.0 / N));
+                     exp(-ALPHA * std::pow(a, 1.0 / N));
       crit_mass = critical_limit(a, e, stell_luminosity_ratio);
       if (total_mass == PROTOPLANET_MASS && is_seed == false) {
         // cout << "test1\n";
@@ -930,7 +928,7 @@ auto dist_planetary_masses(sun &the_sun, long double inner_dust,
 
     if (is_seed) {
       temp = total_mass / (1.0 + total_mass);
-      reduced_mass = pow(temp, 1.0 / 4.0);
+      reduced_mass = std::pow(temp, 1.0 / 4.0);
       r_inner = inner_effect_limit(a, e, reduced_mass);
       r_outer = outer_effect_limit(a, e, reduced_mass);
       crit_mass = critical_limit(a, e, stell_luminosity_ratio);
