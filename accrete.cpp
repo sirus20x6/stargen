@@ -75,11 +75,27 @@ auto farthest_planet(long double stell_mass_ratio) -> long double {
   return 50.0 * pow(stell_mass_ratio, 1.0 / 3.0);
 }
 
+/**
+ * @brief inner effect limit
+ * 
+ * @param a 
+ * @param e 
+ * @param mass 
+ * @return long double 
+ */
 auto inner_effect_limit(long double a, long double e, long double mass)
     -> long double {
   return a * (1.0 - e) * (1.0 - mass) / (1.0 + cloud_eccentricity);
 }
 
+/**
+ * @brief outer effect limit
+ * 
+ * @param a 
+ * @param e 
+ * @param mass 
+ * @return long double 
+ */
 auto outer_effect_limit(long double a, long double e, long double mass)
     -> long double {
   return a * (1.0 + e) * (1.0 + mass) / (1.0 - cloud_eccentricity);
@@ -124,6 +140,16 @@ auto dust_available(long double inside_range, long double outside_range)
   return dust_here;
 }
 
+/**
+ * @brief update dust lanes
+ * 
+ * @param min 
+ * @param max 
+ * @param mass 
+ * @param crit_mass 
+ * @param body_inner_bound 
+ * @param body_outer_bound 
+ */
 void update_dust_lanes(long double min, long double max, long double mass,
                        long double crit_mass, long double body_inner_bound,
                        long double body_outer_bound) {
@@ -227,6 +253,18 @@ void update_dust_lanes(long double min, long double max, long double mass,
   }
 }
 
+/**
+ * @brief collect dust
+ * 
+ * @param last_mass 
+ * @param new_dust 
+ * @param new_gas 
+ * @param a 
+ * @param e 
+ * @param crit_mass 
+ * @param dust_band 
+ * @return long double 
+ */
 auto collect_dust(long double last_mass, long double &new_dust,
                   long double &new_gas, long double a, long double e,
                   long double crit_mass, dust *dust_band) -> long double {
@@ -323,15 +361,19 @@ auto collect_dust(long double last_mass, long double &new_dust,
   }
 }
 
-/*------------------------------------------------------------------------------*/
-/*	Orbital radius is in AU, eccentricity is unitless, and the stellar */
-/*	luminosity ratio is with respect to the sun.  The value returned is the
- */
-/*	mass at which the planet begins to accrete gas as well as dust, and is
- */
-/*	in units of solar masses. */
-/*------------------------------------------------------------------------------*/
 
+
+/**
+ * @brief Orbital radius is in AU, eccentricity is unitless, and the stellar 
+ * luminosity ratio is with respect to the sun.  The value returned is the
+ * mass at which the planet begins to accrete gas as well as dust, and is
+ * in units of solar masses. 
+ * 
+ * @param orb_radius 
+ * @param eccentricity 
+ * @param stell_luminosity_ratio 
+ * @return long double 
+ */
 auto critical_limit(long double orb_radius, long double eccentricity,
                     long double stell_luminosity_ratio) -> long double {
   long double temp = NAN;
@@ -356,6 +398,7 @@ auto critical_limit(long double orb_radius, long double eccentricity,
  * @param body_inner_bound 
  * @param body_outer_bound 
  */
+
 void accrete_dust(long double &seed_mass, long double &new_dust,
                   long double &new_gas, long double a, long double e,
                   long double crit_mass, long double body_inner_bound,
@@ -386,6 +429,21 @@ void accrete_dust(long double &seed_mass, long double &new_dust,
                     body_outer_bound);
   // cout << "test\n";
 }
+
+/**
+ * @brief coalesce planetesimals
+ * 
+ * @param a 
+ * @param e 
+ * @param mass 
+ * @param crit_mass 
+ * @param dust_mass 
+ * @param gas_mass 
+ * @param stell_luminosity_ratio 
+ * @param body_inner_bound 
+ * @param body_outer_bound 
+ * @param do_moons 
+ */
 
 void coalesce_planetesimals(long double a, long double e, long double mass,
                             long double crit_mass, long double dust_mass,
@@ -621,7 +679,21 @@ void coalesce_planetesimals(long double a, long double e, long double mass,
   }
 }
 
-// this appears to be the entry point into the entire module - DKL
+/**
+ * @brief this appears to be the entry point into the entire module - DKL
+ * 
+ * @param the_sun 
+ * @param inner_dust 
+ * @param outer_dust 
+ * @param outer_planet_limit 
+ * @param dust_density_coeff 
+ * @param ecc_coef 
+ * @param nearest_planet_factor 
+ * @param seed_system 
+ * @param do_moons 
+ * @return planet* 
+ */
+
 auto dist_planetary_masses(sun &the_sun, long double inner_dust,
                            long double outer_dust,
                            long double outer_planet_limit,
@@ -873,6 +945,12 @@ auto dist_planetary_masses(sun &the_sun, long double inner_dust,
   return planet_head;
 }
 
+/**
+ * @brief frree dust
+ * 
+ * @param head 
+ */
+
 void free_dust(dust *head) {
   dust *node = nullptr;
   dust *next = nullptr;
@@ -884,6 +962,12 @@ void free_dust(dust *head) {
   }
 }
 
+/**
+ * @brief free planet
+ * 
+ * @param head 
+ */
+
 void free_planet(planet *head) {
   planet *node = nullptr;
   planet *next = nullptr;
@@ -894,6 +978,11 @@ void free_planet(planet *head) {
     // cout << "Deleted World\n";
   }
 }
+
+/**
+ * @brief free generations
+ * 
+ */
 
 void free_generations() {
   gen *node = nullptr;
@@ -915,6 +1004,15 @@ void free_generations() {
   }
 }
 
+/**
+ * @brief is predefined planet helper
+ * 
+ * @param the_planet 
+ * @param predined_planet 
+ * @return true 
+ * @return false 
+ */
+
 auto is_predified_planet_helper(planet *the_planet, planet *predined_planet)
     -> bool {
   // if (the_planet->getA() == predined_planet->getA() && the_planet->getE() ==
@@ -926,6 +1024,13 @@ auto is_predified_planet_helper(planet *the_planet, planet *predined_planet)
   return false;
 }
 
+/**
+ * @brief is predefined planet
+ * 
+ * @param the_planet 
+ * @return true 
+ * @return false 
+ */
 auto is_predefined_planet(planet *the_planet) -> bool {
   if (is_in_eriEps(the_planet)) {
     return true;
@@ -1047,6 +1152,13 @@ auto is_predefined_planet(planet *the_planet) -> bool {
   return false;
 }
 
+/**
+ * @brief is in eriEps
+ * 
+ * @param the_planet 
+ * @return true 
+ * @return false 
+ */
 auto is_in_eriEps(planet *the_planet) -> bool {
   if (is_predified_planet_helper(the_planet, eriEpsI)) {
     return true;
