@@ -3,6 +3,7 @@
 #include <string>
 
 #include "structs.h"
+#include "accrete.h"
 
 using namespace std;
 
@@ -143,7 +144,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
                              long double outer_planet_limit,
                              long double ecc_coef,
                              long double inner_planet_factor, bool do_gases,
-                             bool do_moons);
+                             bool do_moons, accrete &myAccreteObject);
 auto stargen(actions /*action*/, const string& /*flag_char*/, string /*path*/,
              const string& /*url_path_arg*/, const string& /*filename_arg*/,
              const string& /*sys_name_arg*/, string /*prognam*/,

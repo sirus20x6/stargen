@@ -11,19 +11,7 @@
 #include "stargen.h"
 #include "utils.h"
 
-/* Now for some variables global to the accretion process:	    */
-bool dust_left;
-long double r_inner;
-long double r_outer;
-long double reduced_mass;
-long double dust_density;
-long double cloud_eccentricity;
-dust *dust_head = nullptr;
-planet *planet_head = nullptr;
-gen *hist_head = nullptr;
-planet *seed_moons = nullptr;
-
-void set_initial_conditions(long double inner_limit_of_dust,
+void accrete::set_initial_conditions(long double inner_limit_of_dust,
                             long double outer_limit_of_dust) {
   planet_head = nullptr;
   hist_head = nullptr;
@@ -47,7 +35,7 @@ void set_initial_conditions(long double inner_limit_of_dust,
   hist_head = hist;
 }
 
-auto stellar_dust_limit(long double stell_mass_ratio) -> long double {
+auto accrete::stellar_dust_limit(long double stell_mass_ratio) -> long double {
   return 200.0 * std::pow(stell_mass_ratio, 1.0 / 3.0);
 }
 
@@ -58,7 +46,7 @@ auto stellar_dust_limit(long double stell_mass_ratio) -> long double {
  * @param nearest_planet_factor 
  * @return long double 
  */
-auto nearest_planet(long double stell_mass_ratio,
+auto accrete::nearest_planet(long double stell_mass_ratio,
                     long double nearest_planet_factor) -> long double {
   return nearest_planet_factor * std::pow(stell_mass_ratio, 1.0 / 3.0);
 }
@@ -69,7 +57,7 @@ auto nearest_planet(long double stell_mass_ratio,
  * @param stell_mass_ratio 
  * @return long double 
  */
-auto farthest_planet(long double stell_mass_ratio) -> long double {
+auto accrete::farthest_planet(long double stell_mass_ratio) -> long double {
   return 50.0 * std::pow(stell_mass_ratio, 1.0 / 3.0);
 }
 
@@ -81,7 +69,7 @@ auto farthest_planet(long double stell_mass_ratio) -> long double {
  * @param mass 
  * @return long double 
  */
-auto inner_effect_limit(long double a, long double e, long double mass)
+auto accrete::inner_effect_limit(long double a, long double e, long double mass)
     -> long double {
   return a * (1.0 - e) * (1.0 - mass) / (1.0 + cloud_eccentricity);
 }
@@ -94,7 +82,7 @@ auto inner_effect_limit(long double a, long double e, long double mass)
  * @param mass 
  * @return long double 
  */
-auto outer_effect_limit(long double a, long double e, long double mass)
+auto accrete::outer_effect_limit(long double a, long double e, long double mass)
     -> long double {
   return a * (1.0 + e) * (1.0 + mass) / (1.0 - cloud_eccentricity);
 }
@@ -108,7 +96,7 @@ auto outer_effect_limit(long double a, long double e, long double mass)
  * @return true 
  * @return false 
  */
-auto dust_available(long double inside_range, long double outside_range)
+auto accrete::dust_available(long double inside_range, long double outside_range)
     -> bool {
   dust *current_dust_band = nullptr;
   bool dust_here = false;
@@ -148,7 +136,7 @@ auto dust_available(long double inside_range, long double outside_range)
  * @param body_inner_bound 
  * @param body_outer_bound 
  */
-void update_dust_lanes(long double min, long double max, long double mass,
+void accrete::update_dust_lanes(long double min, long double max, long double mass,
                        long double crit_mass, long double body_inner_bound,
                        long double body_outer_bound) {
   bool gas = false;
@@ -263,7 +251,7 @@ void update_dust_lanes(long double min, long double max, long double mass,
  * @param dust_band 
  * @return long double 
  */
-auto collect_dust(long double last_mass, long double &new_dust,
+auto accrete::collect_dust(long double last_mass, long double &new_dust,
                   long double &new_gas, long double a, long double e,
                   long double crit_mass, dust *dust_band) -> long double {
   // cout << EM(last_mass) << " " << EM(new_dust) << " " << EM(new_gas) << " "
@@ -372,7 +360,7 @@ auto collect_dust(long double last_mass, long double &new_dust,
  * @param stell_luminosity_ratio 
  * @return long double 
  */
-auto critical_limit(long double orb_radius, long double eccentricity,
+auto accrete::critical_limit(long double orb_radius, long double eccentricity,
                     long double stell_luminosity_ratio) -> long double {
   long double temp = NAN;
   long double perihelion_dist = NAN;
@@ -397,7 +385,7 @@ auto critical_limit(long double orb_radius, long double eccentricity,
  * @param body_outer_bound 
  */
 
-void accrete_dust(long double &seed_mass, long double &new_dust,
+void accrete::accrete_dust(long double &seed_mass, long double &new_dust,
                   long double &new_gas, long double a, long double e,
                   long double crit_mass, long double body_inner_bound,
                   long double body_outer_bound) {
@@ -443,7 +431,7 @@ void accrete_dust(long double &seed_mass, long double &new_dust,
  * @param do_moons 
  */
 
-void coalesce_planetesimals(long double a, long double e, long double mass,
+void accrete::coalesce_planetesimals(long double a, long double e, long double mass,
                             long double crit_mass, long double dust_mass,
                             long double gas_mass,
                             long double stell_luminosity_ratio,
@@ -692,7 +680,7 @@ void coalesce_planetesimals(long double a, long double e, long double mass,
  * @return planet* 
  */
 
-auto dist_planetary_masses(sun &the_sun, long double inner_dust,
+auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
                            long double outer_dust,
                            long double outer_planet_limit,
                            long double dust_density_coeff, long double ecc_coef,
@@ -949,7 +937,7 @@ auto dist_planetary_masses(sun &the_sun, long double inner_dust,
  * @param head 
  */
 
-void free_dust(dust *head) {
+void accrete::free_dust(dust *head) {
   dust *node = nullptr;
   dust *next = nullptr;
 
@@ -966,7 +954,7 @@ void free_dust(dust *head) {
  * @param head 
  */
 
-void free_planet(planet *head) {
+void accrete::free_planet(planet *head) {
   planet *node = nullptr;
   planet *next = nullptr;
 
@@ -982,7 +970,7 @@ void free_planet(planet *head) {
  * 
  */
 
-void free_generations() {
+void accrete::free_generations() {
   gen *node = nullptr;
   gen *next = nullptr;
 
@@ -1011,7 +999,7 @@ void free_generations() {
  * @return false 
  */
 
-auto is_predified_planet_helper(planet *the_planet, planet *predined_planet)
+auto accrete::is_predefined_planet_helper(planet *the_planet, planet *predined_planet)
     -> bool {
   // if (the_planet->getA() == predined_planet->getA() && the_planet->getE() ==
   // predined_planet->getE())
@@ -1029,7 +1017,7 @@ auto is_predified_planet_helper(planet *the_planet, planet *predined_planet)
  * @return true 
  * @return false 
  */
-auto is_predefined_planet(planet *the_planet) -> bool {
+auto accrete::is_predefined_planet(planet *the_planet) -> bool {
   if (is_in_eriEps(the_planet)) {
     return true;
   } else if (is_in_UMa47(the_planet)) {
@@ -1157,584 +1145,584 @@ auto is_predefined_planet(planet *the_planet) -> bool {
  * @return true 
  * @return false 
  */
-auto is_in_eriEps(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, eriEpsI)) {
+auto accrete::is_in_eriEps(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, eriEpsI)) {
     return true;
   }
   return false;
 }
 
-auto is_in_UMa47(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, UMa47III)) {
+auto accrete::is_in_UMa47(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, UMa47III)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, UMa47II)) {
+  } else if (is_predefined_planet_helper(the_planet, UMa47II)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, UMa47I)) {
-    return true;
-  }
-  return false;
-}
-
-auto is_in_horIot(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, horIotI)) {
+  } else if (is_predefined_planet_helper(the_planet, UMa47I)) {
     return true;
   }
   return false;
 }
 
-auto is_in_xiumab(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, xiumabb)) {
+auto accrete::is_in_horIot(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, horIotI)) {
     return true;
   }
   return false;
 }
 
-auto is_in_51peg(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, Bellerophon)) {
+auto accrete::is_in_xiumab(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, xiumabb)) {
     return true;
   }
   return false;
 }
 
-auto is_in_55can(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, can55d)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, can55f)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, can55c)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, can55b)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, can55e)) {
+auto accrete::is_in_51peg(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, Bellerophon)) {
     return true;
   }
   return false;
 }
 
-auto is_in_UPSAndA(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, UPSAndAe)) {
+auto accrete::is_in_55can(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, can55d)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, UPSAndAd)) {
+  } else if (is_predefined_planet_helper(the_planet, can55f)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, UPSAndAc)) {
+  } else if (is_predefined_planet_helper(the_planet, can55c)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, UPSAndAb)) {
+  } else if (is_predefined_planet_helper(the_planet, can55b)) {
     return true;
-  }
-  return false;
-}
-
-auto is_in_hd10180(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd10180h)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd10180g)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd10180f)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd10180j)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd10180e)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd10180d)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd10180i)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd10180c)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd10180b)) {
+  } else if (is_predefined_planet_helper(the_planet, can55e)) {
     return true;
   }
   return false;
 }
 
-auto is_in_gliese581(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, gliese581f)) {
+auto accrete::is_in_UPSAndA(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, UPSAndAe)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, gliese581d)) {
+  } else if (is_predefined_planet_helper(the_planet, UPSAndAd)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, gliese581g)) {
+  } else if (is_predefined_planet_helper(the_planet, UPSAndAc)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, gliese581c)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, gliese581b)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, gliese581e)) {
+  } else if (is_predefined_planet_helper(the_planet, UPSAndAb)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd10647(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd10647b)) {
+auto accrete::is_in_hd10180(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd10180h)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd10180g)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd10180f)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd10180j)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd10180e)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd10180d)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd10180i)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd10180c)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd10180b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_83leoB(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, leo83Bb)) {
+auto accrete::is_in_gliese581(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, gliese581f)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, leo83Ba)) {
+  } else if (is_predefined_planet_helper(the_planet, gliese581d)) {
     return true;
-  }
-  return false;
-}
-
-auto is_in_muari(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, muarie)) {
+  } else if (is_predefined_planet_helper(the_planet, gliese581g)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, muarib)) {
+  } else if (is_predefined_planet_helper(the_planet, gliese581c)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, muarid)) {
+  } else if (is_predefined_planet_helper(the_planet, gliese581b)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, muaric)) {
+  } else if (is_predefined_planet_helper(the_planet, gliese581e)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd28185(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd28185b)) {
+auto accrete::is_in_hd10647(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd10647b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd40307(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd40307g)) {
+auto accrete::is_in_83leoB(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, leo83Bb)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, hd40307f)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd40307e)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd40307d)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd40307c)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd40307b)) {
+  } else if (is_predefined_planet_helper(the_planet, leo83Ba)) {
     return true;
   }
   return false;
 }
 
-auto is_in_kepler22(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, kepler22b)) {
+auto accrete::is_in_muari(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, muarie)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, muarib)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, muarid)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, muaric)) {
     return true;
   }
   return false;
 }
 
-auto is_in_taucet(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, taucetf)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, taucete)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, taucetd)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, taucetc)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, taucetb)) {
+auto accrete::is_in_hd28185(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd28185b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_alfcentb(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, alfcentbb)) {
+auto accrete::is_in_hd40307(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd40307g)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd40307f)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd40307e)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd40307d)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd40307c)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd40307b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_EPSEri(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, EPSEric)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, EPSErib)) {
+auto accrete::is_in_kepler22(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, kepler22b)) {
     return true;
   }
   return false;
 }
 
-auto is_cyteen(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, cyteen)) {
+auto accrete::is_in_taucet(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, taucetf)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, taucete)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, taucetd)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, taucetc)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, taucetb)) {
     return true;
   }
   return false;
 }
 
-auto is_in_GL849(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, GL849b)) {
+auto accrete::is_in_alfcentb(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, alfcentbb)) {
     return true;
   }
   return false;
 }
 
-auto is_in_ILAqr(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, ILAqrb)) {
+auto accrete::is_in_EPSEri(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, EPSEric)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, ILAqrc)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, ILAqrd)) {
+  } else if (is_predefined_planet_helper(the_planet, EPSErib)) {
     return true;
   }
   return false;
 }
 
-auto is_in_HD20794(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, HD20794d)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, HD20794c)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, HD20794b)) {
+auto accrete::is_cyteen(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, cyteen)) {
     return true;
   }
   return false;
 }
 
-auto is_in_BETHyi(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, BETHyib)) {
+auto accrete::is_in_GL849(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, GL849b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd208527(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd208527b)) {
+auto accrete::is_in_ILAqr(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, ILAqrb)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, ILAqrc)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, ILAqrd)) {
     return true;
   }
   return false;
 }
 
-auto is_in_kepler11(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, kepler11g)) {
+auto accrete::is_in_HD20794(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, HD20794d)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler11f)) {
+  } else if (is_predefined_planet_helper(the_planet, HD20794c)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler11e)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, kepler11d)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, kepler11c)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, kepler11b)) {
+  } else if (is_predefined_planet_helper(the_planet, HD20794b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_bajor(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, bajorI)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorII)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorIII)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorIV)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorV)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorVI)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorVII)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorVIII)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorIX)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorX)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorXI)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorXII)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorXIII)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, bajorXIV)) {
+auto accrete::is_in_BETHyi(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, BETHyib)) {
     return true;
   }
   return false;
 }
 
-auto is_in_gliese667C(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, gliese667Cb)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, gliese667Cc)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, gliese667Cd)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, gliese667Ce)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, gliese667Cf)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, gliese667Cg)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, gliese667Ch)) {
+auto accrete::is_in_hd208527(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd208527b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_kepler283(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, kepler283b)) {
+auto accrete::is_in_kepler11(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, kepler11g)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler283c)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler11f)) {
     return true;
-  }
-  return false;
-}
-
-auto is_in_kepler62(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, kepler62b)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler11e)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler62c)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler11d)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler62d)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler11c)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler62e)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, kepler62f)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler11b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_kepler296(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, kepler296b)) {
+auto accrete::is_in_bajor(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, bajorI)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler296c)) {
+  } else if (is_predefined_planet_helper(the_planet, bajorII)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler296d)) {
+  } else if (is_predefined_planet_helper(the_planet, bajorIII)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler296e)) {
+  } else if (is_predefined_planet_helper(the_planet, bajorIV)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler296f)) {
+  } else if (is_predefined_planet_helper(the_planet, bajorV)) {
     return true;
-  }
-  return false;
-}
-
-auto is_in_gliese180(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, gliese180b)) {
+  } else if (is_predefined_planet_helper(the_planet, bajorVI)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, gliese180c)) {
+  } else if (is_predefined_planet_helper(the_planet, bajorVII)) {
     return true;
-  }
-  return false;
-}
-
-auto is_in_gliese163(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, gliese163b)) {
+  } else if (is_predefined_planet_helper(the_planet, bajorVIII)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, gliese163c)) {
+  } else if (is_predefined_planet_helper(the_planet, bajorIX)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, gliese163d)) {
+  } else if (is_predefined_planet_helper(the_planet, bajorX)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, bajorXI)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, bajorXII)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, bajorXIII)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, bajorXIV)) {
     return true;
   }
   return false;
 }
 
-auto is_in_kepler61(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, kepler61b)) {
+auto accrete::is_in_gliese667C(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, gliese667Cb)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, gliese667Cc)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, gliese667Cd)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, gliese667Ce)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, gliese667Cf)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, gliese667Cg)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, gliese667Ch)) {
     return true;
   }
   return false;
 }
 
-auto is_in_gliese422(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, gliese422b)) {
+auto accrete::is_in_kepler283(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, kepler283b)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, kepler283c)) {
     return true;
   }
   return false;
 }
 
-auto is_in_kepler298(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, kepler298b)) {
+auto accrete::is_in_kepler62(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, kepler62b)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler298c)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler62c)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler298d)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler62d)) {
     return true;
-  }
-  return false;
-}
-
-auto is_in_kepler174(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, kepler174b)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler62e)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, kepler174c)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, kepler174d)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler62f)) {
     return true;
   }
   return false;
 }
 
-auto is_in_gliese682(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, gliese682b)) {
+auto accrete::is_in_kepler296(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, kepler296b)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, gliese682c)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler296c)) {
     return true;
-  }
-  return false;
-}
-
-auto is_in_hd38529(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd38529b)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler296d)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, hd38529c)) {
+  } else if (is_predefined_planet_helper(the_planet, kepler296e)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, kepler296f)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd202206(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd202206b)) {
+auto accrete::is_in_gliese180(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, gliese180b)) {
     return true;
-  } else if (is_predified_planet_helper(the_planet, hd202206c)) {
-    return true;
-  }
-  return false;
-}
-
-auto is_in_hd8673(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd8673b)) {
+  } else if (is_predefined_planet_helper(the_planet, gliese180c)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd22781(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd22781b)) {
+auto accrete::is_in_gliese163(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, gliese163b)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, gliese163c)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, gliese163d)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd217786(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd217786b)) {
+auto accrete::is_in_kepler61(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, kepler61b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd106270(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd106270b)) {
+auto accrete::is_in_gliese422(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, gliese422b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd38801(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd38801b)) {
+auto accrete::is_in_kepler298(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, kepler298b)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, kepler298c)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, kepler298d)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd39091(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd39091b)) {
+auto accrete::is_in_kepler174(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, kepler174b)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, kepler174c)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, kepler174d)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd141937(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd141937b)) {
+auto accrete::is_in_gliese682(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, gliese682b)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, gliese682c)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd33564(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd33564b)) {
+auto accrete::is_in_hd38529(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd38529b)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd38529c)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd23596(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd23596b)) {
+auto accrete::is_in_hd202206(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd202206b)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd202206c)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd222582(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd222582b)) {
+auto accrete::is_in_hd8673(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd8673b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd86264(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd86264b)) {
+auto accrete::is_in_hd22781(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd22781b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd196067(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd196067b)) {
+auto accrete::is_in_hd217786(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd217786b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd10697(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd10697b)) {
+auto accrete::is_in_hd106270(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd106270b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd132406(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd132406b)) {
+auto accrete::is_in_hd38801(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd38801b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd13908(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd13908b)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd13908c)) {
+auto accrete::is_in_hd39091(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd39091b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd2039(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd2039b)) {
+auto accrete::is_in_hd141937(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd141937b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd82943(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd82943b)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd82943c)) {
-    return true;
-  } else if (is_predified_planet_helper(the_planet, hd82943d)) {
+auto accrete::is_in_hd33564(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd33564b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_moa2011blg293l(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, moa2011blg293lb)) {
+auto accrete::is_in_hd23596(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd23596b)) {
     return true;
   }
   return false;
 }
 
-auto is_in_hd213240(planet *the_planet) -> bool {
-  if (is_predified_planet_helper(the_planet, hd213240b)) {
+auto accrete::is_in_hd222582(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd222582b)) {
     return true;
   }
   return false;
 }
 
-auto calcPerihelion(long double a, long double e) -> long double {
+auto accrete::is_in_hd86264(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd86264b)) {
+    return true;
+  }
+  return false;
+}
+
+auto accrete::is_in_hd196067(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd196067b)) {
+    return true;
+  }
+  return false;
+}
+
+auto accrete::is_in_hd10697(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd10697b)) {
+    return true;
+  }
+  return false;
+}
+
+auto accrete::is_in_hd132406(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd132406b)) {
+    return true;
+  }
+  return false;
+}
+
+auto accrete::is_in_hd13908(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd13908b)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd13908c)) {
+    return true;
+  }
+  return false;
+}
+
+auto accrete::is_in_hd2039(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd2039b)) {
+    return true;
+  }
+  return false;
+}
+
+auto accrete::is_in_hd82943(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd82943b)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd82943c)) {
+    return true;
+  } else if (is_predefined_planet_helper(the_planet, hd82943d)) {
+    return true;
+  }
+  return false;
+}
+
+auto accrete::is_in_moa2011blg293l(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, moa2011blg293lb)) {
+    return true;
+  }
+  return false;
+}
+
+auto accrete::is_in_hd213240(planet *the_planet) -> bool {
+  if (is_predefined_planet_helper(the_planet, hd213240b)) {
+    return true;
+  }
+  return false;
+}
+
+auto accrete::calcPerihelion(long double a, long double e) -> long double {
   return a * (1.0 - e);
 }

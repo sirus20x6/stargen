@@ -153,6 +153,8 @@ auto stargen(actions action, const string &flag_char, string path,
   is_circumbinary = (flags_arg & fIsCircubinaryStar) != 0;
   stringstream ss;
 
+  accrete myAccreteObject;
+
   if (do_catalog) {
     catalog_count = cat_arg.count();
   }
@@ -530,7 +532,7 @@ auto stargen(actions action, const string &flag_char, string path,
     generate_stellar_system(the_sun, use_seed_system, seed_planets, flag_char,
                             sys_no, system_name, inner_dust_limit, outer_limit,
                             ecc_coef_arg, inner_planet_factor_arg, do_gases,
-                            do_moons);
+                            do_moons, myAccreteObject);
 
     planet *a_planet = nullptr;
     int counter = 0;
@@ -681,7 +683,7 @@ auto stargen(actions action, const string &flag_char, string path,
     }
 
     if (!use_seed_system) {
-      free_generations();
+      myAccreteObject.free_generations();
     } else {
       planet *ptr = nullptr;
       planet *node = nullptr;
@@ -765,16 +767,16 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
                              long double outer_planet_limit,
                              long double ecc_coef,
                              long double inner_planet_factor, bool do_gases,
-                             bool do_moons) {
+                             bool do_moons, accrete &myAccreteObject) {
   do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   system_counter++;
   long double outer_dust_limit = NAN;
 
   if (!the_sun.getIsCircumbinary()) {
-    outer_dust_limit = stellar_dust_limit(the_sun.getMass());
+    outer_dust_limit = myAccreteObject.stellar_dust_limit(the_sun.getMass());
   } else {
-    outer_dust_limit = stellar_dust_limit(the_sun.getCombinedMass());
+    outer_dust_limit = myAccreteObject.stellar_dust_limit(the_sun.getCombinedMass());
   }
 
   if (the_sun.getLuminosity() == 0) {
@@ -820,7 +822,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
     }
     // cout << min_age << " " << max_age << endl;
     innermost_planet =
-        dist_planetary_masses(the_sun, inner_dust_limit, outer_dust_limit,
+        myAccreteObject.dist_planetary_masses(the_sun, inner_dust_limit, outer_dust_limit,
                               outer_planet_limit, dust_density_coeff, ecc_coef,
                               inner_planet_factor, seed_system, do_moons);
     the_sun.setAge(random_number(min_age, max_age));

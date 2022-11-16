@@ -1,18 +1,7 @@
 #ifndef CONST_H
 #define CONST_H
-#ifdef __cplusplus
-#include <cmath>
-#else
-#include <math.h>
-#endif
 
-#if 0
-#ifdef LONG_RAND
-#define RAND_MAX (2147483647.0)
-#else
-#define RAND_MAX (32767.0)
-#endif
-#endif
+#include <cmath>
 
 #define PI (3.1415926536)
 #define RADIANS_PER_ROTATION (2.0 * PI)
@@ -246,27 +235,28 @@
 #define pow2(a) ((a) * (a))
 #define pow3(a) ((a) * (a) * (a))
 #define pow4(a) ((a) * (a) * (a) * (a))
-#define pow1_4(a) sqrt(sqrt(a))
-#define pow1_3(a) pow(a, (1.0 / 3.0))
-#define pow1_2(a) sqrt(a)
-/*define mass(a) pow(a, (1.0/3.5)) calculates mass based on luminosity (a) */
+#define pow1_4(a) std::sqrt(std::sqrt(a))
+#define pow1_3(a) std::pow(a, (1.0 / 3.0))
+#define pow1_2(a) std::sqrt(a)
+/*define mass(a) std::pow(a, (1.0/3.5)) calculates mass based on luminosity (a) */
 // define mass(a) (a <= (0.3815*pow(0.6224,2.5185))) ?
 // ((log(a)/log(2.5185))/0.6224) : (a <= 1) ? (log(a)/log(4.551)) : (a <=
-// pow(3.1623, 4.351)) ? (log(a)/log(4.351)) : (a <= (2.7563*pow(16,3.4704))) ?
+// std::pow(3.1623, 4.351)) ? (log(a)/log(4.351)) : (a <= (2.7563*pow(16,3.4704))) ?
 // ((log(a)/log(3.4704))/2.7563) : ((log(a)/log(2.4853))/42.321) /* calculates
 // mass based on luminosity (a) */
 #define mass(a)                                                             \
-  (a <= (0.3815 * pow(0.6224, 2.5185)))                                     \
-      ? (1.46613 * pow(a, 0.3970617431010522))                              \
-  : (a <= 1)                  ? pow(a, 0.2197319270490002)                  \
-  : (a <= pow(3.1623, 4.351)) ? pow(a, 0.2298322224775914)                  \
-  : (a <= (2.7563 * pow(16, 3.4704)))                                       \
-      ? (0.746654 * pow(a, 0.2881512217611803))                             \
-      : (0.221579 * pow(a, 0.4023659115599726)) /* calculates mass based on \
+  (a <= (0.3815 * std::pow(0.6224, 2.5185)))                                     \
+      ? (1.46613 * std::pow(a, 0.3970617431010522))                              \
+  : (a <= 1)                  ? std::pow(a, 0.2197319270490002)                  \
+  : (a <= std::pow(3.1623, 4.351)) ? std::pow(a, 0.2298322224775914)                  \
+  : (a <= (2.7563 * std::pow(16, 3.4704)))                                       \
+      ? (0.746654 * std::pow(a, 0.2881512217611803))                             \
+      : (0.221579 * std::pow(a, 0.4023659115599726)) /* calculates mass based on \
                                                    luminosity (a) */
-#define abs2luminosity(a) \
-  pow(N2, (SUNMAG -       \
-           a)) /* calculates luminosity based on absolute magnitude (a) */
+
+/* calculates luminosity based on absolute magnitude (a) */
+#define abs2luminosity(a) (std::pow(N2, (SUNMAG - a)))
+
 #define vis2abs(v, d) (v - 5 * (log10(d / PARSEC) - 1))
 
 #define EM(x) (x) / SUN_MASS_IN_EARTH_MASSES
