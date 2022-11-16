@@ -21,7 +21,7 @@ Strangly some of the code in that fork is more modular / object oriented / bette
 git clone https://github.com/sirus20x6/stargen.git
 cd stargen
 cmake ./CMakeLists.txt
-make
+cmake --build .
 ```
 
 ## Tip use 
