@@ -327,7 +327,7 @@ auto stargen(actions action, const string &flag_char, string path,
                    ".html", prognam, thumbnails);
   }
 
-  if (out_format == ffCSV || out_format == ffCSVdl) {
+  if (out_format == ffCSV || out_format == ffCSVdl || out_format == ffJSON) {
     string csv_url;
     string cleaned_arg = "StarGen";
 
@@ -337,10 +337,17 @@ auto stargen(actions action, const string &flag_char, string path,
       cleaned_arg = filename_arg;
     }
     ss.str("");
-    ss << cleaned_arg << ".csv";
-    csv_file_name = ss.str();
+    if (out_format == ffJSON) {
+      ss << cleaned_arg << ".json";
 
-    open_csv_file(path, csv_file_name, csv_file);
+    }
+    else {
+      ss << cleaned_arg << ".csv";
+    }
+
+    csv_file_name = ss.str();
+    openCVSorJson(path, csv_file_name, csv_file);
+
   }
 
   for (index = 0; index < system_count; index++) {
@@ -657,6 +664,10 @@ auto stargen(actions action, const string &flag_char, string path,
         case ffCSV:
         case ffCSVdl:
           csv_describe_system(csv_file, innermost_planet, do_gases, flag_seed,
+                              do_moons);
+          break;
+        case ffJSON:
+          jsonDescribeSystem(csv_file, innermost_planet, do_gases, flag_seed,
                               do_moons);
           break;
         case ffCELESTIA:

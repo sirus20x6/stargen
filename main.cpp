@@ -209,11 +209,13 @@ int main(int argc, char **argv) {
       } else if (compare_string_char(temp_string, 1, "e") &&
       !compare_string_char(temp_string, 2, "x")) {
         out_format = ffCSV;
-        cout <<"wtfmate";
       } else if (compare_string_char(temp_string, 1, "C")) {
         out_format = ffCSVdl;
       } else if (compare_string_char(temp_string, 1, "c")) {
         out_format = ffCELESTIA;
+      } else if (compare_string_char(temp_string, 1, "J") && 
+                  compare_string_char(temp_string, 2, "S")) {
+        out_format = ffJSON;
       }
       /*else if (compare_string_char(temp_string, 1, "P"))
       {
@@ -544,6 +546,7 @@ void usage(string program) {
   "Output formats: (only one is generated) default HTML to file\n"
   "    -c   Celestia .ssc to stdout\n"
   "    -C   Excel .csv [dl: no thumbnail html] to file\n"
+  "    -JS  JSON .json [dl: no thumbnail html] to file\n"
   "    -e   Excel .csv to file\n"
   "    -S   Vector graphics (SVG) to file\n"
   "    -t   Text to stdout\n"

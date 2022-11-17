@@ -4,12 +4,14 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
+#include <nlohmann/json.hpp>
 
 #include "const.h"
 #include "elements.h"
 #include "enviro.h"
 #include "stargen.h"
 #include "utils.h"
+
 
 using namespace std;
 
@@ -216,67 +218,56 @@ void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
   int moons;
 
   if (!the_sun.getIsCircumbinary()) {
-    the_file << "'Seed', 'Star Name', 'Luminosity', 'Mass', 'Temperature', "
-                "'Spectral Type', 'Total Time on Main Sequence', 'Age', "
-                "'Earth-like Distance'\n";
-    the_file << seed << ", '" << the_sun.getName() << "', "
-             << toString(the_sun.getLuminosity()) << ", "
-             << toString(the_sun.getMass()) << ", "
-             << toString(the_sun.getEffTemp()) << ", '" << the_sun.getSpecType()
-             << "', " << toString(the_sun.getLife()) << ", "
-             << toString(the_sun.getAge()) << ", "
-             << toString(the_sun.getREcosphere(1.0)) << "\n";
+
+    nlohmann::json header = {
+      {"seed", seed},
+      {"Star Name",the_sun.getName()},
+      {"Luminosity",the_sun.getLuminosity()},
+      {"Mass",the_sun.getMass()},
+      {"Temperature",the_sun.getEffTemp()},
+      {"Spectral Type",the_sun.getSpecType()},
+      {"Total Time on Main Sequence",the_sun.getLife()},
+      {"Age",the_sun.getAge()},
+      {"Earth-like Distance",the_sun.getREcosphere(1.0)}
+    };
+          the_file << header.dump(4) << std::endl;
   } else {
-    the_file
-        << "'Seed', 'Star Name', 'Luminosity of Primary', 'Mass of Primary', "
-           "'Temperature of Primary', 'Spectral Type of Primary', 'Luminosity "
-           "of Secondary', 'Mass of Secondary', 'Temperature of Secondary', "
-           "'Spectral Type of Secondary', 'Seperation', 'Eccentricity', "
-           "'Combined Temperature', 'Primary's Total Time on Main Sequence', "
-           "'Age', 'Earth-like Distance'\n";
-    the_file << seed << ", '" << the_sun.getName() << "', "
-             << toString(the_sun.getLuminosity()) << ", "
-             << toString(the_sun.getMass()) << ", "
-             << toString(the_sun.getEffTemp()) << ", '" << the_sun.getSpecType()
-             << "', " << toString(the_sun.getSecondaryLuminosity()) << ", "
-             << toString(the_sun.getSecondaryMass()) << ", "
-             << toString(the_sun.getSecondaryEffTemp()) << ", '"
-             << the_sun.getSecondarySpecType() << "', "
-             << toString(the_sun.getSeperation()) << ", "
-             << toString(the_sun.getEccentricity()) << ", "
-             << toString(the_sun.getCombinedEffTemp()) << ", "
-             << toString(the_sun.getLife()) << ", "
-             << toString(the_sun.getAge()) << ", "
-             << toString(the_sun.getREcosphere(1.0)) << "\n";
+    
+      nlohmann::json header = {
+        {"seed", seed},
+        {"Star Name",the_sun.getName()},
+        {"Luminosity of Primary",the_sun.getLuminosity()},
+        {"Mass of Primary",the_sun.getMass()},
+        {"Temperature of Primary",the_sun.getEffTemp()},
+        {"Spectral Type of Primary",the_sun.getSpecType()},
+        {"Luminosity of Secondary",the_sun.getSecondaryLuminosity()},
+        {"Mass of Secondary",the_sun.getSecondaryMass()},
+        {"Temperature of Secondary",the_sun.getSecondaryEffTemp()},
+        {"Spectral Type of Secondary",the_sun.getSecondarySpecType()},
+        {"Seperation",the_sun.getSeperation()},
+        {"Eccentricity",the_sun.getEccentricity()},
+        {"Combined Temperature",the_sun.getCombinedEffTemp()},
+        {"Total Time on Main Sequence",the_sun.getLife()},
+        {"Age",the_sun.getAge()},
+        {"Earth-like Distance",the_sun.getREcosphere(1.0)}
+      };
+    the_file << header.dump(4) <<std::endl;
   }
-  the_file
-      << "'Planet #', 'Distance', 'Eccentricity', 'Inclination', 'Longitude of "
-         "the Ascending Node', 'Longitude of the Pericenter', 'Mean "
-         "Longitude', 'Axial Tilt', 'Ice Mass Fraction', 'Rock Mass Fraction', "
-         "'Carbon Mass Fraction', 'Total Mass', 'Is Gas Giant', 'Dust Mass', "
-         "'Gas Mass', 'Radius of Core', 'Total Radius', 'Orbit Zone', "
-         "'Density', 'Orbit Period', 'Rotation Period', 'Has Spin Orbit "
-         "Resonance', 'Escape Velocity', 'Surface Acceleration', 'Surface "
-         "Gravity', 'RMS Velocity', 'Minimum Molecular Weight', 'Volatile Gas "
-         "Inventory', 'Surface Pressure', 'Greenhouse Effect', 'Boiling "
-         "Point', 'Albedo', 'Exospheric Temperature', 'Estimated Temperature', "
-         "'Estimated Terran Temperature', 'Surface Temperature', 'Greenhouse "
-         "Rise', 'High Temperature', 'Low Temperature', 'Maximum Temperature', "
-         "'Minimum Temperature', 'Hydrosphere', 'Cloud Cover', 'Ice Cover', "
-         "'Atmosphere', 'Type', 'Minor Moons'\n";
+  nlohmann::json body;
+
   for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
        the_planet = the_planet->next_planet, counter++) {
     ss << the_sun.getName() << " " << counter;
     id = ss.str();
     ss.str("");
-    csv_row(the_file, the_planet, do_gases, false, id, ss);
+    jsonRow(the_file, the_planet, do_gases, false, id, ss);
     if (do_moons) {
       for (moon = the_planet->first_moon, moons = 1; moon != NULL;
            moon = moon->next_planet, moons++) {
         ss << the_sun.getName() << " " << counter << "." << moons;
         id = ss.str();
         ss.str("");
-        csv_row(the_file, moon, do_gases, true, id, ss);
+        jsonRow(the_file, moon, do_gases, true, id, ss);
       }
     }
   }
@@ -376,6 +367,107 @@ void csv_row(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
            << toString(the_planet->getIceCover()) << ", '" << atmosphere
            << "', '" << type_string(the_planet) << "', "
            << the_planet->getMinorMoons() << "\n";
+}
+
+void jsonRow(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
+             string id, stringstream& ss) {
+  do_gases = (flags_arg_clone & fDoGases) != 0;
+  string atmosphere;
+  long double ipp;
+  int index;
+  bool poisonous;
+
+  if (do_gases) {
+    ss.str();
+    for (int i = 0; i < the_planet->getNumGases(); i++) {
+      index = gases.count();
+      poisonous = false;
+
+      for (int n = 0; n < gases.count(); n++) {
+        if (gases[n].getNum() == the_planet->getGas(i).getNum()) {
+          index = n;
+          break;
+        }
+      }
+
+      ipp = inspired_partial_pressure(the_planet->getSurfPressure(),
+                                      the_planet->getGas(i).getSurfPressure());
+      if (ipp < 0.0) {
+        ipp = 0.0;
+      }
+      if (ipp > gases[index].getMaxIpp()) {
+        poisonous = true;
+      }
+      ss << gases[index].getSymbol() << " "
+         << toString(100.0 * (the_planet->getGas(i).getSurfPressure() /
+                              the_planet->getSurfPressure()))
+         << " " << toString(the_planet->getGas(i).getSurfPressure()) << " ("
+         << toString(ipp) << ")";
+      if (poisonous) {
+        ss << " poisonous";
+      }
+      ss << ";";
+    }
+    atmosphere = ss.str();
+    ss.str("");
+  }
+
+
+    nlohmann::json body;
+    body["Planet #"]= id;
+    if (!is_moon) {
+      body["Distance"] = the_planet->getA();
+      body["Eccentricity"] =the_planet->getE();
+    }
+    else {
+      body["Distance"] = the_planet->getMoonA();
+      body["Eccentricity"] =the_planet->getMoonE();
+    }
+    body["Inclination"] = the_planet->getInclination();
+    body["Longitude of the Ascending Node"] = the_planet->getAscendingNode();
+    body["Longitude of the Pericenter"] = the_planet->getLongitudeOfPericenter();
+    body["Mean Longitude"] = the_planet->getMeanLongitude();
+    body["Axial Tilt"] = the_planet->getAxialTilt();
+    body["Ice Mass Fraction"] = the_planet->getImf();
+    body["Rock Mass Fraction"] = the_planet->getRmf();
+    body["Carbon Mass Fraction"] = the_planet->getCmf();
+    body["Total Mass"] = the_planet->getMass();
+    body["Is Gas Giant"] = the_planet->getGasMass();
+    body["Dust Mass"] = the_planet->getDustMass();
+    body["Gas Mass"] = the_planet->getMass();
+    body["Radius of Core"] = the_planet->getCoreRadius();
+    body["Total Radius"] = the_planet->getRadius();
+    body["Orbit Zone"] = the_planet->getOrbitZone();
+    body["Density"] = the_planet->getDensity();
+    body["Orbit Period"] = the_planet->getOrbPeriod();
+    body["Rotation Period"] = the_planet->getDay();
+    body["Has Spin Orbit Resonance"] = the_planet->getResonantPeriod();
+    body["Escape Velocity"] = the_planet->getEscVelocity();
+    body["Surface Acceleration"] = the_planet->getSurfAccel();
+    body["Surface Gravity"] = the_planet->getSurfGrav();
+    body["RMS Velocity"] = the_planet->getRmsVelocity();
+    body["Minimum Molecular Weight"] = the_planet->getMolecWeight();
+    body["Volatile Gas Inventory"] = the_planet->getVolatileGasInventory();
+    body["Get Surface Pressure"] = the_planet->getSurfPressure();
+    body["Greenhouse Effect"] = the_planet->getGreenhouseEffect();
+    body["Boiling Point"] = the_planet->getBoilPoint();
+    body["Albedo"] = the_planet->getAlbedo();
+    body["Exospheric Temperature"] = the_planet->getExosphericTemp();
+    body["Estimated Temperature"] = the_planet->getEstimatedTemp();
+    body["Estimated Terran Temperature"] = the_planet->getEstimatedTerrTemp();
+    body["Surface Temperature"] = the_planet->getSurfTemp();
+    body["Greenhouse Rise"] = the_planet->getGreenhsRise();
+    body["High Temperature"] = the_planet->getHighTemp();
+    body["Low Temperature"] = the_planet->getLowTemp();
+    body["Maximum Temperature"] = the_planet->getMaxTemp();
+    body["Minimum Temperature"] = the_planet->getMinTemp();
+    body["Hydrosphere"] = the_planet->getHydrosphere();
+    body["Cloud Cover"] = the_planet->getCloudCover();
+    body["Ice Cover"] = the_planet->getIceCover();
+    body["Atmosphere"] = atmosphere;
+    body["Type"] = type_string(the_planet);
+    body["Minor Moons"] = the_planet->getMinorMoons();
+    the_file << body.dump(4) << std::endl;
 }
 
 string type_string(planet* the_planet) {
@@ -613,7 +705,14 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
   output.close();
 }
 
-void open_csv_file(string path, string the_filename, fstream& output) {
+/**
+ * @brief openCVSorJson
+ * 
+ * @param path 
+ * @param the_filename 
+ * @param output 
+ */
+void openCVSorJson(string path, string the_filename, fstream& output) {
   string the_file_spec;
   stringstream ss;
 

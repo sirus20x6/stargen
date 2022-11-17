@@ -13,10 +13,12 @@ void csv_describe_system(fstream &, planet *, bool, long, bool);
 void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
                          bool do_gases, long int seed, bool do_moons);
 void csv_row(fstream &, planet *, bool, bool, string, stringstream &);
+void jsonRow(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
+             string id, stringstream& ss);
 auto type_string(planet *) -> string;
 auto cloud_type_string(planet *) -> string;
 void create_svg_file(planet *, string, string, string, string, bool);
-void open_csv_file(string, string, fstream &);
+void openCVSorJson(string, string, fstream &);
 void refresh_file_stream(fstream &, string, string, string);
 void open_html_file(string, long, string, string, string, string, string,
                     fstream &);

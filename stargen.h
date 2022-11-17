@@ -46,6 +46,7 @@ using namespace std;
 #define ffCELESTIA '.SSC'
 #define ffMOONGEN '.BSH'
 #define ffCSV '.CSV'
+#define ffJSON '.JSO'
 #define ffCSVdl '+CSV'
 #define ffSVG '.SVG'
 
