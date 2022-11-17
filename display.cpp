@@ -220,6 +220,7 @@ void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
   if (!the_sun.getIsCircumbinary()) {
 
     nlohmann::json header = {
+      {"Body Type", "Binary Star"},
       {"seed", seed},
       {"Star Name",the_sun.getName()},
       {"Luminosity",the_sun.getLuminosity()},
@@ -234,6 +235,7 @@ void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
   } else {
     
       nlohmann::json header = {
+        {"Body Type", "Star"},
         {"seed", seed},
         {"Star Name",the_sun.getName()},
         {"Luminosity of Primary",the_sun.getLuminosity()},
@@ -414,13 +416,13 @@ void jsonRow(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
 
 
     nlohmann::json body;
-    body["Planet #"]= id;
+    body["Planet #"] = id;
     if (!is_moon) {
       body["Distance"] = the_planet->getA();
       body["Eccentricity"] =the_planet->getE();
     }
     else {
-      body["Distance"] = the_planet->getMoonA();
+      body["Distance au"] = the_planet->getMoonA();
       body["Eccentricity"] =the_planet->getMoonE();
     }
     body["Inclination"] = the_planet->getInclination();
