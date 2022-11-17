@@ -47,8 +47,8 @@ Preset seeds:
     -x   Use the Solar System's masses/orbits
     -a   Use the Solar System's masses/orbits varying Earth
 Stars:
-  For a custom star:
-    Please note that for a custom star, you need to specify a mass and/or a luminosity as well as a spectral type and/or a temperature. Other wise the program will not work.
+	Please note that for a custom star, you need to specify a mass and/or a luminosity
+	as well as a spectral type and/or a temperature. Other wise the program will not work.
     -m#  Specify stellar mass # [fraction of Sun's mass] (optional if -y is used)
     -y#  Specify stellar luminosity # [fraction of Sun's luminosity] (optional if -m is used)
     -Y#  Specify minimum age for star (years) (optional)
@@ -84,8 +84,8 @@ Stars:
     -l   List stars of selected table and exit
     -L   List stars of selected table as HTML and exit
 Filters:
-    Please note that these options are only usefull if you are 
-making a large batch of systems and only want to save certain ones.
+    Please note that these options are only usefull if you are making
+	a large batch of systems and only want to save certain ones.
     -E   Only systems with earthlike planets
     -H   Only systems with habitable planets
     -2   Only systems with 2 or more habitable planets
@@ -104,10 +104,10 @@ File specs:
     -o   Name for the output file(s) [default: taken from star name]
     -p   Path for where the output file(s) are saved [default: ./html]
     -u   Internet URL path for/in the output file(s) [default: none]
-Output formats: (only one is generated)
-(default) HTML to file
+Output formats: (only one is generated) default HTML to file
     -c   Celestia .ssc to stdout
     -C   Excel .csv [dl: no thumbnail html] to file
+    -JS  JSON .json [dl: no thumbnail html] to file
     -e   Excel .csv to file
     -S   Vector graphics (SVG) to file
     -t   Text to stdout
@@ -115,6 +115,6 @@ Output formats: (only one is generated)
 Other:
     -M   Generate moons (highly experimental and incomplete)
     -r   Allow planet migration after forming. (highly experimental)
-    -ak  Print acknowledgement
-    -ex  Print examples
+    -ak  Acknowledgement
+    -ex  Examples
 ```
