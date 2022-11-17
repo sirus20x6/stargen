@@ -10,6 +10,8 @@ using namespace std;
 
 void text_describe_system(planet *, bool, long, bool);
 void csv_describe_system(fstream &, planet *, bool, long, bool);
+void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
+                         bool do_gases, long int seed, bool do_moons);
 void csv_row(fstream &, planet *, bool, bool, string, stringstream &);
 auto type_string(planet *) -> string;
 auto cloud_type_string(planet *) -> string;

@@ -204,6 +204,84 @@ void csv_describe_system(fstream& the_file, planet* innermost_planet,
   }
 }
 
+void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
+                         bool do_gases, long int seed, bool do_moons) {
+  do_gases = (flags_arg_clone & fDoGases) != 0;
+  planet* the_planet;
+  sun the_sun = innermost_planet->getTheSun();
+  int counter;
+  stringstream ss;
+  string id;
+  planet* moon;
+  int moons;
+
+  if (!the_sun.getIsCircumbinary()) {
+    the_file << "'Seed', 'Star Name', 'Luminosity', 'Mass', 'Temperature', "
+                "'Spectral Type', 'Total Time on Main Sequence', 'Age', "
+                "'Earth-like Distance'\n";
+    the_file << seed << ", '" << the_sun.getName() << "', "
+             << toString(the_sun.getLuminosity()) << ", "
+             << toString(the_sun.getMass()) << ", "
+             << toString(the_sun.getEffTemp()) << ", '" << the_sun.getSpecType()
+             << "', " << toString(the_sun.getLife()) << ", "
+             << toString(the_sun.getAge()) << ", "
+             << toString(the_sun.getREcosphere(1.0)) << "\n";
+  } else {
+    the_file
+        << "'Seed', 'Star Name', 'Luminosity of Primary', 'Mass of Primary', "
+           "'Temperature of Primary', 'Spectral Type of Primary', 'Luminosity "
+           "of Secondary', 'Mass of Secondary', 'Temperature of Secondary', "
+           "'Spectral Type of Secondary', 'Seperation', 'Eccentricity', "
+           "'Combined Temperature', 'Primary's Total Time on Main Sequence', "
+           "'Age', 'Earth-like Distance'\n";
+    the_file << seed << ", '" << the_sun.getName() << "', "
+             << toString(the_sun.getLuminosity()) << ", "
+             << toString(the_sun.getMass()) << ", "
+             << toString(the_sun.getEffTemp()) << ", '" << the_sun.getSpecType()
+             << "', " << toString(the_sun.getSecondaryLuminosity()) << ", "
+             << toString(the_sun.getSecondaryMass()) << ", "
+             << toString(the_sun.getSecondaryEffTemp()) << ", '"
+             << the_sun.getSecondarySpecType() << "', "
+             << toString(the_sun.getSeperation()) << ", "
+             << toString(the_sun.getEccentricity()) << ", "
+             << toString(the_sun.getCombinedEffTemp()) << ", "
+             << toString(the_sun.getLife()) << ", "
+             << toString(the_sun.getAge()) << ", "
+             << toString(the_sun.getREcosphere(1.0)) << "\n";
+  }
+  the_file
+      << "'Planet #', 'Distance', 'Eccentricity', 'Inclination', 'Longitude of "
+         "the Ascending Node', 'Longitude of the Pericenter', 'Mean "
+         "Longitude', 'Axial Tilt', 'Ice Mass Fraction', 'Rock Mass Fraction', "
+         "'Carbon Mass Fraction', 'Total Mass', 'Is Gas Giant', 'Dust Mass', "
+         "'Gas Mass', 'Radius of Core', 'Total Radius', 'Orbit Zone', "
+         "'Density', 'Orbit Period', 'Rotation Period', 'Has Spin Orbit "
+         "Resonance', 'Escape Velocity', 'Surface Acceleration', 'Surface "
+         "Gravity', 'RMS Velocity', 'Minimum Molecular Weight', 'Volatile Gas "
+         "Inventory', 'Surface Pressure', 'Greenhouse Effect', 'Boiling "
+         "Point', 'Albedo', 'Exospheric Temperature', 'Estimated Temperature', "
+         "'Estimated Terran Temperature', 'Surface Temperature', 'Greenhouse "
+         "Rise', 'High Temperature', 'Low Temperature', 'Maximum Temperature', "
+         "'Minimum Temperature', 'Hydrosphere', 'Cloud Cover', 'Ice Cover', "
+         "'Atmosphere', 'Type', 'Minor Moons'\n";
+  for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
+       the_planet = the_planet->next_planet, counter++) {
+    ss << the_sun.getName() << " " << counter;
+    id = ss.str();
+    ss.str("");
+    csv_row(the_file, the_planet, do_gases, false, id, ss);
+    if (do_moons) {
+      for (moon = the_planet->first_moon, moons = 1; moon != NULL;
+           moon = moon->next_planet, moons++) {
+        ss << the_sun.getName() << " " << counter << "." << moons;
+        id = ss.str();
+        ss.str("");
+        csv_row(the_file, moon, do_gases, true, id, ss);
+      }
+    }
+  }
+}
+
 void csv_row(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
              string id, stringstream& ss) {
   do_gases = (flags_arg_clone & fDoGases) != 0;
