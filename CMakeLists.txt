@@ -1,7 +1,12 @@
 project(stargen_2014 DESCRIPTION "A program for generating solar systems")
 
-cmake_minimum_required(VERSION 3.9)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+cmake_minimum_required(VERSION 3.11)
+project(stargen VERSION 3.11.0)
+#set(CMAKE_PROJECT_VERSION = 3.4.5)
+#set(CMAKE_PROJECT_VERSION_MAJOR 3)
+#    CMAKE_PROJECT_VERSION_MINOR
+#    CMAKE_PROJECT_VERSION_PATCH
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
@@ -14,6 +19,12 @@ find_package(Boost)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
+include(FetchContent)
+
+cmake_policy(SET CMP0135 NEW)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.1/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
 
 add_executable(stargen 
     accrete.cpp
@@ -42,9 +53,10 @@ add_executable(stargen
     structs.cpp
     utils.cpp)
 
-target_link_libraries(stargen ${Boost_LIBRARY_DIRS})
-target_link_libraries(stargen ${LIBS})
-target_link_libraries(stargen m)
+target_link_libraries(stargen PRIVATE ${Boost_LIBRARY_DIRS})
+target_link_libraries(stargen PRIVATE ${LIBS})
+target_link_libraries(stargen PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(stargen PRIVATE m)
 
 install(TARGETS stargen RUNTIME DESTINATION bin)
 install(DIRECTORY html ref DESTINATION bin)
