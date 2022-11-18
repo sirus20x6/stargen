@@ -2,8 +2,7 @@
 
 #include <gsl/gsl_multifit.h>
 
-#include <boost/algorithm/string/erase.hpp>
-#include <boost/lexical_cast.hpp>
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <string>
@@ -11,7 +10,6 @@
 #include "const.h"
 #include "enviro.h"
 
-using namespace boost;
 using namespace std;
 
 long seed = 0;
@@ -217,7 +215,7 @@ auto soft(long double v, long double max, long double min) -> long double {
 auto lim(long double x) -> long double { return x / pow1_4(1 + x * x * x * x); }
 
 auto remove_spaces(string str) -> string {
-  erase_all(str, " ");
+  str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
   return str;
 }
 

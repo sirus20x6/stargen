@@ -2,7 +2,6 @@
 
 #include <math.h>
 
-#include <boost/concept_check.hpp>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>

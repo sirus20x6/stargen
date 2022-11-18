@@ -435,6 +435,10 @@ int main(int argc, char **argv) {
                  graphic_format);
 }
 
+/**
+ * @brief Initialize Data
+ * 
+ */
 void initData() {
   initRadii();
   initGases();

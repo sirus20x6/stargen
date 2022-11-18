@@ -1,6 +1,5 @@
 #include "accrete.h"
 
-#include <boost/concept_check.hpp>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>

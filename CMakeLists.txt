@@ -6,7 +6,7 @@ project(stargen VERSION 3.11.0)
 #set(CMAKE_PROJECT_VERSION_MAJOR 3)
 #    CMAKE_PROJECT_VERSION_MINOR
 #    CMAKE_PROJECT_VERSION_PATCH
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
@@ -14,11 +14,7 @@ find_package(GSL REQUIRED)
 include_directories(${GSL_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${GSL_LIBRARIES})
 set(CMAKE_BUILD_PARALLEL_LEVEL 8)
-find_package(Boost) 
 
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-endif()
 include(FetchContent)
 
 cmake_policy(SET CMP0135 NEW)
@@ -53,7 +49,6 @@ add_executable(stargen
     structs.cpp
     utils.cpp)
 
-target_link_libraries(stargen PRIVATE ${Boost_LIBRARY_DIRS})
 target_link_libraries(stargen PRIVATE ${LIBS})
 target_link_libraries(stargen PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(stargen PRIVATE m)

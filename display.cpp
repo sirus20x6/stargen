@@ -1,6 +1,5 @@
 #include "display.h"
 
-#include <boost/iterator/iterator_concepts.hpp>
 #include <cmath>
 #include <iostream>
 #include <sstream>
@@ -15,6 +14,14 @@
 
 using namespace std;
 
+/**
+ * @brief Output system to text
+ * 
+ * @param innermost_planet 
+ * @param do_gases 
+ * @param seed 
+ * @param do_moons 
+ */
 void text_describe_system(planet* innermost_planet, bool do_gases,
                           long int seed, bool do_moons) {
   // do_gases = (flags_arg_clone & fDoGases) != 0;
@@ -128,6 +135,15 @@ void text_describe_system(planet* innermost_planet, bool do_gases,
   }
 }
 
+/**
+ * @brief Output to csv file
+ * 
+ * @param the_file 
+ * @param innermost_planet 
+ * @param do_gases 
+ * @param seed 
+ * @param do_moons 
+ */
 void csv_describe_system(fstream& the_file, planet* innermost_planet,
                          bool do_gases, long int seed, bool do_moons) {
   do_gases = (flags_arg_clone & fDoGases) != 0;
@@ -206,6 +222,15 @@ void csv_describe_system(fstream& the_file, planet* innermost_planet,
   }
 }
 
+/**
+ * @brief Output to JSON
+ * 
+ * @param the_file 
+ * @param innermost_planet 
+ * @param do_gases 
+ * @param seed 
+ * @param do_moons 
+ */
 void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
                          bool do_gases, long int seed, bool do_moons) {
   do_gases = (flags_arg_clone & fDoGases) != 0;
@@ -275,6 +300,16 @@ void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
   }
 }
 
+/**
+ * @brief Create a "row" for cvs output. A row is basically a planetoid
+ * 
+ * @param the_file 
+ * @param the_planet 
+ * @param do_gases 
+ * @param is_moon 
+ * @param id 
+ * @param ss 
+ */
 void csv_row(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
              string id, stringstream& ss) {
   do_gases = (flags_arg_clone & fDoGases) != 0;
@@ -472,6 +507,12 @@ void jsonRow(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
     the_file << body.dump(4) << std::endl;
 }
 
+/**
+ * @brief type string
+ * 
+ * @param the_planet 
+ * @return string 
+ */
 string type_string(planet* the_planet) {
   stringstream ss;
   planet_type type = the_planet->getType();
@@ -516,6 +557,12 @@ string type_string(planet* the_planet) {
   return ptype;
 }
 
+/**
+ * @brief cloud type string
+ * 
+ * @param the_planet 
+ * @return string 
+ */
 string cloud_type_string(planet* the_planet) {
   long double temp = the_planet->getEstimatedTemp();
 
@@ -538,6 +585,16 @@ string cloud_type_string(planet* the_planet) {
   }
 }
 
+/**
+ * @brief Create a svg file
+ * 
+ * @param innermost_planet 
+ * @param path 
+ * @param file_name 
+ * @param svg_ext 
+ * @param prognam 
+ * @param do_moons 
+ */
 void create_svg_file(planet* innermost_planet, string path, string file_name,
                      string svg_ext, string prognam, bool do_moons) {
   planet* outermost_planet;
@@ -736,6 +793,14 @@ void openCVSorJson(string path, string the_filename, fstream& output) {
   }
 }
 
+/**
+ * @brief Refresh file stream
+ * 
+ * @param output 
+ * @param path 
+ * @param file_name 
+ * @param ext 
+ */
 void refresh_file_stream(fstream& output, string path, string file_name,
                          string ext) {
   string the_file_spec;
@@ -753,6 +818,18 @@ void refresh_file_stream(fstream& output, string path, string file_name,
   }
 }
 
+/**
+ * @brief Open HTML file
+ * 
+ * @param system_name 
+ * @param seed 
+ * @param path 
+ * @param url_path 
+ * @param file_name 
+ * @param ext 
+ * @param prognam 
+ * @param output 
+ */
 void open_html_file(string system_name, long seed, string path, string url_path,
                     string file_name, string ext, string prognam,
                     fstream& output) {
@@ -801,6 +878,11 @@ void open_html_file(string system_name, long seed, string path, string url_path,
          << "'>\n\n";
 }
 
+/**
+ * @brief Close HTML file
+ * 
+ * @param the_file 
+ */
 void close_html_file(fstream& the_file) {
   the_file << "<p>\n\n";
   the_file << "<center>\n";
@@ -812,6 +894,14 @@ void close_html_file(fstream& the_file) {
   the_file.close();
 }
 
+/**
+ * @brief Print description
+ * 
+ * @param the_file 
+ * @param opening 
+ * @param the_planet 
+ * @param closing 
+ */
 void print_description(fstream& the_file, string opening, planet* the_planet,
                        string closing) {
   bool first = true;
@@ -1036,6 +1126,12 @@ void print_description(fstream& the_file, string opening, planet* the_planet,
   the_file << closing;
 }
 
+/**
+ * @brief List molecules
+ * 
+ * @param the_file 
+ * @param weight 
+ */
 void list_molecules(fstream& the_file, long double weight) {
   int count = 0;
   int max = 8;
@@ -1079,6 +1175,18 @@ void list_molecules(fstream& the_file, long double weight) {
   mol_print(the_file, first, count, max, weight, "Xe", XENON);
 }
 
+/**
+ * @brief html star details helper
+ * 
+ * @param the_file 
+ * @param header 
+ * @param mass 
+ * @param luminosity 
+ * @param temperature 
+ * @param age 
+ * @param life 
+ * @param spec_type 
+ */
 void html_star_details_helper(fstream& the_file, const string& header,
                               long double mass, long double luminosity,
                               long double temperature, long double age,
@@ -1101,6 +1209,23 @@ void html_star_details_helper(fstream& the_file, const string& header,
            << " billion left on main sequence)<br></td></tr>";
 }
 
+/**
+ * @brief HTML thumbnails
+ * 
+ * @param innermost_planet 
+ * @param the_file 
+ * @param system_name 
+ * @param url_path 
+ * @param system_url 
+ * @param svg_url 
+ * @param file_name 
+ * @param details 
+ * @param terrestrials 
+ * @param int_link 
+ * @param do_moons 
+ * @param graphic_format 
+ * @param do_gases 
+ */
 void html_thumbnails(planet* innermost_planet, fstream& the_file,
                      string system_name, string url_path, string system_url,
                      string svg_url, string file_name, bool details,
@@ -1444,6 +1569,11 @@ void html_thumbnails(planet* innermost_planet, fstream& the_file,
   the_file << "</p>\n";
 }
 
+/**
+ * @brief HTML thumbnail totals
+ * 
+ * @param the_file 
+ */
 void html_thumbnail_totals(fstream& the_file) {
   the_file << "\n<p>\n\n";
   the_file
@@ -1543,7 +1673,17 @@ void html_thumbnail_totals(fstream& the_file) {
   the_file << "</table>\n\n";
 }
 
-void html_decribe_planet(planet* the_planet, int counter, int moons,
+/**
+ * @brief HTML describe planet
+ * 
+ * @param the_planet 
+ * @param counter 
+ * @param moons 
+ * @param do_gases 
+ * @param url_path 
+ * @param the_file 
+ */
+void html_describe_planet(planet* the_planet, int counter, int moons,
                          bool do_gases, string url_path, fstream& the_file) {
   string planet_id;
   string typeString = type_string(the_planet);
@@ -1948,6 +2088,15 @@ void html_decribe_planet(planet* the_planet, int counter, int moons,
   the_file << "</table>\n\n</p>\n<br>\n\n";
 }
 
+/**
+ * @brief HTML describe system
+ * 
+ * @param innermost_planet 
+ * @param do_gases 
+ * @param do_moons 
+ * @param url_path 
+ * @param the_file 
+ */
 void html_describe_system(planet* innermost_planet, bool do_gases,
                           bool do_moons, string url_path, fstream& the_file) {
   do_gases = (flags_arg_clone & fDoGases) != 0;
@@ -2022,16 +2171,27 @@ void html_describe_system(planet* innermost_planet, bool do_gases,
   // Tables for individual planets
   for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
        the_planet = the_planet->next_planet, counter++) {
-    html_decribe_planet(the_planet, counter, 0, do_gases, url_path, the_file);
+    html_describe_planet(the_planet, counter, 0, do_gases, url_path, the_file);
     if (do_moons) {
       for (moon = the_planet->first_moon, moons = 1; moon != NULL;
            moon = moon->next_planet, moons++) {
-        html_decribe_planet(moon, counter, moons, do_gases, url_path, the_file);
+        html_describe_planet(moon, counter, moons, do_gases, url_path, the_file);
       }
     }
   }
 }
 
+/**
+ * @brief Celestia describe system
+ * 
+ * @param innermost_planet 
+ * @param designation 
+ * @param system_name 
+ * @param seed 
+ * @param inc 
+ * @param an 
+ * @param do_moons 
+ */
 void celestia_describe_system(planet* innermost_planet, string designation,
                               string system_name, long int seed,
                               long double inc, long double an, bool do_moons) {
@@ -2071,6 +2231,20 @@ void celestia_describe_system(planet* innermost_planet, string designation,
   }
 }
 
+/**
+ * @brief Celestia describe world
+ * 
+ * @param the_planet 
+ * @param designation 
+ * @param system_name 
+ * @param seed 
+ * @param inc 
+ * @param an 
+ * @param counter 
+ * @param the_sun 
+ * @param is_moon 
+ * @param planet_num 
+ */
 void celestia_describe_world(planet* the_planet, string designation,
                              string system_name, long int seed, long double inc,
                              long double an, int counter, sun& the_sun,
@@ -2568,6 +2742,14 @@ designation << endl;
   }
 }
 */
+
+/**
+ * @brief lprint
+ * 
+ * @param the_file 
+ * @param first 
+ * @param text 
+ */
 void lprint(fstream& the_file, bool& first, string text) {
   if (first) {
     first = false;
@@ -2577,6 +2759,12 @@ void lprint(fstream& the_file, bool& first, string text) {
   the_file << text;
 }
 
+/**
+ * @brief Image type string
+ * 
+ * @param the_planet 
+ * @return string 
+ */
 string image_type_string(planet* the_planet) {
   string typeString;
   stringstream ss;
@@ -2589,6 +2777,12 @@ string image_type_string(planet* the_planet) {
   return remove_spaces(typeString);
 }
 
+/**
+ * @brief Print Spin Resonance Factor
+ * 
+ * @param eccentricity 
+ * @return string 
+ */
 string printSpinResonanceFactor(long double eccentricity) {
   long double top = 1.0 - eccentricity;
   long double bottom = 1.0 + eccentricity;
@@ -2658,6 +2852,17 @@ string printSpinResonanceFactor(long double eccentricity) {
   }
 }
 
+/**
+ * @brief Mol Print
+ * 
+ * @param the_file 
+ * @param first 
+ * @param count 
+ * @param max 
+ * @param min_weight 
+ * @param molecule 
+ * @param weight 
+ */
 void mol_print(fstream& the_file, bool& first, int& count, int max,
                long double min_weight, string molecule, long double weight) {
   if (weight >= min_weight) {
@@ -2670,6 +2875,12 @@ void mol_print(fstream& the_file, bool& first, int& count, int max,
   }
 }
 
+/**
+ * @brief Texture name
+ * 
+ * @param type 
+ * @return string 
+ */
 string texture_name(planet_type type) {
   string typeString = "Unknown";
   switch (type) {
@@ -2719,6 +2930,11 @@ string texture_name(planet_type type) {
   return typeString;
 }
 
+/**
+ * @brief Display clouds
+ * 
+ * @param the_planet 
+ */
 void display_clouds(planet* the_planet) {
   int ranCtex = random_number(1.5, 5.5);
   cout << "# Cloud cover percentage: " << (the_planet->getCloudCover() * 100.0)
@@ -2742,6 +2958,14 @@ void display_clouds(planet* the_planet) {
   }
 }
 
+/**
+ * @brief Assign Distance Colors
+ * 
+ * @param the_planet 
+ * @param r0 
+ * @param g0 
+ * @param b0 
+ */
 void assignDistanceColors(planet* the_planet, long double r0, long double g0,
                           long double b0) {
   long double r, g, b;
@@ -2778,6 +3002,19 @@ void assignDistanceColors(planet* the_planet, long double r0, long double g0,
   cout << "\tBlendTexture true\n";
 }
 
+/**
+ * @brief Assign Temperature Colors
+ * 
+ * @param the_planet 
+ * @param t0 
+ * @param r0 
+ * @param g0 
+ * @param b0 
+ * @param t1 
+ * @param r1 
+ * @param g1 
+ * @param b1 
+ */
 void assignTemperatureColors(planet* the_planet, long double t0, long double r0,
                              long double g0, long double b0, long double t1,
                              long double r1, long double g1, long double b1) {
