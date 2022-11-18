@@ -11600,7 +11600,7 @@ long double gas_dwarf_radius(planet *the_planet) {
   long double gas_density;
   long double atmosphere_height;
   long double radius;
-  double x[] = {
+  std::vector<double> x = {
       48.1,   60.3,   540.1,  166.3, 239.9, 347.9,  969.8, 106.9, 318.2,
       581.0,  407.7,  409.7,  237.2, 984.1, 709.9,  549.9, 684.9, 406.5,
       171.8,  340.0,  1123.6, 790.9, 93.1,  89.8,   875.5, 635.7, 239.0,
@@ -11614,7 +11614,7 @@ long double gas_dwarf_radius(planet *the_planet) {
       560.1,  769.4,  522.8,  465.9, 680.0, 828.0,  459.9, 397.3, 479.9,
       746.3,  1102.9, 817.0,  842.9, 801.2, 1001.4, 595.0};
   int array_size = sizeof(x) / sizeof(double);
-  double y[] = {1.638,
+  std::vector<double> y = {1.638,
                 1.27,
                 0.09 * EARTH_DENSITY,
                 0.09 * EARTH_DENSITY,
@@ -11721,7 +11721,8 @@ long double gas_dwarf_radius(planet *the_planet) {
                 0.27 * EARTH_DENSITY,
                 0.27 * EARTH_DENSITY};
   double coeff[3];
-  polynomialfit(array_size, 3, x, y, coeff);
+  //polynomialfit(array_size, 3, x, y, coeff);
+  polyRegression(x, y, coeff);
   gas_density =
       quad_trend(coeff[2], coeff[1], coeff[0], the_planet->getEstimatedTemp());
   atmosphere_height = volume_radius(the_planet->getGasMass(), gas_density);

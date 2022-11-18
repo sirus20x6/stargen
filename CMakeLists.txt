@@ -10,9 +10,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
-find_package(GSL REQUIRED)
-include_directories(${GSL_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${GSL_LIBRARIES})
 set(CMAKE_BUILD_PARALLEL_LEVEL 8)
 
 include(FetchContent)
@@ -49,7 +46,6 @@ add_executable(stargen
     structs.cpp
     utils.cpp)
 
-target_link_libraries(stargen PRIVATE ${LIBS})
 target_link_libraries(stargen PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(stargen PRIVATE m)
 

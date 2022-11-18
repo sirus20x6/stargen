@@ -33,7 +33,8 @@ auto quad_trend(long double, long double, long double, long double)
 auto ln_trend(long double, long double, long double) -> long double;
 auto logistal_trend(long double, long double, long double, long double)
     -> long double;
-auto polynomialfit(int, int, double*, double*, double*) -> bool;
+//auto polynomialfit(int, int, double*, double*, double*) -> bool;
+void polyRegression(const std::vector<double>& x, const std::vector<double>& y, double *store);
 auto soft(long double, long double, long double) -> long double;
 auto lim(long double) -> long double;
 auto remove_spaces(string) -> string;
