@@ -119,7 +119,7 @@ Other:
     -ex  Examples
 ```
 
-## HTML
+## HTML Output
 
 ![image](https://user-images.githubusercontent.com/5103327/202611592-becc5423-bad3-40ae-a075-0a1667ec0e87.png)
 
