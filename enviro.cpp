@@ -382,8 +382,7 @@ auto eff_temp_to_spec_type(long double eff_temp, long double luminosity) -> stri
         dt = 0.0;
       }
       at = floor(dt);
-      my_itoa(at, temp, 10);
-      aclass = ac.append(temp);
+      aclass = ac.append(std::to_string(at));
       break;
     }
   }
@@ -400,8 +399,7 @@ auto eff_temp_to_spec_type(long double eff_temp, long double luminosity) -> stri
       dt = 0.0;
     }
     at = floor(dt);
-    my_itoa(at, temp, 10);
-    aclass = ac.append(temp);
+    aclass = ac.append(std::to_string(at));
   } else {
     if (compare_string_char(aclass, 1, "O")) {
       if (xmag < -9) {

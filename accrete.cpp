@@ -10,6 +10,12 @@
 #include "utils.h"    // for toString, random_eccentricity, random_number
 
 
+/**
+ * @brief Set Initial Conditions
+ * 
+ * @param inner_limit_of_dust 
+ * @param outer_limit_of_dust 
+ */
 void accrete::set_initial_conditions(long double inner_limit_of_dust,
                             long double outer_limit_of_dust) {
   planet_head = nullptr;
@@ -34,6 +40,12 @@ void accrete::set_initial_conditions(long double inner_limit_of_dust,
   hist_head = hist;
 }
 
+/**
+ * @brief Stellar Dust Limit
+ * 
+ * @param stell_mass_ratio 
+ * @return long double 
+ */
 auto accrete::stellar_dust_limit(long double stell_mass_ratio) -> long double {
   return 200.0 * std::pow(stell_mass_ratio, (long double) 1.0 / 3.0);
 }

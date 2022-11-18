@@ -26,57 +26,10 @@ auto compare_string_char(string &a_string, int place, const char *a_character,
   return false;
 }
 
-/*string replaceStrChar(string str, const char *old, const char *the_new)
-{
-  bool found;
-  // set our locator equal to the first appearance of any character in replace
-  size_t i = str.find_first_of(replace);
-
-  while (found != string::npos)
-  { // While our position in the sting is in range.
-    str[found] = ch; // Change the character at position.
-    found = str.find_first_of(replace, found+1); // Relocate again.
-  }
-
-  return str; // return our new string.
-}*/
-
-/**
- * C++ version 0.4 char* style "itoa":
- * Written by Lukás Chmela
- * Released under GPLv3.
- */
-auto my_itoa(int value, char *result, int base) -> char * {
-  // check that the base if valid
-  if (base < 2 || base > 36) {
-    *result = '\0';
-    return result;
-  }
-
-  char *ptr = result, *ptr1 = result, tmp_char = 0;
-  int tmp_value = 0;
-
-  do {
-    tmp_value = value;
-    value /= base;
-    *ptr++ =
-        "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxy"
-        "z"[35 + (tmp_value - value * base)];
-  } while (value);
-
-  // Apply negative sign
-  if (tmp_value < 0) {
-    *ptr++ = '-';
-  }
-  *ptr-- = '\0';
-  while (ptr1 < ptr) {
-    tmp_char = *ptr;
-    *ptr-- = *ptr1;
-    *ptr1++ = tmp_char;
-  }
-  return result;
-}
-
+/// @brief 
+/// @param inner 
+/// @param outer 
+/// @return 
 auto random_number(long double inner, long double outer) -> long double {
   long double range = NAN;
 
@@ -89,10 +42,17 @@ auto random_number(long double inner, long double outer) -> long double {
 /* exact value given it in 'value'.                                */
 /*-----------------------------------------------------------------*/
 
+/// @brief 
+/// @param value 
+/// @param variation 
+/// @return 
 auto about(long double value, long double variation) -> long double {
   return (value + (value * random_number(-variation, variation)));
 }
 
+/// @brief 
+/// @param ecc_coef 
+/// @return 
 auto random_eccentricity(long double ecc_coef) -> long double {
   long double e = NAN;
   e = 1.0 - std::pow(random_number(0.0, 1.0), ecc_coef);
@@ -111,6 +71,9 @@ auto random_eccentricity(long double ecc_coef) -> long double {
 // using Box-Muller transform
 // ref: http://en.literateprograms.org/Box-Muller_transform_%28C%29
 
+/// @brief 
+/// @param sigma 
+/// @return 
 auto gaussian(long double sigma) -> long double {
   long double x = NAN, y = NAN, r = NAN;
   do {
@@ -129,6 +92,9 @@ auto gaussian(long double sigma) -> long double {
  * NOTE: use m > 0
  * ==================================================
  */
+/// @brief 
+/// @param m 
+/// @return 
 auto poisson(long double m) -> long {
   long double t = 0.0;
   long x = 0;
@@ -148,19 +114,39 @@ auto poisson(long double m) -> long {
  * NOTE: use m > 0.0
  * =========================================================
  */
+/// @brief 
+/// @param m 
+/// @return 
 auto exponential(long double m) -> long double {
   return (-1.0 * m) * log(1.0 - random_number(0.0, 1.0));
 }
 
+/// @brief 
+/// @param a 
+/// @param b 
+/// @param c 
+/// @param x 
+/// @return 
 auto quad_trend(long double a, long double b, long double c, long double x)
     -> long double {
   return (a * pow2(x)) + (b * x) + c;
 }
 
+/// @brief 
+/// @param a 
+/// @param b 
+/// @param x 
+/// @return 
 auto ln_trend(long double a, long double b, long double x) -> long double {
   return a + (b * log(x));
 }
 
+/// @brief 
+/// @param a 
+/// @param b 
+/// @param c 
+/// @param x 
+/// @return 
 auto logistal_trend(long double a, long double b, long double c, long double x)
     -> long double {
   return c / (1 + (a * exp(-1.0 * b * x)));
@@ -207,6 +193,10 @@ auto logistal_trend(long double a, long double b, long double c, long double x)
 //   to know if the fit is "good" */
 // }
 
+/// @brief 
+/// @param x 
+/// @param y 
+/// @param store 
 void polyRegression(const std::vector<double>& x, const std::vector<double>& y, double *store) {
     int n = x.size();
     std::vector<int> r(n);
@@ -252,19 +242,32 @@ void polyRegression(const std::vector<double>& x, const std::vector<double>& y, 
     // }
 }
 
+/// @brief 
+/// @param v 
+/// @param max 
+/// @param min 
+/// @return 
 auto soft(long double v, long double max, long double min) -> long double {
   long double dv = v - min;
   long double dm = max - min;
   return (lim(2.0 * dv / dm - 1.0) + 1.0) / 2.0 * dm + min;
 }
 
+/// @brief 
+/// @param x 
+/// @return 
 auto lim(long double x) -> long double { return x / pow1_4(1 + x * x * x * x); }
 
+/// @brief 
+/// @param str 
+/// @return 
 auto remove_spaces(string str) -> string {
   str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
   return str;
 }
 
+/// @brief 
+/// @return 
 auto randf() -> double {
   long mplier = 16807;
   long modlus = 2147483647;
@@ -290,11 +293,16 @@ auto randf() -> double {
   return (double)nextn / (double)modlus;
 }
 
+/// @brief 
+/// @param a_seed 
 void srandf(long a_seed) {
   jseed = a_seed;
   ifrst = 0;
 }
 
+/// @brief 
+/// @param inclination 
+/// @return 
 auto fix_inclination(long double inclination) -> long double {
   // we can't have a negative number
   inclination = abs(inclination);
@@ -303,10 +311,18 @@ auto fix_inclination(long double inclination) -> long double {
   return inclination;
 }
 
+/// @brief 
+/// @param m 
+/// @param b 
+/// @param x 
+/// @return 
 auto linear_trend(long double m, long double b, long double x) -> long double {
   return (m * x) + b;
 }
 
+/// @brief 
+/// @param the_string 
+/// @return 
 auto my_strtoupper(const string &the_string) -> string {
   const char *temp = the_string.c_str();
   char temp2 = 0;
@@ -323,6 +339,11 @@ auto my_strtoupper(const string &the_string) -> string {
   return output;
 }
 
+/// @brief 
+/// @param spec_type 
+/// @param luminosity 
+/// @param run 
+/// @return 
 auto star_type_to_num(const string &spec_type, long double luminosity, int run)
     -> int {
   stringstream ss;
@@ -376,12 +397,26 @@ auto star_type_to_num(const string &spec_type, long double luminosity, int run)
   }
 }
 
+/// @brief 
+/// @param x 
+/// @param y 
+/// @param w 
+/// @param z 
+/// @param a 
+/// @param b 
 void logfix(long double x, long double y, long double w, long double z,
             long double &a, long double &b) {
   a = ((y * log(w)) - (z * log(x))) / (log(w) - log(x));
   b = (z - y) / (log(w) - log(x));
 }
 
+/// @brief 
+/// @param x 
+/// @param y1 
+/// @param y2 
+/// @param lower 
+/// @param upper 
+/// @return 
 auto rangeAdjust(long double x, long double y1, long double y2,
                  long double lower, long double upper) -> long double {
   long double range = upper - lower;
@@ -391,16 +426,38 @@ auto rangeAdjust(long double x, long double y1, long double y2,
   return result;
 }
 
+/// @brief 
+/// @param x 
+/// @param y 
+/// @param w 
+/// @param z 
+/// @param a 
+/// @param b 
 void e_fix(long double x, long double y, long double w, long double z,
            long double &a, long double &b) {
   a = ((exp(x) * z) - (exp(w) * y)) / (exp(x) - exp(w));
   b = (y - z) / (exp(x) - exp(w));
 }
 
+/// @brief 
+/// @param a 
+/// @param b 
+/// @param x 
+/// @return 
 auto e_trend(long double a, long double b, long double x) -> long double {
   return a + (b * exp(x));
 }
 
+/// @brief 
+/// @param x 
+/// @param y 
+/// @param w 
+/// @param z 
+/// @param p 
+/// @param q 
+/// @param a 
+/// @param b 
+/// @param c 
 void quadfix(long double x, long double y, long double w, long double z,
              long double p, long double q, long double &a, long double &b,
              long double &c) {
@@ -414,6 +471,18 @@ void quadfix(long double x, long double y, long double w, long double z,
       ((p - w) * (p - x) * (w - x));
 }
 
+/**
+ * @brief Quintic trend
+ * 
+ * @param a 
+ * @param b 
+ * @param c 
+ * @param d 
+ * @param e 
+ * @param f 
+ * @param x 
+ * @return long double 
+ */
 auto quintic_trend(long double a, long double b, long double c, long double d,
                    long double e, long double f, long double x) -> long double {
   return (a * std::pow(x, 5.0)) + (b * pow4(x)) + (c * pow3(x)) + (d * pow2(x)) +

@@ -26,30 +26,30 @@ void initData();
 void usage(string);
 
 void  printAknowledgement() {
-  cout << "Web systems (-W) taken from\n";
-  cout << "\thttp://www.solstation.com/stars.htm, Wikipedia, and various research papers\n";
-  cout << "AU systems (-F) taken from stories by C.J. Cherry\n";
-  cout << "Manticore systems (-B) taken from stories by David Weber\n";
-  cout << "StarGen: " << stargen_revision << endl;
+  cout << "Web systems (-W) taken from\n"
+   << "\thttp://www.solstation.com/stars.htm, Wikipedia, and various research papers\n"
+   << "AU systems (-F) taken from stories by C.J. Cherry\n"
+   << "Manticore systems (-B) taken from stories by David Weber\n"
+   << "StarGen: " << stargen_revision << endl;
 }
 
 void printExamples() {
-  cout << "Examples:\n";
-  cout << "10000 systems with 1 as the seed for the first system around a\n"
-          "custom star with moons and migrated planets and only save ones with "
-          "an earthlike planet:\n\n";
-  cout << "stargen -m1.09 -y1.12609 -BG0V -b6215 -M -r -s1 -n10000 -E\n\n";
-  cout << "10000 systems with 1 as the seed for the first system around a\n"
-          "custom star in a circumbinary system with moons and migrated "
-          "planets and only save ones with an earthlike planet:\n\n";
-  cout << "stargen -m1.09 -y1.12609 -BG0V -b6215 -CB -w0.75 -j0.178473 -X4493 -NK3V "
-          "-d0.11146 -f0.011 -M -r -s1 -n10000 -E\n\n";
-  cout << "10000 systems with 1 as the seed for the first system around a predefined star:\n\n";
-  cout << "stargen -W73 -M -r -s1 -n10000 -E\n\n";
-  cout << "10000 systems with 1 as the seed for the first system around a\n"
-          "custom star with a distant companion star with moons and migrated "
-          "planets and only save ones with an earthlike planet:\n\n";
-  cout << "stargen -m1.09 -y1.12609 -BG0V -b6215 -w0.75 -d1114.6 -f0.011 -M -r -s1 -n10000 -E\n\n";
+  cout << "Examples:\n"
+  "10000 systems with 1 as the seed for the first system around a\n"
+  "custom star with moons and migrated planets and only save ones with "
+  "an earthlike planet:\n\n"
+  "stargen -m1.09 -y1.12609 -BG0V -b6215 -M -r -s1 -n10000 -E\n\n"
+  "10000 systems with 1 as the seed for the first system around a\n"
+  "custom star in a circumbinary system with moons and migrated "
+  "planets and only save ones with an earthlike planet:\n\n"
+  "stargen -m1.09 -y1.12609 -BG0V -b6215 -CB -w0.75 -j0.178473 -X4493 -NK3V "
+  "-d0.11146 -f0.011 -M -r -s1 -n10000 -E\n\n"
+  "10000 systems with 1 as the seed for the first system around a predefined star:\n\n"
+  "stargen -W73 -M -r -s1 -n10000 -E\n\n"
+  "10000 systems with 1 as the seed for the first system around a\n"
+  "custom star with a distant companion star with moons and migrated "
+  "planets and only save ones with an earthlike planet:\n\n"
+  "stargen -m1.09 -y1.12609 -BG0V -b6215 -w0.75 -d1114.6 -f0.011 -M -r -s1 -n10000 -E\n\n";
 }
 
 int main(int argc, char **argv) {

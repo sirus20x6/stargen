@@ -20,7 +20,6 @@ extern long nextn;
 auto compare_string_char(string& a_string, int place, const char* a_character,
                          int length = 1) -> bool;
 // string replaceStrChar(string, const char *, const char *);
-auto my_itoa(int, char*, int) -> char*;
 auto float_to_string(long double) -> string;
 auto random_number(long double, long double) -> long double;
 auto about(long double, long double) -> long double;
