@@ -600,10 +600,12 @@ auto stargen(actions action, const string &flag_char, string path,
       wt_type_count += 10;  // 1-Face
     }
 
-    for (a_planet = innermost_planet, counter = 0; a_planet != nullptr;
-         a_planet = a_planet->next_planet, counter++) {
-      ;
-    }
+// why is there an empty for loop here? will investigate old versions to see
+// what used to be here
+    // for (a_planet = innermost_planet, counter = 0; a_planet != nullptr;
+    //      a_planet = a_planet->next_planet, counter++) {
+    //   ;
+    // }
 
     norm_type_count = wt_type_count - (counter - type_count);
 
