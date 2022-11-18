@@ -2777,6 +2777,30 @@ string image_type_string(planet* the_planet) {
   return remove_spaces(typeString);
 }
 
+fraction stern_brocot_search(long double f, long double tol) {
+	int base = floor(f);
+	f-=base;
+	if(f<tol)
+		return fraction(base,1);
+	if(1-tol < f)
+		return fraction(base+1,1);
+
+	fraction lower(0,1);
+	fraction upper(1,1);
+
+	while(true) {
+		fraction middle(lower.n+upper.n, lower.d+upper.d);
+
+		if( middle.d*(f+tol) < middle.n ) {
+			upper = middle;
+		} else if (middle.n < middle.d*(f-tol) ) {
+			lower = middle;
+		} else {
+			return fraction(middle.d*base + middle.n, middle.d);
+		}
+	}
+}
+
 /**
  * @brief Print Spin Resonance Factor
  * 
@@ -2787,69 +2811,17 @@ string printSpinResonanceFactor(long double eccentricity) {
   long double top = 1.0 - eccentricity;
   long double bottom = 1.0 + eccentricity;
   long double fraction = top / bottom;
-  if (fraction <= AVE(1.0 / 10.0, 1.0 / 9.0)) {
-    return "10:1";
-  } else if (fraction <= AVE(1.0 / 9.0, 1.0 / 8.0)) {
-    return "9:1";
-  } else if (fraction <= AVE(1.0 / 8.0, 1.0 / 7.0)) {
-    return "8:1";
-  } else if (fraction <= AVE(1.0 / 7.0, 1.0 / 6.0)) {
-    return "7:1";
-  } else if (fraction <= AVE(1.0 / 6.0, 1.0 / 5.0)) {
-    return "6:1";
-  } else if (fraction <= AVE(1.0 / 5.0, 2.0 / 9.0)) {
-    return "5:1";
-  } else if (fraction <= AVE(2.0 / 9.0, 1.0 / 4.0)) {
-    return "9:2";
-  } else if (fraction <= AVE(1.0 / 4.0, 2.0 / 7.0)) {
-    return "4:1";
-  } else if (fraction <= AVE(2.0 / 7.0, 3.0 / 10.0)) {
-    return "7:2";
-  } else if (fraction <= AVE(3.0 / 10.0, 1.0 / 3.0)) {
-    return "10:3";
-  } else if (fraction <= AVE(1.0 / 3.0, 3.0 / 8.0)) {
-    return "3:1";
-  } else if (fraction <= AVE(3.0 / 8.0, 2.0 / 5.0)) {
-    return "8:3";
-  } else if (fraction <= AVE(2.0 / 5.0, 3.0 / 7.0)) {
-    return "5:2";
-  } else if (fraction <= AVE(3.0 / 7.0, 4.0 / 9.0)) {
-    return "7:3";
-  } else if (fraction <= AVE(4.0 / 9.0, 1.0 / 2.0)) {
-    return "9:4";
-  } else if (fraction <= AVE(1.0 / 2.0, 5.0 / 9.0)) {
-    return "2:1";
-  } else if (fraction <= AVE(5.0 / 9.0, 4.0 / 7.0)) {
-    return "9:5";
-  } else if (fraction <= AVE(4.0 / 7.0, 3.0 / 5.0)) {
-    return "7:4";
-  } else if (fraction <= AVE(3.0 / 5.0, 5.0 / 8.0)) {
-    return "5:3";
-  } else if (fraction <= AVE(5.0 / 8.0, 2.0 / 3.0)) {
-    return "8:5";
-  } else if (fraction <= AVE(2.0 / 3.0, 7.0 / 10.0)) {
-    return "3:2";
-  } else if (fraction <= AVE(7.0 / 10.0, 5.0 / 7.0)) {
-    return "10:7";
-  } else if (fraction <= AVE(5.0 / 7.0, 3.0 / 4.0)) {
-    return "7:5";
-  } else if (fraction <= AVE(3.0 / 4.0, 7.0 / 9.0)) {
-    return "4:3";
-  } else if (fraction <= AVE(7.0 / 9.0, 4.0 / 5.0)) {
-    return "9:7";
-  } else if (fraction <= AVE(4.0 / 5.0, 5.0 / 6.0)) {
-    return "5:4";
-  } else if (fraction <= AVE(5.0 / 6.0, 6.0 / 7.0)) {
-    return "6:5";
-  } else if (fraction <= AVE(6.0 / 7.0, 7.0 / 8.0)) {
-    return "7:6";
-  } else if (fraction <= AVE(7.0 / 8.0, 8.0 / 9.0)) {
-    return "8:7";
-  } else if (fraction <= AVE(8.0 / 9.0, 9.0 / 10.0)) {
-    return "9:8";
-  } else {
-    return "10:9";
-  }
+  long double tolerance = .01;
+
+  // this is a test to replace the hard coded check with something formulaic
+  // with a tolerance of .01 the ratios shouldn't get too crazy
+  // decrease tollerance to increase accuracy but you may get ratios like 1549/1322
+  // for the number 0.85345349958 at a tolerance of .000001 instead of something like 
+  // 7/6 for tolerances between .007 and .015
+  // see https://gist.github.com/mikeando/7073d62385a34a61a6f7
+  struct fraction sb = stern_brocot_search(fraction, tolerance);
+  //this is setup to have numerator and denomenator flipped.
+  return (std::to_string(sb.d)) + ":" + (std::to_string(sb.n));
 }
 
 /**

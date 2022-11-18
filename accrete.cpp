@@ -474,19 +474,13 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
     if ((diff > 0.0)) {
       dist1 = (a * (1.0 + e) * (1.0 + reduced_mass)) - a;
       /* x aphelion */
-      reduced_mass =
-          std::pow(the_planet->getMass() / (1.0 + the_planet->getMass()), 0.25);
-      dist2 = the_planet->getA() -
-              (the_planet->getA() * (1.0 - the_planet->getE()) *
-               (1.0 - reduced_mass));
+      reduced_mass = std::pow(the_planet->getMass() / (1.0 + the_planet->getMass()), 0.25);
+      dist2 = the_planet->getA() - (the_planet->getA() * (1.0 - the_planet->getE()) * (1.0 - reduced_mass));
     } else {
       dist1 = a - (a * (1.0 - e) * (1.0 - reduced_mass));
       /* x perihelion */
-      reduced_mass = std::pow(
-          (the_planet->getMass() / (1.0 + the_planet->getMass())), 0.25);
-      dist2 = (the_planet->getA() * (1.0 + the_planet->getE()) *
-               (1.0 + reduced_mass)) -
-              the_planet->getA();
+      reduced_mass = std::pow((the_planet->getMass() / (1.0 + the_planet->getMass())), 0.25);
+      dist2 = (the_planet->getA() * (1.0 + the_planet->getE()) * (1.0 + reduced_mass)) - the_planet->getA();
     }
 
     if (fabs(diff) <= fabs(dist1) || fabs(diff) <= fabs(dist2)) {
@@ -498,8 +492,8 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
 
       temp = the_planet->getMass() * sqrt(the_planet->getA()) *
              sqrt(1.0 - std::pow(the_planet->getE(), 2.0));
-      temp = temp + (mass * sqrt(a) * sqrt(sqrt(1.0 - std::pow(e, 2.0))));
-      temp = temp / ((the_planet->getMass() + mass) * sqrt(new_a));
+      temp += (mass * sqrt(a) * sqrt(sqrt(1.0 - std::pow(e, 2.0))));
+      temp /= ((the_planet->getMass() + mass) * sqrt(new_a));
       temp = 1.0 - std::pow(temp, 2.0);
       if (temp < 0.0 || temp >= 1.0) {
         temp = 0.0;
@@ -927,6 +921,8 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
     }
 
     if (is_seed) {
+      // Page 17 of formation of planetary systems by aggregation
+      // last paragraph
       temp = total_mass / (1.0 + total_mass);
       reduced_mass = std::pow(temp, 1.0 / 4.0);
       r_inner = inner_effect_limit(a, e, reduced_mass);

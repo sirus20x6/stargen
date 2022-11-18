@@ -8,6 +8,18 @@
 
 using namespace std;
 
+struct fraction {
+	int n;
+	int d;
+	fraction(int n, int d) {
+		this->n = n;
+		this->d = d;
+	}
+	float asFloat() {
+		return float((double)n/(double)d);
+	}
+};
+
 void text_describe_system(planet *, bool, long, bool);
 void csv_describe_system(fstream &, planet *, bool, long, bool);
 void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
@@ -45,4 +57,6 @@ void assignDistanceColors(planet *, long double, long double, long double);
 void assignTemperatureColors(planet *, long double, long double, long double,
                              long double, long double, long double, long double,
                              long double);
+fraction stern_brocot_search(long double f, long double tol);
+
 #endif
