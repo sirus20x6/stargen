@@ -1,6 +1,7 @@
 #ifndef ANDROMEDA_H
 #define ANDROMEDA_H
-#include "structs.h"
+#include <iosfwd>     // for std
+#include "structs.h"  // for catalog
 
 using namespace std;
 

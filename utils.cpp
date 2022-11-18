@@ -1,14 +1,15 @@
 #include "utils.h"
-
-#include <gsl/gsl_multifit.h>
-
-#include <algorithm>
-#include <cmath>
-#include <cstdlib>
-#include <string>
-
-#include "const.h"
-#include "enviro.h"
+#include <bits/std_abs.h>           // for abs
+#include <gsl/gsl_matrix_double.h>  // for gsl_matrix_alloc, gsl_matrix_free
+#include <gsl/gsl_multifit.h>       // for gsl_multifit_linear, gsl_multifit...
+#include <gsl/gsl_vector_double.h>  // for gsl_vector_alloc, gsl_vector_free
+#include <algorithm>                // for remove_if
+#include <cctype>                   // for toupper, isspace
+#include <cmath>                    // for log, exp, pow, NAN, sqrt, fmod, abs
+#include <cstdlib>                  // for rand, abs, RAND_MAX
+#include <string>                   // for string, basic_string, operator<<
+#include "const.h"                  // for pow2, pow1_4, pow3, pow4
+#include "enviro.h"                 // for eff_temp_to_spec_type, getStarType
 
 using namespace std;
 

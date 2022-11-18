@@ -1,8 +1,8 @@
 #include "andromeda.h"
-
-#include "andromeda2.h"
-#include "const.h"
-#include "planets.h"
+#include <string>        // for string
+#include "andromeda2.h"  // for andromeda_stars, total_andromeda_stars
+#include "c_structs.h"   // for old_star
+#include "planets.h"     // for mercury
 
 catalog andromeda;
 

@@ -1,15 +1,13 @@
 #include "structs.h"
-
-#include <cmath>
-#include <cstdlib>
-#include <cstring>
-#include <iomanip>
-#include <iostream>
-
-#include "const.h"
-#include "enviro.h"
-#include "star_temps.h"
-#include "utils.h"
+#include <cmath>        // for pow, NAN
+#include <cstdlib>      // for NULL, exit, EXIT_FAILURE
+#include <iomanip>      // for operator<<, setw, setprecision
+#include <iostream>     // for operator<<, basic_ostream, ostream, basic_ost...
+#include <utility>      // for move
+#include "c_structs.h"  // for star2
+#include "const.h"      // for pow2, KM_PER_AU, ACCURACY_FOR_PEAK, CM_PER_KM
+#include "enviro.h"     // for eff_temp_to_spec_type, luminosity_to_mass
+#include "utils.h"      // for quicksort, fix_inclination, my_strtoupper
 
 using namespace std;
 

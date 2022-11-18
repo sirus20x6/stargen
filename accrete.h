@@ -1,6 +1,10 @@
 #ifndef ACCRETE_H
 #define ACCRETE_H
-#include "structs.h"
+
+class dust;
+class gen;
+class planet;
+class sun;
 
 class accrete {
 

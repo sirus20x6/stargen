@@ -1,14 +1,14 @@
 #include "accrete.h"
+#include <cmath>      // for pow, sqrt, NAN, fabs, exp, M_PI
+#include <cstdlib>    // for rand
+#include <iostream>   // for operator<<, basic_ostream, char_traits, cerr
+#include <string>     // for operator<<, string
+#include "const.h"    // for SUN_MASS_IN_EARTH_MASSES, PROTOPLANET_MASS, K
+#include "planets.h"  // for BETHyib, Bellerophon, EPSErib, EPSEric, GL849b
+#include "stargen.h"  // for flag_verbose, max_distance_arg, fDoMoons, flags...
+#include "structs.h"  // for planet, dust, gen, sun
+#include "utils.h"    // for toString, random_eccentricity, random_number
 
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include <vector>
-
-#include "const.h"
-#include "planets.h"
-#include "stargen.h"
-#include "utils.h"
 
 void accrete::set_initial_conditions(long double inner_limit_of_dust,
                             long double outer_limit_of_dust) {

@@ -1,7 +1,8 @@
 #include "elements.h"
-#include <cstdlib>
-#include "const.h"
-#include "structs.h"
+#include <iosfwd>     // for std
+#include <string>     // for string
+#include "const.h"    // for AVE, FREEZING_POINT_OF_WATER, AN_AR, AN_CH4
+#include "structs.h"  // for ChemTable, Chemical
 
 using namespace std;
 

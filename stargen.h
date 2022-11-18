@@ -1,9 +1,10 @@
 #ifndef STARGEN_H
 #define STARGEN_H
-#include <string>
+#include <iosfwd>     // for std
+#include <string>     // for string
+#include "structs.h"  // for sun
+class accrete;
 
-#include "structs.h"
-#include "accrete.h"
 
 using namespace std;
 

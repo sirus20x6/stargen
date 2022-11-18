@@ -1,16 +1,14 @@
 #ifndef UTILS_H
 #define UTILS_H
-#include <algorithm>
-#include <cctype>
-#include <cmath>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <sstream>
-#include <string>
-#include <vector>
-
-#include "stargen.h"
+#include <stddef.h>   // for size_t
+#include <algorithm>  // for replace
+#include <cmath>      // for isnan
+#include <iomanip>    // for operator<<, setprecision
+#include <iostream>   // for stringstream, cout, basic_ostream<>::__ostream_...
+#include <map>        // for map
+#include <string>     // for string, to_string
+#include <vector>     // for vector
+#include "stargen.h"  // for decimals_arg
 
 using namespace std;
 

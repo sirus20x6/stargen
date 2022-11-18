@@ -1,23 +1,15 @@
 #include "stargen.h"
-
-#include <cmath>
-
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <utility>
-#include <vector>
-
-#include "accrete.h"
-#include "const.h"
-#include "display.h"
-#include "elements.h"
-#include "enviro.h"
-#include "planets.h"
-#include "utils.h"
+#include <cmath>       // for pow, NAN, exp, log
+#include <cstdlib>     // for EXIT_SUCCESS, srand, rand
+#include <ctime>       // for time, time_t
+#include <iostream>    // for operator<<, basic_ostream, ostream, endl, stri...
+#include "accrete.h"   // for accrete
+#include "const.h"     // for SUN_MASS_IN_EARTH_MASSES, KM_PER_AU, EARTH_AVE...
+#include "display.h"   // for type_string, close_html_file, create_svg_file
+#include "elements.h"  // for gases
+#include "enviro.h"    // for makeHabitable, est_temp, gravity, acceleration
+#include "planets.h"   // for earth, mercury
+#include "utils.h"     // for toString, random_number, replaceStrChar, about
 
 using namespace std;
 

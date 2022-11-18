@@ -1,6 +1,7 @@
 #include "dole.h"
-#include "const.h"
-#include "planets.h"
+#include <string>     // for string
+#include "const.h"    // for AVE
+#include "planets.h"  // for alfcentbb, eriEpsI, mercury, taucetb
 
 catalog dole;
 

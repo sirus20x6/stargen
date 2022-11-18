@@ -2,9 +2,15 @@
 #define STRUCTS_H
 #pragma once
 
-#include <string>
-#include <vector>
-#include "c_structs.h"
+#include <iosfwd>  // for ostream, std
+#include <string>  // for string, basic_string
+#include <vector>  // for vector
+class ChemTable;  // lines 496-496
+class Chemical;  // lines 427-427
+class catalog;  // lines 395-395
+class gas;  // lines 30-30
+class star;  // lines 326-326
+struct star2;
 
 using namespace std;
 

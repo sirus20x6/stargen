@@ -1,22 +1,21 @@
 #include "enviro.h"
+#include <ctype.h>                 // for isdigit
+#include <cmath>                   // for pow, NAN, sqrt, fabs, exp, log, floor
+#include <cstdlib>                 // for exit, EXIT_FAILURE, atoi
+#include <cstring>                 // for strstr, strcmp
+#include <iostream>                // for operator<<, basic_ostream, endl
+#include <map>                     // for map, map<>::mapped_type
+#include <string>                  // for string, operator<<, operator==
+#include <vector>                  // for vector
+#include "const.h"                 // for SUN_MASS_IN_EARTH_MASSES, AVE, pow2
+#include "elements.h"              // for gases
+#include "gas_radius_helpers.h"    // for mini_neptune_radius, gas_dwarf_radius
+#include "radius_tables.h"         // for solid_rock, solid_half_rock_half_iron
+#include "solid_radius_helpers.h"  // for rock_radius, half_rock_half_iron_r...
+#include "star_temps.h"            // for tempA, tempB, tempE, tempF, tempG
+#include "stargen.h"               // for the_sun_clone, flag_verbose, assig...
+#include "utils.h"                 // for toString, random_number, about
 
-#include <math.h>
-
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-
-#include "const.h"
-#include "elements.h"
-#include "gas_radius_helpers.h"
-#include "radius_tables.h"
-#include "solid_radius_helpers.h"
-#include "star_temps.h"
-#include "stargen.h"
-#include "utils.h"
 
 using namespace std;
 
