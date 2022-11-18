@@ -118,3 +118,9 @@ Other:
     -ak  Acknowledgement
     -ex  Examples
 ```
+
+## HTML Output
+
+![image](https://user-images.githubusercontent.com/5103327/202611592-becc5423-bad3-40ae-a075-0a1667ec0e87.png)
+
+![sol](https://user-images.githubusercontent.com/5103327/202611824-00d230a4-3ace-4111-98a6-07b54285c309.png)
