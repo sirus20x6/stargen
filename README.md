@@ -9,6 +9,12 @@ Then I found comments from this old sister fork https://github.com/fusiongyro/st
 
 Strangly some of the code in that fork is more modular / object oriented / better despite having fewer features. I may steal some of it for refactoring
 
+## New Features
+- Replaced orbital ressonance look up table with formulaic version that is more accurate
+- Added JSON exporting
+- Removed dependency on boost
+- Removed dependency on GNU Scientific Library
+
 ## TODO
 - JSON support for exporting solar data
 - Convert existing data in the code over to JSON
