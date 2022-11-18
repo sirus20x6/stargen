@@ -1,7 +1,5 @@
 #include "structs.h"
 
-#include <math.h>
-
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
@@ -497,7 +495,7 @@ void catalog::sort() {
 }
 
 /// @brief 
-Chemicle::Chemicle() : num(0), symbol(""), htmlSymbol(""), name(""), weight(0), melt(0), boil(0), density(0), pzero(0), c(0), n(0), abunde(0), abunds(0), reactivity(0), maxIpp(0), minIpp(0) {
+Chemical::Chemical() : num(0), symbol(""), htmlSymbol(""), name(""), weight(0), melt(0), boil(0), density(0), pzero(0), c(0), n(0), abunde(0), abunds(0), reactivity(0), maxIpp(0), minIpp(0) {
   
   
   
@@ -540,7 +538,7 @@ Chemicle::Chemicle() : num(0), symbol(""), htmlSymbol(""), name(""), weight(0), 
 /// @param r 
 /// @param ma 
 /// @param mi 
-Chemicle::Chemicle(int nu, string s, string h, string na, long double w,
+Chemical::Chemical(int nu, string s, string h, string na, long double w,
                    long double m, long double b, long double d, long double p,
                    long double c2, long double n2, long double ae,
                    long double as, long double r, long double ma,
@@ -572,7 +570,7 @@ Chemicle::Chemicle(int nu, string s, string h, string na, long double w,
 
 /// @brief 
 /// @param right 
-Chemicle::Chemicle(Chemicle& right) : num(right.num), symbol(right.symbol), htmlSymbol(right.htmlSymbol), name(right.name), weight(right.weight), melt(right.melt), boil(right.boil), density(right.density), pzero(right.pzero), c(right.c), n(right.n), abunde(right.abunde), abunds(right.abunds), reactivity(right.reactivity), maxIpp(right.maxIpp), minIpp(right.minIpp) {
+Chemical::Chemical(Chemical& right) : num(right.num), symbol(right.symbol), htmlSymbol(right.htmlSymbol), name(right.name), weight(right.weight), melt(right.melt), boil(right.boil), density(right.density), pzero(right.pzero), c(right.c), n(right.n), abunde(right.abunde), abunds(right.abunds), reactivity(right.reactivity), maxIpp(right.maxIpp), minIpp(right.minIpp) {
   
   
   
@@ -600,7 +598,7 @@ Chemicle::Chemicle(Chemicle& right) : num(right.num), symbol(right.symbol), html
 
 /// @brief 
 /// @param right 
-Chemicle::Chemicle(const Chemicle& right) : num(right.num), symbol(right.symbol), htmlSymbol(right.htmlSymbol), name(right.name), weight(right.weight), melt(right.melt), boil(right.boil), density(right.density), pzero(right.pzero), c(right.c), n(right.n), abunde(right.abunde), abunds(right.abunds), reactivity(right.reactivity), maxIpp(right.maxIpp), minIpp(right.minIpp) {
+Chemical::Chemical(const Chemical& right) : num(right.num), symbol(right.symbol), htmlSymbol(right.htmlSymbol), name(right.name), weight(right.weight), melt(right.melt), boil(right.boil), density(right.density), pzero(right.pzero), c(right.c), n(right.n), abunde(right.abunde), abunds(right.abunds), reactivity(right.reactivity), maxIpp(right.maxIpp), minIpp(right.minIpp) {
   
   
   
@@ -627,7 +625,7 @@ Chemicle::Chemicle(const Chemicle& right) : num(right.num), symbol(right.symbol)
 }
 
 /// @brief 
-Chemicle::~Chemicle() {
+Chemical::~Chemical() {
   num = 0;
   symbol = "";
   htmlSymbol = "";
@@ -653,7 +651,7 @@ Chemicle::~Chemicle() {
 /// @brief 
 /// @param right 
 /// @return 
-auto Chemicle::operator=(const Chemicle& right) -> Chemicle& {
+auto Chemical::operator=(const Chemical& right) -> Chemical& {
   num = right.num;
   symbol = right.symbol;
   htmlSymbol = right.htmlSymbol;
@@ -680,37 +678,37 @@ auto Chemicle::operator=(const Chemicle& right) -> Chemicle& {
   return *this;
 }
 
-void Chemicle::setBoil(long double b) {
+void Chemical::setBoil(long double b) {
   boil = b;
   fixBoil();
 }
 
-void Chemicle::setMelt(long double m) {
+void Chemical::setMelt(long double m) {
   melt = m;
   fixMelt();
 }
 
-void Chemicle::setMaxIpp(long double ma) {
+void Chemical::setMaxIpp(long double ma) {
   maxIpp = ma;
   fixMaxIpp();
 }
 
-void Chemicle::setMinIpp(long double mi) {
+void Chemical::setMinIpp(long double mi) {
   minIpp = mi;
   fixMinIpp();
 }
 
-void Chemicle::setAbunde(long double a) {
+void Chemical::setAbunde(long double a) {
   abunde = a;
   fixAbunde();
 }
 
-void Chemicle::setAbunds(long double a) {
+void Chemical::setAbunds(long double a) {
   abunds = a;
   fixAbunds();
 }
 
-void Chemicle::fixAbunde() {
+void Chemical::fixAbunde() {
   if (abunde <= 0) {
     if (num > 92) {
       abunde = 1.0E-41;
@@ -720,7 +718,7 @@ void Chemicle::fixAbunde() {
   }
 }
 
-void Chemicle::fixAbunds() {
+void Chemical::fixAbunds() {
   if (abunds <= 0) {
     if (num > 92) {
       abunds = 1.0E-41;
@@ -730,19 +728,19 @@ void Chemicle::fixAbunds() {
   }
 }
 
-void Chemicle::fixBoil() {
+void Chemical::fixBoil() {
   if (boil <= 0) {
     boil = melt + 100.0;
   }
 }
 
-void Chemicle::fixMaxIpp() {
+void Chemical::fixMaxIpp() {
   if (maxIpp <= 0) {
     maxIpp = INCREDIBLY_LARGE_NUMBER;
   }
 }
 
-void Chemicle::fixMelt() {
+void Chemical::fixMelt() {
   if (boil > 0 && melt <= 0) {
     melt = boil * (2.0 / 3.0);
   } else if (melt <= 0) {
@@ -750,20 +748,20 @@ void Chemicle::fixMelt() {
   }
 }
 
-void Chemicle::fixMinIpp() {
+void Chemical::fixMinIpp() {
   // do nothing
 }
 
-void Chemicle::setSpaces() {
+void Chemical::setSpaces() {
   nameSpaces = 18 - name.length();
   symbolSpaces = 15 - symbol.length();
 }
 
-auto Chemicle::getNameSpaces() -> int { return nameSpaces; }
+auto Chemical::getNameSpaces() -> int { return nameSpaces; }
 
-auto Chemicle::getSymbolSpaces() -> int { return symbolSpaces; }
+auto Chemical::getSymbolSpaces() -> int { return symbolSpaces; }
 
-auto Chemicle::operator<(Chemicle& right) -> bool {
+auto Chemical::operator<(Chemical& right) -> bool {
   long double xx = abunds * abunde;
   long double yy = right.abunds * right.abunde;
 
@@ -787,7 +785,7 @@ auto Chemicle::operator<(Chemicle& right) -> bool {
   return false;
 }
 
-auto Chemicle::operator==(Chemicle& right) -> bool {
+auto Chemical::operator==(Chemical& right) -> bool {
   long double xx = abunds * abunde;
   long double yy = right.abunds * right.abunde;
 
@@ -798,7 +796,7 @@ auto Chemicle::operator==(Chemicle& right) -> bool {
   return false;
 }
 
-auto operator<<(ostream& strm, Chemicle& obj) -> ostream& {
+auto operator<<(ostream& strm, Chemical& obj) -> ostream& {
   strm << left << obj.getNum() << ".\t" << right << obj.getSymbol();
   for (int i = 0; i < obj.getSymbolSpaces(); i++) {
     strm << " ";
@@ -813,14 +811,14 @@ auto operator<<(ostream& strm, Chemicle& obj) -> ostream& {
   return strm;
 }
 
-void ChemTable::addChemicle(const Chemicle &chem) {
+void ChemTable::addChemicle(const Chemical &chem) {
   chemicles.push_back(chem);
   quicksort(chemicles, 0, chemicles.size());
 }
 
 auto ChemTable::count() -> int { return chemicles.size(); }
 
-auto ChemTable::operator[](const int& index) -> Chemicle& {
+auto ChemTable::operator[](const int& index) -> Chemical& {
   if (index < 0 || index >= chemicles.size()) {
     cerr << "ERROR: Subscript out of range.\n";
     exit(EXIT_FAILURE);

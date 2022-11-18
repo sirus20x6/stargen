@@ -4,7 +4,6 @@
 
 #include <string>
 #include <vector>
-//#include <boost/concept_check.hpp>
 #include "c_structs.h"
 
 using namespace std;
@@ -425,10 +424,10 @@ class gen {
   gen *next;
 };
 
-class Chemicle;
-auto operator<<(ostream &, Chemicle &) -> ostream &;
+class Chemical;
+auto operator<<(ostream &, Chemical &) -> ostream &;
 
-class Chemicle {
+class Chemical {
  private:
   int num{0};
   string symbol{""};
@@ -457,13 +456,13 @@ class Chemicle {
   void setSpaces();
 
  public:
-  Chemicle();
-  Chemicle(int, string, string, string, long double, long double, long double,
+  Chemical();
+  Chemical(int, string, string, string, long double, long double, long double,
            long double, long double, long double, long double, long double,
            long double, long double, long double, long double);
-  Chemicle(Chemicle &);
-  Chemicle(const Chemicle &);
-  ~Chemicle();
+  Chemical(Chemical &);
+  Chemical(const Chemical &);
+  ~Chemical();
   auto getNum() -> int { return num; }
   void setMelt(long double);
   void setBoil(long double);
@@ -473,9 +472,9 @@ class Chemicle {
   void setMinIpp(long double);
   auto getNameSpaces() -> int;
   auto getSymbolSpaces() -> int;
-  auto operator=(Chemicle const&) -> Chemicle&;
-  auto operator<(Chemicle &) -> bool;
-  auto operator==(Chemicle &) -> bool;
+  auto operator=(Chemical const&) -> Chemical&;
+  auto operator<(Chemical &) -> bool;
+  auto operator==(Chemical &) -> bool;
   auto getAbunde() -> long double { return abunde; }
   auto getAbunds() -> long double { return abunds; }
   auto getBoil() -> long double { return boil; }
@@ -491,7 +490,7 @@ class Chemicle {
   auto getReactivity() -> long double { return reactivity; }
   auto getSymbol() -> string { return symbol; }
   auto getWeight() -> long double { return weight; }
-  friend auto operator<<(ostream &, Chemicle &) -> ostream &;
+  friend auto operator<<(ostream &, Chemical &) -> ostream &;
 };
 
 class ChemTable;
@@ -499,13 +498,13 @@ auto operator<<(ostream &, ChemTable &) -> ostream &;
 
 class ChemTable {
  private:
-  vector<Chemicle> chemicles;
+  vector<Chemical> chemicles;
 
  public:
   ChemTable() = default;
-  void addChemicle(const Chemicle&);
+  void addChemicle(const Chemical&);
   auto count() -> int;
-  auto operator[](const int &) -> Chemicle &;
+  auto operator[](const int &) -> Chemical &;
   friend auto operator<<(ostream &, ChemTable &) -> ostream &;
 };
 
