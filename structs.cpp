@@ -1,5 +1,7 @@
 #include "structs.h"
 
+#include <math.h>
+
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
@@ -13,6 +15,23 @@
 
 using namespace std;
 
+/**
+ * @brief Construct a new star::star object
+ * 
+ * @param l 
+ * @param m 
+ * @param et 
+ * @param t 
+ * @param m2 
+ * @param e 
+ * @param d 
+ * @param i 
+ * @param a 
+ * @param kp 
+ * @param des 
+ * @param cel 
+ * @param n 
+ */
 star::star(long double l, long double m, long double et, string t,
            long double m2, long double e, long double d, long double i,
            long double a, planet* kp, string des, bool cel, string n) {
@@ -80,6 +99,10 @@ star::star(star2& data) {
   isCircumbinary = false;
 }
 
+/**
+ * @brief Destroy the star::star object
+ * 
+ */
 star::~star() {
   luminosity = 0;
   mass = 0;
@@ -96,10 +119,22 @@ star::~star() {
   isCircumbinary = false;
 }
 
+/**
+ * @brief Calculate Luminosity
+ * 
+ */
 void star::calcLuminosity() { luminosity = mass_to_luminosity(mass); }
 
+/**
+ * @brief Calculate Mass
+ * 
+ */
 void star::calcMass() { mass = luminosity_to_mass(luminosity); }
 
+/**
+ * @brief Calculate Eff Temp
+ * 
+ */
 void star::calcEffTemp() { eff_temp = spec_type_to_eff_temp(spec_type); }
 
 star::star(star& right) {
@@ -166,7 +201,10 @@ star::star(const star& right) {
   }
 }
 
-star star::operator=(star& right) {
+/// @brief 
+/// @param right 
+/// @return 
+auto star::operator=(star& right) -> star {
   luminosity = right.luminosity;
   mass = right.mass;
   eff_temp = right.eff_temp;
@@ -199,7 +237,11 @@ star star::operator=(star& right) {
   return *this;
 }
 
-ostream& operator<<(ostream& strm, star& obj) {
+/// @brief 
+/// @param strm 
+/// @param obj 
+/// @return 
+auto operator<<(ostream& strm, star& obj) -> ostream& {
   string is_in_celestia = "";
 
   if (obj.in_celestia) {
@@ -214,59 +256,114 @@ ostream& operator<<(ostream& strm, star& obj) {
   return strm;
 }
 
-string star::getName() { return name; }
+/// @brief 
+/// @return 
+auto star::getName() -> string { return name; }
 
+/// @brief 
+/// @param e 
 void star::setExtraSpaces(int e) { extra_spaces = e; }
 
-int star::getExtraSpaces() { return extra_spaces; }
+/// @brief 
+/// @return 
+auto star::getExtraSpaces() -> int { return extra_spaces; }
 
-long double star::getAn() { return an; }
+/// @brief 
+/// @return 
+auto star::getAn() -> long double { return an; }
 
-long double star::getInc() { return inc; }
+/// @brief 
+/// @return 
+auto star::getInc() -> long double { return inc; }
 
-planet* star::getKnownPlanets() { return known_planets; }
+/// @brief 
+/// @return 
+auto star::getKnownPlanets() -> planet* { return known_planets; }
 
-bool star::getInCelestia() { return in_celestia; }
+/// @brief 
+/// @return 
+auto star::getInCelestia() -> bool { return in_celestia; }
 
-long double star::getEffTemp() { return eff_temp; }
+/// @brief 
+/// @return 
+auto star::getEffTemp() -> long double { return eff_temp; }
 
-long double star::getLuminosity() { return luminosity; }
+/// @brief 
+/// @return 
+auto star::getLuminosity() -> long double { return luminosity; }
 
-long double star::getMass() { return mass; }
+/// @brief 
+/// @return 
+auto star::getMass() -> long double { return mass; }
 
-string star::getSpecType() { return spec_type; }
+/// @brief 
+/// @return 
+auto star::getSpecType() -> string { return spec_type; }
 
-string star::getDesig() { return desig; }
+/// @brief 
+/// @return 
+auto star::getDesig() -> string { return desig; }
 
-long double star::getDistance() { return distance; }
+/// @brief 
+/// @return 
+auto star::getDistance() -> long double { return distance; }
 
-long double star::getEccentricity() { return eccentricity; }
+/// @brief 
+/// @return 
+auto star::getEccentricity() -> long double { return eccentricity; }
 
-long double star::getMass2() { return mass2; }
+/// @brief 
+/// @return 
+auto star::getMass2() -> long double { return mass2; }
 
-long double star::getEffTemp2() { return eff_temp2; }
+/// @brief 
+/// @return 
+auto star::getEffTemp2() -> long double { return eff_temp2; }
 
-bool star::getIsCircumbinary() { return isCircumbinary; }
+/// @brief 
+/// @return 
+auto star::getIsCircumbinary() -> bool { return isCircumbinary; }
 
-long double star::getLuminosity2() { return luminosity2; }
+/// @brief 
+/// @return 
+auto star::getLuminosity2() -> long double { return luminosity2; }
 
-string star::getSpecType2() { return spec_type2; }
+/// @brief 
+/// @return 
+auto star::getSpecType2() -> string { return spec_type2; }
 
+/// @brief 
+/// @param d 
 void star::setDistance(long double d) { distance = d; }
 
+/// @brief 
+/// @param e 
 void star::setEccentricity(long double e) { eccentricity = e; }
 
+/// @brief 
+/// @param e 
 void star::setEffTemp2(long double e) { eff_temp2 = e; }
 
+/// @brief 
+/// @param b 
 void star::setIsCircumbinary(bool b) { isCircumbinary = b; }
 
+/// @brief 
+/// @param l 
 void star::setLuminosity2(long double l) { luminosity2 = l; }
 
+/// @brief 
+/// @param m 
 void star::setMass2(long double m) { mass2 = m; }
 
-void star::setSpecType2(string s) { spec_type2 = s; }
+/// @brief 
+/// @param s 
+void star::setSpecType2(string s) { spec_type2 = std::move(s); }
 
-bool star::operator<(star& right) {
+/// @brief 
+/// @param right 
+/// @return 
+auto star::operator<(star& right) -> bool {
   if (desig == "Sol" && right.desig == "Sol") {
     return false;
   } else if (desig == "Sol") {
@@ -279,26 +376,36 @@ bool star::operator<(star& right) {
   return false;
 }
 
-bool star::operator==(star& right) {
+/// @brief 
+/// @param right 
+/// @return 
+auto star::operator==(star& right) -> bool {
   if (name == right.name) {
     return true;
   }
   return false;
 }
 
-catalog::catalog() { extra_spaces = 0; }
+/// @brief 
+catalog::catalog() : extra_spaces(0) { }
 
-catalog::catalog(string a) {
-  arg = a;
-  extra_spaces = 0;
+/// @brief 
+/// @param a 
+catalog::catalog(string a) : arg(a), extra_spaces(0) {
+  
+  
 }
 
-int catalog::count() { return stars.size(); }
+/// @brief 
+/// @return 
+auto catalog::count() -> int { return stars.size(); }
 
+/// @brief 
+/// @param the_star 
 void catalog::addStar(star& the_star) {
   string star_name;
-  int name_length;
-  int diff;
+  int name_length = 0;
+  int diff = 0;
 
   stars.push_back(the_star);
 
@@ -312,7 +419,10 @@ void catalog::addStar(star& the_star) {
   }
 }
 
-star& catalog::operator[](const int& sub) {
+/// @brief 
+/// @param sub 
+/// @return 
+auto catalog::operator[](const int& sub) -> star& {
   if (sub < 0 || sub > (stars.size() - 1)) {
     cerr << "Non existant star!\n";
     exit(EXIT_FAILURE);
@@ -320,6 +430,7 @@ star& catalog::operator[](const int& sub) {
   return stars[sub];
 }
 
+/// @brief 
 catalog::~catalog() {
   /*planet *planets = NULL;
   planet *node = NULL;
@@ -339,7 +450,11 @@ catalog::~catalog() {
   stars.clear();
 }
 
-ostream& operator<<(ostream& strm, catalog& obj) {
+/// @brief 
+/// @param strm 
+/// @param obj 
+/// @return 
+auto operator<<(ostream& strm, catalog& obj) -> ostream& {
   int total_stars = obj.count();
   strm << setw(14) << "Name" << setw(37 + obj.extra_spaces) << "Mass"
        << setw(12) << "Luminosity" << setw(13) << "Temperature" << setw(11)
@@ -354,7 +469,10 @@ ostream& operator<<(ostream& strm, catalog& obj) {
   return strm;
 }
 
-catalog catalog::operator=(catalog& right) {
+/// @brief 
+/// @param right 
+/// @return 
+auto catalog::operator=(catalog& right) -> catalog {
   arg = right.arg;
   stars.clear();
   int new_stars = right.count();
@@ -364,32 +482,38 @@ catalog catalog::operator=(catalog& right) {
   return *this;
 }
 
-void catalog::setArg(string a) { arg = a; }
+/// @brief 
+/// @param a 
+void catalog::setArg(string a) { arg = std::move(a); }
 
-string catalog::getArg() { return arg; }
+/// @brief 
+/// @return 
+auto catalog::getArg() -> string { return arg; }
 
+/// @brief 
 void catalog::sort() {
   // writeVector(stars, "\n");
   quicksort(stars, 0, stars.size());
 }
 
-Chemicle::Chemicle() {
-  num = 0;
-  symbol = "";
-  htmlSymbol = "";
-  name = "";
-  weight = 0;
-  melt = 0;
-  boil = 0;
-  density = 0;
-  pzero = 0;
-  c = 0;
-  n = 0;
-  abunde = 0;
-  abunds = 0;
-  reactivity = 0;
-  maxIpp = 0;
-  minIpp = 0;
+/// @brief 
+Chemicle::Chemicle() : num(0), symbol(""), htmlSymbol(""), name(""), weight(0), melt(0), boil(0), density(0), pzero(0), c(0), n(0), abunde(0), abunds(0), reactivity(0), maxIpp(0), minIpp(0) {
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   fixBoil();
   fixMelt();
   fixAbunde();
@@ -399,6 +523,23 @@ Chemicle::Chemicle() {
   setSpaces();
 }
 
+/// @brief 
+/// @param nu 
+/// @param s 
+/// @param h 
+/// @param na 
+/// @param w 
+/// @param m 
+/// @param b 
+/// @param d 
+/// @param p 
+/// @param c2 
+/// @param n2 
+/// @param ae 
+/// @param as 
+/// @param r 
+/// @param ma 
+/// @param mi 
 Chemicle::Chemicle(int nu, string s, string h, string na, long double w,
                    long double m, long double b, long double d, long double p,
                    long double c2, long double n2, long double ae,
@@ -429,23 +570,25 @@ Chemicle::Chemicle(int nu, string s, string h, string na, long double w,
   setSpaces();
 }
 
-Chemicle::Chemicle(Chemicle& right) {
-  num = right.num;
-  symbol = right.symbol;
-  htmlSymbol = right.htmlSymbol;
-  name = right.name;
-  weight = right.weight;
-  melt = right.melt;
-  boil = right.boil;
-  density = right.density;
-  pzero = right.pzero;
-  c = right.c;
-  n = right.n;
-  abunde = right.abunde;
-  abunds = right.abunds;
-  reactivity = right.reactivity;
-  maxIpp = right.maxIpp;
-  minIpp = right.minIpp;
+/// @brief 
+/// @param right 
+Chemicle::Chemicle(Chemicle& right) : num(right.num), symbol(right.symbol), htmlSymbol(right.htmlSymbol), name(right.name), weight(right.weight), melt(right.melt), boil(right.boil), density(right.density), pzero(right.pzero), c(right.c), n(right.n), abunde(right.abunde), abunds(right.abunds), reactivity(right.reactivity), maxIpp(right.maxIpp), minIpp(right.minIpp) {
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   fixBoil();
   fixMelt();
   fixAbunde();
@@ -455,23 +598,25 @@ Chemicle::Chemicle(Chemicle& right) {
   setSpaces();
 }
 
-Chemicle::Chemicle(const Chemicle& right) {
-  num = right.num;
-  symbol = right.symbol;
-  htmlSymbol = right.htmlSymbol;
-  name = right.name;
-  weight = right.weight;
-  melt = right.melt;
-  boil = right.boil;
-  density = right.density;
-  pzero = right.pzero;
-  c = right.c;
-  n = right.n;
-  abunde = right.abunde;
-  abunds = right.abunds;
-  reactivity = right.reactivity;
-  maxIpp = right.maxIpp;
-  minIpp = right.minIpp;
+/// @brief 
+/// @param right 
+Chemicle::Chemicle(const Chemicle& right) : num(right.num), symbol(right.symbol), htmlSymbol(right.htmlSymbol), name(right.name), weight(right.weight), melt(right.melt), boil(right.boil), density(right.density), pzero(right.pzero), c(right.c), n(right.n), abunde(right.abunde), abunds(right.abunds), reactivity(right.reactivity), maxIpp(right.maxIpp), minIpp(right.minIpp) {
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   fixBoil();
   fixMelt();
   fixAbunde();
@@ -481,6 +626,7 @@ Chemicle::Chemicle(const Chemicle& right) {
   setSpaces();
 }
 
+/// @brief 
 Chemicle::~Chemicle() {
   num = 0;
   symbol = "";
@@ -502,39 +648,12 @@ Chemicle::~Chemicle() {
   symbolSpaces = 0;
 }
 
-long double Chemicle::getAbunde() { return abunde; }
 
-long double Chemicle::getAbunds() { return abunds; }
 
-long double Chemicle::getBoil() { return boil; }
-
-long double Chemicle::getC() { return c; }
-
-long double Chemicle::getDensity() { return density; }
-
-string Chemicle::getHtmlSymbol() { return htmlSymbol; }
-
-long double Chemicle::getMaxIpp() { return maxIpp; }
-
-long double Chemicle::getMelt() { return melt; }
-
-long double Chemicle::getMinIpp() { return minIpp; }
-
-long double Chemicle::getN() { return n; }
-
-string Chemicle::getName() { return name; }
-
-int Chemicle::getNum() { return num; }
-
-long double Chemicle::getPzero() { return pzero; }
-
-long double Chemicle::getReactivity() { return reactivity; }
-
-string Chemicle::getSymbol() { return symbol; }
-
-long double Chemicle::getWeight() { return weight; }
-
-Chemicle Chemicle::operator=(Chemicle& right) {
+/// @brief 
+/// @param right 
+/// @return 
+auto Chemicle::operator=(const Chemicle& right) -> Chemicle& {
   num = right.num;
   symbol = right.symbol;
   htmlSymbol = right.htmlSymbol;
@@ -640,11 +759,11 @@ void Chemicle::setSpaces() {
   symbolSpaces = 15 - symbol.length();
 }
 
-int Chemicle::getNameSpaces() { return nameSpaces; }
+auto Chemicle::getNameSpaces() -> int { return nameSpaces; }
 
-int Chemicle::getSymbolSpaces() { return symbolSpaces; }
+auto Chemicle::getSymbolSpaces() -> int { return symbolSpaces; }
 
-bool Chemicle::operator<(Chemicle& right) {
+auto Chemicle::operator<(Chemicle& right) -> bool {
   long double xx = abunds * abunde;
   long double yy = right.abunds * right.abunde;
 
@@ -668,7 +787,7 @@ bool Chemicle::operator<(Chemicle& right) {
   return false;
 }
 
-bool Chemicle::operator==(Chemicle& right) {
+auto Chemicle::operator==(Chemicle& right) -> bool {
   long double xx = abunds * abunde;
   long double yy = right.abunds * right.abunde;
 
@@ -679,7 +798,7 @@ bool Chemicle::operator==(Chemicle& right) {
   return false;
 }
 
-ostream& operator<<(ostream& strm, Chemicle& obj) {
+auto operator<<(ostream& strm, Chemicle& obj) -> ostream& {
   strm << left << obj.getNum() << ".\t" << right << obj.getSymbol();
   for (int i = 0; i < obj.getSymbolSpaces(); i++) {
     strm << " ";
@@ -694,14 +813,14 @@ ostream& operator<<(ostream& strm, Chemicle& obj) {
   return strm;
 }
 
-void ChemTable::addChemicle(Chemicle chem) {
+void ChemTable::addChemicle(const Chemicle &chem) {
   chemicles.push_back(chem);
   quicksort(chemicles, 0, chemicles.size());
 }
 
-int ChemTable::count() { return chemicles.size(); }
+auto ChemTable::count() -> int { return chemicles.size(); }
 
-Chemicle& ChemTable::operator[](const int& index) {
+auto ChemTable::operator[](const int& index) -> Chemicle& {
   if (index < 0 || index >= chemicles.size()) {
     cerr << "ERROR: Subscript out of range.\n";
     exit(EXIT_FAILURE);
@@ -709,7 +828,7 @@ Chemicle& ChemTable::operator[](const int& index) {
   return chemicles[index];
 }
 
-ostream& operator<<(ostream& strm, ChemTable& obj) {
+auto operator<<(ostream& strm, ChemTable& obj) -> ostream& {
   cout << "Num\t" << setw(6) << "Symbol" << setw(13) << "Name" << setw(24)
        << "Weight" << setw(22) << "Min breathable IPP" << setw(20)
        << "Max Breathable IPP" << setw(15) << "Abund\n";
@@ -841,32 +960,32 @@ sun::sun(const sun& right) {
   eccentricity = right.eccentricity;
 }*/
 
-long double sun::getAge() { return age; }
+auto sun::getAge() -> long double { return age; }
 
-long double sun::getEffTemp() {
+auto sun::getEffTemp() -> long double {
   if (effTemp == 0) {
     effTemp = spec_type_to_eff_temp(specType);
   }
   return effTemp;
 }
 
-long double sun::getLife() { return 1.0E10 * (mass / luminosity); }
+auto sun::getLife() -> long double { return 1.0E10 * (mass / luminosity); }
 
-long double sun::getSecondaryLife() {
+auto sun::getSecondaryLife() -> long double {
   return 1.0E10 * (secondaryMass / secondaryLuminosity);
 }
 
-long double sun::getLuminosity() { return luminosity; }
+auto sun::getLuminosity() -> long double { return luminosity; }
 
-long double sun::getMass() { return mass; }
+auto sun::getMass() -> long double { return mass; }
 
-string sun::getName() { return name; }
+auto sun::getName() -> string { return name; }
 
-long double sun::getREcosphere(long double mass) {
+auto sun::getREcosphere(long double mass) -> long double {
   return habitable_zone_distance(*this, EARTH_LIKE, mass);
 }
 
-string sun::getSpecType() {
+auto sun::getSpecType() -> string {
   if (specType.empty()) {
     specType = eff_temp_to_spec_type(effTemp, luminosity);
   }
@@ -886,25 +1005,25 @@ void sun::setLuminosity(long double l) { luminosity = l; }
 
 void sun::setMass(long double m) { mass = m; }
 
-void sun::setName(string n) { name = n; }
+void sun::setName(string n) { name = std::move(n); }
 
 void sun::setSpecType(string s) {
-  specType = s;
+  specType = std::move(s);
   specType = my_strtoupper(specType);
   if (effTemp == 0) {
     effTemp = spec_type_to_eff_temp(specType);
   }
 }
 
-bool sun::getIsCircumbinary() { return isCircumbinary; }
+auto sun::getIsCircumbinary() -> bool { return isCircumbinary; }
 
-long double sun::getSecondaryEffTemp() { return secondaryEffTemp; }
+auto sun::getSecondaryEffTemp() -> long double { return secondaryEffTemp; }
 
-long double sun::getSecondaryLuminosity() { return secondaryLuminosity; }
+auto sun::getSecondaryLuminosity() -> long double { return secondaryLuminosity; }
 
-long double sun::getSecondaryMass() { return secondaryMass; }
+auto sun::getSecondaryMass() -> long double { return secondaryMass; }
 
-string sun::getSecondarySpecType() { return secondarySpecType; }
+auto sun::getSecondarySpecType() -> string { return secondarySpecType; }
 
 void sun::setIsCircumbinary(bool cb) {
   isCircumbinary = cb;
@@ -936,28 +1055,28 @@ void sun::setSecondaryMass(long double m) {
 }
 
 void sun::setSecondarySpecType(string t) {
-  secondarySpecType = t;
+  secondarySpecType = std::move(t);
   if (secondaryEffTemp == 0) {
     secondaryEffTemp = spec_type_to_eff_temp(secondarySpecType);
   }
 }
 
-long double sun::getCombinedLuminosity() {
+auto sun::getCombinedLuminosity() -> long double {
   return luminosity + secondaryLuminosity;
 }
 
-long double sun::getCombinedMass() { return mass + secondaryMass; }
+auto sun::getCombinedMass() -> long double { return mass + secondaryMass; }
 
-long double sun::getEccentricity() { return eccentricity; }
+auto sun::getEccentricity() -> long double { return eccentricity; }
 
-long double sun::getSeperation() { return seperation; }
+auto sun::getSeperation() -> long double { return seperation; }
 
 void sun::setEccentricity(long double e) { eccentricity = e; }
 
 void sun::setSeperation(long double s) { seperation = s; }
 
-long double sun::getMinStableDistance() {
-  long double u;
+auto sun::getMinStableDistance() -> long double {
+  long double u = NAN;
   if (!isCircumbinary) {
     return 0;
   } else {
@@ -969,8 +1088,8 @@ long double sun::getMinStableDistance() {
   }
 }
 
-long double sun::getCombinedEffTemp() {
-  long double f1, f2, prev, curr, peak, temperature, a, m, b;
+auto sun::getCombinedEffTemp() -> long double {
+  long double f1 = NAN, f2 = NAN, prev = NAN, curr = NAN, peak = NAN, temperature = NAN, a = NAN, m = NAN, b = NAN;
   if (combinedEffTemp != 0) {
     return combinedEffTemp;
   }
@@ -1015,118 +1134,118 @@ long double sun::getCombinedEffTemp() {
   }
 }
 
-planet::planet() {
-  planetNo = 0;
-  a = 0;
-  e = 0;
-  axialTilt = 0;
-  gasGiant = false;
-  dustMass = 0;
-  gasMass = 0;
-  imf = 0;
-  rmf = 0;
-  cmf = 0;
-  moonA = 0;
-  moonE = 0;
-  coreRadius = 0;
-  radius = 0;
-  orbitZone = 0;
-  density = 0;
-  orbPeriod = 0;
-  day = 0;
-  resonantPeriod = false;
-  escVelocity = 0;
-  surfAccel = 0;
-  surfGrav = 0;
-  rmsVelocity = 0;
-  molecWeight = 0;
-  volatileGasInventory = 0;
-  surfPressure = 0;
-  greenhouseEffect = false;
-  boilPoint = 0;
-  albedo = 0;
-  exosphericTemp = 0;
-  estimatedTemp = 0;
-  estimatedTerrTemp = 0;
-  surfTemp = 0;
-  greenhsRise = 0;
-  highTemp = 0;
-  lowTemp = 0;
-  maxTemp = 0;
-  minTemp = 0;
-  hydrosphere = 0;
-  cloudCover = 0;
-  iceCover = 0;
-  inclination = 0;
-  ascendingNode = 0;
-  longitudeOfPericenter = 0;
-  meanLongitude = 0;
-  first_moon = NULL;
-  next_planet = NULL;
-  reconnect_to = NULL;
-  first_moon_backup = NULL;
-  type = tUnknown;
-  deleteable = true;
+planet::planet() : planetNo(0), a(0), e(0), axialTilt(0), gasGiant(false), dustMass(0), gasMass(0), imf(0), rmf(0), cmf(0), moonA(0), moonE(0), coreRadius(0), radius(0), orbitZone(0), density(0), orbPeriod(0), day(0), resonantPeriod(false), escVelocity(0), surfAccel(0), surfGrav(0), rmsVelocity(0), molecWeight(0), volatileGasInventory(0), surfPressure(0), greenhouseEffect(false), boilPoint(0), albedo(0), exosphericTemp(0), estimatedTemp(0), estimatedTerrTemp(0), surfTemp(0), greenhsRise(0), highTemp(0), lowTemp(0), maxTemp(0), minTemp(0), hydrosphere(0), cloudCover(0), iceCover(0), inclination(0), ascendingNode(0), longitudeOfPericenter(0), meanLongitude(0), first_moon(NULL), next_planet(NULL), reconnect_to(NULL), first_moon_backup(NULL), type(tUnknown), deleteable(true) {
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 }
 
 planet::planet(int n, long double a2, long double e2, long double t, bool gg,
-               long double d, long double g, planet* moon, planet* next) {
-  planetNo = n;
-  a = a2;
-  e = e2;
-  axialTilt = t;
-  gasGiant = gg;
-  dustMass = d;
-  gasMass = g;
-  imf = 0;
-  rmf = 0;
-  cmf = 0;
-  moonA = 0;
-  moonE = 0;
-  coreRadius = 0;
-  radius = 0;
-  orbitZone = 0;
-  density = 0;
-  orbPeriod = 0;
-  day = 0;
-  resonantPeriod = false;
-  escVelocity = 0;
-  surfAccel = 0;
-  surfGrav = 0;
-  rmsVelocity = 0;
-  molecWeight = 0;
-  volatileGasInventory = 0;
-  surfPressure = 0;
-  greenhouseEffect = false;
-  boilPoint = 0;
-  albedo = 0;
-  exosphericTemp = 0;
-  estimatedTemp = 0;
-  estimatedTerrTemp = 0;
-  surfTemp = 0;
-  greenhsRise = 0;
-  highTemp = 0;
-  lowTemp = 0;
-  maxTemp = 0;
-  minTemp = 0;
-  hydrosphere = 0;
-  cloudCover = 0;
-  iceCover = 0;
-  inclination = 0;
-  ascendingNode = 0;
-  longitudeOfPericenter = 0;
-  meanLongitude = 0;
-  first_moon = moon;
-  next_planet = next;
-  reconnect_to = next;
-  first_moon_backup = moon;
-  type = tUnknown;
-  deleteable = true;
+               long double d, long double g, planet* moon, planet* next) : planetNo(n), a(a2), e(e2), axialTilt(t), gasGiant(gg), dustMass(d), gasMass(g), imf(0), rmf(0), cmf(0), moonA(0), moonE(0), coreRadius(0), radius(0), orbitZone(0), density(0), orbPeriod(0), day(0), resonantPeriod(false), escVelocity(0), surfAccel(0), surfGrav(0), rmsVelocity(0), molecWeight(0), volatileGasInventory(0), surfPressure(0), greenhouseEffect(false), boilPoint(0), albedo(0), exosphericTemp(0), estimatedTemp(0), estimatedTerrTemp(0), surfTemp(0), greenhsRise(0), highTemp(0), lowTemp(0), maxTemp(0), minTemp(0), hydrosphere(0), cloudCover(0), iceCover(0), inclination(0), ascendingNode(0), longitudeOfPericenter(0), meanLongitude(0), first_moon(moon), next_planet(next), reconnect_to(next), first_moon_backup(moon), type(tUnknown), deleteable(true) {
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 }
 
 planet::~planet() {
-  planet* node = NULL;
-  planet* next = NULL;
+  planet* node = nullptr;
+  planet* next = nullptr;
 
   a = 0;
   e = 0;
@@ -1175,8 +1294,8 @@ planet::~planet() {
   while (!atmosphere.empty()) {
     atmosphere.pop_back();
   }
-  if (first_moon != NULL) {
-    for (node = first_moon; node != NULL; node = next) {
+  if (first_moon != nullptr) {
+    for (node = first_moon; node != nullptr; node = next) {
       next = node->next_planet;
       if (node->getDeletable()) {
         delete node;
@@ -1185,7 +1304,7 @@ planet::~planet() {
       }
     }
   }
-  if (first_moon_backup != NULL) {
+  if (first_moon_backup != nullptr) {
     first_moon = first_moon_backup;
   }
 }
@@ -1193,8 +1312,8 @@ planet::~planet() {
 void planet::addGas(gas g) {
   bool unique = true;
   // this shouldn't be necessary but for some weird reason, it is.
-  for (int i = 0; i < atmosphere.size(); i++) {
-    if (g.getNum() == atmosphere[i].getNum()) {
+  for (auto & i : atmosphere) {
+    if (g.getNum() == i.getNum()) {
       unique = false;
       break;
     }
@@ -1246,105 +1365,105 @@ void planet::estimateMass() {
                            -0.747842501143578, 0.27996106732024, knownRadius);
 }
 
-long double planet::getA() { return a; }
+auto planet::getA() -> long double { return a; }
 
-long double planet::getAlbedo() { return albedo; }
+auto planet::getAlbedo() -> long double { return albedo; }
 
-long double planet::getAscendingNode() { return ascendingNode; }
+auto planet::getAscendingNode() -> long double { return ascendingNode; }
 
-long double planet::getAxialTilt() { return axialTilt; }
+auto planet::getAxialTilt() -> long double { return axialTilt; }
 
-long double planet::getBoilPoint() { return boilPoint; }
+auto planet::getBoilPoint() -> long double { return boilPoint; }
 
-long double planet::getCloudCover() { return cloudCover; }
+auto planet::getCloudCover() -> long double { return cloudCover; }
 
-long double planet::getCmf() { return cmf; }
+auto planet::getCmf() -> long double { return cmf; }
 
-long double planet::getCoreRadius() { return coreRadius; }
+auto planet::getCoreRadius() -> long double { return coreRadius; }
 
-long double planet::getDay() { return day; }
+auto planet::getDay() -> long double { return day; }
 
-bool planet::getDeletable() { return deleteable; }
+auto planet::getDeletable() -> bool { return deleteable; }
 
-long double planet::getDensity() { return density; }
+auto planet::getDensity() -> long double { return density; }
 
-long double planet::getDustMass() { return dustMass; }
+auto planet::getDustMass() -> long double { return dustMass; }
 
-long double planet::getE() { return e; }
+auto planet::getE() -> long double { return e; }
 
-long double planet::getEquatrorialRadius() {
+auto planet::getEquatrorialRadius() -> long double {
   return radius * (1.0 + getOblateness());
 }
 
-long double planet::getEscVelocity() { return escVelocity; }
+auto planet::getEscVelocity() -> long double { return escVelocity; }
 
-long double planet::getEsi() { return esi; }
+auto planet::getEsi() -> long double { return esi; }
 
-long double planet::getEstimatedTemp() { return estimatedTemp; }
+auto planet::getEstimatedTemp() -> long double { return estimatedTemp; }
 
-long double planet::getEstimatedTerrTemp() { return estimatedTerrTemp; }
+auto planet::getEstimatedTerrTemp() -> long double { return estimatedTerrTemp; }
 
-long double planet::getExosphericTemp() { return exosphericTemp; }
+auto planet::getExosphericTemp() -> long double { return exosphericTemp; }
 
-gas planet::getGas(int i) { return atmosphere[i]; }
+auto planet::getGas(int i) -> gas { return atmosphere[i]; }
 
-bool planet::getGasGiant() { return gasGiant; }
+auto planet::getGasGiant() -> bool { return gasGiant; }
 
-long double planet::getGasMass() { return gasMass; }
+auto planet::getGasMass() -> long double { return gasMass; }
 
-bool planet::getGreenhouseEffect() { return greenhouseEffect; }
+auto planet::getGreenhouseEffect() -> bool { return greenhouseEffect; }
 
-long double planet::getGreenhsRise() { return greenhsRise; }
+auto planet::getGreenhsRise() -> long double { return greenhsRise; }
 
-long double planet::getHighTemp() { return highTemp; }
+auto planet::getHighTemp() -> long double { return highTemp; }
 
-long double planet::getHydrosphere() { return hydrosphere; }
+auto planet::getHydrosphere() -> long double { return hydrosphere; }
 
-long double planet::getHza() { return hza; }
+auto planet::getHza() -> long double { return hza; }
 
-long double planet::getHzc() { return hzc; }
+auto planet::getHzc() -> long double { return hzc; }
 
-long double planet::getHzd() { return hzd; }
+auto planet::getHzd() -> long double { return hzd; }
 
-long double planet::getIceCover() { return iceCover; }
+auto planet::getIceCover() -> long double { return iceCover; }
 
-long double planet::getImf() { return imf; }
+auto planet::getImf() -> long double { return imf; }
 
-long double planet::getInclination() { return inclination; }
+auto planet::getInclination() -> long double { return inclination; }
 
-long double planet::getKnownRadius() { return knownRadius; }
+auto planet::getKnownRadius() -> long double { return knownRadius; }
 
-long double planet::getLongitudeOfPericenter() { return longitudeOfPericenter; }
+auto planet::getLongitudeOfPericenter() -> long double { return longitudeOfPericenter; }
 
-long double planet::getLowTemp() { return lowTemp; }
+auto planet::getLowTemp() -> long double { return lowTemp; }
 
-long double planet::getMass() { return dustMass + gasMass; }
+auto planet::getMass() -> long double { return dustMass + gasMass; }
 
-long double planet::getMaxTemp() { return maxTemp; }
+auto planet::getMaxTemp() -> long double { return maxTemp; }
 
-long double planet::getMeanLongitude() { return meanLongitude; }
+auto planet::getMeanLongitude() -> long double { return meanLongitude; }
 
-int planet::getMinorMoons() { return minorMoons; }
+auto planet::getMinorMoons() -> int { return minorMoons; }
 
-long double planet::getMinTemp() { return minTemp; }
+auto planet::getMinTemp() -> long double { return minTemp; }
 
-long double planet::getMolecWeight() { return molecWeight; }
+auto planet::getMolecWeight() -> long double { return molecWeight; }
 
 /*planet* planet::getMoon(int i)
 {
   return temp_moon[i];
 }*/
 
-long double planet::getMoonA() { return moonA; }
+auto planet::getMoonA() -> long double { return moonA; }
 
 /*int planet::getMoonCount()
 {
   return temp_moon.size();
 }*/
 
-long double planet::getMoonE() { return moonE; }
+auto planet::getMoonE() -> long double { return moonE; }
 
-long double planet::getOblateness() {
+auto planet::getOblateness() -> long double {
   // return oblateness;
   long double multiplier = 0;
   long double result = 0;
@@ -1382,39 +1501,39 @@ long double planet::getOblateness() {
   return result;
 }
 
-int planet::getOrbitZone() { return orbitZone; }
+auto planet::getOrbitZone() -> int { return orbitZone; }
 
-long double planet::getOrbPeriod() { return orbPeriod; }
+auto planet::getOrbPeriod() -> long double { return orbPeriod; }
 
-int planet::getPlanetNo() { return planetNo; }
+auto planet::getPlanetNo() -> int { return planetNo; }
 
-long double planet::getPolarRadius() {
+auto planet::getPolarRadius() -> long double {
   return radius * (1.0 - getOblateness());
 }
 
-long double planet::getRadius() { return radius; }
+auto planet::getRadius() -> long double { return radius; }
 
-bool planet::getResonantPeriod() { return resonantPeriod; }
+auto planet::getResonantPeriod() -> bool { return resonantPeriod; }
 
-long double planet::getRmf() { return rmf; }
+auto planet::getRmf() -> long double { return rmf; }
 
-long double planet::getRmsVelocity() { return rmsVelocity; }
+auto planet::getRmsVelocity() -> long double { return rmsVelocity; }
 
-long double planet::getSph() { return sph; }
+auto planet::getSph() -> long double { return sph; }
 
-long double planet::getSurfAccel() { return surfAccel; }
+auto planet::getSurfAccel() -> long double { return surfAccel; }
 
-long double planet::getSurfGrav() { return surfGrav; }
+auto planet::getSurfGrav() -> long double { return surfGrav; }
 
-long double planet::getSurfPressure() { return surfPressure; }
+auto planet::getSurfPressure() -> long double { return surfPressure; }
 
-long double planet::getSurfTemp() { return surfTemp; }
+auto planet::getSurfTemp() -> long double { return surfTemp; }
 
-sun& planet::getTheSun() { return theSun; }
+auto planet::getTheSun() -> sun& { return theSun; }
 
-planet_type planet::getType() { return type; }
+auto planet::getType() -> planet_type { return type; }
 
-long double planet::getVolatileGasInventory() { return volatileGasInventory; }
+auto planet::getVolatileGasInventory() -> long double { return volatileGasInventory; }
 
 void planet::setA(long double a2) { a = a2; }
 
@@ -1503,7 +1622,7 @@ void planet::setInclination(long double in) {
 }
 
 void planet::setKnownRadius(long double k) {
-  long double water_min, water_max, rock_min, rock_max;
+  long double water_min = NAN, water_max = NAN, rock_min = NAN, rock_max = NAN;
   knownRadius = k;
   estimateMass();
   if (dustMass > EM(2.0)) {
@@ -1531,7 +1650,7 @@ void planet::setMoonA(long double m) { moonA = m; }
 
 void planet::setMoonE(long double m) { moonE = m; }
 
-int planet::getNumGases() { return atmosphere.size(); }
+auto planet::getNumGases() -> int { return atmosphere.size(); }
 
 void planet::setOblateness(long double o) { oblateness = o; }
 
@@ -1573,59 +1692,59 @@ void planet::setVolatileGasInventory(long double v) {
 }
 
 void planet::sortMoons() {
-  planet* prev = NULL;
-  planet* next = NULL;
-  planet* node = NULL;
+  planet* prev = nullptr;
+  planet* next = nullptr;
+  planet* node = nullptr;
   // planet *temp = NULL;
   vector<planet*> temp_vector;
   long double roche_limit = 0;
   long double hill_sphere = 0;
-  for (node = first_moon; node != NULL; node = next) {
+  for (node = first_moon; node != nullptr; node = next) {
     next = node->next_planet;
-    node->next_planet = NULL;
+    node->next_planet = nullptr;
     temp_vector.push_back(node);
   }
-  first_moon = NULL;
-  for (int i = 0; i < temp_vector.size(); i++) {
+  first_moon = nullptr;
+  for (auto & i : temp_vector) {
     // we shouldn't have to do this here but some moons that shouldn't
     // be possible somehow slip throw the cracks...
     hill_sphere =
         a * KM_PER_AU * std::pow(getMass() / (3.0 * theSun.getMass()), 1.0 / 3.0);
     roche_limit =
-        2.44 * radius * std::pow(density / temp_vector[i]->getDensity(), 1.0 / 3.0);
+        2.44 * radius * std::pow(density / i->getDensity(), 1.0 / 3.0);
     if ((roche_limit * 1.5) >= (hill_sphere / 3.0)) {
-      delete temp_vector[i];
-    } else if ((temp_vector[i]->getMoonA() * KM_PER_AU) < (roche_limit * 1.5)) {
-      delete temp_vector[i];
-    } else if ((temp_vector[i]->getMoonA() * KM_PER_AU) > (hill_sphere / 3.0)) {
-      delete temp_vector[i];
+      delete i;
+    } else if ((i->getMoonA() * KM_PER_AU) < (roche_limit * 1.5)) {
+      delete i;
+    } else if ((i->getMoonA() * KM_PER_AU) > (hill_sphere / 3.0)) {
+      delete i;
     }
     // if it passed all those tests, we can place the moon.
     else {
-      if (first_moon == NULL) {
-        first_moon = temp_vector[i];
-      } else if (temp_vector[i]->getMoonA() < first_moon->getMoonA()) {
-        temp_vector[i]->next_planet = first_moon;
-        first_moon = temp_vector[i];
-      } else if (first_moon->next_planet == NULL) {
-        first_moon->next_planet = temp_vector[i];
-        temp_vector[i]->next_planet = NULL;
+      if (first_moon == nullptr) {
+        first_moon = i;
+      } else if (i->getMoonA() < first_moon->getMoonA()) {
+        i->next_planet = first_moon;
+        first_moon = i;
+      } else if (first_moon->next_planet == nullptr) {
+        first_moon->next_planet = i;
+        i->next_planet = nullptr;
       } else {
         next = first_moon;
-        while (next != NULL && next->getMoonA() < temp_vector[i]->getMoonA()) {
+        while (next != nullptr && next->getMoonA() < i->getMoonA()) {
           prev = next;
           next = next->next_planet;
         }
-        temp_vector[i]->next_planet = next;
-        if (prev != NULL) {
-          prev->next_planet = temp_vector[i];
+        i->next_planet = next;
+        if (prev != nullptr) {
+          prev->next_planet = i;
         }
       }
     }
   }
 }
 
-bool planet::operator<(planet& right) {
+auto planet::operator<(planet& right) -> bool {
   if (a < right.a) {
     return true;
   } else if (moonA < right.moonA) {
@@ -1638,7 +1757,7 @@ bool planet::operator<(planet& right) {
   return false;
 }
 
-bool planet::operator==(planet& right) {
+auto planet::operator==(planet& right) -> bool {
   if (a == right.a && moonA == right.moonA && e == right.e &&
       moonE == right.moonE) {
     return true;
@@ -1646,12 +1765,12 @@ bool planet::operator==(planet& right) {
   return false;
 }
 
-dust::dust() {
-  innerEdge = 0;
-  outerEdge = 0;
-  dustPresent = true;
-  gasPresent = true;
-  next_band = NULL;
+dust::dust() : innerEdge(0), outerEdge(0), dustPresent(true), gasPresent(true), next_band(NULL) {
+  
+  
+  
+  
+  
 }
 
 dust::~dust() {
@@ -1662,11 +1781,11 @@ dust::~dust() {
   // next_band = NULL;
 }
 
-bool dust::getDustPresent() { return dustPresent; }
+auto dust::getDustPresent() -> bool { return dustPresent; }
 
-bool dust::getGasPresent() { return gasPresent; }
+auto dust::getGasPresent() -> bool { return gasPresent; }
 
-long double dust::getInnerEdge() {
+auto dust::getInnerEdge() -> long double {
   if (innerEdge < outerEdge) {
     return innerEdge;
   } else {
@@ -1675,7 +1794,7 @@ long double dust::getInnerEdge() {
   }
 }
 
-long double dust::getOuterEdge() { return outerEdge; }
+auto dust::getOuterEdge() -> long double { return outerEdge; }
 
 void dust::setDustPresent(bool d) { dustPresent = d; }
 
@@ -1685,10 +1804,10 @@ void dust::setInnerEdge(long double i) { innerEdge = i; }
 
 void dust::setOuterEdge(long double o) { outerEdge = o; }
 
-gen::gen() {
-  dusts = NULL;
-  planets = NULL;
-  next = NULL;
+gen::gen() : dusts(NULL), planets(NULL), next(NULL) {
+  
+  
+  
 }
 
 gen::~gen() {
@@ -1697,34 +1816,34 @@ gen::~gen() {
   // next = NULL;
 }
 
-gas::gas() {
-  num = 0;
-  surfPressure = 0;
+gas::gas() : num(0), surfPressure(0) {
+  
+  
 }
 
-int gas::getNum() { return num; }
+auto gas::getNum() -> int { return num; }
 
-long double gas::getSurfPressure() { return surfPressure; }
+auto gas::getSurfPressure() -> long double { return surfPressure; }
 
 void gas::setNum(int n) { num = n; }
 
 void gas::setSurfPressure(long double s) { surfPressure = s; }
 
-bool gas::operator<(gas& right) {
+auto gas::operator<(gas& right) -> bool {
   if (surfPressure > right.surfPressure) {
     return true;
   }
   return false;
 }
 
-bool gas::operator==(gas& right) {
+auto gas::operator==(gas& right) -> bool {
   if (surfPressure == right.surfPressure) {
     return true;
   }
   return false;
 }
 
-ostream& operator<<(ostream& strm, gas& obj) {
+auto operator<<(ostream& strm, gas& obj) -> ostream& {
   strm << obj.getNum() << " - " << obj.getSurfPressure() << endl;
   return strm;
 }

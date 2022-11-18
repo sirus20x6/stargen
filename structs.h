@@ -33,8 +33,8 @@ auto operator<<(ostream &, gas &) -> ostream &;
 
 class gas {
  private:
-  int num;
-  long double surfPressure;
+  int num{0};
+  long double surfPressure{0};
 
  public:
   gas();
@@ -49,20 +49,20 @@ class gas {
 
 class sun {
  private:
-  long double luminosity;
-  long double mass;
-  long double effTemp;
-  string specType;
-  long double age;
-  string name;
-  bool isCircumbinary;
-  long double secondaryMass;
-  long double secondaryLuminosity;
-  long double secondaryEffTemp;
-  long double combinedEffTemp;
-  string secondarySpecType;
-  long double seperation;
-  long double eccentricity;
+  long double luminosity{0};
+  long double mass{0};
+  long double effTemp{0};
+  string specType{""};
+  long double age{0};
+  string name{""};
+  bool isCircumbinary{false};
+  long double secondaryMass{0};
+  long double secondaryLuminosity{0};
+  long double secondaryEffTemp{0};
+  long double combinedEffTemp{0};
+  string secondarySpecType{""};
+  long double seperation{};
+  long double eccentricity{};
 
  public:
   sun();
@@ -107,63 +107,63 @@ class sun {
 
 class planet {
  private:
-  int planetNo;
-  long double a;         /* semi-major axis of solar orbit (in AU)*/
-  long double e;         /* eccentricity of solar orbit		 */
-  long double axialTilt; /* units of degrees */
-  bool gasGiant;         /* TRUE if the planet is a gas giant */
-  long double dustMass;  /* mass, ignoring gas				 */
-  long double gasMass;   /* mass, ignoring dust				 */
-  long double imf;       /* ice mass fraction */
-  long double rmf;       /* rock mass fraction */
-  long double cmf;       /* fraction of rock that's carbon instead of silicate*/
-  long double moonA;     /* semi-major axis of lunar orbit (in AU)*/
-  long double moonE;     /* eccentricity of lunar orbit		 */
-  long double coreRadius;  /* radius of the rocky core (in km)	 */
-  long double radius;      /* equatorial radius (in km)		 */
-  int orbitZone;           /* the 'zone' of the planet			 */
-  long double density;     /* density (in g/cc)				 */
-  long double orbPeriod;   /* length of the local year (days)	 */
-  long double day;         /* length of the local day (hours)	 */
-  bool resonantPeriod;     /* TRUE if in resonant rotation		 */
-  long double escVelocity; /* units of cm/sec */
-  long double surfAccel;   /* units of cm/sec2   */
-  long double surfGrav;    /* units of Earth gravities			 */
-  long double rmsVelocity; /* units of cm/sec */
-  long double molecWeight; /* smallest molecular weight retained*/
-  long double volatileGasInventory;
-  long double surfPressure;      /* units of millibars (mb)			 */
-  bool greenhouseEffect;         /* runaway greenhouse effect?		 */
-  long double boilPoint;         /* the boiling point of water (Kelvin)*/
-  long double albedo;            /* albedo of the planet				 */
-  long double exosphericTemp;    /* units of degrees Kelvin    */
-  long double estimatedTemp;     /* quick non-iterative estimate (K)  */
-  long double estimatedTerrTemp; /* for terrestrial moons and the like*/
-  long double surfTemp;          /* surface temperature in Kelvin	 */
-  long double greenhsRise;       /* Temperature rise due to greenhouse */
-  long double highTemp;          /* Day-time temperature              */
-  long double lowTemp;           /* Night-time temperature			 */
-  long double maxTemp;           /* Summer/Day           */
-  long double minTemp;           /* Winter/Night           */
-  long double hydrosphere;       /* fraction of surface covered		 */
-  long double cloudCover;        /* fraction of surface covered		 */
-  long double iceCover;          /* fraction of surface covered		 */
+  int planetNo{0};
+  long double a{0};         /* semi-major axis of solar orbit (in AU)*/
+  long double e{0};         /* eccentricity of solar orbit		 */
+  long double axialTilt{0}; /* units of degrees */
+  bool gasGiant{false};         /* TRUE if the planet is a gas giant */
+  long double dustMass{0};  /* mass, ignoring gas				 */
+  long double gasMass{0};   /* mass, ignoring dust				 */
+  long double imf{0};       /* ice mass fraction */
+  long double rmf{0};       /* rock mass fraction */
+  long double cmf{0};       /* fraction of rock that's carbon instead of silicate*/
+  long double moonA{0};     /* semi-major axis of lunar orbit (in AU)*/
+  long double moonE{0};     /* eccentricity of lunar orbit		 */
+  long double coreRadius{0};  /* radius of the rocky core (in km)	 */
+  long double radius{0};      /* equatorial radius (in km)		 */
+  int orbitZone{0};           /* the 'zone' of the planet			 */
+  long double density{0};     /* density (in g/cc)				 */
+  long double orbPeriod{0};   /* length of the local year (days)	 */
+  long double day{0};         /* length of the local day (hours)	 */
+  bool resonantPeriod{false};     /* TRUE if in resonant rotation		 */
+  long double escVelocity{0}; /* units of cm/sec */
+  long double surfAccel{0};   /* units of cm/sec2   */
+  long double surfGrav{0};    /* units of Earth gravities			 */
+  long double rmsVelocity{0}; /* units of cm/sec */
+  long double molecWeight{0}; /* smallest molecular weight retained*/
+  long double volatileGasInventory{0};
+  long double surfPressure{0};      /* units of millibars (mb)			 */
+  bool greenhouseEffect{false};         /* runaway greenhouse effect?		 */
+  long double boilPoint{0};         /* the boiling point of water (Kelvin)*/
+  long double albedo{0};            /* albedo of the planet				 */
+  long double exosphericTemp{0};    /* units of degrees Kelvin    */
+  long double estimatedTemp{0};     /* quick non-iterative estimate (K)  */
+  long double estimatedTerrTemp{0}; /* for terrestrial moons and the like*/
+  long double surfTemp{0};          /* surface temperature in Kelvin	 */
+  long double greenhsRise{0};       /* Temperature rise due to greenhouse */
+  long double highTemp{0};          /* Day-time temperature              */
+  long double lowTemp{0};           /* Night-time temperature			 */
+  long double maxTemp{0};           /* Summer/Day           */
+  long double minTemp{0};           /* Winter/Night           */
+  long double hydrosphere{0};       /* fraction of surface covered		 */
+  long double cloudCover{0};        /* fraction of surface covered		 */
+  long double iceCover{0};          /* fraction of surface covered		 */
   sun theSun;
   vector<gas> atmosphere;
-  planet_type type; /* Type code */
-  int minorMoons;
-  long double inclination;
-  long double ascendingNode;
-  long double longitudeOfPericenter;
-  long double meanLongitude;
-  long double hzd;
-  long double hzc;
-  long double hza;
-  long double esi;
-  long double sph;
-  long double oblateness;
-  bool deleteable;
-  long double knownRadius;
+  planet_type type{tUnknown}; /* Type code */
+  int minorMoons{};
+  long double inclination{0};
+  long double ascendingNode{0};
+  long double longitudeOfPericenter{0};
+  long double meanLongitude{0};
+  long double hzd{};
+  long double hzc{};
+  long double hza{};
+  long double esi{};
+  long double sph{};
+  long double oblateness{};
+  bool deleteable{true};
+  long double knownRadius{};
   void estimateMass();
   // vector<planet *> temp_moon;
  public:
@@ -305,10 +305,10 @@ class planet {
 
 class dust {
  private:
-  long double innerEdge;
-  long double outerEdge;
-  bool dustPresent;
-  bool gasPresent;
+  long double innerEdge{0};
+  long double outerEdge{0};
+  bool dustPresent{true};
+  bool gasPresent{true};
 
  public:
   dust();
@@ -398,7 +398,7 @@ auto operator<<(ostream &, catalog &) -> ostream &;
 
 class catalog {
  private:
-  int extra_spaces;
+  int extra_spaces{0};
   string arg;
   vector<star> stars;
 
@@ -430,24 +430,24 @@ auto operator<<(ostream &, Chemicle &) -> ostream &;
 
 class Chemicle {
  private:
-  int num;
-  string symbol;
-  string htmlSymbol;
-  string name;
-  long double weight;
-  long double melt;
-  long double boil;
-  long double density;
-  long double pzero;
-  long double c;
-  long double n;
-  long double abunde;
-  long double abunds;
-  long double reactivity;
-  long double maxIpp;
-  long double minIpp;
-  int nameSpaces;
-  int symbolSpaces;
+  int num{0};
+  string symbol{""};
+  string htmlSymbol{""};
+  string name{""};
+  long double weight{0};
+  long double melt{0};
+  long double boil{0};
+  long double density{0};
+  long double pzero{0};
+  long double c{0};
+  long double n{0};
+  long double abunde{0};
+  long double abunds{0};
+  long double reactivity{0};
+  long double maxIpp{0};
+  long double minIpp{0};
+  int nameSpaces{};
+  int symbolSpaces{};
   void fixMelt();
   void fixBoil();
   void fixMaxIpp();
@@ -464,33 +464,33 @@ class Chemicle {
   Chemicle(Chemicle &);
   Chemicle(const Chemicle &);
   ~Chemicle();
-  auto getNum() -> int;
-  auto getSymbol() -> string;
-  auto getHtmlSymbol() -> string;
-  auto getName() -> string;
-  auto getWeight() -> long double;
+  auto getNum() -> int { return num; }
   void setMelt(long double);
-  auto getMelt() -> long double;
   void setBoil(long double);
-  auto getBoil() -> long double;
-  auto getDensity() -> long double;
-  auto getPzero() -> long double;
-  auto getC() -> long double;
-  auto getN() -> long double;
   void setAbunde(long double);
-  auto getAbunde() -> long double;
   void setAbunds(long double);
-  auto getAbunds() -> long double;
-  auto getReactivity() -> long double;
   void setMaxIpp(long double);
-  auto getMaxIpp() -> long double;
   void setMinIpp(long double);
-  auto getMinIpp() -> long double;
   auto getNameSpaces() -> int;
   auto getSymbolSpaces() -> int;
-  auto operator=(Chemicle &) -> Chemicle;
+  auto operator=(Chemicle const&) -> Chemicle&;
   auto operator<(Chemicle &) -> bool;
   auto operator==(Chemicle &) -> bool;
+  auto getAbunde() -> long double { return abunde; }
+  auto getAbunds() -> long double { return abunds; }
+  auto getBoil() -> long double { return boil; }
+  auto getC() -> long double { return c; }
+  auto getDensity() -> long double { return density; }
+  auto getHtmlSymbol() -> string { return htmlSymbol; }
+  auto getMaxIpp() -> long double { return maxIpp; }
+  auto getMelt() -> long double { return melt; }
+  auto getMinIpp() -> long double { return minIpp; }
+  auto getN() -> long double { return n; }
+  auto getName() -> string { return name; }
+  auto getPzero() -> long double { return pzero; }
+  auto getReactivity() -> long double { return reactivity; }
+  auto getSymbol() -> string { return symbol; }
+  auto getWeight() -> long double { return weight; }
   friend auto operator<<(ostream &, Chemicle &) -> ostream &;
 };
 
@@ -503,7 +503,7 @@ class ChemTable {
 
  public:
   ChemTable() = default;
-  void addChemicle(Chemicle);
+  void addChemicle(const Chemicle&);
   auto count() -> int;
   auto operator[](const int &) -> Chemicle &;
   friend auto operator<<(ostream &, ChemTable &) -> ostream &;

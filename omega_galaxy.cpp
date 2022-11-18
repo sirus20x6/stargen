@@ -6,6 +6,10 @@
 
 catalog omega_galaxy;
 
+/**
+ * @brief initialize Omega Galaxy
+ * 
+ */
 void initOmegaGalaxy() {
   star sol(1.0, 1.00, 5780, "G2V", 0, 0, 0, 0, 0, mercury, "Sol", true,
            "The Solar System");

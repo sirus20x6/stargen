@@ -105,8 +105,33 @@ bool allow_planet_migration = false;
 
 long system_seed = 0;
 
-string stargen_revision = "$Revision: 2.0 $";
+string stargen_revision = "$Revision: 3.0 $";
 
+/**
+ * @brief stargen
+ * 
+ * @param action 
+ * @param flag_char 
+ * @param path 
+ * @param url_path_arg 
+ * @param filename_arg 
+ * @param sys_name_arg 
+ * @param prognam 
+ * @param mass_arg 
+ * @param luminosity_arg 
+ * @param seed_arg 
+ * @param count_arg 
+ * @param incr_arg 
+ * @param cat_arg 
+ * @param sys_no_arg 
+ * @param ratio_arg 
+ * @param ecc_coef_arg 
+ * @param inner_planet_factor_arg 
+ * @param flags_arg 
+ * @param out_format 
+ * @param graphic_format 
+ * @return int 
+ */
 auto stargen(actions action, const string &flag_char, string path,
              const string &url_path_arg, const string &filename_arg,
              const string &sys_name_arg, string prognam, long double mass_arg,
@@ -759,6 +784,10 @@ auto stargen(actions action, const string &flag_char, string path,
   return EXIT_SUCCESS;
 }
 
+/**
+ * @brief init
+ * 
+ */
 void init() {
   if (flag_seed == 0) {
     time_t temp_time = 0;
@@ -772,6 +801,23 @@ void init() {
 
 int system_counter = 0;
 
+/**
+ * @brief generate stellar system
+ * 
+ * @param the_sun 
+ * @param use_seed_system 
+ * @param seed_system 
+ * @param flag_char 
+ * @param sys_no 
+ * @param system_name 
+ * @param inner_dust_limit 
+ * @param outer_planet_limit 
+ * @param ecc_coef 
+ * @param inner_planet_factor 
+ * @param do_gases 
+ * @param do_moons 
+ * @param myAccreteObject 
+ */
 void generate_stellar_system(sun &the_sun, bool use_seed_system,
                              planet *seed_system, const string& flag_char, int sys_no,
                              const string& system_name, long double inner_dust_limit,
@@ -843,6 +889,17 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
                    system_name, do_gases, do_moons);
 }
 
+/**
+ * @brief generate planets
+ * 
+ * @param the_sun 
+ * @param random_tilt 
+ * @param flag_char 
+ * @param sys_no 
+ * @param system_name 
+ * @param do_gases 
+ * @param do_moons 
+ */
 void generate_planets(sun &the_sun, bool random_tilt, const string &flag_char,
                       int sys_no, const string &system_name, bool do_gases,
                       bool do_moons) {
@@ -894,6 +951,19 @@ void generate_planets(sun &the_sun, bool random_tilt, const string &flag_char,
   }
 }
 
+/**
+ * @brief generate planet
+ * 
+ * @param the_planet 
+ * @param planet_no 
+ * @param the_sun 
+ * @param random_tilt 
+ * @param planet_id 
+ * @param do_gases 
+ * @param do_moons 
+ * @param is_moon 
+ * @param parent_mass 
+ */
 void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                      bool random_tilt, const string &planet_id, bool do_gases,
                      bool do_moons, bool is_moon, long double parent_mass) {
@@ -2060,6 +2130,16 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
   }
 }
 
+/**
+ * @brief assign type
+ * 
+ * @param the_sun 
+ * @param the_planet 
+ * @param planet_id 
+ * @param is_moon 
+ * @param do_gases 
+ * @param second_time 
+ */
 void assign_type(sun &the_sun, planet *the_planet, const string &planet_id,
                  bool is_moon, bool do_gases, bool second_time) {
   if (the_planet->getSurfPressure() < 1.0) {

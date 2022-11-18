@@ -271,7 +271,7 @@ auto accrete::collect_dust(long double last_mass, long double &new_dust,
   long double next_gas = 0;
 
   temp = last_mass / (1.0 + last_mass);
-  reduced_mass = std::pow(temp, 1.0 / 4.0);
+  reduced_mass = std::pow(temp, (long double) 0.25);
   r_inner = inner_effect_limit(a, e, reduced_mass);
   r_outer = outer_effect_limit(a, e, reduced_mass);
 
@@ -327,7 +327,7 @@ auto accrete::collect_dust(long double last_mass, long double &new_dust,
       width = width - temp2;
 
       // calculate the area of a cross-section, and the volume
-      temp = 4.0 * PI * std::pow(a, 2.0) * reduced_mass *
+      temp = 4.0 * M_PI * std::pow(a, 2.0) * reduced_mass *
              (1.0 - e * (temp1 - temp2) / bandwidth);
       volume = temp * width;
 
@@ -464,7 +464,7 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
       dist1 = (a * (1.0 + e) * (1.0 + reduced_mass)) - a;
       /* x aphelion */
       reduced_mass =
-          std::pow(the_planet->getMass() / (1.0 + the_planet->getMass()), 1.0 / 4.0);
+          std::pow(the_planet->getMass() / (1.0 + the_planet->getMass()), 0.25);
       dist2 = the_planet->getA() -
               (the_planet->getA() * (1.0 - the_planet->getE()) *
                (1.0 - reduced_mass));
@@ -472,7 +472,7 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
       dist1 = a - (a * (1.0 - e) * (1.0 - reduced_mass));
       /* x perihelion */
       reduced_mass = std::pow(
-          (the_planet->getMass() / (1.0 + the_planet->getMass())), 1.0 / 4.0);
+          (the_planet->getMass() / (1.0 + the_planet->getMass())), 0.25);
       dist2 = (the_planet->getA() * (1.0 + the_planet->getE()) *
                (1.0 + reduced_mass)) -
               the_planet->getA();
@@ -633,6 +633,7 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
     the_planet->setGasMass(gas_mass);
     the_planet->first_moon = seed_moons;
     the_planet->first_moon_backup = seed_moons;
+    
     if (mass >= crit_mass) {
       the_planet->setGasGiant(true);
     } else {

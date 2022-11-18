@@ -11,6 +11,14 @@
 
 using namespace std;
 
+/**
+ * @brief water radius
+ * 
+ * @param mass 
+ * @param the_planet 
+ * @param mass_radii 
+ * @return long double 
+ */
 long double water_radius(long double mass, planet *the_planet,
                          map<long double, long double> &mass_radii) {
   long double radius;
@@ -390,6 +398,15 @@ long double water_radius(long double mass, planet *the_planet,
   return radius;
 }
 
+/**
+ * @brief one quarter rock three fourths water radius
+ * 
+ * @param mass 
+ * @param cmf 
+ * @param the_planet 
+ * @param mass_radii 
+ * @return long double 
+ */
 long double one_quater_rock_three_fourths_water_radius(
     long double mass, long double cmf, planet *the_planet,
     map<long double, long double> &mass_radii) {
@@ -786,6 +803,15 @@ long double one_quater_rock_three_fourths_water_radius(
   return radius;
 }
 
+/**
+ * @brief half rock half water radius
+ * 
+ * @param mass 
+ * @param cmf 
+ * @param the_planet 
+ * @param mass_radii 
+ * @return long double 
+ */
 long double half_rock_half_water_radius(
     long double mass, long double cmf, planet *the_planet,
     map<long double, long double> &mass_radii) {
@@ -1185,6 +1211,15 @@ long double half_rock_half_water_radius(
   return radius;
 }
 
+/**
+ * @brief rock radius
+ * 
+ * @param mass 
+ * @param cmf 
+ * @param the_planet 
+ * @param mass_radii 
+ * @return long double 
+ */
 long double rock_radius(long double mass, long double cmf, planet *the_planet,
                         map<long double, long double> &mass_radii) {
   long double radius;
@@ -1584,6 +1619,15 @@ long double rock_radius(long double mass, long double cmf, planet *the_planet,
   return radius;
 }
 
+/**
+ * @brief half rock half iron radius
+ * 
+ * @param mass 
+ * @param cmf 
+ * @param the_planet 
+ * @param mass_radii 
+ * @return long double 
+ */
 long double half_rock_half_iron_radius(
     long double mass, long double cmf, planet *the_planet,
     map<long double, long double> &mass_radii) {
@@ -1995,6 +2039,14 @@ long double half_rock_half_iron_radius(
   return radius;
 }
 
+/**
+ * @brief iron radius
+ * 
+ * @param mass 
+ * @param the_planet 
+ * @param mass_radii 
+ * @return long double 
+ */
 long double iron_radius(long double mass, planet *the_planet,
                         map<long double, long double> &mass_radii) {
   long double radius;
@@ -2395,6 +2447,14 @@ long double iron_radius(long double mass, planet *the_planet,
   return radius;
 }
 
+/**
+ * @brief solid 0 Point 953 iron 0 point 047 water radius
+ * 
+ * @param mass 
+ * @param the_planet 
+ * @param mass_radii 
+ * @return long double 
+ */
 long double solid_0point953_iron_0point047_water_radius(
     long double mass, planet *the_planet,
     map<long double, long double> &mass_radii) {
@@ -2665,6 +2725,14 @@ long double solid_0point953_iron_0point047_water_radius(
   return radius;
 }
 
+/**
+ * @brief solid 0 point 51 iron 0 point 49 water radius
+ * 
+ * @param mass 
+ * @param the_planet 
+ * @param mass_radii 
+ * @return long double 
+ */
 long double solid_0point51_iron_0point49_water_radius(
     long double mass, planet *the_planet,
     map<long double, long double> &mass_radii) {
@@ -2935,6 +3003,14 @@ long double solid_0point51_iron_0point49_water_radius(
   return radius;
 }
 
+/**
+ * @brief solid 0 point 264 iron 0 point 736 water radius
+ * 
+ * @param mass 
+ * @param the_planet 
+ * @param mass_radii 
+ * @return long double 
+ */
 long double solid_0point264_iron_0point736_water_radius(
     long double mass, planet *the_planet,
     map<long double, long double> &mass_radii) {
@@ -3205,6 +3281,15 @@ long double solid_0point264_iron_0point736_water_radius(
   return radius;
 }
 
+/**
+ * @brief fraction radius
+ * 
+ * @param mass 
+ * @param imf 
+ * @param rmf 
+ * @param cmf 
+ * @return long double 
+ */
 long double fraction_radius(long double mass, long double imf, long double rmf,
                             long double cmf) {
   long double ice_fraction;
