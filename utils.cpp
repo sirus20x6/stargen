@@ -63,7 +63,7 @@ auto random_eccentricity(long double ecc_coef) -> long double {
   //   e = 0.99;
   // }
 
-  e = std::max(e , (long double) .99);
+  e = std::min(e , (long double) .99);
 
   return e;
 }

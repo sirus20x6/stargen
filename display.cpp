@@ -918,27 +918,47 @@ void print_description(fstream& the_file, string opening, planet* the_planet,
     long double iron =
         (1.0 - (the_planet->getRmf() + the_planet->getImf())) * 100.0;
 
-    if (gravity < 0.8) {
+    if (gravity < 0.5) {
+      lprint(the_file, first, "Very Low-G");
+    }
+    else if (gravity < .8) {
       lprint(the_file, first, "Low-G");
-    } else if (gravity > 1.2) {
+    }
+    else if (gravity < 1.2) {
+      lprint(the_file, first, "Earth-Like-G");
+    }
+    else if (gravity < 1.4) {
       lprint(the_file, first, "High-G");
+    }
+    else {
+      lprint(the_file, first, "Very-High-G");
     }
 
     if (rel_temp < -5.0) {
       lprint(the_file, first, "Cold");
-    } else if (rel_temp < -2.0) {
+    }
+    else if (rel_temp < -2.0) {
       lprint(the_file, first, "Cool");
-    } else if (rel_temp > 7.5) {
-      lprint(the_file, first, "Hot");
-    } else if (rel_temp > 3.0) {
+    }
+    else if (rel_temp < 3.0) {
+      lprint(the_file, first, "Mild");
+    }
+    else if (rel_temp < 7.5) {
       lprint(the_file, first, "Warm");
     }
+    else {
+      lprint(the_file, first, "Hot");
+    }
+
+
 
     if (the_planet->getType() != tIron && the_planet->getType() != tAsteroids) {
       if (iron > 90.0) {
         lprint(the_file, first, "'Cannonball'");
       } else if (iron > 60) {
         lprint(the_file, first, "Large Iron Core");
+      } else if (iron >= 20) {
+        lprint(the_file, first, "Medium Iron Core");
       } else if (iron < 1) {
         lprint(the_file, first, "Coreless");
       } else if (iron < 20) {
@@ -953,25 +973,46 @@ void print_description(fstream& the_file, string opening, planet* the_planet,
     }
 
     if (the_planet->getType() != tIce) {
-      if (ice > 10.0) {
-        lprint(the_file, first, "Icy");
+      if (ice > 90.0) {
+        lprint(the_file, first, "Ice Covered");
       }
-    } else {
-      if (ice < 50.0) {
-        lprint(the_file, first, "Not-so-Icy");
+    } else if (ice > 75.0) {
+        lprint(the_file, first, "Mostly Ice");
       }
-    }
+      else if (ice > 50.0) {
+        lprint(the_file, first, "Half Ice");
+      }
+      else if (ice > 25.0) {
+        lprint(the_file, first, "Significant Ice");
+      }
+      else if (ice > 10.0) {
+        lprint(the_file, first, "A Bit Icey");
+      }
 
     if (atmosphere < 0.001) {
       lprint(the_file, first, "Airless");
     } else {
       if (the_planet->getType() != tWater) {
-        if (seas < 25.0) {
+        if (seas < 10.0) {
+          lprint(the_file, first, "Desert");
+        } 
+        else if (seas < 15.0) {
+          lprint(the_file, first, "Semi-Arid");
+        }
+        else if (seas < 25.0) {
           lprint(the_file, first, "Arid");
-        } else if (seas < 50.0) {
+        }
+        else if (seas < 50.0) {
           lprint(the_file, first, "Dry");
-        } else if (seas > 80.00) {
+        }
+        else if (seas <= 75.0) {
+          lprint(the_file, first, "Moist");
+        }
+        else if (seas < 85.00) {
           lprint(the_file, first, "Wet");
+        }
+        else {
+          lprint(the_file, first, "Water World");
         }
       }
 

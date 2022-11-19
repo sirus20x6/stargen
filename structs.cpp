@@ -28,10 +28,10 @@ using namespace std;
  * @param cel 
  * @param n 
  */
-star::star(long double l, long double m, long double et, string t,
+star::star(long double lum, long double m, long double et, string t,
            long double m2, long double e, long double d, long double i,
            long double a, planet* kp, string des, bool cel, string n) {
-  luminosity = l;
+  luminosity = lum;
   mass = m;
   eff_temp = et;
   spec_type = t;
