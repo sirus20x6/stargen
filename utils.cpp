@@ -1,4 +1,3 @@
-#include "utils.h"
 #include <bits/std_abs.h>           // for abs
 #include <iostream>
 #include <numeric>
@@ -10,6 +9,7 @@
 #include <string>                   // for string, basic_string, operator<<
 #include "const.h"                  // for pow2, pow1_4, pow3, pow4
 #include "enviro.h"                 // for eff_temp_to_spec_type, getStarType
+#include "utils.h"
 
 using namespace std;
 
@@ -57,11 +57,13 @@ auto random_eccentricity(long double ecc_coef) -> long double {
   long double e = NAN;
   e = 1.0 - std::pow(random_number(0.0, 1.0), ecc_coef);
 
-  if (e > .99)  // Note that this coresponds to a random number less than
-                // 10E-26. It happens with GNU C for -S254 -W27
-  {
-    e = 0.99;
-  }
+  // if (e > .99)  // Note that this coresponds to a random number less than
+  //               // 10E-26. It happens with GNU C for -S254 -W27
+  // {
+  //   e = 0.99;
+  // }
+
+  e = std::max(e , (long double) .99);
 
   return e;
 }
@@ -152,60 +154,19 @@ auto logistal_trend(long double a, long double b, long double c, long double x)
   return c / (1 + (a * exp(-1.0 * b * x)));
 }
 
-// code from http://rosettacode.org/wiki/Polynomial_regression#C
-// auto polynomialfit(int obs, int degree, double *dx, double *dy, double *store)
-//     -> bool /* n, p */
-// {
-//   gsl_multifit_linear_workspace *ws = nullptr;
-//   gsl_matrix *cov = nullptr, *X = nullptr;
-//   gsl_vector *y = nullptr, *c = nullptr;
-//   double chisq = NAN;
-
-//   int i = 0, j = 0;
-
-//   X = gsl_matrix_alloc(obs, degree);
-//   y = gsl_vector_alloc(obs);
-//   c = gsl_vector_alloc(degree);
-//   cov = gsl_matrix_alloc(degree, degree);
-
-//   for (i = 0; i < obs; i++) {
-//     gsl_matrix_set(X, i, 0, 1.0);
-//     for (j = 0; j < degree; j++) {
-//       gsl_matrix_set(X, i, j, std::pow(dx[i], j));
-//     }
-//     gsl_vector_set(y, i, dy[i]);
-//   }
-
-//   ws = gsl_multifit_linear_alloc(obs, degree);
-//   gsl_multifit_linear(X, y, c, cov, &chisq, ws);
-
-//   /* store result ... */
-//   for (i = 0; i < degree; i++) {
-//     store[i] = gsl_vector_get(c, i);
-//   }
-
-//   gsl_multifit_linear_free(ws);
-//   gsl_matrix_free(X);
-//   gsl_matrix_free(cov);
-//   gsl_vector_free(y);
-//   gsl_vector_free(c);
-//   return true; /* we do not "analyse" the result (cov matrix mainly)
-//   to know if the fit is "good" */
-// }
-
-/// @brief 
+/// @brief code from http://rosettacode.org/wiki/Polynomial_regression#C
 /// @param x 
 /// @param y 
 /// @param store 
 void polyRegression(const std::vector<double>& x, const std::vector<double>& y, double *store) {
-    int n = x.size();
+    unsigned long n = x.size();
     std::vector<int> r(n);
     std::iota(r.begin(), r.end(), 0);
-    double xm = std::accumulate(x.begin(), x.end(), 0.0) / x.size();
-    double ym = std::accumulate(y.begin(), y.end(), 0.0) / y.size();
-    double x2m = std::transform_reduce(r.begin(), r.end(), 0.0, std::plus<double>{}, [](double a) {return a * a; }) / r.size();
-    double x3m = std::transform_reduce(r.begin(), r.end(), 0.0, std::plus<double>{}, [](double a) {return a * a * a; }) / r.size();
-    double x4m = std::transform_reduce(r.begin(), r.end(), 0.0, std::plus<double>{}, [](double a) {return a * a * a * a; }) / r.size();
+    double xm = std::accumulate(x.begin(), x.end(), 0.0) / (double) x.size();
+    double ym = std::accumulate(y.begin(), y.end(), 0.0) / (double) y.size();
+    double x2m = std::transform_reduce(r.begin(), r.end(), 0.0, std::plus<double>{}, [](double a) {return a * a; }) / (double) r.size();
+    double x3m = std::transform_reduce(r.begin(), r.end(), 0.0, std::plus<double>{}, [](double a) {return a * a * a; }) / (double) r.size();
+    double x4m = std::transform_reduce(r.begin(), r.end(), 0.0, std::plus<double>{}, [](double a) {return a * a * a * a; }) / (double) r.size();
 
     double xym = std::transform_reduce(x.begin(), x.end(), y.begin(), 0.0, std::plus<double>{}, std::multiplies<double>{});
     xym /= fmin(x.size(), y.size());
@@ -219,27 +180,10 @@ void polyRegression(const std::vector<double>& x, const std::vector<double>& y, 
     double sx2x2 = x4m - x2m * x2m;
     double sx2y = x2ym - x2m * ym;
 
-    double b = (sxy * sx2x2 - sx2y * sxx2) / (sxx * sx2x2 - sxx2 * sxx2);
-    double c = (sx2y * sxx - sxy * sxx2) / (sxx * sx2x2 - sxx2 * sxx2);
-    double a = ym - b * xm - c * x2m;
+    store[1] = (sxy * sx2x2 - sx2y * sxx2) / (sxx * sx2x2 - sxx2 * sxx2);
+    store[2] = (sx2y * sxx - sxy * sxx2) / (sxx * sx2x2 - sxx2 * sxx2);
+    store[0] = ym - store[1] * xm - store[2] * x2m;
 
-    auto abc = [a, b, c](int xx) {
-        return a + b * xx + c * xx*xx;
-    };
-
-    store[0] = a;
-    store[1] = b;
-    store[2] = c;
-
-    // auto xit = x.cbegin();
-    // auto xend = x.cend();
-    // auto yit = y.cbegin();
-    // auto yend = y.cend();
-    // while (xit != xend && yit != yend) {
-    //     printf("%2d %3d  %5.1f\n", *xit, *yit, abc(*xit));
-    //     xit = std::next(xit);
-    //     yit = std::next(yit);
-    // }
 }
 
 /// @brief 
