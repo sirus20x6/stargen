@@ -16,11 +16,11 @@ Strangly some of the code in that fork is more modular / object oriented / bette
 - Removed dependency on GNU Scientific Library
 
 ## TODO
-- JSON support for exporting solar data
 - Convert existing data in the code over to JSON
 - Remove all global variables
 - Make the code more modular and compliant with modern C++ code
 - Add multithreading probably through OpenMP
+- ~~JSON support for exporting solar data~~
 
 ## Build instructions
 ```bash
