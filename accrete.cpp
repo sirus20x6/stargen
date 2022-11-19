@@ -787,8 +787,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
     } else {
       a = random_number(planet_inner_bound, planet_outer_bound);
       e = random_eccentricity(ecc_coef);
-      i = 0;
-      while (calcPerihelion(a, e) < planet_inner_bound && i < 1000;i++) {
+      for (int i = 0;(calcPerihelion(a, e) < planet_inner_bound) && (i < 1000);i++) {
         a = random_number(planet_inner_bound, planet_outer_bound);
         e = random_eccentricity(ecc_coef);
       }
