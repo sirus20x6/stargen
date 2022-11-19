@@ -834,9 +834,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
       if (total_mass > PROTOPLANET_MASS) {
         if (allow_planet_migration && is_seed == false) {
           long double min_distance = 0.0;
-          if (the_sun.getIsCircumbinary()) {
-            min_distance = planet_inner_bound;
-          } else if (nearest_planet_factor != 0.3) {
+          if (the_sun.getIsCircumbinary() || (nearest_planet_factor != 0.3)) {
             min_distance = planet_inner_bound;
           } else {
             min_distance = 0.015;
@@ -846,26 +844,18 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
           new_a = random_number(min_distance, a);
           new_e = random_eccentricity(ecc_coef);
           i = 0;
-          while (calcPerihelion(new_a, new_e) < min_distance) {
-            if (i > 1000) {
-              break;
-            }
+          for (;(calcPerihelion(new_a, new_e) < min_distance) && (i < 1000); i++) {
             new_a = random_number(min_distance, a);
             new_e = random_eccentricity(ecc_coef);
-            i++;
           }
           if (total_mass >= ((0.7 * JUPITER_MASS) / SUN_MASS_IN_EARTH_MASSES)) {
             if (((1 + rand()) % 14) == 0 && min_distance < 0.2) {
               new_a = random_number(min_distance, 0.2);
               new_e = random_eccentricity(ecc_coef);
               i = 0;
-              while (calcPerihelion(new_a, new_e) < min_distance) {
-                if (i > 1000) {
-                  break;
-                }
+              for (;(calcPerihelion(new_a, new_e) < min_distance) && (i < 1000); i++) {
                 new_a = random_number(min_distance, 0.2);
                 new_e = random_eccentricity(ecc_coef);
-                i++;
               }
             }
             if (((1 + rand()) % 10) == 0 &&
@@ -873,13 +863,9 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
               while (new_e < 0.1) {
                 new_e = random_eccentricity(0.25);
                 i = 0;
-                while (calcPerihelion(new_a, new_e) < min_distance) {
-                  if (i > 1000) {
-                    break;
-                  }
+                for (;(calcPerihelion(new_a, new_e) < min_distance) && (i < 1000); i++) {
                   new_a = random_number(min_distance, a);
                   new_e = random_eccentricity(ecc_coef);
-                  i++;
                 }
               }
             }
@@ -891,13 +877,9 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
               new_a = random_number(min_distance, a / 2.0);
               new_e = random_eccentricity(ecc_coef);
               int i = 0;
-              while (calcPerihelion(new_a, new_e) < planet_inner_bound) {
-                if (i > 1000) {
-                  break;
-                }
+              for (;calcPerihelion(new_a, new_e) < planet_inner_bound && i < 1000;i++) {
                 new_a = random_number(min_distance, a / 2.0);
                 new_e = random_eccentricity(ecc_coef);
-                i++;
               }
             }
           }
