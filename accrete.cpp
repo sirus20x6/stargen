@@ -271,7 +271,7 @@ auto accrete::collect_dust(long double last_mass, long double &new_dust,
   long double temp1 = NAN;
   long double temp2 = NAN;
   long double temp = NAN;
-  long double temp_density = NAN;
+  long double temp_density = 0.0;
   long double bandwidth = NAN;
   long double width = NAN;
   long double volume = NAN;
@@ -293,12 +293,10 @@ auto accrete::collect_dust(long double last_mass, long double &new_dust,
   if (dust_band == nullptr) {
     return 0;
   } else {
-    // if we have dust, use the dust density, otherwise zero
-    if (!dust_band->getDustPresent()) {
-      temp_density = 0.0;
-    } else {
-      temp_density = dust_density;
-    }
+  // if we have dust, use the dust density, otherwise zero
+  if (dust_band->getDustPresent()) {
+    temp_density = dust_density;
+  }
 
     // if the last mass is below the critical mass, or there's no dust in this 
     // dust band, the density is the overall accretion density;
@@ -490,8 +488,7 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
           (the_planet->getMass() + mass) /
           ((the_planet->getMass() / the_planet->getA()) + (mass / a));
 
-      temp = the_planet->getMass() * sqrt(the_planet->getA()) *
-             sqrt(1.0 - std::pow(the_planet->getE(), 2.0));
+      temp = the_planet->getMass() * sqrt(the_planet->getA()) * sqrt(1.0 - std::pow(the_planet->getE(), 2.0));
       temp += (mass * sqrt(a) * sqrt(sqrt(1.0 - std::pow(e, 2.0))));
       temp /= ((the_planet->getMass() + mass) * sqrt(new_a));
       temp = 1.0 - std::pow(temp, 2.0);
@@ -717,8 +714,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
   if (!the_sun.getIsCircumbinary()) {
     stell_mass_ratio = the_sun.getMass();
     stell_luminosity_ratio = the_sun.getLuminosity();
-    planet_inner_bound =
-        nearest_planet(stell_mass_ratio, nearest_planet_factor);
+    planet_inner_bound = nearest_planet(stell_mass_ratio, nearest_planet_factor);
   } else {
     stell_mass_ratio = the_sun.getCombinedMass();
     stell_luminosity_ratio = the_sun.getCombinedLuminosity();
@@ -792,13 +788,9 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
       a = random_number(planet_inner_bound, planet_outer_bound);
       e = random_eccentricity(ecc_coef);
       i = 0;
-      while (calcPerihelion(a, e) < planet_inner_bound) {
-        if (i > 1000) {
-          break;
-        }
+      while (calcPerihelion(a, e) < planet_inner_bound && i < 1000;i++) {
         a = random_number(planet_inner_bound, planet_outer_bound);
         e = random_eccentricity(ecc_coef);
-        i++;
       }
       total_mass = PROTOPLANET_MASS;
       dust_mass = 0;
