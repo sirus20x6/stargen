@@ -1110,13 +1110,13 @@ auto sun::getCombinedEffTemp() -> long double {
   }
 }
 
-planet::planet() : deleteable(true) {
+planet::planet() : planetNo(0), a(0), e(0), axialTilt(0), gasGiant(false), dustMass(0), gasMass(0), imf(0), rmf(0), cmf(0), moonA(0), moonE(0), coreRadius(0), radius(0), orbitZone(0), density(0), orbPeriod(0), day(0), resonantPeriod(false), escVelocity(0), surfAccel(0), surfGrav(0), rmsVelocity(0), molecWeight(0), volatileGasInventory(0), surfPressure(0), greenhouseEffect(false), boilPoint(0), albedo(0), exosphericTemp(0), estimatedTemp(0), estimatedTerrTemp(0), surfTemp(0), greenhsRise(0), highTemp(0), lowTemp(0), maxTemp(0), minTemp(0), hydrosphere(0), cloudCover(0), iceCover(0), inclination(0), ascendingNode(0), longitudeOfPericenter(0), meanLongitude(0), first_moon(NULL), next_planet(NULL), reconnect_to(NULL), first_moon_backup(NULL), type(tUnknown), deleteable(true) {
 
 }
 
 planet::planet(int n, long double a2, long double e2, long double t, bool gg,
-               long double d, long double g, planet* moon, planet* next) : planetNo(n), a(a2), e(e2), axialTilt(t), gasGiant(gg), dustMass(d), gasMass(g),
-               first_moon(moon), next_planet(next), reconnect_to(next), first_moon_backup(moon) {
+               long double d, long double g, planet* moon, planet* next) : planetNo(n), a(a2), e(e2), axialTilt(t), gasGiant(gg), dustMass(d), gasMass(g), imf(0), rmf(0), cmf(0), moonA(0), moonE(0), coreRadius(0), radius(0), orbitZone(0), density(0), orbPeriod(0), day(0), resonantPeriod(false), escVelocity(0), surfAccel(0), surfGrav(0), rmsVelocity(0), molecWeight(0), volatileGasInventory(0), surfPressure(0), greenhouseEffect(false), boilPoint(0), albedo(0), exosphericTemp(0), estimatedTemp(0), estimatedTerrTemp(0), surfTemp(0), greenhsRise(0), highTemp(0), lowTemp(0), maxTemp(0), minTemp(0), hydrosphere(0), cloudCover(0), iceCover(0), inclination(0), ascendingNode(0), longitudeOfPericenter(0), meanLongitude(0), first_moon(moon), next_planet(next), reconnect_to(next), first_moon_backup(moon), type(tUnknown), deleteable(true) {
+
 }
 
 planet::~planet() {

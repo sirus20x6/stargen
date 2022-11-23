@@ -2,7 +2,7 @@
 #include	"const.h"
 
 old_star andromeda_stars[] =
-// L			Mass				Eff_Temp	Spec_Type	Mass2			Eccen.	SMAxis	 Planets		Designation		InCel Name
+// L			                   Mass				Eff_Temp	Spec_Type	Mass2	Eccen.	SMAxis	 Planets		Designation		InCel Name
 { {abs2luminosity(6.87),	mass(abs2luminosity(6.87)),	0,	(char*)"K6V",		0,	0,	 0,0,0,		(char*)"M31 (L1)",	1,	(char*)"And K6 L1"},
  {abs2luminosity(10.6),	mass(abs2luminosity(10.6)),	0,	(char*)"M2V",		0,	0,	 0,0,0,		(char*)"M31 (L2)",	1,	(char*)"And M2 L2"},
  {abs2luminosity(5.21),	mass(abs2luminosity(5.21)),	0,	(char*)"K1V",		0,	0,	 0,0,0,		(char*)"M31 (L3)",	1,	(char*)"And K1 L3"},
