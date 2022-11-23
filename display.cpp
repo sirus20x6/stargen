@@ -775,8 +775,8 @@ void openCVSorJson(string path, string the_filename, fstream& output) {
  * @param file_name 
  * @param ext 
  */
-void refresh_file_stream(fstream& output, string path, string file_name,
-                         string ext) {
+void refresh_file_stream(fstream& output, const string &path, const string &file_name,
+                         const string &ext) {
   string the_file_spec;
   stringstream ss;
 
@@ -804,8 +804,8 @@ void refresh_file_stream(fstream& output, string path, string file_name,
  * @param prognam 
  * @param output 
  */
-void open_html_file(string system_name, long seed, string path, string url_path,
-                    string file_name, string ext, string prognam,
+void open_html_file(const string &system_name, long seed, const string &path, const string &url_path,
+                    const string &file_name, const string &ext, const string &prognam,
                     fstream& output) {
   string the_file_spec;
   bool noname = system_name.empty();
@@ -876,8 +876,8 @@ void close_html_file(fstream& the_file) {
  * @param the_planet 
  * @param closing 
  */
-void print_description(fstream& the_file, string opening, planet* the_planet,
-                       string closing) {
+void print_description(fstream& the_file, const string &opening, planet* the_planet,
+                       const string &closing) {
   bool first = true;
   long double earth_masses = the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES;
   long double earth_radii = convert_km_to_eu(the_planet->getRadius());
@@ -1205,7 +1205,7 @@ void list_molecules(fstream& the_file, long double weight) {
 void html_star_details_helper(fstream& the_file, const string& header,
                               long double mass, long double luminosity,
                               long double temperature, long double age,
-                              long double life, string spec_type) {
+                              long double life, const string &spec_type) {
   the_file << "<tr><td colspan=2 bgcolor='" << BGHEADER << "' align=center>";
   the_file << "<font size='+1' color='" << TXHEADER << "'><b>" << header
            << "</b></font>";
@@ -1242,8 +1242,8 @@ void html_star_details_helper(fstream& the_file, const string& header,
  * @param do_gases 
  */
 void html_thumbnails(planet* innermost_planet, fstream& the_file,
-                     string system_name, string url_path, string system_url,
-                     string svg_url, string file_name, bool details,
+                     const string &system_name, const string &url_path, const string &system_url,
+                     const string &svg_url, const string &file_name, bool details,
                      bool terrestrials, bool int_link, bool do_moons,
                      int graphic_format, bool do_gases) {
   planet* the_planet;
@@ -1699,7 +1699,7 @@ void html_thumbnail_totals(fstream& the_file) {
  * @param the_file 
  */
 void html_describe_planet(planet* the_planet, int counter, int moons,
-                         bool do_gases, string url_path, fstream& the_file) {
+                         bool do_gases, const string &url_path, fstream& the_file) {
   string planet_id;
   string typeString = type_string(the_planet);
   stringstream ss;
@@ -2113,7 +2113,7 @@ void html_describe_planet(planet* the_planet, int counter, int moons,
  * @param the_file 
  */
 void html_describe_system(planet* innermost_planet, bool do_gases,
-                          bool do_moons, string url_path, fstream& the_file) {
+                          bool do_moons, const string &url_path, fstream& the_file) {
   do_gases = (flags_arg_clone & fDoGases) != 0;
   planet* the_planet;
   int counter;
@@ -2260,8 +2260,8 @@ void celestia_describe_system(planet* innermost_planet, string designation,
  * @param is_moon 
  * @param planet_num 
  */
-void celestia_describe_world(planet* the_planet, string designation,
-                             string system_name, long int seed, long double inc,
+void celestia_describe_world(planet* the_planet, const string &designation,
+                             const string &system_name, long int seed, long double inc,
                              long double an, int counter, sun& the_sun,
                              bool is_moon, int planet_num) {
   long double tmp, local_inc, mean_long;
@@ -2765,7 +2765,7 @@ designation << endl;
  * @param first 
  * @param text 
  */
-void lprint(fstream& the_file, bool& first, string text) {
+void lprint(fstream& the_file, bool& first, const string &text) {
   if (first) {
     first = false;
   } else {
