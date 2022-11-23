@@ -31,23 +31,27 @@ auto type_string(planet *) -> string;
 auto cloud_type_string(planet *) -> string;
 void create_svg_file(planet *, string, string, string, string, bool);
 void openCVSorJson(string, string, fstream &);
-void refresh_file_stream(fstream &, string, string, string);
-void open_html_file(string, long, string, string, string, string, string,
+void refresh_file_stream(fstream &, const string&, const string&, const string&);
+void open_html_file(const string&, long, const string&, const string&, const string&, const string&, const string&,
                     fstream &);
 void close_html_file(fstream &);
-void print_description(fstream &, string, planet *, string);
+void print_description(fstream &, const string&, planet *, const string&);
 void list_molecules(fstream &, long double);
-void html_thumbnails(planet *, fstream &, string, string, string, string,
-                     string, bool, bool, bool, bool, int, bool);
+void html_star_details_helper(fstream& the_file, const string& header,
+                              long double mass, long double luminosity,
+                              long double temperature, long double age,
+                              long double life, const string &spec_type);
+void html_thumbnails(planet *, fstream &, const string&, const string&, const string&, const string&,
+                     const string&, bool, bool, bool, bool, int, bool);
 void html_thumbnail_totals(fstream &);
-void html_describe_planet(planet *, int, int, bool, string, fstream &);
-void html_describe_system(planet *, bool, bool, string, fstream &);
+void html_describe_planet(planet *, int, int, bool, const string&, fstream &);
+void html_describe_system(planet *, bool, bool, const string&, fstream &);
 void celestia_describe_system(planet *, string, string, long, long double,
                               long double, bool);
-void celestia_describe_world(planet *, string, string, long, long double,
+void celestia_describe_world(planet *, const string&, const string&, long, long double,
                              long double, int, sun &, bool, int);
-void moongen_describe_system(planet *, string, string, long);
-void lprint(fstream &, bool &, string);
+void moongen_describe_system(planet *, const string&, const string&, long);
+void lprint(fstream &, bool &, const string&);
 auto image_type_string(planet *) -> string;
 auto printSpinResonanceFactor(long double) -> string;
 void mol_print(fstream &, bool &, int &, int, long double, string, long double);

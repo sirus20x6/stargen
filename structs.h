@@ -391,10 +391,10 @@ class star {
   auto getSpecType2() -> string;
   void setIsCircumbinary(bool);
   auto getIsCircumbinary() -> bool;
-  auto operator=(star &) -> star;
+  auto operator=(const star &) -> star;
   // star operator=(const star);
   auto operator<(star &) -> bool;
-  auto operator==(star &) -> bool;
+  auto operator==(const star &) -> bool;
   friend auto operator<<(ostream &, star &) -> ostream &;
 };
 
@@ -414,9 +414,9 @@ class catalog {
   void setArg(string);
   void addStar(star &);
   auto getArg() -> string;
-  auto count() -> int;
+  auto count() -> unsigned long;
   auto operator[](const int &) -> star &;
-  auto operator=(catalog &) -> catalog;
+  auto operator=(catalog &) -> catalog&;
   friend auto operator<<(ostream &, catalog &) -> ostream &;
   void sort();
 };
@@ -509,7 +509,7 @@ class ChemTable {
  public:
   ChemTable() = default;
   void addChemicle(const Chemical&);
-  auto count() -> int;
+  auto count() -> const unsigned long;
   auto operator[](const int &) -> Chemical &;
   friend auto operator<<(ostream &, ChemTable &) -> ostream &;
 };

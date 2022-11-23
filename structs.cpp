@@ -200,7 +200,7 @@ star::star(const star& right) {
 /// @brief 
 /// @param right 
 /// @return 
-auto star::operator=(star& right) -> star {
+auto star::operator=(const star& right) -> star {
   luminosity = right.luminosity;
   mass = right.mass;
   eff_temp = right.eff_temp;
@@ -375,7 +375,7 @@ auto star::operator<(star& right) -> bool {
 /// @brief 
 /// @param right 
 /// @return 
-auto star::operator==(star& right) -> bool {
+auto star::operator==(const star& right) -> bool {
   if (name == right.name) {
     return true;
   }
@@ -389,24 +389,21 @@ catalog::catalog() : extra_spaces(0) { }
 /// @param a 
 catalog::catalog(string a) : arg(a), extra_spaces(0) {
   
-  
 }
 
 /// @brief 
 /// @return 
-auto catalog::count() -> int { return stars.size(); }
+auto catalog::count() -> unsigned long { return stars.size(); }
 
 /// @brief 
 /// @param the_star 
 void catalog::addStar(star& the_star) {
-  string star_name;
-  int name_length = 0;
+  string star_name = the_star.getName();;
+  unsigned long name_length = star_name.length();
   int diff = 0;
 
   stars.push_back(the_star);
 
-  star_name = the_star.getName();
-  name_length = star_name.length();
   if (name_length > 30) {
     diff = name_length - 30;
     if (diff > extra_spaces) {
@@ -468,10 +465,10 @@ auto operator<<(ostream& strm, catalog& obj) -> ostream& {
 /// @brief 
 /// @param right 
 /// @return 
-auto catalog::operator=(catalog& right) -> catalog {
+auto catalog::operator=(catalog& right) -> catalog& {
   arg = right.arg;
   stars.clear();
-  int new_stars = right.count();
+  unsigned long new_stars = right.count();
   for (int i = 0; i < new_stars; i++) {
     stars.push_back(right[i]);
   }
@@ -814,7 +811,7 @@ void ChemTable::addChemicle(const Chemical &chem) {
   quicksort(chemicles, 0, chemicles.size());
 }
 
-auto ChemTable::count() -> int { return chemicles.size(); }
+auto ChemTable::count() -> const unsigned long { return chemicles.size(); }
 
 auto ChemTable::operator[](const int& index) -> Chemical& {
   if (index < 0 || index >= chemicles.size()) {
@@ -938,23 +935,6 @@ sun::sun(const sun& right) {
     specType = eff_temp_to_spec_type(effTemp, luminosity);
   }
 }
-
-/*sun sun::operator=(sun& right)
-{
-  luminosity = right.luminosity;
-  mass = right.mass;
-  effTemp = right.effTemp;
-  specType = right.specType;
-  age = right.age;
-  name = right.name;
-  isCircumbinary = right.isCircumbinary;
-  secondaryMass = right.secondaryMass;
-  secondaryLuminosity = right.secondaryLuminosity;
-  secondaryEffTemp = right.secondaryEffTemp;
-  secondarySpecType = right.secondarySpecType;
-  seperation = right.seperation;
-  eccentricity = right.eccentricity;
-}*/
 
 auto sun::getAge() -> long double { return age; }
 
@@ -1130,113 +1110,13 @@ auto sun::getCombinedEffTemp() -> long double {
   }
 }
 
-planet::planet() : planetNo(0), a(0), e(0), axialTilt(0), gasGiant(false), dustMass(0), gasMass(0), imf(0), rmf(0), cmf(0), moonA(0), moonE(0), coreRadius(0), radius(0), orbitZone(0), density(0), orbPeriod(0), day(0), resonantPeriod(false), escVelocity(0), surfAccel(0), surfGrav(0), rmsVelocity(0), molecWeight(0), volatileGasInventory(0), surfPressure(0), greenhouseEffect(false), boilPoint(0), albedo(0), exosphericTemp(0), estimatedTemp(0), estimatedTerrTemp(0), surfTemp(0), greenhsRise(0), highTemp(0), lowTemp(0), maxTemp(0), minTemp(0), hydrosphere(0), cloudCover(0), iceCover(0), inclination(0), ascendingNode(0), longitudeOfPericenter(0), meanLongitude(0), first_moon(NULL), next_planet(NULL), reconnect_to(NULL), first_moon_backup(NULL), type(tUnknown), deleteable(true) {
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+planet::planet() : deleteable(true) {
+
 }
 
 planet::planet(int n, long double a2, long double e2, long double t, bool gg,
-               long double d, long double g, planet* moon, planet* next) : planetNo(n), a(a2), e(e2), axialTilt(t), gasGiant(gg), dustMass(d), gasMass(g), imf(0), rmf(0), cmf(0), moonA(0), moonE(0), coreRadius(0), radius(0), orbitZone(0), density(0), orbPeriod(0), day(0), resonantPeriod(false), escVelocity(0), surfAccel(0), surfGrav(0), rmsVelocity(0), molecWeight(0), volatileGasInventory(0), surfPressure(0), greenhouseEffect(false), boilPoint(0), albedo(0), exosphericTemp(0), estimatedTemp(0), estimatedTerrTemp(0), surfTemp(0), greenhsRise(0), highTemp(0), lowTemp(0), maxTemp(0), minTemp(0), hydrosphere(0), cloudCover(0), iceCover(0), inclination(0), ascendingNode(0), longitudeOfPericenter(0), meanLongitude(0), first_moon(moon), next_planet(next), reconnect_to(next), first_moon_backup(moon), type(tUnknown), deleteable(true) {
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+               long double d, long double g, planet* moon, planet* next) : planetNo(n), a(a2), e(e2), axialTilt(t), gasGiant(gg), dustMass(d), gasMass(g),
+               first_moon(moon), next_planet(next), reconnect_to(next), first_moon_backup(moon) {
 }
 
 planet::~planet() {
