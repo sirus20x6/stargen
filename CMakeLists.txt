@@ -1,16 +1,21 @@
-project(stargen_2014 DESCRIPTION "A program for generating solar systems")
+cmake_minimum_required(VERSION 3.20)
+project(stargen VERSION 3.0.0.0 DESCRIPTION "A program for generating solar systems")
 
-cmake_minimum_required(VERSION 3.11)
-project(stargen VERSION 3.11.0)
-#set(CMAKE_PROJECT_VERSION = 3.4.5)
-#set(CMAKE_PROJECT_VERSION_MAJOR 3)
-#    CMAKE_PROJECT_VERSION_MINOR
-#    CMAKE_PROJECT_VERSION_PATCH
+set(my_project_VERSION ${GIT_VERSION})
+message(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}")
+message(STATUS "CMAKE_PROJECT_VERSION: ${CMAKE_PROJECT_VERSION}")
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
-set(CMAKE_BUILD_PARALLEL_LEVEL 8)
+cmake_host_system_information(RESULT logical QUERY NUMBER_OF_LOGICAL_CORES)
+cmake_host_system_information(RESULT physical QUERY NUMBER_OF_PHYSICAL_CORES)
+
+message(STATUS "NUMBER_OF_LOGICAL_CORES: ${logical}")
+message(STATUS "NUMBER_OF_PHYSICAL_CORES: ${physical}")
+set(CMAKE_BUILD_PARALLEL_LEVEL ${logical})
 
 include(FetchContent)
 
