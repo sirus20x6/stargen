@@ -14,6 +14,9 @@ This is a fork of a version of stargen from https://github.com/sirus20x6/stargen
 - Add an export option to export planets to SpaceEngine .sc script.
 - Fix distances of moons; they are currently based solely on hill spheres; making the innermost moons take 90 days to orbit a planet that is far from their sun(s).
 
+## Known Issues
+- A typo I can't find is causing radius errors for certain planet masses, causing StarGen to quit. This will interfere with large batches of systems. Only solution is to start over. :(
+
 ## Build instructions
 ```bash
 git clone https://github.com/PlutonianEmpire/stargen.git
