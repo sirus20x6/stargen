@@ -2676,7 +2676,7 @@ void celestia_describe_world(planet* the_planet, const string &designation,
   }
   // cout << "\tOrbitFrame { EclipticJ2000{} }\n";
   cout << "\tOrbitFrame { \n"
-  "\t\tBodyFixed { \n"
+  "\t\tMeanEquator { \n"
   "\t\t\tCenter \"" << parent << "\"\n"
   "\t\t}\n"
   "\t}\n"
@@ -2709,11 +2709,8 @@ void celestia_describe_world(planet* the_planet, const string &designation,
 
   // cout << "\tBodyFrame { EclipticJ2000{} }\n";
   cout << "\tBodyFrame { \n";
-  cout << "\t\tBodyFixed { \n";
+  cout << "\t\tMeanEquator { \n";
   cout << "\t\t\tCenter \"" << parent << "\"\n";
-  cout << "\t\t\tMeanEquator {\n";
-  cout << "\t\t\t\tCenter \"" << parent << "\"\n";
-  cout << "\t\t\t}\n";
   cout << "\t\t}\n";
   cout << "\t}\n";
   cout << "\tUniformRotation {\n";
