@@ -2483,6 +2483,11 @@ void celestia_describe_world(planet* the_planet, const string &designation,
   cout << "#   Estimated terrestrial temperature:\t"
        << toString(the_planet->getEstimatedTerrTemp() - FREEZING_POINT_OF_WATER)
        << "\tdegrees Celcius\n";
+  if (the_planet->getGreenhsRise() > 0.1) {
+  cout << "#   Greenhouse Amount:\t"
+       << toString(the_planet->getGreenhsRise())
+       << "\tdegrees Celcius\n";
+	   }
   cout << "#   Boiling point of water:\t"
        << toString(the_planet->getBoilPoint() - FREEZING_POINT_OF_WATER)
        << "\tdegrees Celcius\n";
@@ -2540,6 +2545,9 @@ void celestia_describe_world(planet* the_planet, const string &designation,
 
   switch (the_planet->getType()) {
     case t1Face:
+		if (the_planet->getGreenhsRise() > 0.1) {
+			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
+		}
       cout << "\tHazeColor [ 1 1 1 ]\n"
       "\tHazeDensity 0.3\n\n"
       "\tAtmosphere {\n"
@@ -2557,6 +2565,9 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       cout << "\t}\n\n";
       break;
     case tIce:
+		if (the_planet->getGreenhsRise() > 0.1) {
+			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
+		}
       cout << "\tHazeColor [ 0.2 0.5 1 ]\n"
       "\tHazeDensity 1\n\n"
       "\tAtmosphere {\n"
@@ -2574,6 +2585,9 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       cout << "\t}\n\n";
       break;
     case tMartian:
+		if (the_planet->getGreenhsRise() > 0.1) {
+			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
+		}
       cout << "\tHazeColor [ 1 1 1 ]\n"
       "\tHazeDensity 0.45\n\n"
       "\tAtmosphere {\n"
@@ -2591,6 +2605,9 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       cout << "\t}\n\n";
       break;
     case tTerrestrial:
+		if (the_planet->getGreenhsRise() > 0.1) {
+			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
+		}
       cout << "\tHazeColor [ 1 1 1 ]\n"
       "\tHazeDensity 0.3\n\n"
       "\tAtmosphere {\n"
@@ -2608,6 +2625,9 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       cout << "\t}\n\n";
       break;
     case tWater:
+		if (the_planet->getGreenhsRise() > 0.1) {
+			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
+		}
       cout << "\tHazeColor [ 1 1 1 ]\n"
       "\tHazeDensity 0.3\n\n"
       "\tAtmosphere {\n"
@@ -2626,6 +2646,9 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       break;
     case tOil:
     case tVenusian:
+		if (the_planet->getGreenhsRise() > 0.1) {
+			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
+		}
       cout << "\tHazeColor [ 0.5 0.35 0.2 ]\n"
       "\tHazeDensity 0.35\n\n"
       "\tAtmosphere {\n"
