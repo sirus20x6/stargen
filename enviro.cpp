@@ -2927,10 +2927,11 @@ auto is_potentialy_habitable_optimistic(planet *the_planet) -> bool {
             // would expirence before their orbits stablize.
   {
     return false;
-  } else if (star_type == "O" || star_type == "B" ||
-             star_type == "A")  // Types O, B, and A don't live long enough to
+  } else if (star_type == "O")  // Types O, B, and A don't live long enough to
                                 // produce habitable worlds and are two bright
-                                // for photosysisis to occure.
+                                // for photosysisis to occure. (Deleted B & A
+								// to encourage science fantasy planets. ;) )
+								// ~ PlutonianEmpire
   {
     return false;
   }
@@ -3303,10 +3304,11 @@ auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": too small a
     // star for extended\n";
     return false;
-  } else if (star_type == "O" || star_type == "B" ||
-             star_type == "A")  // Types O, B, and A don't live long enough to
+  } else if (star_type == "O")  // Types O, B, and A don't live long enough to
                                 // produce habitable worlds and are two bright
-                                // for photosysisis to occure.
+                                // for photosysisis to occure. (Deleted B & A
+								// to encourage science fantasy planets. ;) )
+								// ~ PlutonianEmpire
   {
     // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong star
     // for extended\n";

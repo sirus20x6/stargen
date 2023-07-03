@@ -336,7 +336,7 @@ auto accrete::collect_dust(long double last_mass, long double &new_dust,
       width = width - temp2;
 
       // calculate the area of a cross-section, and the volume
-      temp = 4.0 * M_PI * std::pow(a, 2.0) * reduced_mass *
+      temp = 4.0 * PI * std::pow(a, 2.0) * reduced_mass *
              (1.0 - e * (temp1 - temp2) / bandwidth);
       volume = temp * width;
 

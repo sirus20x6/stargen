@@ -2361,7 +2361,7 @@ void celestia_describe_world(planet* the_planet, const string &designation,
     cout << "\tSpecularColor [ 0.1 0.1 0.13 ]\n";
     cout << "\tSpecularPower 25.0\n";
     cout << "\tBumpMap \"tice" << ranItex << "-bump.*\"\n";
-    cout << "\tBumpHeight 3.5\n";
+    cout << "\tBumpHeight 1.5\n";
     cout << "\tColor [ 1.0 0.9 0.75 ]\n";
   } else if (the_planet->getType() == tWater) {
     cout << "# Hydrosphere percentage: "
@@ -2387,7 +2387,7 @@ void celestia_describe_world(planet* the_planet, const string &designation,
     int ranRtex = random_number(1.5, 5.5);
     cout << "\tTexture \"trock" << ranRtex << ".*\"\n";
     cout << "\tBumpMap \"trock" << ranRtex << "-bump.*\"\n";
-    cout << "\tBumpHeight 3.5\n";
+    cout << "\tBumpHeight 1.5\n";
 
     if (the_planet->getType() != tOil) {
       assignDistanceColors(the_planet, 0.52, 0.47, 0.42);
@@ -2404,13 +2404,13 @@ void celestia_describe_world(planet* the_planet, const string &designation,
     cout << "\tSpecularColor [ 0.1 0.1 0.13 ]\n";
     cout << "\tSpecularPower 25.0\n";
     cout << "\tBumpMap \"t1face" << ran1tex << "-bump.*\"\n";
-    cout << "\tBumpHeight 3.5\n";
+    cout << "\tBumpHeight 1.5\n";
     cout << "\tColor [ 0.52 0.47 0.42 ]\n";
   } else if (the_planet->getType() == tVenusian) {
     int ranVtex = random_number(1.5, 5.5);
     cout << "\tTexture \"tvenus" << ranVtex << ".*\"\n";
     cout << "\tBumpMap \"tvenus" << ranVtex << "-bump.*\"\n";
-    cout << "\tBumpHeight 3.5\n";
+    cout << "\tBumpHeight 1.5\n";
   } else if (the_planet->getType() == tMartian) {
     cout << "# Ice cover percentage:   "
          << toString(the_planet->getIceCover() * 100.0) << endl;
@@ -2418,7 +2418,7 @@ void celestia_describe_world(planet* the_planet, const string &designation,
     int ranMtex = random_number(1.5, 5.5);
     cout << "\tTexture \"tmars" << ranMtex << ".*\"\n";
     cout << "\tBumpMap \"tmars" << ranMtex << "-bump.*\"\n";
-    cout << "\tBumpHeight 3.5\n";
+    cout << "\tBumpHeight 1.5\n";
 
     assignDistanceColors(the_planet, 1, 0.75, 0.7);
   } else if (the_planet->getType() == tTerrestrial) {
@@ -2433,7 +2433,7 @@ void celestia_describe_world(planet* the_planet, const string &designation,
     cout << "\tSpecularColor [ 0.8 0.8 0.85 ]\n";
     cout << "\tSpecularPower 25.0\n";
     cout << "\tBumpMap \"tearth" << ranEtex << "-bump.*\"\n";
-    cout << "\tBumpHeight 3.5\n";
+    cout << "\tBumpHeight 1.5\n";
     cout << "\tColor [ 0.9 0.9 0.95 ]\n";
   } else if (the_planet->getType() == tAsteroids) {
     int ranAtex = random_number(1.5, 3.5);
@@ -2443,7 +2443,7 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       cout << "\tMesh \"asteroid.cms\"\n";
     } else {
       cout << "\tBumpMap \"tasteroid-bump.*\"\n";
-      cout << "\tBumpHeight 3.5\n";
+      cout << "\tBumpHeight 1.5\n";
     }
     if (ranAtex == 1) {
       cout << "\tColor   [ 0.52 0.46 0.43 ]\n";
@@ -2547,7 +2547,12 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tLower [ 0.8 0.4 0.1 ]\n"
       "\t\tUpper [ 0.0 0.0 0.9 ]\n"
       "\t\tSky [ 0.8 0.4 0.1 ]\n"
-      "\t\tSunset [ 0.8 0.5 0.2 ]\n";
+      "\t\tSunset [ 0.8 0.5 0.2 ]\n"
+	  "\t\tMie 0.001\n"
+	  "\t\tMieAsymmetry -0.25"
+	  "\t\tRayleigh [ 0.008 0.004 0.001 ]"
+	  "\t\tAbsorption [ 0.002 0.005 0.008 ]"
+	  "\t\tMieScaleHeight 9";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
@@ -2559,7 +2564,12 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tLower [ 0.8 0.4 0.1 ]\n"
       "\t\tUpper [ 0.0 0.0 0.9 ]\n"
       "\t\tSky [ 0.8 0.4 0.1 ]\n"
-      "\t\tSunset [ 0.8 0.5 0.2 ]\n";
+      "\t\tSunset [ 0.8 0.5 0.2 ]\n"
+	  "\t\tMie 0.001\n"
+	  "\t\tMieAsymmetry -0.25"
+	  "\t\tRayleigh [ 0.008 0.004 0.001 ]"
+	  "\t\tAbsorption [ 0.002 0.005 0.008 ]"
+	  "\t\tMieScaleHeight 12";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
@@ -2571,7 +2581,12 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tLower [ 0.8 0.6 0.6 ]\n"
       "\t\tUpper [ 0.7 0.3 0.3 ]\n"
       "\t\tSky [ 0.83 0.75 0.65 ]\n"
-      "\t\tSunset [ 0.7 0.7 0.8 ]\n";
+      "\t\tSunset [ 0.7 0.7 0.8 ]\n"
+	  "\t\tMie 0.0024\n"
+	  "\t\tMieAsymmetry -0.15"
+	  "\t\tRayleigh [ 0.0083 0.0075 0.0065 ]"
+	  "\t\tAbsorption [ 0.003 0.003 0.002 ]"
+	  "\t\tMieScaleHeight 20";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
@@ -2583,7 +2598,12 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tLower [ 0.5 0.5 0.65 ]\n"
       "\t\tUpper [ 0.3 0.3 0.6 ]\n"
       "\t\tSky [ 0.3 0.6 0.9 ]\n"
-      "\t\tSunset [ 1.0 0.6 0.2 ]\n";
+      "\t\tSunset [ 1.0 0.6 0.2 ]\n"
+	  "\t\tMie 0.001\n"
+	  "\t\tMieAsymmetry -0.25"
+	  "\t\tRayleigh [ 0.003 0.006 0.009 ]"
+	  "\t\tAbsorption [ 0.000 0.004 0.008 ]"
+	  "\t\tMieScaleHeight 12";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
@@ -2595,7 +2615,12 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tLower [ 0.4 0.4 0.7 ]\n"
       "\t\tUpper [ 0.2 0.2 0.6 ]\n"
       "\t\tSky [ 0.4 0.7 0.9 ]\n"
-      "\t\tSunset [ 1.0 0.6 0.2 ]\n";
+      "\t\tSunset [ 1.0 0.6 0.2 ]\n"
+	  "\t\tMie 0.001\n"
+	  "\t\tMieAsymmetry -0.25"
+	  "\t\tRayleigh [ 0.004 0.007 0.009 ]"
+	  "\t\tAbsorption [ 0.000 0.004 0.008 ]"
+	  "\t\tMieScaleHeight 15";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
@@ -2607,7 +2632,11 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tHeight 60\n"
       "\t\tLower [ 0.8 0.8 0.5 ]\n"
       "\t\tUpper [ 0.6 0.6 0.6 ]\n"
-      "\t\tSky [ 0.8 0.8 0.5 ]\n";
+      "\t\tSky [ 0.8 0.8 0.5 ]\n"
+	  "\t\tMie 0.002\n"
+	  "\t\tMieAsymmetry -0.33"
+	  "\t\tRayleigh [ 0.008 0.008 0.005 ]"
+	  "\t\tMieScaleHeight 20";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
@@ -2616,11 +2645,27 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       cout << "\tOblateness " << toString(the_planet->getOblateness()) << endl;
       cout << "\tHazeColor [ 0.5 0.8 1.0 ]\n";
       cout << "\tHazeDensity 0.2\n";
+	  cout << "\tAtmosphere {\n"
+      "\t\tHeight 500\n"
+	  "\t\tMie 0.0001\n"
+	  "\t\tMieAsymmetry -0.1"
+	  "\t\tRayleigh [ 0.00104 0.00193 0.00400 ]"
+	  "\t\tAbsorption [ 0.00000 0.00050 0.00100 ]"
+	  "\t\tMieScaleHeight 20.3";
+      cout << "\t}\n\n";
       break;
     case tGasGiant:
       cout << "\tOblateness " << toString(the_planet->getOblateness()) << endl;
       cout << "\tHazeColor [ 0.4 0.45 0.5 ]\n";
       cout << "\tHazeDensity 0.3\n";
+	  cout << "\tAtmosphere {\n"
+      "\t\tHeight 1000\n"
+	  "\t\tMie 0.0001\n"
+	  "\t\tMieAsymmetry -0.15"
+	  "\t\tRayleigh [ 0.00095 0.00145 0.00298 ]"
+	  "\t\tAbsorption [ 0.00033 0.00010 0.00001 ]"
+	  "\t\tMieScaleHeight 28";
+      cout << "\t}\n\n";
       break;
     case tBrownDwarf:
       cout << "\tHazeColor [ 0.5 0.45 0.45 ]\n";
