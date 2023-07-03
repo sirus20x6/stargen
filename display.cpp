@@ -2275,9 +2275,9 @@ void celestia_describe_world(planet* the_planet, const string &designation,
   string name;
 
   if (is_moon) {
-    ss << "p" << counter << "-" << planet_num;
+    ss << "\"p" << counter << "-" << planet_num;
   } else {
-    ss << "p" << counter;
+    ss << "\"p" << counter;
   }
   name = ss.str();
 
@@ -2483,11 +2483,6 @@ void celestia_describe_world(planet* the_planet, const string &designation,
   cout << "#   Estimated terrestrial temperature:\t"
        << toString(the_planet->getEstimatedTerrTemp() - FREEZING_POINT_OF_WATER)
        << "\tdegrees Celcius\n";
-  if (the_planet->getGreenhsRise() > 0.1) {
-  cout << "#   Greenhouse Amount:\t"
-       << toString(the_planet->getGreenhsRise())
-       << "\tdegrees Celcius\n";
-	   }
   cout << "#   Boiling point of water:\t"
        << toString(the_planet->getBoilPoint() - FREEZING_POINT_OF_WATER)
        << "\tdegrees Celcius\n";
@@ -2545,9 +2540,6 @@ void celestia_describe_world(planet* the_planet, const string &designation,
 
   switch (the_planet->getType()) {
     case t1Face:
-		if (the_planet->getGreenhsRise() > 0.1) {
-			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
-		}
       cout << "\tHazeColor [ 1 1 1 ]\n"
       "\tHazeDensity 0.3\n\n"
       "\tAtmosphere {\n"
@@ -2557,17 +2549,14 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tSky [ 0.8 0.4 0.1 ]\n"
       "\t\tSunset [ 0.8 0.5 0.2 ]\n"
 	  "\t\tMie 0.001\n"
-	  "\t\tMieAsymmetry -0.25"
-	  "\t\tRayleigh [ 0.008 0.004 0.001 ]"
-	  "\t\tAbsorption [ 0.002 0.005 0.008 ]"
-	  "\t\tMieScaleHeight 9";
+	  "\t\tMieAsymmetry -0.25\n"
+	  "\t\tRayleigh [ 0.008 0.004 0.001 ]\n"
+	  "\t\tAbsorption [ 0.002 0.005 0.008 ]\n"
+	  "\t\tMieScaleHeight 9\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
     case tIce:
-		if (the_planet->getGreenhsRise() > 0.1) {
-			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
-		}
       cout << "\tHazeColor [ 0.2 0.5 1 ]\n"
       "\tHazeDensity 1\n\n"
       "\tAtmosphere {\n"
@@ -2577,17 +2566,14 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tSky [ 0.8 0.4 0.1 ]\n"
       "\t\tSunset [ 0.8 0.5 0.2 ]\n"
 	  "\t\tMie 0.001\n"
-	  "\t\tMieAsymmetry -0.25"
-	  "\t\tRayleigh [ 0.008 0.004 0.001 ]"
-	  "\t\tAbsorption [ 0.002 0.005 0.008 ]"
-	  "\t\tMieScaleHeight 12";
+	  "\t\tMieAsymmetry -0.25\n"
+	  "\t\tRayleigh [ 0.008 0.004 0.001 ]\n"
+	  "\t\tAbsorption [ 0.002 0.005 0.008 ]\n"
+	  "\t\tMieScaleHeight 12\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
     case tMartian:
-		if (the_planet->getGreenhsRise() > 0.1) {
-			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
-		}
       cout << "\tHazeColor [ 1 1 1 ]\n"
       "\tHazeDensity 0.45\n\n"
       "\tAtmosphere {\n"
@@ -2597,17 +2583,14 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tSky [ 0.83 0.75 0.65 ]\n"
       "\t\tSunset [ 0.7 0.7 0.8 ]\n"
 	  "\t\tMie 0.0024\n"
-	  "\t\tMieAsymmetry -0.15"
-	  "\t\tRayleigh [ 0.0083 0.0075 0.0065 ]"
-	  "\t\tAbsorption [ 0.003 0.003 0.002 ]"
-	  "\t\tMieScaleHeight 20";
+	  "\t\tMieAsymmetry -0.15\n"
+	  "\t\tRayleigh [ 0.0083 0.0075 0.0065 ]\n"
+	  "\t\tAbsorption [ 0.003 0.003 0.002 ]\n"
+	  "\t\tMieScaleHeight 20\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
     case tTerrestrial:
-		if (the_planet->getGreenhsRise() > 0.1) {
-			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
-		}
       cout << "\tHazeColor [ 1 1 1 ]\n"
       "\tHazeDensity 0.3\n\n"
       "\tAtmosphere {\n"
@@ -2617,17 +2600,14 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tSky [ 0.3 0.6 0.9 ]\n"
       "\t\tSunset [ 1.0 0.6 0.2 ]\n"
 	  "\t\tMie 0.001\n"
-	  "\t\tMieAsymmetry -0.25"
-	  "\t\tRayleigh [ 0.003 0.006 0.009 ]"
-	  "\t\tAbsorption [ 0.000 0.004 0.008 ]"
-	  "\t\tMieScaleHeight 12";
+	  "\t\tMieAsymmetry -0.25\n"
+	  "\t\tRayleigh [ 0.003 0.006 0.009 ]\n"
+	  "\t\tAbsorption [ 0.000 0.004 0.008 ]\n"
+	  "\t\tMieScaleHeight 12\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
     case tWater:
-		if (the_planet->getGreenhsRise() > 0.1) {
-			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
-		}
       cout << "\tHazeColor [ 1 1 1 ]\n"
       "\tHazeDensity 0.3\n\n"
       "\tAtmosphere {\n"
@@ -2637,18 +2617,15 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tSky [ 0.4 0.7 0.9 ]\n"
       "\t\tSunset [ 1.0 0.6 0.2 ]\n"
 	  "\t\tMie 0.001\n"
-	  "\t\tMieAsymmetry -0.25"
-	  "\t\tRayleigh [ 0.004 0.007 0.009 ]"
-	  "\t\tAbsorption [ 0.000 0.004 0.008 ]"
-	  "\t\tMieScaleHeight 15";
+	  "\t\tMieAsymmetry -0.25\n"
+	  "\t\tRayleigh [ 0.004 0.007 0.009 ]\n"
+	  "\t\tAbsorption [ 0.000 0.004 0.008 ]\n"
+	  "\t\tMieScaleHeight 15\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
     case tOil:
     case tVenusian:
-		if (the_planet->getGreenhsRise() > 0.1) {
-			cout << "\tTempDiscrepancy " << toString(the_planet->getGreenhsRise()) << endl;
-		}
       cout << "\tHazeColor [ 0.5 0.35 0.2 ]\n"
       "\tHazeDensity 0.35\n\n"
       "\tAtmosphere {\n"
@@ -2657,9 +2634,9 @@ void celestia_describe_world(planet* the_planet, const string &designation,
       "\t\tUpper [ 0.6 0.6 0.6 ]\n"
       "\t\tSky [ 0.8 0.8 0.5 ]\n"
 	  "\t\tMie 0.002\n"
-	  "\t\tMieAsymmetry -0.33"
-	  "\t\tRayleigh [ 0.008 0.008 0.005 ]"
-	  "\t\tMieScaleHeight 20";
+	  "\t\tMieAsymmetry -0.33\n"
+	  "\t\tRayleigh [ 0.008 0.008 0.005 ]\n"
+	  "\t\tMieScaleHeight 20\n";
       display_clouds(the_planet);
       cout << "\t}\n\n";
       break;
@@ -2671,10 +2648,10 @@ void celestia_describe_world(planet* the_planet, const string &designation,
 	  cout << "\tAtmosphere {\n"
       "\t\tHeight 500\n"
 	  "\t\tMie 0.0001\n"
-	  "\t\tMieAsymmetry -0.1"
-	  "\t\tRayleigh [ 0.00104 0.00193 0.00400 ]"
-	  "\t\tAbsorption [ 0.00000 0.00050 0.00100 ]"
-	  "\t\tMieScaleHeight 20.3";
+	  "\t\tMieAsymmetry -0.1\n"
+	  "\t\tRayleigh [ 0.00104 0.00193 0.00400 ]\n"
+	  "\t\tAbsorption [ 0.00000 0.00050 0.00100 ]\n"
+	  "\t\tMieScaleHeight 20.3\n";
       cout << "\t}\n\n";
       break;
     case tGasGiant:
@@ -2684,10 +2661,10 @@ void celestia_describe_world(planet* the_planet, const string &designation,
 	  cout << "\tAtmosphere {\n"
       "\t\tHeight 1000\n"
 	  "\t\tMie 0.0001\n"
-	  "\t\tMieAsymmetry -0.15"
-	  "\t\tRayleigh [ 0.00095 0.00145 0.00298 ]"
-	  "\t\tAbsorption [ 0.00033 0.00010 0.00001 ]"
-	  "\t\tMieScaleHeight 28";
+	  "\t\tMieAsymmetry -0.15\n"
+	  "\t\tRayleigh [ 0.00095 0.00145 0.00298 ]\n"
+	  "\t\tAbsorption [ 0.00033 0.00010 0.00001 ]\n"
+	  "\t\tMieScaleHeight 28\n";
       cout << "\t}\n\n";
       break;
     case tBrownDwarf:
@@ -2699,7 +2676,7 @@ void celestia_describe_world(planet* the_planet, const string &designation,
   }
   // cout << "\tOrbitFrame { EclipticJ2000{} }\n";
   cout << "\tOrbitFrame { \n"
-  "\t\tBodyFixed { \n"
+  "\t\tMeanEquator { \n"
   "\t\t\tCenter \"" << parent << "\"\n"
   "\t\t}\n"
   "\t}\n"
@@ -2732,11 +2709,8 @@ void celestia_describe_world(planet* the_planet, const string &designation,
 
   // cout << "\tBodyFrame { EclipticJ2000{} }\n";
   cout << "\tBodyFrame { \n";
-  cout << "\t\tBodyFixed { \n";
+  cout << "\t\tMeanEquator { \n";
   cout << "\t\t\tCenter \"" << parent << "\"\n";
-  cout << "\t\t\tMeanEquator {\n";
-  cout << "\t\t\t\t\"" << parent << "\"\n";
-  cout << "\t\t\t}\n";
   cout << "\t\t}\n";
   cout << "\t}\n";
   cout << "\tUniformRotation {\n";
@@ -2770,7 +2744,8 @@ void celestia_describe_world(planet* the_planet, const string &designation,
     cout << "\t\tInclination\t"
          << toString(local_inc + the_planet->getAxialTilt()) << endl;
   }
-  cout << "\t\tAscendingNode\t" << toString(an) << endl;
+  cout << "\t\tAscendingNode\t"  << toString(the_planet->getAscendingNode())
+       << endl;
   cout << "\t\tMeridianAngle\t" << toString(the_planet->getMeanLongitude())
        << endl;
   cout << "\t}\n";
