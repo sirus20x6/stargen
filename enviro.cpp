@@ -3150,12 +3150,12 @@ auto planet_radius_helper(long double planet_mass, long double mass1,
          << endl;
     cout << "Input was:\n";
     cout << "planet_mass = " << planet_mass << endl;
-    cout << "mass1 = " << toString((long double)mass1) << endl;
-    cout << "radius1 = " << toString((long double)radius1) << endl;
-    cout << "mass2 = " << toString((long double)mass2) << endl;
-    cout << "radius2 = " << toString((long double)radius2) << endl;
-    cout << "mass3 = " << toString((long double)mass3) << endl;
-    cout << "radius3 = " << toString((long double)radius3) << endl;
+    cout << "mass1 = " << to_string((long double)mass1) << endl;
+    cout << "radius1 = " << to_string((long double)radius1) << endl;
+    cout << "mass2 = " << to_string((long double)mass2) << endl;
+    cout << "radius2 = " << to_string((long double)radius2) << endl;
+    cout << "mass3 = " << to_string((long double)mass3) << endl;
+    cout << "radius3 = " << to_string((long double)radius3) << endl;
     exit(EXIT_FAILURE);
   }
   long double radius = 0.0;

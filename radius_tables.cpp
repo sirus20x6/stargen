@@ -1,4 +1,5 @@
 #include "radius_tables.h"
+#include "cmath"
 
 using namespace std;
 
@@ -87,6 +88,10 @@ map<long double, long double> solid_0point953_iron_0point047_water;
 map<long double, long double> solid_0point51_iron_0point49_water;
 map<long double, long double> solid_0point264_iron_0point736_water;
 map<long double, long double> earth_like;
+
+long double solid_iron_calc(double x){
+return 0.79250f + 0.22077f * log(x) + 0.01845 * log(x)*log(x);
+}
 
 void initRadii() {
   gas_300Myr_1960K_0core_mass[0] = 0.0;
@@ -1205,56 +1210,6 @@ void initRadii() {
   solid_half_rock_half_iron[116.5] = 2.745;
   solid_half_rock_half_iron[133.8] = 2.789;
   solid_half_rock_half_iron[153.1] = 2.829;
-
-  solid_iron[0.001496] = 0.09947;
-  solid_iron[0.002096] = 0.1112;
-  solid_iron[0.002931] = 0.1243;
-  solid_iron[0.00409] = 0.1387;
-  solid_iron[0.005694] = 0.1546;
-  solid_iron[0.007904] = 0.1722;
-  solid_iron[0.01094] = 0.1915;
-  solid_iron[0.01507] = 0.2126;
-  solid_iron[0.0207] = 0.2356;
-  solid_iron[0.02829] = 0.2606;
-  solid_iron[0.0385] = 0.2876;
-  solid_iron[0.05212] = 0.3167;
-  solid_iron[0.07021] = 0.348;
-  solid_iron[0.09408] = 0.3814;
-  solid_iron[0.1254] = 0.417;
-  solid_iron[0.1663] = 0.4548;
-  solid_iron[0.2193] = 0.4949;
-  solid_iron[0.2877] = 0.537;
-  solid_iron[0.3754] = 0.5814;
-  solid_iron[0.4875] = 0.6279;
-  solid_iron[0.6298] = 0.6765;
-  solid_iron[0.8096] = 0.727;
-  solid_iron[1.036] = 0.7796;
-  solid_iron[1.319] = 0.834;
-  solid_iron[1.671] = 0.8902;
-  solid_iron[2.108] = 0.9481;
-  solid_iron[2.648] = 1.007;
-  solid_iron[3.31] = 1.068;
-  solid_iron[4.119] = 1.13;
-  solid_iron[5.103] = 1.193;
-  solid_iron[6.293] = 1.257;
-  solid_iron[7.727] = 1.321;
-  solid_iron[9.445] = 1.386;
-  solid_iron[11.49] = 1.451;
-  solid_iron[13.92] = 1.515;
-  solid_iron[16.78] = 1.579;
-  solid_iron[20.14] = 1.642;
-  solid_iron[24.05] = 1.704;
-  solid_iron[28.6] = 1.765;
-  solid_iron[33.87] = 1.824;
-  solid_iron[39.94] = 1.881;
-  solid_iron[46.92] = 1.937;
-  solid_iron[54.93] = 1.99;
-  solid_iron[64.08] = 2.042;
-  solid_iron[74.51] = 2.091;
-  solid_iron[86.37] = 2.138;
-  solid_iron[99.8] = 2.183;
-  solid_iron[115.0] = 2.226;
-  solid_iron[132.1] = 2.266;
 
   solid_0point953_iron_0point047_water[0.1] = 0.4226;
   solid_0point953_iron_0point047_water[0.1259] = 0.4536;

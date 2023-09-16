@@ -2059,392 +2059,392 @@ long double iron_radius(long double mass, planet *the_planet,
   long double radius2;
   if (mass <= 0.001496) {
     radius1 = fraction_radius(mass, 0, 0, 0);
-    radius2 = planet_radius_helper(mass, 0.001496, mass_radii[0.001496],
-                                   0.002096, mass_radii[0.002096], 0.002931,
-                                   mass_radii[0.002931]);
+    radius2 = planet_radius_helper(mass, 0.001496, solid_iron_calc(0.001496),
+                                   0.002096, solid_iron_calc(0.002096), 0.002931,
+                                   solid_iron_calc(0.002931));
     radius = rangeAdjust(mass, radius1, radius2, 0.0, 0.001496);
   } else if (mass <= 0.002096) {
     // radius = quad_trend(-2681.77957240149, 29.1753892167919,
     // 0.0618254642138286, mass);
-    radius = planet_radius_helper(mass, 0.001496, mass_radii[0.001496],
-                                  0.002096, mass_radii[0.002096], 0.002931,
-                                  mass_radii[0.002931]);
+    radius = planet_radius_helper(mass, 0.001496, solid_iron_calc(0.001496),
+                                  0.002096, solid_iron_calc(0.002096), 0.002931,
+                                  solid_iron_calc(0.002931));
   } else if (mass <= 0.002931) {
     // radius = quad_trend(-1688.63294694608, 24.2372061422203,
     // 0.0678174361405534, mass);
-    radius1 = planet_radius_helper(mass, 0.001496, mass_radii[0.001496],
-                                   0.002096, mass_radii[0.002096], 0.002931,
-                                   mass_radii[0.002931]);
-    radius2 = planet_radius_helper(mass, 0.002096, mass_radii[0.002096],
-                                   0.002931, mass_radii[0.002931], 0.00409,
-                                   mass_radii[0.00409]);
+    radius1 = planet_radius_helper(mass, 0.001496, solid_iron_calc(0.001496),
+                                   0.002096, solid_iron_calc(0.002096), 0.002931,
+                                   solid_iron_calc(0.002931));
+    radius2 = planet_radius_helper(mass, 0.002096, solid_iron_calc(0.002096),
+                                   0.002931, solid_iron_calc(0.002931), 0.00409,
+                                   solid_iron_calc(0.00409));
     radius = rangeAdjust(mass, radius1, radius2, 0.002096, 0.002931);
   } else if (mass <= 0.00409) {
     // radius = quad_trend(-915.413258520028, 18.8629573194402,
     // 0.0768735211649926, mass);
-    radius1 = planet_radius_helper(mass, 0.002096, mass_radii[0.002096],
-                                   0.002931, mass_radii[0.002931], 0.00409,
-                                   mass_radii[0.00409]);
-    radius2 = planet_radius_helper(mass, 0.002931, mass_radii[0.002931],
-                                   0.00409, mass_radii[0.00409], 0.005694,
-                                   mass_radii[0.005694]);
+    radius1 = planet_radius_helper(mass, 0.002096, solid_iron_calc(0.002096),
+                                   0.002931, solid_iron_calc(0.002931), 0.00409,
+                                   solid_iron_calc(0.00409));
+    radius2 = planet_radius_helper(mass, 0.002931, solid_iron_calc(0.002931),
+                                   0.00409, solid_iron_calc(0.00409), 0.005694,
+                                   solid_iron_calc(0.005694));
     radius = rangeAdjust(mass, radius1, radius2, 0.002931, 0.00409);
   } else if (mass <= 0.005694) {
     // radius = quad_trend(-512.025546524638, 14.9254112879076,
     // 0.086217430425244, mass);
-    radius1 = planet_radius_helper(mass, 0.002931, mass_radii[0.002931],
-                                   0.00409, mass_radii[0.00409], 0.005694,
-                                   mass_radii[0.005694]);
-    radius2 = planet_radius_helper(mass, 0.00409, mass_radii[0.00409], 0.005694,
-                                   mass_radii[0.005694], 0.007904,
-                                   mass_radii[0.007904]);
+    radius1 = planet_radius_helper(mass, 0.002931, solid_iron_calc(0.002931),
+                                   0.00409, solid_iron_calc(0.00409), 0.005694,
+                                   solid_iron_calc(0.005694));
+    radius2 = planet_radius_helper(mass, 0.00409, solid_iron_calc(0.00409), 0.005694,
+                                   solid_iron_calc(0.005694), 0.007904,
+                                   solid_iron_calc(0.007904));
     radius = rangeAdjust(mass, radius1, radius2, 0.00409, 0.005694);
   } else if (mass <= 0.007904) {
     // radius = quad_trend(-292.3316061, 11.93892609, 0.0960976238, mass);
-    radius1 = planet_radius_helper(mass, 0.00409, mass_radii[0.00409], 0.005694,
-                                   mass_radii[0.005694], 0.007904,
-                                   mass_radii[0.007904]);
-    radius2 = planet_radius_helper(mass, 0.005694, mass_radii[0.005694],
-                                   0.007904, mass_radii[0.007904], 0.01094,
-                                   mass_radii[0.01094]);
+    radius1 = planet_radius_helper(mass, 0.00409, solid_iron_calc(0.00409), 0.005694,
+                                   solid_iron_calc(0.005694), 0.007904,
+                                   solid_iron_calc(0.007904));
+    radius2 = planet_radius_helper(mass, 0.005694, solid_iron_calc(0.005694),
+                                   0.007904, solid_iron_calc(0.007904), 0.01094,
+                                   solid_iron_calc(0.01094));
     radius = rangeAdjust(mass, radius1, radius2, 0.005694, 0.007904);
   } else if (mass <= 0.01094) {
     // radius = quad_trend(-192.8510361, 10.06829345, 0.104668233, mass);
-    radius1 = planet_radius_helper(mass, 0.005694, mass_radii[0.005694],
-                                   0.007904, mass_radii[0.007904], 0.01094,
-                                   mass_radii[0.01094]);
+    radius1 = planet_radius_helper(mass, 0.005694, solid_iron_calc(0.005694),
+                                   0.007904, solid_iron_calc(0.007904), 0.01094,
+                                   solid_iron_calc(0.01094));
     radius2 =
-        planet_radius_helper(mass, 0.007904, mass_radii[0.007904], 0.01094,
-                             mass_radii[0.01094], 0.01507, mass_radii[0.01507]);
+        planet_radius_helper(mass, 0.007904, solid_iron_calc(0.007904), 0.01094,
+                             solid_iron_calc(0.01094), 0.01507, solid_iron_calc(0.01507));
     radius = rangeAdjust(mass, radius1, radius2, 0.007904, 0.01094);
   } else if (mass <= 0.01507) {
     // radius = quad_trend(-99.45862138, 7.642892436, 0.1200091513, mass);
     radius1 =
-        planet_radius_helper(mass, 0.007904, mass_radii[0.007904], 0.01094,
-                             mass_radii[0.01094], 0.01507, mass_radii[0.01507]);
+        planet_radius_helper(mass, 0.007904, solid_iron_calc(0.007904), 0.01094,
+                             solid_iron_calc(0.01094), 0.01507, solid_iron_calc(0.01507));
     radius2 =
-        planet_radius_helper(mass, 0.01094, mass_radii[0.01094], 0.01507,
-                             mass_radii[0.01507], 0.0207, mass_radii[0.0207]);
+        planet_radius_helper(mass, 0.01094, solid_iron_calc(0.01094), 0.01507,
+                             solid_iron_calc(0.01507), 0.0207, solid_iron_calc(0.0207));
     radius = rangeAdjust(mass, radius1, radius2, 0.01094, 0.01507);
   } else if (mass <= 0.0207) {
     // radius = quad_trend(-59.86761779, 6.226722237, 0.1323595252, mass);
     radius1 =
-        planet_radius_helper(mass, 0.01094, mass_radii[0.01094], 0.01507,
-                             mass_radii[0.01507], 0.0207, mass_radii[0.0207]);
+        planet_radius_helper(mass, 0.01094, solid_iron_calc(0.01094), 0.01507,
+                             solid_iron_calc(0.01507), 0.0207, solid_iron_calc(0.0207));
     radius2 =
-        planet_radius_helper(mass, 0.01507, mass_radii[0.01507], 0.0207,
-                             mass_radii[0.0207], 0.02829, mass_radii[0.02829]);
+        planet_radius_helper(mass, 0.01507, solid_iron_calc(0.01507), 0.0207,
+                             solid_iron_calc(0.0207), 0.02829, solid_iron_calc(0.02829));
     radius = rangeAdjust(mass, radius1, radius2, 0.01507, 0.0207);
   } else if (mass <= 0.02829) {
     // radius = quad_trend(-36.47985573, 5.080955774, 0.1460554689, mass);
     radius1 =
-        planet_radius_helper(mass, 0.01507, mass_radii[0.01507], 0.0207,
-                             mass_radii[0.0207], 0.02829, mass_radii[0.02829]);
+        planet_radius_helper(mass, 0.01507, solid_iron_calc(0.01507), 0.0207,
+                             solid_iron_calc(0.0207), 0.02829, solid_iron_calc(0.02829));
     radius2 =
-        planet_radius_helper(mass, 0.0207, mass_radii[0.0207], 0.02829,
-                             mass_radii[0.02829], 0.0385, mass_radii[0.0385]);
+        planet_radius_helper(mass, 0.0207, solid_iron_calc(0.0207), 0.02829,
+                             solid_iron_calc(0.02829), 0.0385, solid_iron_calc(0.0385));
     radius = rangeAdjust(mass, radius1, radius2, 0.0207, 0.02829);
   } else if (mass <= 0.0385) {
     // radius = quad_trend(-21.31356831, 4.067999437, 0.1625740583, mass);
     radius1 =
-        planet_radius_helper(mass, 0.0207, mass_radii[0.0207], 0.02829,
-                             mass_radii[0.02829], 0.0385, mass_radii[0.0385]);
+        planet_radius_helper(mass, 0.0207, solid_iron_calc(0.0207), 0.02829,
+                             solid_iron_calc(0.02829), 0.0385, solid_iron_calc(0.0385));
     radius2 =
-        planet_radius_helper(mass, 0.02829, mass_radii[0.02829], 0.0385,
-                             mass_radii[0.0385], 0.05212, mass_radii[0.05212]);
+        planet_radius_helper(mass, 0.02829, solid_iron_calc(0.02829), 0.0385,
+                             solid_iron_calc(0.0385), 0.05212, solid_iron_calc(0.05212));
     radius = rangeAdjust(mass, radius1, radius2, 0.02829, 0.0385);
   } else if (mass <= 0.05212) {
     // radius = quad_trend(-12.81381824, 3.297752085, 0.1796298268, mass);
     radius1 =
-        planet_radius_helper(mass, 0.02829, mass_radii[0.02829], 0.0385,
-                             mass_radii[0.0385], 0.05212, mass_radii[0.05212]);
+        planet_radius_helper(mass, 0.02829, solid_iron_calc(0.02829), 0.0385,
+                             solid_iron_calc(0.0385), 0.05212, solid_iron_calc(0.05212));
     radius2 =
-        planet_radius_helper(mass, 0.0385, mass_radii[0.0385], 0.05212,
-                             mass_radii[0.05212], 0.07021, mass_radii[0.07021]);
+        planet_radius_helper(mass, 0.0385, solid_iron_calc(0.0385), 0.05212,
+                             solid_iron_calc(0.05212), 0.07021, solid_iron_calc(0.07021));
     radius = rangeAdjust(mass, radius1, radius2, 0.0385, 0.05212);
   } else if (mass <= 0.07021) {
     // radius = quad_trend(-7.888269424, 2.695209699, 0.1976541102, mass);
     radius1 =
-        planet_radius_helper(mass, 0.0385, mass_radii[0.0385], 0.05212,
-                             mass_radii[0.05212], 0.07021, mass_radii[0.07021]);
+        planet_radius_helper(mass, 0.0385, solid_iron_calc(0.0385), 0.05212,
+                             solid_iron_calc(0.05212), 0.07021, solid_iron_calc(0.07021));
     radius2 =
-        planet_radius_helper(mass, 0.05212, mass_radii[0.05212], 0.07021,
-                             mass_radii[0.07021], 0.09408, mass_radii[0.09408]);
+        planet_radius_helper(mass, 0.05212, solid_iron_calc(0.05212), 0.07021,
+                             solid_iron_calc(0.07021), 0.09408, solid_iron_calc(0.09408));
     radius = rangeAdjust(mass, radius1, radius2, 0.05212, 0.07021);
   } else if (mass <= 0.09408) {
     // radius = quad_trend(-4.757963763, 2.180931782, 0.218330896, mass);
     radius1 =
-        planet_radius_helper(mass, 0.05212, mass_radii[0.05212], 0.07021,
-                             mass_radii[0.07021], 0.09408, mass_radii[0.09408]);
+        planet_radius_helper(mass, 0.05212, solid_iron_calc(0.05212), 0.07021,
+                             solid_iron_calc(0.07021), 0.09408, solid_iron_calc(0.09408));
     radius2 =
-        planet_radius_helper(mass, 0.07021, mass_radii[0.07021], 0.09408,
-                             mass_radii[0.09408], 0.1254, mass_radii[0.1254]);
+        planet_radius_helper(mass, 0.07021, solid_iron_calc(0.07021), 0.09408,
+                             solid_iron_calc(0.09408), 0.1254, solid_iron_calc(0.1254));
     radius = rangeAdjust(mass, radius1, radius2, 0.07021, 0.09408);
   } else if (mass <= 0.1254) {
     // radius = quad_trend(-2.941685354, 1.782294997, 0.2397586803, mass);
     radius1 =
-        planet_radius_helper(mass, 0.07021, mass_radii[0.07021], 0.09408,
-                             mass_radii[0.09408], 0.1254, mass_radii[0.1254]);
+        planet_radius_helper(mass, 0.07021, solid_iron_calc(0.07021), 0.09408,
+                             solid_iron_calc(0.09408), 0.1254, solid_iron_calc(0.1254));
     radius2 =
-        planet_radius_helper(mass, 0.09408, mass_radii[0.09408], 0.1254,
-                             mass_radii[0.1254], 0.1663, mass_radii[0.1663]);
+        planet_radius_helper(mass, 0.09408, solid_iron_calc(0.09408), 0.1254,
+                             solid_iron_calc(0.1254), 0.1663, solid_iron_calc(0.1663));
     radius = rangeAdjust(mass, radius1, radius2, 0.09408, 0.1254);
   } else if (mass <= 0.1663) {
     // radius = quad_trend(-1.784894626, 1.444859141, 0.2638824172, mass);
     radius1 =
-        planet_radius_helper(mass, 0.09408, mass_radii[0.09408], 0.1254,
-                             mass_radii[0.1254], 0.1663, mass_radii[0.1663]);
+        planet_radius_helper(mass, 0.09408, solid_iron_calc(0.09408), 0.1254,
+                             solid_iron_calc(0.1254), 0.1663, solid_iron_calc(0.1663));
     radius2 =
-        planet_radius_helper(mass, 0.1254, mass_radii[0.1254], 0.1663,
-                             mass_radii[0.1663], 0.2193, mass_radii[0.2193]);
+        planet_radius_helper(mass, 0.1254, solid_iron_calc(0.1254), 0.1663,
+                             solid_iron_calc(0.1663), 0.2193, solid_iron_calc(0.2193));
     radius = rangeAdjust(mass, radius1, radius2, 0.1254, 0.1663);
   } else if (mass <= 0.2193) {
     // radius = quad_trend(-1.162328645, 1.204797699, 0.2865871433, mass);
     radius1 =
-        planet_radius_helper(mass, 0.1254, mass_radii[0.1254], 0.1663,
-                             mass_radii[0.1663], 0.2193, mass_radii[0.2193]);
+        planet_radius_helper(mass, 0.1254, solid_iron_calc(0.1254), 0.1663,
+                             solid_iron_calc(0.1663), 0.2193, solid_iron_calc(0.2193));
     radius2 =
-        planet_radius_helper(mass, 0.1663, mass_radii[0.1663], 0.2193,
-                             mass_radii[0.2193], 0.2877, mass_radii[0.2877]);
+        planet_radius_helper(mass, 0.1663, solid_iron_calc(0.1663), 0.2193,
+                             solid_iron_calc(0.2193), 0.2877, solid_iron_calc(0.2877));
     radius = rangeAdjust(mass, radius1, radius2, 0.1663, 0.2193);
   } else if (mass <= 0.2877) {
     // radius = quad_trend(-0.699716184, 0.9702531813, 0.3157745709, mass);
     radius1 =
-        planet_radius_helper(mass, 0.1663, mass_radii[0.1663], 0.2193,
-                             mass_radii[0.2193], 0.2877, mass_radii[0.2877]);
+        planet_radius_helper(mass, 0.1663, solid_iron_calc(0.1663), 0.2193,
+                             solid_iron_calc(0.2193), 0.2877, solid_iron_calc(0.2877));
     radius2 =
-        planet_radius_helper(mass, 0.2193, mass_radii[0.2193], 0.2877,
-                             mass_radii[0.2877], 0.3754, mass_radii[0.3754]);
+        planet_radius_helper(mass, 0.2193, solid_iron_calc(0.2193), 0.2877,
+                             solid_iron_calc(0.2877), 0.3754, solid_iron_calc(0.3754));
     radius = rangeAdjust(mass, radius1, radius2, 0.2193, 0.2877);
   } else if (mass <= 0.3754) {
     // radius = quad_trend(-0.4577736374, 0.8098210786, 0.3419049902, mass);
     radius1 =
-        planet_radius_helper(mass, 0.2193, mass_radii[0.2193], 0.2877,
-                             mass_radii[0.2877], 0.3754, mass_radii[0.3754]);
+        planet_radius_helper(mass, 0.2193, solid_iron_calc(0.2193), 0.2877,
+                             solid_iron_calc(0.2877), 0.3754, solid_iron_calc(0.3754));
     radius2 =
-        planet_radius_helper(mass, 0.2877, mass_radii[0.2877], 0.3754,
-                             mass_radii[0.3754], 0.4875, mass_radii[0.4875]);
+        planet_radius_helper(mass, 0.2877, solid_iron_calc(0.2877), 0.3754,
+                             solid_iron_calc(0.3754), 0.4875, solid_iron_calc(0.4875));
     radius = rangeAdjust(mass, radius1, radius2, 0.2877, 0.3754);
   } else if (mass <= 0.4875) {
     // radius = quad_trend(-0.2880355042, 0.6633540435, 0.3729683416, mass);
     radius1 =
-        planet_radius_helper(mass, 0.2877, mass_radii[0.2877], 0.3754,
-                             mass_radii[0.3754], 0.4875, mass_radii[0.4875]);
+        planet_radius_helper(mass, 0.2877, solid_iron_calc(0.2877), 0.3754,
+                             solid_iron_calc(0.3754), 0.4875, solid_iron_calc(0.4875));
     radius2 =
-        planet_radius_helper(mass, 0.3754, mass_radii[0.3754], 0.4875,
-                             mass_radii[0.4875], 0.6298, mass_radii[0.6298]);
+        planet_radius_helper(mass, 0.3754, solid_iron_calc(0.3754), 0.4875,
+                             solid_iron_calc(0.4875), 0.6298, solid_iron_calc(0.6298));
     radius = rangeAdjust(mass, radius1, radius2, 0.2877, 0.3754);
   } else if (mass <= 0.6298) {
     // radius = quad_trend(-0.1883400931, 0.5519643698, 0.4035775744, mass);
     radius1 =
-        planet_radius_helper(mass, 0.3754, mass_radii[0.3754], 0.4875,
-                             mass_radii[0.4875], 0.6298, mass_radii[0.6298]);
+        planet_radius_helper(mass, 0.3754, solid_iron_calc(0.3754), 0.4875,
+                             solid_iron_calc(0.4875), 0.6298, solid_iron_calc(0.6298));
     radius2 =
-        planet_radius_helper(mass, 0.4875, mass_radii[0.4875], 0.6298,
-                             mass_radii[0.6298], 0.8096, mass_radii[0.8096]);
+        planet_radius_helper(mass, 0.4875, solid_iron_calc(0.4875), 0.6298,
+                             solid_iron_calc(0.6298), 0.8096, solid_iron_calc(0.8096));
     radius = rangeAdjust(mass, radius1, radius2, 0.3754, 0.6298);
   } else if (mass <= 0.8096) {
     // radius = quad_trend(-0.1194866451, 0.4528567076, 0.4386849891, mass);
     radius1 =
-        planet_radius_helper(mass, 0.4875, mass_radii[0.4875], 0.6298,
-                             mass_radii[0.6298], 0.8096, mass_radii[0.8096]);
+        planet_radius_helper(mass, 0.4875, solid_iron_calc(0.4875), 0.6298,
+                             solid_iron_calc(0.6298), 0.8096, solid_iron_calc(0.8096));
     radius2 =
-        planet_radius_helper(mass, 0.6298, mass_radii[0.6298], 0.8096,
-                             mass_radii[0.8096], 1.036, mass_radii[1.036]);
+        planet_radius_helper(mass, 0.6298, solid_iron_calc(0.6298), 0.8096,
+                             solid_iron_calc(0.8096), 1.036, solid_iron_calc(1.036));
     radius = rangeAdjust(mass, radius1, radius2, 0.6298, 0.8096);
   } else if (mass <= 1.036) {
     // radius = quad_trend(-0.0787318553, 0.3776396675, 0.4728678898, mass);
     radius1 =
-        planet_radius_helper(mass, 0.6298, mass_radii[0.6298], 0.8096,
-                             mass_radii[0.8096], 1.036, mass_radii[1.036]);
-    radius2 = planet_radius_helper(mass, 0.8096, mass_radii[0.8096], 1.036,
-                                   mass_radii[1.036], 1.319, mass_radii[1.319]);
+        planet_radius_helper(mass, 0.6298, solid_iron_calc(0.6298), 0.8096,
+                             solid_iron_calc(0.8096), 1.036, solid_iron_calc(1.036));
+    radius2 = planet_radius_helper(mass, 0.8096, solid_iron_calc(0.8096), 1.036,
+                                   solid_iron_calc(1.036), 1.319, solid_iron_calc(1.319));
     radius = rangeAdjust(mass, radius1, radius2, 0.8096, 1.036);
   } else if (mass <= 1.319) {
     // radius = quad_trend(-0.0512867047, 0.313006338, 0.5103712488, mass);
-    radius1 = planet_radius_helper(mass, 0.8096, mass_radii[0.8096], 1.036,
-                                   mass_radii[1.036], 1.319, mass_radii[1.319]);
-    radius2 = planet_radius_helper(mass, 1.036, mass_radii[1.036], 1.319,
-                                   mass_radii[1.319], 1.671, mass_radii[1.671]);
+    radius1 = planet_radius_helper(mass, 0.8096, solid_iron_calc(0.8096), 1.036,
+                                   solid_iron_calc(1.036), 1.319, solid_iron_calc(1.319));
+    radius2 = planet_radius_helper(mass, 1.036, solid_iron_calc(1.036), 1.319,
+                                   solid_iron_calc(1.319), 1.671, solid_iron_calc(1.671));
     radius = rangeAdjust(mass, radius1, radius2, 1.036, 1.319);
   } else if (mass <= 1.671) {
     // radius = quad_trend(-0.0344294192, 0.2626030543, 0.5475255322, mass);
-    radius1 = planet_radius_helper(mass, 1.036, mass_radii[1.036], 1.319,
-                                   mass_radii[1.319], 1.671, mass_radii[1.671]);
-    radius2 = planet_radius_helper(mass, 1.319, mass_radii[1.319], 1.671,
-                                   mass_radii[1.671], 2.108, mass_radii[2.108]);
+    radius1 = planet_radius_helper(mass, 1.036, solid_iron_calc(1.036), 1.319,
+                                   solid_iron_calc(1.319), 1.671, solid_iron_calc(1.671));
+    radius2 = planet_radius_helper(mass, 1.319, solid_iron_calc(1.319), 1.671,
+                                   solid_iron_calc(1.671), 2.108, solid_iron_calc(2.108));
     radius = rangeAdjust(mass, radius1, radius2, 1.319, 1.671);
   } else if (mass <= 2.108) {
     // radius = quad_trend(-0.0239715508, 0.2230827695, 0.584363039, mass);
-    radius1 = planet_radius_helper(mass, 1.319, mass_radii[1.319], 1.671,
-                                   mass_radii[1.671], 2.108, mass_radii[2.108]);
-    radius2 = planet_radius_helper(mass, 1.671, mass_radii[1.671], 2.108,
-                                   mass_radii[2.108], 2.648, mass_radii[2.648]);
+    radius1 = planet_radius_helper(mass, 1.319, solid_iron_calc(1.319), 1.671,
+                                   solid_iron_calc(1.671), 2.108, solid_iron_calc(2.108));
+    radius2 = planet_radius_helper(mass, 1.671, solid_iron_calc(1.671), 2.108,
+                                   solid_iron_calc(2.108), 2.648, solid_iron_calc(2.648));
     radius = rangeAdjust(mass, radius1, radius2, 1.671, 2.108);
   } else if (mass <= 2.648) {
     // radius = quad_trend(-0.0140840757, 0.176057938, 0.6395547667, mass);
-    radius1 = planet_radius_helper(mass, 1.671, mass_radii[1.671], 2.108,
-                                   mass_radii[2.108], 2.648, mass_radii[2.648]);
-    radius2 = planet_radius_helper(mass, 2.108, mass_radii[2.108], 2.648,
-                                   mass_radii[2.648], 3.31, mass_radii[3.31]);
+    radius1 = planet_radius_helper(mass, 1.671, solid_iron_calc(1.671), 2.108,
+                                   solid_iron_calc(2.108), 2.648, solid_iron_calc(2.648));
+    radius2 = planet_radius_helper(mass, 2.108, solid_iron_calc(2.108), 2.648,
+                                   solid_iron_calc(2.648), 3.31, solid_iron_calc(3.31));
     radius = rangeAdjust(mass, radius1, radius2, 2.108, 2.648);
   } else if (mass <= 3.31) {
     // radius = quad_trend(-0.0105419379, 0.154953881, 0.6706011795, mass);
-    radius1 = planet_radius_helper(mass, 2.108, mass_radii[2.108], 2.648,
-                                   mass_radii[2.648], 3.31, mass_radii[3.31]);
-    radius2 = planet_radius_helper(mass, 2.648, mass_radii[2.648], 3.31,
-                                   mass_radii[3.31], 4.119, mass_radii[4.119]);
+    radius1 = planet_radius_helper(mass, 2.108, solid_iron_calc(2.108), 2.648,
+                                   solid_iron_calc(2.648), 3.31, solid_iron_calc(3.31));
+    radius2 = planet_radius_helper(mass, 2.648, solid_iron_calc(2.648), 3.31,
+                                   solid_iron_calc(3.31), 4.119, solid_iron_calc(4.119));
     radius = rangeAdjust(mass, radius1, radius2, 2.648, 3.31);
   } else if (mass <= 4.119) {
     // radius = quad_trend(-0.0070348211, 0.1288995104, 0.718416824, mass);
-    radius1 = planet_radius_helper(mass, 2.648, mass_radii[2.648], 3.31,
-                                   mass_radii[3.31], 4.119, mass_radii[4.119]);
-    radius2 = planet_radius_helper(mass, 3.31, mass_radii[3.31], 4.119,
-                                   mass_radii[4.119], 5.103, mass_radii[5.103]);
+    radius1 = planet_radius_helper(mass, 2.648, solid_iron_calc(2.648), 3.31,
+                                   solid_iron_calc(3.31), 4.119, solid_iron_calc(4.119));
+    radius2 = planet_radius_helper(mass, 3.31, solid_iron_calc(3.31), 4.119,
+                                   solid_iron_calc(4.119), 5.103, solid_iron_calc(5.103));
     radius = rangeAdjust(mass, radius1, radius2, 3.31, 4.119);
   } else if (mass <= 5.103) {
     // radius = quad_trend(-0.0047115353, 0.1074741683, 0.7672505662, mass);
-    radius1 = planet_radius_helper(mass, 3.31, mass_radii[3.31], 4.119,
-                                   mass_radii[4.119], 5.103, mass_radii[5.103]);
-    radius2 = planet_radius_helper(mass, 4.119, mass_radii[4.119], 5.103,
-                                   mass_radii[5.103], 6.293, mass_radii[6.293]);
+    radius1 = planet_radius_helper(mass, 3.31, solid_iron_calc(3.31), 4.119,
+                                   solid_iron_calc(4.119), 5.103, solid_iron_calc(5.103));
+    radius2 = planet_radius_helper(mass, 4.119, solid_iron_calc(4.119), 5.103,
+                                   solid_iron_calc(5.103), 6.293, solid_iron_calc(6.293));
     radius = rangeAdjust(mass, radius1, radius2, 4.119, 5.103);
   } else if (mass <= 6.293) {
     // radius = quad_trend(-0.003487465, 0.0935246637, 0.8065593536, mass);
-    radius1 = planet_radius_helper(mass, 4.119, mass_radii[4.119], 5.103,
-                                   mass_radii[5.103], 6.293, mass_radii[6.293]);
-    radius2 = planet_radius_helper(mass, 5.103, mass_radii[5.103], 6.293,
-                                   mass_radii[6.293], 7.727, mass_radii[7.727]);
+    radius1 = planet_radius_helper(mass, 4.119, solid_iron_calc(4.119), 5.103,
+                                   solid_iron_calc(5.103), 6.293, solid_iron_calc(6.293));
+    radius2 = planet_radius_helper(mass, 5.103, solid_iron_calc(5.103), 6.293,
+                                   solid_iron_calc(6.293), 7.727, solid_iron_calc(7.727));
     radius = rangeAdjust(mass, radius1, radius2, 5.103, 6.293);
   } else if (mass <= 7.727) {
     // radius = quad_trend(-0.0021560003, 0.0748575287, 0.8713031702, mass);
-    radius1 = planet_radius_helper(mass, 5.103, mass_radii[5.103], 6.293,
-                                   mass_radii[6.293], 7.727, mass_radii[7.727]);
-    radius2 = planet_radius_helper(mass, 6.293, mass_radii[6.293], 7.727,
-                                   mass_radii[7.727], 9.445, mass_radii[9.445]);
+    radius1 = planet_radius_helper(mass, 5.103, solid_iron_calc(5.103), 6.293,
+                                   solid_iron_calc(6.293), 7.727, solid_iron_calc(7.727));
+    radius2 = planet_radius_helper(mass, 6.293, solid_iron_calc(6.293), 7.727,
+                                   solid_iron_calc(7.727), 9.445, solid_iron_calc(9.445));
     radius = rangeAdjust(mass, radius1, radius2, 6.293, 7.727);
   } else if (mass <= 9.445) {
     // radius = quad_trend(-0.00160772, 0.0654424596, 0.9113174962, mass);
-    radius1 = planet_radius_helper(mass, 6.293, mass_radii[6.293], 7.727,
-                                   mass_radii[7.727], 9.445, mass_radii[9.445]);
-    radius2 = planet_radius_helper(mass, 7.727, mass_radii[7.727], 9.445,
-                                   mass_radii[9.445], 11.49, mass_radii[11.49]);
+    radius1 = planet_radius_helper(mass, 6.293, solid_iron_calc(6.293), 7.727,
+                                   solid_iron_calc(7.727), 9.445, solid_iron_calc(9.445));
+    radius2 = planet_radius_helper(mass, 7.727, solid_iron_calc(7.727), 9.445,
+                                   solid_iron_calc(9.445), 11.49, solid_iron_calc(11.49));
     radius = rangeAdjust(mass, radius1, radius2, 7.727, 9.445);
   } else if (mass <= 11.49) {
     // radius = quad_trend(-0.0012172944, 0.0572688997, 0.9536876732, mass);
-    radius1 = planet_radius_helper(mass, 7.727, mass_radii[7.727], 9.445,
-                                   mass_radii[9.445], 11.49, mass_radii[11.49]);
-    radius2 = planet_radius_helper(mass, 9.445, mass_radii[9.445], 11.49,
-                                   mass_radii[11.49], 13.92, mass_radii[13.92]);
+    radius1 = planet_radius_helper(mass, 7.727, solid_iron_calc(7.727), 9.445,
+                                   solid_iron_calc(9.445), 11.49, solid_iron_calc(11.49));
+    radius2 = planet_radius_helper(mass, 9.445, solid_iron_calc(9.445), 11.49,
+                                   solid_iron_calc(11.49), 13.92, solid_iron_calc(13.92));
     radius = rangeAdjust(mass, radius1, radius2, 9.445, 11.49);
   } else if (mass <= 13.92) {
     // radius = quad_trend(-7.485494E-4, 0.0453580881, 1.028659131, mass);
-    radius1 = planet_radius_helper(mass, 9.445, mass_radii[9.445], 11.49,
-                                   mass_radii[11.49], 13.92, mass_radii[13.92]);
-    radius2 = planet_radius_helper(mass, 11.49, mass_radii[11.49], 13.92,
-                                   mass_radii[13.92], 16.78, mass_radii[16.78]);
+    radius1 = planet_radius_helper(mass, 9.445, solid_iron_calc(9.445), 11.49,
+                                   solid_iron_calc(11.49), 13.92, solid_iron_calc(13.92));
+    radius2 = planet_radius_helper(mass, 11.49, solid_iron_calc(11.49), 13.92,
+                                   solid_iron_calc(13.92), 16.78, solid_iron_calc(16.78));
     radius = rangeAdjust(mass, radius1, radius2, 11.49, 13.92);
   } else if (mass <= 16.78) {
     // radius = quad_trend(-5.83219E-4, 0.0402824467, 1.067276595, mass);
-    radius1 = planet_radius_helper(mass, 11.49, mass_radii[11.49], 13.92,
-                                   mass_radii[13.92], 16.78, mass_radii[16.78]);
-    radius2 = planet_radius_helper(mass, 13.92, mass_radii[13.92], 16.78,
-                                   mass_radii[16.78], 20.14, mass_radii[20.14]);
+    radius1 = planet_radius_helper(mass, 11.49, solid_iron_calc(11.49), 13.92,
+                                   solid_iron_calc(13.92), 16.78, solid_iron_calc(16.78));
+    radius2 = planet_radius_helper(mass, 13.92, solid_iron_calc(13.92), 16.78,
+                                   solid_iron_calc(16.78), 20.14, solid_iron_calc(20.14));
     radius = rangeAdjust(mass, radius1, radius2, 13.92, 16.78);
   } else if (mass <= 20.14) {
     // radius = quad_trend(-3.979673E-4, 0.0334429539, 1.129882258, mass);
-    radius1 = planet_radius_helper(mass, 13.92, mass_radii[13.92], 16.78,
-                                   mass_radii[16.78], 20.14, mass_radii[20.14]);
-    radius2 = planet_radius_helper(mass, 16.78, mass_radii[16.78], 20.14,
-                                   mass_radii[20.14], 24.05, mass_radii[24.05]);
+    radius1 = planet_radius_helper(mass, 13.92, solid_iron_calc(13.92), 16.78,
+                                   solid_iron_calc(16.78), 20.14, solid_iron_calc(20.14));
+    radius2 = planet_radius_helper(mass, 16.78, solid_iron_calc(16.78), 20.14,
+                                   solid_iron_calc(20.14), 24.05, solid_iron_calc(24.05));
     radius = rangeAdjust(mass, radius1, radius2, 16.78, 20.14);
   } else if (mass <= 24.05) {
     // radius = quad_trend(-2.896199E-4, 0.0286550795, 1.182362194, mass);
-    radius1 = planet_radius_helper(mass, 16.78, mass_radii[16.78], 20.14,
-                                   mass_radii[20.14], 24.05, mass_radii[24.05]);
-    radius2 = planet_radius_helper(mass, 20.14, mass_radii[20.14], 24.05,
-                                   mass_radii[24.05], 28.6, mass_radii[28.6]);
+    radius1 = planet_radius_helper(mass, 16.78, solid_iron_calc(16.78), 20.14,
+                                   solid_iron_calc(20.14), 24.05, solid_iron_calc(24.05));
+    radius2 = planet_radius_helper(mass, 20.14, solid_iron_calc(20.14), 24.05,
+                                   solid_iron_calc(24.05), 28.6, solid_iron_calc(28.6));
     radius = rangeAdjust(mass, radius1, radius2, 20.14, 24.05);
   } else if (mass <= 28.6) {
     // radius = quad_trend(-2.251678E-4, 0.0252616764, 1.226694282, mass);
-    radius1 = planet_radius_helper(mass, 20.14, mass_radii[20.14], 24.05,
-                                   mass_radii[24.05], 28.6, mass_radii[28.6]);
-    radius2 = planet_radius_helper(mass, 24.05, mass_radii[24.05], 28.6,
-                                   mass_radii[28.6], 33.87, mass_radii[33.87]);
+    radius1 = planet_radius_helper(mass, 20.14, solid_iron_calc(20.14), 24.05,
+                                   solid_iron_calc(24.05), 28.6, solid_iron_calc(28.6));
+    radius2 = planet_radius_helper(mass, 24.05, solid_iron_calc(24.05), 28.6,
+                                   solid_iron_calc(28.6), 33.87, solid_iron_calc(33.87));
     radius = rangeAdjust(mass, radius1, radius2, 24.05, 28.6);
   } else if (mass <= 33.87) {
     // radius = quad_trend(-1.591712E-4, 0.0211388691, 1.290623996, mass);
-    radius1 = planet_radius_helper(mass, 24.05, mass_radii[24.05], 28.6,
-                                   mass_radii[28.6], 33.87, mass_radii[33.87]);
-    radius2 = planet_radius_helper(mass, 28.6, mass_radii[28.6], 33.87,
-                                   mass_radii[33.87], 39.94, mass_radii[39.94]);
+    radius1 = planet_radius_helper(mass, 24.05, solid_iron_calc(24.05), 28.6,
+                                   solid_iron_calc(28.6), 33.87, solid_iron_calc(33.87));
+    radius2 = planet_radius_helper(mass, 28.6, solid_iron_calc(28.6), 33.87,
+                                   solid_iron_calc(33.87), 39.94, solid_iron_calc(39.94));
     radius = rangeAdjust(mass, radius1, radius2, 28.6, 33.87);
   } else if (mass <= 39.94) {
     // radius = quad_trend(-1.04791E-4, 0.171250664, 1.364187783, mass);
-    radius1 = planet_radius_helper(mass, 28.6, mass_radii[28.6], 33.87,
-                                   mass_radii[33.87], 39.94, mass_radii[39.94]);
-    radius2 = planet_radius_helper(mass, 33.87, mass_radii[33.87], 39.94,
-                                   mass_radii[39.94], 46.92, mass_radii[46.92]);
+    radius1 = planet_radius_helper(mass, 28.6, solid_iron_calc(28.6), 33.87,
+                                   solid_iron_calc(33.87), 39.94, solid_iron_calc(39.94));
+    radius2 = planet_radius_helper(mass, 33.87, solid_iron_calc(33.87), 39.94,
+                                   solid_iron_calc(39.94), 46.92, solid_iron_calc(46.92));
     radius = rangeAdjust(mass, radius1, radius2, 33.87, 39.94);
   } else if (mass <= 46.92) {
     // radius = quad_trend(-9.380878E-5, 0.0161711529, 1.38476825, mass);
-    radius1 = planet_radius_helper(mass, 33.87, mass_radii[33.87], 39.94,
-                                   mass_radii[39.94], 46.92, mass_radii[46.92]);
-    radius2 = planet_radius_helper(mass, 39.94, mass_radii[39.94], 46.92,
-                                   mass_radii[46.92], 54.93, mass_radii[54.93]);
+    radius1 = planet_radius_helper(mass, 33.87, solid_iron_calc(33.87), 39.94,
+                                   solid_iron_calc(39.94), 46.92, solid_iron_calc(46.92));
+    radius2 = planet_radius_helper(mass, 39.94, solid_iron_calc(39.94), 46.92,
+                                   solid_iron_calc(46.92), 54.93, solid_iron_calc(54.93));
     radius = rangeAdjust(mass, radius1, radius2, 39.94, 46.92);
   } else if (mass <= 54.93) {
     // radius = quad_trend(-5.440961E-5, 0.0121583483, 1.486312324, mass);
-    radius1 = planet_radius_helper(mass, 39.94, mass_radii[39.94], 46.92,
-                                   mass_radii[46.92], 54.93, mass_radii[54.93]);
-    radius2 = planet_radius_helper(mass, 46.92, mass_radii[46.92], 54.93,
-                                   mass_radii[54.93], 64.08, mass_radii[64.08]);
+    radius1 = planet_radius_helper(mass, 39.94, solid_iron_calc(39.94), 46.92,
+                                   solid_iron_calc(46.92), 54.93, solid_iron_calc(54.93));
+    radius2 = planet_radius_helper(mass, 46.92, solid_iron_calc(46.92), 54.93,
+                                   solid_iron_calc(54.93), 64.08, solid_iron_calc(64.08));
     radius = rangeAdjust(mass, radius1, radius2, 46.92, 54.93);
   } else if (mass <= 64.08) {
     // radius = quad_trend(-5.031019E-5, 0.0116704759, 1.500741944, mass);
-    radius1 = planet_radius_helper(mass, 46.92, mass_radii[46.92], 54.93,
-                                   mass_radii[54.93], 64.08, mass_radii[64.08]);
-    radius2 = planet_radius_helper(mass, 54.93, mass_radii[54.93], 64.08,
-                                   mass_radii[64.08], 74.51, mass_radii[74.51]);
+    radius1 = planet_radius_helper(mass, 46.92, solid_iron_calc(46.92), 54.93,
+                                   solid_iron_calc(54.93), 64.08, solid_iron_calc(64.08));
+    radius2 = planet_radius_helper(mass, 54.93, solid_iron_calc(54.93), 64.08,
+                                   solid_iron_calc(64.08), 74.51, solid_iron_calc(74.51));
     radius = rangeAdjust(mass, radius1, radius2, 54.93, 64.08);
   } else if (mass <= 74.51) {
     // radius = quad_trend(-3.297829E-5, 0.0092684477, 1.583494853, mass);
-    radius1 = planet_radius_helper(mass, 54.93, mass_radii[54.93], 64.08,
-                                   mass_radii[64.08], 74.51, mass_radii[74.51]);
-    radius2 = planet_radius_helper(mass, 64.08, mass_radii[64.08], 74.51,
-                                   mass_radii[74.51], 86.37, mass_radii[86.37]);
+    radius1 = planet_radius_helper(mass, 54.93, solid_iron_calc(54.93), 64.08,
+                                   solid_iron_calc(64.08), 74.51, solid_iron_calc(74.51));
+    radius2 = planet_radius_helper(mass, 64.08, solid_iron_calc(64.08), 74.51,
+                                   solid_iron_calc(74.51), 86.37, solid_iron_calc(86.37));
     radius = rangeAdjust(mass, radius1, radius2, 64.08, 74.51);
   } else if (mass <= 86.37) {
     // radius = quad_trend(-2.420693E-5, 0.0078573106, 1.639942343, mass);
-    radius1 = planet_radius_helper(mass, 64.08, mass_radii[64.08], 74.51,
-                                   mass_radii[74.51], 86.37, mass_radii[86.37]);
-    radius2 = planet_radius_helper(mass, 74.51, mass_radii[74.51], 86.37,
-                                   mass_radii[86.37], 99.8, mass_radii[99.8]);
+    radius1 = planet_radius_helper(mass, 64.08, solid_iron_calc(64.08), 74.51,
+                                   solid_iron_calc(74.51), 86.37, solid_iron_calc(86.37));
+    radius2 = planet_radius_helper(mass, 74.51, solid_iron_calc(74.51), 86.37,
+                                   solid_iron_calc(86.37), 99.8, solid_iron_calc(99.8));
     radius = rangeAdjust(mass, radius1, radius2, 74.51, 86.37);
   } else if (mass <= 99.8) {
     // radius = quad_trend(-1.822424E-5, 0.0067435142, 1.691511445, mass);
-    radius1 = planet_radius_helper(mass, 74.51, mass_radii[74.51], 86.37,
-                                   mass_radii[86.37], 99.8, mass_radii[99.8]);
-    radius2 = planet_radius_helper(mass, 86.37, mass_radii[86.37], 99.8,
-                                   mass_radii[99.8], 115.0, mass_radii[115.0]);
+    radius1 = planet_radius_helper(mass, 74.51, solid_iron_calc(74.51), 86.37,
+                                   solid_iron_calc(86.37), 99.8, solid_iron_calc(99.8));
+    radius2 = planet_radius_helper(mass, 86.37, solid_iron_calc(86.37), 99.8,
+                                   solid_iron_calc(99.8), 115.0, solid_iron_calc(115.0));
     radius = rangeAdjust(mass, radius1, radius2, 86.37, 99.8);
   } else if (mass <= 115.0) {
     // radius = quad_trend(-1.516304E-5, 0.0060859676, 1.726644882, mass);
-    radius1 = planet_radius_helper(mass, 86.37, mass_radii[86.37], 99.8,
-                                   mass_radii[99.8], 115.0, mass_radii[115.0]);
-    radius2 = planet_radius_helper(mass, 99.8, mass_radii[99.8], 115.0,
-                                   mass_radii[115.0], 132.1, mass_radii[132.1]);
+    radius1 = planet_radius_helper(mass, 86.37, solid_iron_calc(86.37), 99.8,
+                                   solid_iron_calc(99.8), 115.0, solid_iron_calc(115.0));
+    radius2 = planet_radius_helper(mass, 99.8, solid_iron_calc(99.8), 115.0,
+                                   solid_iron_calc(115.0), 132.1, solid_iron_calc(132.1));
     radius = rangeAdjust(mass, radius1, radius2, 99.8, 115.0);
   } else if (mass <= 132.1) {
-    radius1 = planet_radius_helper(mass, 99.8, mass_radii[99.8], 115.0,
-                                   mass_radii[115.0], 132.1, mass_radii[132.1]);
-    radius2 = planet_radius_helper2(mass, 115.0, mass_radii[115.0], 132.1,
-                                    mass_radii[132.1]);
+    radius1 = planet_radius_helper(mass, 99.8, solid_iron_calc(99.8), 115.0,
+                                   solid_iron_calc(115.0), 132.1, solid_iron_calc(132.1));
+    radius2 = planet_radius_helper2(mass, 115.0, solid_iron_calc(115.0), 132.1,
+                                    solid_iron_calc(132.1));
     radius = rangeAdjust(mass, radius1, radius2, 115.0, 132.1);
   } else {
     // radius = ln_trend(0.8568787518, 0.2885439056, mass);
-    radius = planet_radius_helper2(mass, 115.0, mass_radii[115.0], 132.1,
-                                   mass_radii[132.1]);
+    radius = planet_radius_helper2(mass, 115.0, solid_iron_calc(115.0), 132.1,
+                                   solid_iron_calc(132.1));
   }
   if (flag_verbose & 0x80000) {
     radiusDebug("100% iron", the_planet, radius, mass_radii);
