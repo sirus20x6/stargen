@@ -93,6 +93,10 @@ long double solid_iron_calc(double x){
 return 0.79250f + 0.22077f * log(x) + 0.01845 * log(x)*log(x);
 }
 
+long double water_radius_calc(double x){
+  return 1.52452 + 0.42613 * log(x) + 0.02165 * log(x)*log(x);
+}
+
 void initRadii() {
   gas_300Myr_1960K_0core_mass[0] = 0.0;
   gas_300Myr_1960K_0core_mass[28] = 2.326;
@@ -960,56 +964,6 @@ void initRadii() {
   gas_4point5Gyr_78K_100core_mass[1292] = 1.012;
   gas_4point5Gyr_78K_100core_mass[2154] = 1.023;
   gas_4point5Gyr_78K_100core_mass[3594] = 1.004;
-
-  solid_water[0.04663] = 0.58;
-  solid_water[0.06174] = 0.63;
-  solid_water[0.08208] = 0.6853;
-  solid_water[0.1091] = 0.7455;
-  solid_water[0.1445] = 0.8102;
-  solid_water[0.1904] = 0.879;
-  solid_water[0.2494] = 0.9515;
-  solid_water[0.3249] = 1.028;
-  solid_water[0.4206] = 1.107;
-  solid_water[0.5416] = 1.19;
-  solid_water[0.6938] = 1.276;
-  solid_water[0.8866] = 1.366;
-  solid_water[1.132] = 1.461;
-  solid_water[1.444] = 1.562;
-  solid_water[1.841] = 1.699;
-  solid_water[2.346] = 1.782;
-  solid_water[2.985] = 1.901;
-  solid_water[3.77] = 2.023;
-  solid_water[4.735] = 2.147;
-  solid_water[5.909] = 2.274;
-  solid_water[7.325] = 2.401;
-  solid_water[9.038] = 2.529;
-  solid_water[11.11] = 2.66;
-  solid_water[13.55] = 2.789;
-  solid_water[16.42] = 2.915;
-  solid_water[19.77] = 3.039;
-  solid_water[23.68] = 3.16;
-  solid_water[28.21] = 3.278;
-  solid_water[33.49] = 3.393;
-  solid_water[39.62] = 3.506;
-  solid_water[46.72] = 3.616;
-  solid_water[54.92] = 3.724;
-  solid_water[64.22] = 3.826;
-  solid_water[74.79] = 3.924;
-  solid_water[86.85] = 4.017;
-  solid_water[100.3] = 4.104;
-  solid_water[115.3] = 4.183;
-  solid_water[131.9] = 4.256;
-  solid_water[150.3] = 4.322;
-  solid_water[170.8] = 4.382;
-  solid_water[193.6] = 4.435;
-  solid_water[218.7] = 4.483;
-  solid_water[246.6] = 4.525;
-  solid_water[277.3] = 4.561;
-  solid_water[311.3] = 4.592;
-  solid_water[348.7] = 4.618;
-  solid_water[390.1] = 4.639;
-  solid_water[435.9] = 4.656;
-  solid_water[486.4] = 4.669;
 
   solid_one_quater_rock_three_fourths_water[0.01217] = 0.3616;
   solid_one_quater_rock_three_fourths_water[0.01699] = 0.4009;
