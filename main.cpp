@@ -53,7 +53,7 @@ void printExamples() {
 }
 
 int main(int argc, char **argv) {
-  actions action = aGenerate;
+    actions action = aGenerate;
   string flag_char = "?";
   string path = SUBDIR;
   string url_path_arg = "";
@@ -428,6 +428,7 @@ int main(int argc, char **argv) {
   }
 
   flags_arg_clone = flags_arg;
+  ZoneScoped;
   return stargen(action, flag_char, path, url_path_arg, filename_arg, arg_name,
                  prognam, mass_arg, luminosity_arg, seed_arg, count_arg,
                  increment_arg, star_catalog, sys_no_arg, ratio_arg,

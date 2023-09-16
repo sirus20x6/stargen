@@ -21,7 +21,7 @@ using namespace std;
  */
 long double water_radius(long double mass, planet *the_planet,
                          map<long double, long double> &mass_radii) {
-  long double radius;
+    long double radius;
   bool adjust_for_carbon;
   long double radius1;
   long double radius2;
@@ -395,6 +395,7 @@ long double water_radius(long double mass, planet *the_planet,
   if (flag_verbose & 0x80000) {
     radiusDebug("100% water/ice", the_planet, radius, mass_radii);
   }
+  ZoneScoped;
   return radius;
 }
 
@@ -410,7 +411,7 @@ long double water_radius(long double mass, planet *the_planet,
 long double one_quater_rock_three_fourths_water_radius(
     long double mass, long double cmf, planet *the_planet,
     map<long double, long double> &mass_radii) {
-  long double radius;
+    long double radius;
   long double radius1;
   long double radius2;
   bool adjust_for_carbon;
@@ -800,6 +801,7 @@ long double one_quater_rock_three_fourths_water_radius(
   if (flag_verbose & 0x80000) {
     radiusDebug("25% rock, 75% water/ice", the_planet, radius, mass_radii);
   }
+  ZoneScoped;
   return radius;
 }
 
@@ -815,7 +817,7 @@ long double one_quater_rock_three_fourths_water_radius(
 long double half_rock_half_water_radius(
     long double mass, long double cmf, planet *the_planet,
     map<long double, long double> &mass_radii) {
-  long double radius;
+    long double radius;
   long double radius1;
   long double radius2;
   bool adjust_for_carbon;
@@ -1208,6 +1210,7 @@ long double half_rock_half_water_radius(
   if (flag_verbose & 0x80000) {
     radiusDebug("50% rock, 50% water/ice", the_planet, radius, mass_radii);
   }
+  ZoneScoped;
   return radius;
 }
 
@@ -1222,7 +1225,7 @@ long double half_rock_half_water_radius(
  */
 long double rock_radius(long double mass, long double cmf, planet *the_planet,
                         map<long double, long double> &mass_radii) {
-  long double radius;
+    long double radius;
   long double radius1;
   long double radius2;
   bool adjust_for_carbon;
@@ -1616,6 +1619,7 @@ long double rock_radius(long double mass, long double cmf, planet *the_planet,
   if (flag_verbose & 0x80000) {
     radiusDebug("100% rock", the_planet, radius, mass_radii);
   }
+  ZoneScoped;
   return radius;
 }
 
@@ -1631,7 +1635,7 @@ long double rock_radius(long double mass, long double cmf, planet *the_planet,
 long double half_rock_half_iron_radius(
     long double mass, long double cmf, planet *the_planet,
     map<long double, long double> &mass_radii) {
-  long double radius;
+    long double radius;
   long double radius1;
   long double radius2;
   bool adjust_for_carbon;
@@ -2036,6 +2040,7 @@ long double half_rock_half_iron_radius(
   if (flag_verbose & 0x80000) {
     radiusDebug("50% rock, 50% iron", the_planet, radius, mass_radii);
   }
+  ZoneScoped;
   return radius;
 }
 
@@ -2049,7 +2054,7 @@ long double half_rock_half_iron_radius(
  */
 long double iron_radius(long double mass, planet *the_planet,
                         map<long double, long double> &mass_radii) {
-  long double radius;
+    long double radius;
   long double radius1;
   long double radius2;
   if (mass <= 0.001496) {
@@ -2444,6 +2449,7 @@ long double iron_radius(long double mass, planet *the_planet,
   if (flag_verbose & 0x80000) {
     radiusDebug("100% iron", the_planet, radius, mass_radii);
   }
+  ZoneScoped;
   return radius;
 }
 
@@ -2458,7 +2464,7 @@ long double iron_radius(long double mass, planet *the_planet,
 long double solid_0point953_iron_0point047_water_radius(
     long double mass, planet *the_planet,
     map<long double, long double> &mass_radii) {
-  long double radius, radius1, radius2;
+    long double radius, radius1, radius2;
   if (mass <= 0.1) {
     radius1 = fraction_radius(mass, 0, 0, 0);
     radius2 =
@@ -2722,6 +2728,7 @@ long double solid_0point953_iron_0point047_water_radius(
     radius = planet_radius_helper2(mass, 79.43, mass_radii[79.43], 100.0,
                                    mass_radii[100.0]);
   }
+  ZoneScoped;
   return radius;
 }
 
@@ -2736,7 +2743,7 @@ long double solid_0point953_iron_0point047_water_radius(
 long double solid_0point51_iron_0point49_water_radius(
     long double mass, planet *the_planet,
     map<long double, long double> &mass_radii) {
-  long double radius, radius1, radius2;
+    long double radius, radius1, radius2;
   if (mass <= 0.1) {
     radius1 = fraction_radius(mass, 0, 0, 0);
     radius2 =
@@ -3000,7 +3007,7 @@ long double solid_0point51_iron_0point49_water_radius(
     radius = planet_radius_helper2(mass, 79.43, mass_radii[79.43], 100.0,
                                    mass_radii[100.0]);
   }
-  return radius;
+    return radius;
 }
 
 /**
@@ -3014,7 +3021,7 @@ long double solid_0point51_iron_0point49_water_radius(
 long double solid_0point264_iron_0point736_water_radius(
     long double mass, planet *the_planet,
     map<long double, long double> &mass_radii) {
-  long double radius, radius1, radius2;
+    long double radius, radius1, radius2;
   if (mass <= 0.1) {
     radius1 = fraction_radius(mass, 0, 0, 0);
     radius2 =
@@ -3278,6 +3285,7 @@ long double solid_0point264_iron_0point736_water_radius(
     radius = planet_radius_helper2(mass, 79.43, mass_radii[79.43], 100.0,
                                    mass_radii[100.0]);
   }
+  ZoneScoped;
   return radius;
 }
 
@@ -3290,21 +3298,22 @@ long double solid_0point264_iron_0point736_water_radius(
  * @param cmf 
  * @return long double 
  */
-long double fraction_radius(long double mass, long double imf, long double rmf,
-                            long double cmf) {
-  long double ice_fraction;
-  long double carbon_fraction;
-  long double silicate_fraction;
-  long double iron_fraction;
-  long double density;
-  long double radius;
+long double fraction_radius(long double mass, long double imf, long double rmf, long double cmf) {
+        
+    // Convert mass to Sun mass in Earth masses
+    mass /= SUN_MASS_IN_EARTH_MASSES;
 
-  mass /= SUN_MASS_IN_EARTH_MASSES;
-  ice_fraction = imf * ICE_DENSITY;
-  carbon_fraction = (cmf * rmf) * CARBON_DENSITY;
-  silicate_fraction = (rmf - (cmf * rmf)) * ROCK_DENSITY;
-  iron_fraction = (1.0 - (rmf + imf)) * IRON_DENSITY;
-  density = ice_fraction + silicate_fraction + carbon_fraction + iron_fraction;
-  radius = volume_radius(mass, density) / KM_EARTH_RADIUS;
-  return radius;
+    // Directly compute the fractions without intermediate variables
+    long double ice_fraction = imf * ICE_DENSITY;
+    long double carbon_fraction = cmf * rmf * CARBON_DENSITY;
+    long double silicate_fraction = (rmf - cmf * rmf) * ROCK_DENSITY;
+    long double iron_fraction = (1.0 - (rmf + imf)) * IRON_DENSITY;
+
+    long double density = ice_fraction + silicate_fraction + carbon_fraction + iron_fraction;
+    long double radius = volume_radius(mass, density) / KM_EARTH_RADIUS;
+    
+    ZoneScoped;
+    
+    return radius;
 }
+

@@ -132,7 +132,7 @@ auto stargen(actions action, const string &flag_char, string path,
              long double ratio_arg, long double ecc_coef_arg,
              long double inner_planet_factor_arg, int flags_arg, int out_format,
              int graphic_format) -> int {
-  sun the_sun;
+    sun the_sun;
   long double min_mass = 0.4;
   long double inc_mass = 0.05;
   long double max_mass = 2.35;
@@ -774,7 +774,7 @@ auto stargen(actions action, const string &flag_char, string path,
       close_html_file(thumbnails);
     }
   }
-
+  ZoneScoped;
   return EXIT_SUCCESS;
 }
 
@@ -783,7 +783,7 @@ auto stargen(actions action, const string &flag_char, string path,
  * 
  */
 void init() {
-  if (flag_seed == 0) {
+    if (flag_seed == 0) {
     time_t temp_time = 0;
     auto seed = (unsigned)(time(&temp_time));
     srand(seed);
@@ -791,6 +791,7 @@ void init() {
   }
   srand(flag_seed);
   system_seed = flag_seed;
+  ZoneScoped;
 }
 
 int system_counter = 0;
@@ -819,7 +820,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
                              long double ecc_coef,
                              long double inner_planet_factor, bool do_gases,
                              bool do_moons, accrete &myAccreteObject) {
-  do_gases = (flags_arg_clone & fDoGases) != 0;
+    do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   system_counter++;
   long double outer_dust_limit = NAN;
@@ -881,6 +882,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
   // cout << "test" << system_counter << endl;
   generate_planets(the_sun, !use_seed_system, flag_char, sys_no,
                    system_name, do_gases, do_moons);
+  ZoneScoped;
 }
 
 /**
@@ -897,7 +899,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
 void generate_planets(sun &the_sun, bool random_tilt, const string &flag_char,
                       int sys_no, const string &system_name, bool do_gases,
                       bool do_moons) {
-  do_gases = (flags_arg_clone & fDoGases) != 0;
+    do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   planet *the_planet = nullptr;
   int planet_no = 0;
@@ -943,6 +945,7 @@ void generate_planets(sun &the_sun, bool random_tilt, const string &flag_char,
       }
     }
   }
+  ZoneScoped;
 }
 
 /**
@@ -961,7 +964,7 @@ void generate_planets(sun &the_sun, bool random_tilt, const string &flag_char,
 void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                      bool random_tilt, const string &planet_id, bool do_gases,
                      bool do_moons, bool is_moon, long double parent_mass) {
-  do_gases = (flags_arg_clone & fDoGases) != 0;
+    do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   long double tmp = NAN;
   long double ecc_coef = 0.077;
@@ -1698,10 +1701,11 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
       }
     }
   }
+  ZoneScoped;
 }
 
 void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
-  int tIndex = 0;
+    int tIndex = 0;
 
   if (the_planet->getType() == tUnknown) {
     tIndex = 0;
@@ -2122,6 +2126,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
            << habitable << " " << planet_id << "\tSphinx-like\n";
     }
   }
+  ZoneScoped;
 }
 
 /**
@@ -2136,7 +2141,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
  */
 void assign_type(sun &the_sun, planet *the_planet, const string &planet_id,
                  bool is_moon, bool do_gases, bool second_time) {
-  if (the_planet->getSurfPressure() < 1.0) {
+    if (the_planet->getSurfPressure() < 1.0) {
     if (the_planet->getRadius() < round_threshold(the_planet->getDensity())) {
       the_planet->setType(tAsteroids);
     } else {
@@ -2252,4 +2257,5 @@ void assign_type(sun &the_sun, planet *the_planet, const string &planet_id,
       }
     }
   }
+  ZoneScoped;
 }

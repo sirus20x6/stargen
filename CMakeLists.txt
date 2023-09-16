@@ -19,10 +19,17 @@ set(CMAKE_BUILD_PARALLEL_LEVEL ${logical})
 
 include(FetchContent)
 
+# Fetch Tracy content
+FetchContent_Declare(
+    tracy
+    URL https://github.com/wolfpld/tracy/archive/master.zip
+)
+FetchContent_MakeAvailable(tracy)
+
+# Fetch nlohmann json
 cmake_policy(SET CMP0135 NEW)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.1/json.tar.xz)
 FetchContent_MakeAvailable(json)
-
 
 add_executable(stargen 
     accrete.cpp
@@ -49,8 +56,18 @@ add_executable(stargen
     star_temps.cpp
     star_trek.cpp
     structs.cpp
-    utils.cpp)
+    utils.cpp
+    _deps/tracy-src/public/TracyClient.cpp
+)
 
+# Include Tracy directories
+target_include_directories(stargen PRIVATE ${tracy_SOURCE_DIR})
+
+# Define Tracy enabling macro
+target_compile_definitions(stargen PRIVATE TRACY_ENABLE)
+target_include_directories(stargen PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
+
+# Link libraries
 target_link_libraries(stargen PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(stargen PRIVATE m)
 

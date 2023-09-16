@@ -9,6 +9,8 @@
 #include <string>                   // for string, basic_string, operator<<
 #include "const.h"                  // for pow2, pow1_4, pow3, pow4
 #include "enviro.h"                 // for eff_temp_to_spec_type, getStarType
+#include <immintrin.h>
+#include <cpuid.h>
 #include "utils.h"
 
 using namespace std;
@@ -402,17 +404,46 @@ auto e_trend(long double a, long double b, long double x) -> long double {
 /// @param a 
 /// @param b 
 /// @param c 
-void quadfix(long double x, long double y, long double w, long double z,
-             long double p, long double q, long double &a, long double &b,
-             long double &c) {
-  a = ((q * (w - x)) - (w * y) + (p * (y - z)) + (x * z)) /
-      ((p - w) * (p - x) * (w - x));
-  b = ((q * (pow2(x) - pow2(w))) + (pow2(w) * y) - (pow2(x) * z) +
-       (pow2(p) * (z - y))) /
-      ((p - w) * (p - x) * (w - x));
-  c = ((q * w * x * (w - x)) +
-       (p * ((p * w * y) - (pow2(w) * y) - (p * x * z) + (pow2(x) * z)))) /
-      ((p - w) * (p - x) * (w - x));
+// Original quadfix
+void quadfix(const long double x, const long double y, 
+             const long double w, const long double z, 
+             const long double p, const long double q, 
+             long double &a, long double &b, long double &c) {
+    a = ((q * (w - x)) - (w * y) + (p * (y - z)) + (x * z)) /
+        ((p - w) * (p - x) * (w - x));
+    b = ((q * (pow2(x) - pow2(w))) + (pow2(w) * y) - (pow2(x) * z) +
+         (pow2(p) * (z - y))) /
+        ((p - w) * (p - x) * (w - x));
+    c = ((q * w * x * (w - x)) +
+         (p * ((p * w * y) - (pow2(w) * y) - (p * x * z) + (pow2(x) * z)))) /
+        ((p - w) * (p - x) * (w - x));
+}
+
+// AVX2 quadfix
+void quadfix_avx2(const long double x[4], const long double y[4], 
+                  const long double w[4], const long double z[4], 
+                  const long double p[4], const long double q[4], 
+                  long double a[4], long double b[4], long double c[4]) {
+    // Your AVX2 implementation of quadfix here
+}
+
+bool is_avx2_supported() {
+    unsigned int eax, ebx, ecx, edx;
+    __get_cpuid(1, &eax, &ebx, &ecx, &edx);
+    return ecx & bit_AVX2;
+}
+
+void quadfix_optimized(const long double x[4], const long double y[4], 
+                       const long double w[4], const long double z[4], 
+                       const long double p[4], const long double q[4], 
+                       long double a[4], long double b[4], long double c[4]) {
+    if (is_avx2_supported()) {
+        quadfix_avx2(x, y, w, z, p, q, a, b, c);
+    } else {
+        for (int i = 0; i < 4; ++i) {
+            quadfix(x[i], y[i], w[i], z[i], p[i], q[i], a[i], b[i], c[i]);
+        }
+    }
 }
 
 /**

@@ -142,7 +142,7 @@
 #define B (1.2E-5)                  /* Used in Crit_mass calc	*/
 #define DUST_DENSITY_COEFF (2.0E-3) /* A in Dole's paper		*/
 #define ALPHA (5.0)                 /* Used in density calcs	*/
-#define N (3.0)                     /* Used in density calcs	*/
+#define NDENSITY (3.0)                     /* Used in density calcs	*/
 #define J (1.46E-19)                /* Used in day-length calcs (cm2/sec2 g) */
 #ifdef HUGE_VAL
 #define INCREDIBLY_LARGE_NUMBER HUGE_VAL

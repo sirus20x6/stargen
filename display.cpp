@@ -24,7 +24,7 @@ using namespace std;
  */
 void text_describe_system(planet* innermost_planet, bool do_gases,
                           long int seed, bool do_moons) {
-  // do_gases = (flags_arg_clone & fDoGases) != 0;
+    // do_gases = (flags_arg_clone & fDoGases) != 0;
   planet* the_planet;
   sun the_sun = innermost_planet->getTheSun();
   int counter;
@@ -107,6 +107,7 @@ void text_describe_system(planet* innermost_planet, bool do_gases,
     "   Planetary albedo:\t\t" << toString(the_planet->getAlbedo()) << endl;
     cout << endl << endl;
   }
+ZoneScoped;  
 }
 
 /**
@@ -120,7 +121,7 @@ void text_describe_system(planet* innermost_planet, bool do_gases,
  */
 void csv_describe_system(fstream& the_file, planet* innermost_planet,
                          bool do_gases, long int seed, bool do_moons) {
-  do_gases = (flags_arg_clone & fDoGases) != 0;
+                            do_gases = (flags_arg_clone & fDoGases) != 0;
   planet* the_planet;
   sun the_sun = innermost_planet->getTheSun();
   int counter;
@@ -194,6 +195,7 @@ void csv_describe_system(fstream& the_file, planet* innermost_planet,
       }
     }
   }
+  ZoneScoped;
 }
 
 /**
@@ -207,7 +209,7 @@ void csv_describe_system(fstream& the_file, planet* innermost_planet,
  */
 void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
                          bool do_gases, long int seed, bool do_moons) {
-  do_gases = (flags_arg_clone & fDoGases) != 0;
+    do_gases = (flags_arg_clone & fDoGases) != 0;
   planet* the_planet;
   sun the_sun = innermost_planet->getTheSun();
   int counter;
@@ -272,6 +274,7 @@ void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
       }
     }
   }
+  ZoneScoped;  
 }
 
 /**
@@ -286,7 +289,7 @@ void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
  */
 void csv_row(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
              string id, stringstream& ss) {
-  do_gases = (flags_arg_clone & fDoGases) != 0;
+    do_gases = (flags_arg_clone & fDoGases) != 0;
   string atmosphere;
   long double ipp;
   int index;
@@ -378,11 +381,12 @@ void csv_row(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
            << toString(the_planet->getIceCover()) << ", '" << atmosphere
            << "', '" << type_string(the_planet) << "', "
            << the_planet->getMinorMoons() << "\n";
+  ZoneScoped;  
 }
 
 void jsonRow(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
              string id, stringstream& ss) {
-  do_gases = (flags_arg_clone & fDoGases) != 0;
+    do_gases = (flags_arg_clone & fDoGases) != 0;
   string atmosphere;
   long double ipp;
   int index;
@@ -479,6 +483,7 @@ void jsonRow(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
     body["Type"] = type_string(the_planet);
     body["Minor Moons"] = the_planet->getMinorMoons();
     the_file << body.dump(4) << std::endl;
+  ZoneScoped;  
 }
 
 /**
@@ -488,7 +493,7 @@ void jsonRow(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
  * @return string 
  */
 string type_string(planet* the_planet) {
-  stringstream ss;
+    stringstream ss;
   planet_type type = the_planet->getType();
   string ptype;
 
@@ -528,6 +533,7 @@ string type_string(planet* the_planet) {
   }
 
   ptype = ss.str();
+  ZoneScoped;  
   return ptype;
 }
 
@@ -538,8 +544,8 @@ string type_string(planet* the_planet) {
  * @return string 
  */
 string cloud_type_string(planet* the_planet) {
-  long double temp = the_planet->getEstimatedTemp();
-
+    long double temp = the_planet->getEstimatedTemp();
+  ZoneScoped;  
   if (temp > 2240) {
     return "Carbon";
   } else if (temp > 1400) {
@@ -571,7 +577,7 @@ string cloud_type_string(planet* the_planet) {
  */
 void create_svg_file(planet* innermost_planet, string path, string file_name,
                      string svg_ext, string prognam, bool do_moons) {
-  planet* outermost_planet;
+    planet* outermost_planet;
   planet* a_planet;
   fstream output;
   string the_file_spec;
@@ -734,7 +740,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
     output << "</g>\n";
     output << "</svg>\n";
   }
-
+  ZoneScoped;  
   output.close();
 }
 
@@ -746,7 +752,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
  * @param output 
  */
 void openCVSorJson(string path, string the_filename, fstream& output) {
-  string the_file_spec;
+    string the_file_spec;
   stringstream ss;
 
   ss.str("");
@@ -765,6 +771,7 @@ void openCVSorJson(string path, string the_filename, fstream& output) {
   if (!output) {
     exit(EXIT_FAILURE);
   }
+  ZoneScoped;
 }
 
 /**
