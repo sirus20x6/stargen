@@ -1144,6 +1144,11 @@ auto accrete::is_in_eriEps(planet *the_planet) -> bool {
   return false;
 }
 
+/**
+* @brief Checks if the given planet is in the UMa47 star system.
+* @param the_planet The planet to check.
+* @return true if the planet is in the UMa47 system, false otherwise.
+*/
 auto accrete::is_in_UMa47(planet *the_planet) -> bool {
     ZoneScoped;
   if (is_predefined_planet_helper(the_planet, UMa47III)) {
@@ -1156,6 +1161,11 @@ auto accrete::is_in_UMa47(planet *the_planet) -> bool {
   return false;
 }
 
+/**
+* @brief Checks if the given planet is in the horIot star system.
+* @param the_planet The planet to check.
+* @return true if the planet is in the horIot system, false otherwise.
+*/
 auto accrete::is_in_horIot(planet *the_planet) -> bool {
     ZoneScoped;
   if (is_predefined_planet_helper(the_planet, horIotI)) {
@@ -1164,6 +1174,11 @@ auto accrete::is_in_horIot(planet *the_planet) -> bool {
   return false;
 }
 
+/**
+* @brief Checks if the given planet is in the xiumab star system.
+* @param the_planet The planet to check.
+* @return true if the planet is in the xiumab system, false otherwise.
+*/
 auto accrete::is_in_xiumab(planet *the_planet) -> bool {
     ZoneScoped;
   if (is_predefined_planet_helper(the_planet, xiumabb)) {
@@ -1172,6 +1187,11 @@ auto accrete::is_in_xiumab(planet *the_planet) -> bool {
   return false;
 }
 
+/**
+* @brief Checks if the given planet is in the 51peg star system.
+* @param the_planet The planet to check.
+* @return true if the planet is in the 51peg system, false otherwise.
+*/
 auto accrete::is_in_51peg(planet *the_planet) -> bool {
     ZoneScoped;
   if (is_predefined_planet_helper(the_planet, Bellerophon)) {
@@ -1180,6 +1200,11 @@ auto accrete::is_in_51peg(planet *the_planet) -> bool {
   return false;
 }
 
+/**
+ * @brief Checks if the given planet is in the 55can star system.
+ * @param the_planet The planet to check.
+ * @return true if the planet is in the 55can system, false otherwise.
+ */
 auto accrete::is_in_55can(planet *the_planet) -> bool {
     ZoneScoped;
   if (is_predefined_planet_helper(the_planet, can55d)) {
@@ -1210,6 +1235,11 @@ auto accrete::is_in_UPSAndA(planet *the_planet) -> bool {
   return false;
 }
 
+/**
+ * @brief Checks if the given planet is in the UPSAndA star system.
+ * @param the_planet The planet to check.
+ * @return true if the planet is in the UPSAndA system, false otherwise.
+ */
 auto accrete::is_in_hd10180(planet *the_planet) -> bool {
     ZoneScoped;
   if (is_predefined_planet_helper(the_planet, hd10180h)) {
