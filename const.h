@@ -3,106 +3,71 @@
 
 #include <cmath>
 
-#define PI (3.1415926536)
-#define RADIANS_PER_ROTATION (2.0 * PI)
+constexpr double PI = 3.1415926536;
+constexpr double RADIANS_PER_ROTATION = 2.0 * PI;
 
-#define ECCENTRICITY_COEFF (0.077)         /* Dole's was 0.077			*/
-#define PROTOPLANET_MASS (1.0E-15)         /* Units of solar masses	*/
-#define CHANGE_IN_EARTH_ANG_VEL (-1.3E-15) /* Units of radians/sec/year*/
+constexpr double ECCENTRICITY_COEFF = 0.077;         /* Dole's was 0.077			*/
+constexpr double PROTOPLANET_MASS = 1.0E-15;         /* Units of solar masses	*/
+constexpr double CHANGE_IN_EARTH_ANG_VEL = -1.3E-15; /* Units of radians/sec/year*/
 //#define CHANGE_IN_EARTH_ANG_VEL (-9.38547486033519553073e-15)		/* Units
 //of radians/sec/year. From http://www.ridgenet.net/~do_while/sage/v5i5d.htm*/
-#define SOLAR_MASS_IN_GRAMS \
-  (1.98892E33) /* Units of grams			*/
-#define SOLAR_MASS_IN_KILOGRAMS \
-  (1.98892E30) /* Units of kg				*/
-#define EARTH_MASS_IN_GRAMS \
-  (5.9742E27)                      /* Units of grams			*/
-#define EARTH_RADIUS (6.378137E8)  /* Units of cm \
-                                    */
-#define EARTH_DENSITY (5.515)      /* Units of g/cc			*/
-#define KM_EARTH_RADIUS (6378.137) /* Units of km \
-                                    */
-//      EARTH_ACCELERATION		(981.0)			/* Units of
-//      cm/sec2			*/
-#define EARTH_ACCELERATION (980.665)  /* Units of cm/sec2 \
-                                       */
-#define EARTH_AXIAL_TILT (23.44)      /* Units of degrees			*/
-#define EARTH_EXOSPHERE_TEMP (1273.0) /* Units of degrees Kelvin	*/
-#define SUN_MASS_IN_EARTH_MASSES (332775.64)
-#define ASTEROID_MASS_LIMIT (0.001)  /* Units of Earth Masses	*/
-#define EARTH_EFFECTIVE_TEMP (250.0) /* Units of degrees Kelvin (was 255) \
-                                      */
-#define CLOUD_COVERAGE_FACTOR \
-  (1.839E-8)                                /* Km2/kg					*/
-#define EARTH_WATER_MASS_PER_AREA (3.83E15) /* grams per square km \
-                                             */
-#define EARTH_SURF_PRES_IN_MILLIBARS (1013.25)
-#define EARTH_SURF_PRES_IN_MMHG \
-  (760.)                                /* Dole p. 15				*/
-#define EARTH_SURF_PRES_IN_PSI (14.696) /* Pounds per square inch	*/
-#define MMHG_TO_MILLIBARS \
-  (EARTH_SURF_PRES_IN_MILLIBARS / EARTH_SURF_PRES_IN_MMHG)
-#define PSI_TO_MILLIBARS (EARTH_SURF_PRES_IN_MILLIBARS / EARTH_SURF_PRES_IN_PSI)
-#define H20_ASSUMED_PRESSURE (47. * MMHG_TO_MILLIBARS) /* Dole p. 15      */
-//#define MIN_O2_IPP	(72. * MMHG_TO_MILLIBARS)	/* Dole, p. 15
-//*/
-#define MIN_O2_IPP \
-  (53. * MMHG_TO_MILLIBARS) /* Dole, p. 15				*/
-#define MAX_O2_IPP \
-  (400. * MMHG_TO_MILLIBARS) /* Dole, p. 15				*/
-#define MAX_HE_IPP \
-  (61000. * MMHG_TO_MILLIBARS) /* Dole, p. 16				*/
-#define MAX_NE_IPP \
-  (3900. * MMHG_TO_MILLIBARS) /* Dole, p. 16				*/
-#define MIN_N2_IPP \
-  (10. * MMHG_TO_MILLIBARS) /* Dole, p. 16				*/
-#define MAX_N2_IPP \
-  (2330. * MMHG_TO_MILLIBARS) /* Dole, p. 16				*/
-#define MAX_AR_IPP \
-  (1220. * MMHG_TO_MILLIBARS) /* Dole, p. 16				*/
-#define MAX_KR_IPP \
-  (350. * MMHG_TO_MILLIBARS) /* Dole, p. 16				*/
-#define MAX_XE_IPP \
-  (160. * MMHG_TO_MILLIBARS) /* Dole, p. 16				*/
-#define MIN_CO2_IPP \
-  (0.05 * MMHG_TO_MILLIBARS) /* Dole, p. 16				*/
-//#define MAX_CO2_IPP (7. * MMHG_TO_MILLIBARS)	/* Dole, p. 16
-//*/
-#define MAX_CO2_IPP \
-  (14. * MMHG_TO_MILLIBARS)                    /* Dole, p. 16                    */  // SEB: FOR PELL
-#define MAX_HABITABLE_PRESSURE \
-  (118 * PSI_TO_MILLIBARS) /* Dole, p. 16				*/
+constexpr double SOLAR_MASS_IN_GRAMS = 1.98892E33;
+constexpr double SOLAR_MASS_IN_KILOGRAMS = 1.98892E30;
+constexpr double EARTH_MASS_IN_GRAMS = 5.9742E27;
+constexpr double EARTH_RADIUS = 6.378137E8; /* Units of cm */
+constexpr double EARTH_DENSITY = 5.515; /* Units of g/cc			*/
+constexpr double KM_EARTH_RADIUS = 6378.137;
+constexpr double EARTH_ACCELERATION = 980.665; /* Units of cm/sec2 */
+constexpr double EARTH_AXIAL_TILT = 23.44; /* Units of degrees			*/
+constexpr double EARTH_EXOSPHERE_TEMP = 1273.0; /* Units of degrees Kelvin	*/
+constexpr double SUN_MASS_IN_EARTH_MASSES = 332775.64;
+constexpr double ASTEROID_MASS_LIMIT = 0.001; /* Units of Earth Masses	*/
+constexpr double EARTH_EFFECTIVE_TEMP = 250.0; /* Units of degrees Kelvin (was 255) */
+constexpr double CLOUD_COVERAGE_FACTOR = 1.839E-8; /* Km2/kg					*/
+constexpr double EARTH_WATER_MASS_PER_AREA = 3.83E15; /* grams per square km*/
+constexpr double EARTH_SURF_PRES_IN_MILLIBARS = 1013.25;
+constexpr double EARTH_SURF_PRES_IN_MMHG = 760.; /* Dole p. 15				*/
+constexpr double EARTH_SURF_PRES_IN_PSI = 14.696;
+constexpr double MMHG_TO_MILLIBARS = EARTH_SURF_PRES_IN_MILLIBARS / EARTH_SURF_PRES_IN_MMHG;
+constexpr double PSI_TO_MILLIBARS = EARTH_SURF_PRES_IN_MILLIBARS / EARTH_SURF_PRES_IN_PSI;
+//Dole p. 15
+constexpr double H20_ASSUMED_PRESSURE = 47. * MMHG_TO_MILLIBARS;
+constexpr double MIN_O2_IPP = 53. * MMHG_TO_MILLIBARS;
+constexpr double MAX_O2_IPP = 400. * MMHG_TO_MILLIBARS;
+//Dole p. 16
+constexpr double MAX_HE_IPP = 61000. * MMHG_TO_MILLIBARS;
+constexpr double MAX_NE_IPP = 3900. * MMHG_TO_MILLIBARS;
+constexpr double MIN_N2_IPP = 10. * MMHG_TO_MILLIBARS;
+constexpr double MAX_N2_IPP = 2330. * MMHG_TO_MILLIBARS;
+constexpr double MAX_AR_IPP = 1220. * MMHG_TO_MILLIBARS;
+constexpr double MAX_KR_IPP = 350. * MMHG_TO_MILLIBARS;
+constexpr double MAX_XE_IPP = 160. * MMHG_TO_MILLIBARS;
+constexpr double MIN_CO2_IPP = 0.05 * MMHG_TO_MILLIBARS;
+constexpr double MAX_CO2_IPP = 14. * MMHG_TO_MILLIBARS;
+constexpr double MAX_HABITABLE_PRESSURE = 118 * PSI_TO_MILLIBARS;
 // The next gases are listed as poisonous in parts per million by volume at 1
 // atm:
-#define PPM_PRSSURE (EARTH_SURF_PRES_IN_MILLIBARS / 1000000.)
-#define MAX_F_IPP (0.1 * PPM_PRSSURE) /* Dole, p. 18 \
-                                       */
-#define MAX_CL_IPP \
-  (1.0 * PPM_PRSSURE) /* Dole, p. 18				*/
-#define MAX_NH3_IPP \
-  (100. * PPM_PRSSURE) /* Dole, p. 18				*/
-#define MAX_O3_IPP \
-  (0.1 * PPM_PRSSURE) /* Dole, p. 18 umol/mol = 100 nmol/mol		*/
-#define MAX_CH4_IPP \
-  (50000. * PPM_PRSSURE) /* Dole, p. 18				*/
+constexpr double PPM_PRSSURE = EARTH_SURF_PRES_IN_MILLIBARS / 1000000.;
+// Dole p. 18
+constexpr double MAX_F_IPP = 0.1 * PPM_PRSSURE;
+constexpr double MAX_CL_IPP = 1.0 * PPM_PRSSURE;
+constexpr double MAX_NH3_IPP = 100. * PPM_PRSSURE;
+constexpr double MAX_O3_IPP = 0.1 * PPM_PRSSURE;
+constexpr double MAX_CH4_IPP = 50000. * PPM_PRSSURE;
+constexpr double EARTH_CONVECTION_FACTOR = 0.43;
 
-#define EARTH_CONVECTION_FACTOR \
-  (0.43) /* from Hart, eq.20			*/
-//      FREEZING_POINT_OF_WATER (273.0)			/* Units of degrees
-//      Kelvin	*/
-#define FREEZING_POINT_OF_WATER (273.15) /* Units of degrees Kelvin	*/
-//      EARTH_AVERAGE_CELSIUS   (15.5)			/* Average Earth
-//      Temperature */
-#define EARTH_AVERAGE_CELSIUS (14.0) /* Average Earth Temperature */
-#define EARTH_AVERAGE_KELVIN (EARTH_AVERAGE_CELSIUS + FREEZING_POINT_OF_WATER)
-#define DAYS_IN_A_YEAR (365.256) /* Earth days per Earth year*/
+constexpr double FREEZING_POINT_OF_WATER = 273.15;
+
+constexpr double EARTH_AVERAGE_CELSIUS = 14.0;
+constexpr double EARTH_AVERAGE_KELVIN = EARTH_AVERAGE_CELSIUS + FREEZING_POINT_OF_WATER;
+constexpr double DAYS_IN_A_YEAR = 365.256;
 //		gas_retention_threshold = 5.0;  		/* ratio of esc vel to
 //RMS vel */
-#define GAS_RETENTION_THRESHOLD (6.0) /* ratio of esc vel to RMS vel */
+constexpr double GAS_RETENTION_THRESHOLD = 6.0; /* ratio of esc vel to RMS vel */
 
-#define ICE_ALBEDO (0.7)
-#define CLOUD_ALBEDO (0.52)
-#define GAS_GIANT_ALBEDO (0.5) /* albedo of a gas giant	*/
+constexpr double ICE_ALBEDO = 0.7;
+constexpr double CLOUD_ALBEDO = 0.52;
+constexpr double GAS_GIANT_ALBEDO = 0.5; /* albedo of a gas giant	*/
 #define CLASS_I_ALBEDO (0.57)
 #define CLASS_II_ALBEDO (0.81)
 #define CLASS_III_ALBEDO (0.12)
@@ -128,32 +93,32 @@
 #define TEMPERATURE_CLASS_V (1400.0)
 #define TEMPERATURE_CARBON_GIANT (2240.0)
 
-#define SECONDS_PER_HOUR (3600.0)
-#define CM_PER_AU (1.495978707E13) /* number of cm in an AU	*/
-#define CM_PER_KM (1.0E5)          /* number of cm in a km		*/
-#define KM_PER_AU (CM_PER_AU / CM_PER_KM)
-#define CM_PER_METER (100.0)
-//#define MILLIBARS_PER_BAR		(1013.25)
-#define MILLIBARS_PER_BAR (1000.00)
+constexpr double SECONDS_PER_HOUR = 3600.0;
+constexpr double CM_PER_AU = 1.495978707E13;
+constexpr double CM_PER_KM = 1.0E5;
+constexpr double KM_PER_AU = CM_PER_AU / CM_PER_KM;
+constexpr double CM_PER_METER = 100.0;
+constexpr double MILLIBARS_PER_BAR = 1000.00;
 
-#define GRAV_CONSTANT (6.672E-8)    /* units of dyne cm2/gram2	*/
-#define MOLAR_GAS_CONST (8314.41)   /* units: g*m2/(sec2*K*mol) */
-#define K (50.0)                    /* K = gas/dust ratio		*/
-#define B (1.2E-5)                  /* Used in Crit_mass calc	*/
-#define DUST_DENSITY_COEFF (2.0E-3) /* A in Dole's paper		*/
-#define ALPHA (5.0)                 /* Used in density calcs	*/
-#define NDENSITY (3.0)                     /* Used in density calcs	*/
-#define J (1.46E-19)                /* Used in day-length calcs (cm2/sec2 g) */
+constexpr double GRAV_CONSTANT = 6.672E-8;
+constexpr double MOLAR_GAS_CONST = 8314.41;
+constexpr double K = 50.0;
+constexpr double B = 1.2E-5;
+constexpr double DUST_DENSITY_COEFF = 2.0E-3;
+constexpr double ALPHA = 5.0;
+constexpr double NDENSITY = 3.0;
+constexpr double J = 1.46E-19;
+// Define INCREDIBLY_LARGE_NUMBER based on whether HUGE_VAL is available or not
 #ifdef HUGE_VAL
-#define INCREDIBLY_LARGE_NUMBER HUGE_VAL
+constexpr double INCREDIBLY_LARGE_NUMBER = HUGE_VAL;
 #else
-#define INCREDIBLY_LARGE_NUMBER (9.9999E37)
+constexpr double INCREDIBLY_LARGE_NUMBER = 9.9999E37;
 #endif
 
 /*	Now for a few molecular weights (used for RMS velocity calcs):	   */
 /*	This table is from Dole's book "Habitable Planets for Man", p. 38  */
 
-#define ATOMIC_HYDROGEN (1.0)    /* H   */
+constexpr double ATOMIC_HYDROGEN = 1.0;
 #define MOL_HYDROGEN (2.0)       /* H2  */
 #define HELIUM (4.0)             /* He  */
 #define ATOMIC_NITROGEN (14.0)   /* N   */
