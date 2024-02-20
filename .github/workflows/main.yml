@@ -34,8 +34,12 @@ jobs:
         echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
 
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "MinGW Makefiles"
-
+  run: |
+    if [ "${{ matrix.os }}" = "windows-latest" ]; then
+      cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "MinGW Makefiles"
+    else
+      cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+    fi
     - name: Build
       run: cmake --build build --config ${{env.BUILD_TYPE}}
 
