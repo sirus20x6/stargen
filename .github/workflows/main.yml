@@ -35,15 +35,15 @@ jobs:
         echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
         echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
 
-    - name: Configure CMake
-      run: |
-        if (${{ matrix.os }} -eq "windows-2019") {
-          cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "MinGW Makefiles"
-        } else {
-          cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-        }
+    - name: Configure CMake (Windows)
+      if: matrix.os == 'windows-2019'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "MinGW Makefiles"
       shell: pwsh
-        
+
+    - name: Configure CMake (Unix)
+      if: matrix.os != 'windows-2019'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
     - name: Build
       run: cmake --build build --config ${{env.BUILD_TYPE}}
 
