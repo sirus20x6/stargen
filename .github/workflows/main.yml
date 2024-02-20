@@ -51,18 +51,56 @@ jobs:
       working-directory: build
       run: ctest -C ${{env.BUILD_TYPE}}
 
+  - name: Package
+      run: |
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          Compress-Archive -Path build/* -DestinationPath stargen.${{ matrix.artifact_extension }}
+        else
+          tar -czvf stargen.${{ matrix.artifact_extension }} -C build .
+        fi
+      shell: ${{ matrix.os == 'windows-2019' && 'pwsh' || 'bash' }}
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: stargen-${{ matrix.os }}.${{ matrix.artifact_extension }}
+        path: stargen.${{ matrix.artifact_extension }}
+
   create-release:
-    needs: build-and-test
+    needs: build-and-package
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
-          draft: false
-          prerelease: false
+    - uses: actions/download-artifact@v3
+      with:
+        path: artifacts
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset (Ubuntu)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/stargen-ubuntu-latest.tar.gz
+        asset_name: stargen-linux-latest.tar.gz
+        asset_content_type: application/gzip
+
+    - name: Upload Release Asset (Windows)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/stargen-windows-2019.zip
+        asset_name: stargen-windows.zip
+        asset_content_type: application/zip
