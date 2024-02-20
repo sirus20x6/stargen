@@ -14,12 +14,27 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+          - os: windows-latest
+            cc: gcc
+            cxx: g++
     steps:
     - uses: actions/checkout@v3
-        
+
+    - name: Set up MinGW (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: egor-tensin/setup-mingw@v3
+
+    - name: Set up environment variables
+      run: |
+        echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
+        echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
+
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "MinGW Makefiles"
 
     - name: Build
       run: cmake --build build --config ${{env.BUILD_TYPE}}
