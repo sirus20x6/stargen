@@ -101,8 +101,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        # Adjust the path to point directly to the file inside the artifact-specific directory
-        asset_path: ${{ github.workspace }}/artifacts/stargen-ubuntu-latest.tar.gz/stargen-ubuntu-latest.tar.gz
+        # Corrected path to match the actual file name
+        asset_path: ${{ github.workspace }}/artifacts/stargen-ubuntu-latest.tar.gz/stargen.tar.gz
         asset_name: stargen-linux.tar.gz
         asset_content_type: application/gzip
     
@@ -112,7 +112,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        # Adjust the path to point directly to the file inside the artifact-specific directory
-        asset_path: ${{ github.workspace }}/artifacts/stargen-windows-2019.zip/stargen-windows-2019.zip
+        # Corrected path to match the actual file name
+        asset_path: ${{ github.workspace }}/artifacts/stargen-windows-2019.zip/stargen.zip
         asset_name: stargen-windows.zip
         asset_content_type: application/zip
+
