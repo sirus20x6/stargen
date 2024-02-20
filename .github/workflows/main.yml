@@ -53,14 +53,14 @@ jobs:
       working-directory: build
       run: ctest -C ${{env.BUILD_TYPE}}
 
-    - name: Package
-      run: |
-        if [ "${{ runner.os }}" = "Windows" ]; then
-          Compress-Archive -Path build/* -DestinationPath stargen.${{ matrix.artifact_extension }}
-        else
-          tar -czvf stargen.${{ matrix.artifact_extension }} -C build .
-        fi
-      shell: ${{ matrix.os == 'windows-2019' && 'pwsh' || 'bash' }}
+    - name: Package (Windows)
+      if: matrix.os == 'windows-2019'
+      run: Compress-Archive -Path build/* -DestinationPath stargen.${{ matrix.artifact_extension }}
+      shell: pwsh
+
+    - name: Package (Unix)
+      if: matrix.os != 'windows-2019'
+      run: tar -czvf stargen.${{ matrix.artifact_extension }} -C build .
 
     - uses: actions/upload-artifact@v3
       with:
