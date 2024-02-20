@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/CMakeFiles/tracy-populate"
+		},
+		{
+			"file" : "/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/CMakeFiles/tracy-populate.rule"
+		},
+		{
+			"file" : "/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/CMakeFiles/tracy-populate-complete.rule"
+		},
+		{
+			"file" : "/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/tracy-populate-prefix/src/tracy-populate-stamp/tracy-populate-build.rule"
+		},
+		{
+			"file" : "/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/tracy-populate-prefix/src/tracy-populate-stamp/tracy-populate-configure.rule"
+		},
+		{
+			"file" : "/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/tracy-populate-prefix/src/tracy-populate-stamp/tracy-populate-download.rule"
+		},
+		{
+			"file" : "/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/tracy-populate-prefix/src/tracy-populate-stamp/tracy-populate-install.rule"
+		},
+		{
+			"file" : "/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/tracy-populate-prefix/src/tracy-populate-stamp/tracy-populate-mkdir.rule"
+		},
+		{
+			"file" : "/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/tracy-populate-prefix/src/tracy-populate-stamp/tracy-populate-patch.rule"
+		},
+		{
+			"file" : "/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/tracy-populate-prefix/src/tracy-populate-stamp/tracy-populate-test.rule"
+		},
+		{
+			"file" : "/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/tracy-populate-prefix/src/tracy-populate-stamp/tracy-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"tracy-populate"
+		],
+		"name" : "tracy-populate"
+	}
+}
