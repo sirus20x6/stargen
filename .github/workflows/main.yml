@@ -37,11 +37,12 @@ jobs:
 
     - name: Configure CMake
       run: |
-        if [ "${{ matrix.os }}" == "windows-2019" ]; then
+        if (${{ matrix.os }} -eq "windows-2019") {
           cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "MinGW Makefiles"
-        else
+        } else {
           cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-        fi
+        }
+      shell: pwsh
         
     - name: Build
       run: cmake --build build --config ${{env.BUILD_TYPE}}
