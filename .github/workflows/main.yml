@@ -10,7 +10,7 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  build-and-test:
+  build-and-package:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -18,9 +18,11 @@ jobs:
           - os: ubuntu-latest
             cc: gcc
             cxx: g++
+            artifact_extension: tar.gz
           - os: windows-2019
             cc: gcc
             cxx: g++
+            artifact_extension: zip
     steps:
     - uses: actions/checkout@v3
 
@@ -51,7 +53,7 @@ jobs:
       working-directory: build
       run: ctest -C ${{env.BUILD_TYPE}}
 
-  - name: Package
+    - name: Package
       run: |
         if [ "${{ runner.os }}" = "Windows" ]; then
           Compress-Archive -Path build/* -DestinationPath stargen.${{ matrix.artifact_extension }}
