@@ -87,13 +87,18 @@ jobs:
         draft: false
         prerelease: false
 
+    - name: Download Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: ${{ github.workspace }}/artifacts/
+
     - name: Upload Release Asset (Ubuntu)
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/stargen-ubuntu-latest.tar.gz
+        asset_path: ${{ github.workspace }}/artifacts/stargen-ubuntu-latest.tar.gz
         asset_name: stargen-linux-latest.tar.gz
         asset_content_type: application/gzip
 
@@ -103,6 +108,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/stargen-windows-2019.zip
+        asset_path: ${{ github.workspace }}/artifacts/stargen-windows-2019.zip
         asset_name: stargen-windows.zip
         asset_content_type: application/zip
