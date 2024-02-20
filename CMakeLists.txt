@@ -7,14 +7,11 @@ message(STATUS "CMAKE_PROJECT_VERSION: ${CMAKE_PROJECT_VERSION}")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
-# Remove the direct setting of C++ standard via CMAKE_CXX_FLAGS
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF) # This line ensures -std=c++20 rather than -std=gnu++20
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
-
 
 cmake_host_system_information(RESULT logical QUERY NUMBER_OF_LOGICAL_CORES)
 cmake_host_system_information(RESULT physical QUERY NUMBER_OF_PHYSICAL_CORES)
@@ -76,6 +73,11 @@ target_include_directories(stargen PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
 # Link libraries
 target_link_libraries(stargen PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(stargen PRIVATE m)
+
+# Windows-specific libraries
+if(WIN32)
+  target_link_libraries(stargen PRIVATE Dbghelp Ws2_32)
+endif()
 
 install(TARGETS stargen RUNTIME DESTINATION bin)
 install(DIRECTORY html ref DESTINATION bin)
