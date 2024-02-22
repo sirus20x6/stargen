@@ -710,7 +710,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
 
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   planet *seeds = seed_system;
-  // planet *seed_moons = NULL;
+  // planet *seed_moons = nullptr;
   planet *moon = nullptr;
   planet *temp_moons = nullptr;
   planet *new_moon = nullptr;

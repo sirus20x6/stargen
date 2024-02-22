@@ -50,7 +50,7 @@ void text_describe_system(planet* innermost_planet, bool do_gases,
                        habitable_zone_distance(the_sun, EARLY_MARS, 1.0)))
        << " AU\n\n";
   cout << "Planets present at:\n";
-  for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
+  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
        the_planet = the_planet->next_planet, counter++) {
     cout << counter << "\t" << toString(the_planet->getA()) << " AU\t"
          << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
@@ -66,7 +66,7 @@ void text_describe_system(planet* innermost_planet, bool do_gases,
          << endl;
   }
   cout << endl << endl << endl;
-  for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
+  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
        the_planet = the_planet->next_planet, counter++) {
     cout << "Planet " << counter;
     if (is_gas_planet(the_planet)) {
@@ -179,14 +179,14 @@ void csv_describe_system(fstream& the_file, planet* innermost_planet,
          "Rise', 'High Temperature', 'Low Temperature', 'Maximum Temperature', "
          "'Minimum Temperature', 'Hydrosphere', 'Cloud Cover', 'Ice Cover', "
          "'Atmosphere', 'Type', 'Minor Moons'\n";
-  for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
+  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
        the_planet = the_planet->next_planet, counter++) {
     ss << the_sun.getName() << " " << counter;
     id = ss.str();
     ss.str("");
     csv_row(the_file, the_planet, do_gases, false, id, ss);
     if (do_moons) {
-      for (moon = the_planet->first_moon, moons = 1; moon != NULL;
+      for (moon = the_planet->first_moon, moons = 1; moon != nullptr;
            moon = moon->next_planet, moons++) {
         ss << the_sun.getName() << " " << counter << "." << moons;
         id = ss.str();
@@ -258,14 +258,14 @@ void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
   }
   nlohmann::json body;
 
-  for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
+  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
        the_planet = the_planet->next_planet, counter++) {
     ss << the_sun.getName() << " " << counter;
     id = ss.str();
     ss.str("");
     jsonRow(the_file, the_planet, do_gases, false, id, ss);
     if (do_moons) {
-      for (moon = the_planet->first_moon, moons = 1; moon != NULL;
+      for (moon = the_planet->first_moon, moons = 1; moon != nullptr;
            moon = moon->next_planet, moons++) {
         ss << the_sun.getName() << " " << counter << "." << moons;
         id = ss.str();
@@ -597,7 +597,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
   _ftype = 'TEXT';
 #endif
 
-  for (outermost_planet = innermost_planet; outermost_planet != NULL;
+  for (outermost_planet = innermost_planet; outermost_planet != nullptr;
        outermost_planet = outermost_planet->next_planet) {
     long double max_x = 760.0;
     long double max_y = 120.0;
@@ -713,7 +713,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name,
 
     output << "\n";
 
-    for (a_planet = innermost_planet; a_planet != NULL;
+    for (a_planet = innermost_planet; a_planet != nullptr;
          a_planet = a_planet->next_planet) {
       long double x = (offset + mult) + (log10(a_planet->getA()) * mult);
       long double r =
@@ -1274,7 +1274,7 @@ void html_thumbnails(planet* innermost_planet, fstream& the_file,
     exit(EXIT_FAILURE);
   }
 
-  for (the_planet = innermost_planet; the_planet != NULL;
+  for (the_planet = innermost_planet; the_planet != nullptr;
        the_planet = the_planet->next_planet) {
     if (the_planet->getType() == tAsteroids) {
       asteroid_belt_count++;
@@ -1285,7 +1285,7 @@ void html_thumbnails(planet* innermost_planet, fstream& the_file,
     }
     object_count++;
     if (do_moons) {
-      for (moon = the_planet->first_moon; moon != NULL;
+      for (moon = the_planet->first_moon; moon != nullptr;
            moon = moon->next_planet) {
         moon_count++;
       }
@@ -1330,7 +1330,7 @@ void html_thumbnails(planet* innermost_planet, fstream& the_file,
            << "ref/Sun.gif' ";
   the_file << "width=15 height=63 border=0></td>\n";
 
-  for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
+  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
        the_planet = the_planet->next_planet, counter++) {
     ss.str("");
     int ppixels =
@@ -1395,7 +1395,7 @@ void html_thumbnails(planet* innermost_planet, fstream& the_file,
     }
 
     if (do_moons) {
-      for (moon = the_planet->first_moon, moons = 1; do_moons && moon != NULL;
+      for (moon = the_planet->first_moon, moons = 1; do_moons && moon != nullptr;
            moon = moon->next_planet, moons++) {
         ss.str("");
         string mtype = type_string(moon);
@@ -1466,7 +1466,7 @@ void html_thumbnails(planet* innermost_planet, fstream& the_file,
                        potentialy_habitables_seen)) {
     the_file << "<tr><td colspan=2><table width='100%'>";
 
-    for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
+    for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
          the_planet = the_planet->next_planet, counter++) {
       if (is_habitable_jovian(the_planet) || is_terrestrial(the_planet) ||
           is_potentialy_habitable(the_planet)) {
@@ -1482,7 +1482,7 @@ void html_thumbnails(planet* innermost_planet, fstream& the_file,
       }
 
       if (do_moons) {
-        for (moon = the_planet->first_moon, moons = 1; moon != NULL;
+        for (moon = the_planet->first_moon, moons = 1; moon != nullptr;
              moon = moon->next_planet, moons++) {
           if (is_habitable_jovian(moon) || is_terrestrial(moon) ||
               is_potentialy_habitable(moon)) {
@@ -2139,7 +2139,7 @@ void html_describe_system(planet* innermost_planet, bool do_gases,
               "colspan=3>Type</th><th>Dist.</th><th>Mass</th><th>Radius</th>\n";
   the_file << "</tr>\n";
 
-  for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
+  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
        the_planet = the_planet->next_planet, counter++) {
     typeString = type_string(the_planet);
 
@@ -2160,7 +2160,7 @@ void html_describe_system(planet* innermost_planet, bool do_gases,
     the_file << "</td></tr>\n";
 
     if (do_moons) {
-      for (moon = the_planet->first_moon, moons = 1; moon != NULL;
+      for (moon = the_planet->first_moon, moons = 1; moon != nullptr;
            moon = moon->next_planet, moons++) {
         typeString = type_string(moon);
 
@@ -2191,11 +2191,11 @@ void html_describe_system(planet* innermost_planet, bool do_gases,
   the_file << "</table>\n<br clear=all>\n";
 
   // Tables for individual planets
-  for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
+  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
        the_planet = the_planet->next_planet, counter++) {
     html_describe_planet(the_planet, counter, 0, do_gases, url_path, the_file);
     if (do_moons) {
-      for (moon = the_planet->first_moon, moons = 1; moon != NULL;
+      for (moon = the_planet->first_moon, moons = 1; moon != nullptr;
            moon = moon->next_planet, moons++) {
         html_describe_planet(moon, counter, moons, do_gases, url_path, the_file);
       }
@@ -2239,12 +2239,12 @@ void celestia_describe_system(planet* innermost_planet, string designation,
        << " billion left on main sequence)\n";
   cout << "# Habitable ecosphere: " << toString(min_r_ecosphere) << " AU to "
        << toString(max_r_ecosphere) << " AU\n\n";
-  for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
+  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
        the_planet = the_planet->next_planet, counter++) {
     celestia_describe_world(the_planet, designation, system_name, seed, inc, an,
                             counter, the_sun, false, counter);
     if (do_moons) {
-      for (moon = the_planet->first_moon, moons = 1; moon != NULL;
+      for (moon = the_planet->first_moon, moons = 1; moon != nullptr;
            moon = moon->next_planet, moons++) {
         celestia_describe_world(moon, designation, system_name, seed, inc, an,
                                 moons, the_sun, true, counter);
@@ -2784,12 +2784,12 @@ string system_name, long int seed)
   cout << "# Script to generate moons for some planets in the system " <<
 designation << " (" << system_name << ")\n"; cout << "#\n";
 
-  for (the_planet = innermost_planet, counter = 1; the_planet != NULL;
+  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
 the_planet = the_planet->next_planet, counter++)
   {
     mass = the_planet->getMass();
     total_moon_mass = 0;
-    for (moon = the_planet->first_moon; moon != NULL; moon = moon->next_planet)
+    for (moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet)
     {
       total_moon_mass += moon->getMass();
     }

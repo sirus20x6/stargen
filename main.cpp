@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
   initData();
 
   prognam = argv[0];
-  if ((c = strrchr(prognam.c_str(), DIRSEP[0])) != NULL) {
+  if ((c = strrchr(prognam.c_str(), DIRSEP[0])) != nullptr) {
     prognam = c + 1;
   }
 
