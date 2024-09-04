@@ -903,149 +903,102 @@ void print_description(fstream& the_file, const string &opening, planet* the_pla
     lprint(the_file, first, "Dwarf planet");
   }
 
-  if (is_gas_planet(the_planet)) {
+if (is_gas_planet(the_planet)) {
     long double temp = the_planet->getEstimatedTemp() - FREEZING_POINT_OF_WATER;
-
-    ss << earth_masses << " Earth Masses";
-    lprint(the_file, first, ss.str());
-    ss.str("");
-    ss << temp << " C";
-    lprint(the_file, first, ss.str());
-  } else {
-    long double rel_temp =
-        (the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER) -
-        EARTH_AVERAGE_CELSIUS;
+    lprint(the_file, first, format("{} Earth Masses", earth_masses));
+    lprint(the_file, first, format("{} C", temp));
+} else {
+    long double rel_temp = (the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER) - EARTH_AVERAGE_CELSIUS;
     long double seas = 100.0 * the_planet->getHydrosphere();
     long double clouds = 100.0 * the_planet->getCloudCover();
-    long double atmosphere =
-        the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS;
+    long double atmosphere = the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS;
     long double ice = 100.0 * the_planet->getIceCover();
     long double gravity = the_planet->getSurfGrav();
-    long double iron =
-        (1.0 - (the_planet->getRmf() + the_planet->getImf())) * 100.0;
+    long double iron = (1.0 - (the_planet->getRmf() + the_planet->getImf())) * 100.0;
 
-    if (gravity < 0.5) {
-      lprint(the_file, first, "Very Low-G");
-    }
-    else if (gravity < .8) {
-      lprint(the_file, first, "Low-G");
-    }
-    else if (gravity < 1.2) {
-      lprint(the_file, first, "Earth-Like-G");
-    }
-    else if (gravity < 1.4) {
-      lprint(the_file, first, "High-G");
-    }
-    else {
-      lprint(the_file, first, "Very-High-G");
+    // Gravity description
+    switch (static_cast<int>(gravity * 2)) {
+        case 0: case 1: lprint(the_file, first, "Very Low-G"); break;
+        case 2: case 3: lprint(the_file, first, "Low-G"); break;
+        case 4: case 5: lprint(the_file, first, "Earth-Like-G"); break;
+        case 6: case 7: lprint(the_file, first, "High-G"); break;
+        default: lprint(the_file, first, "Very-High-G"); break;
     }
 
-    if (rel_temp < -5.0) {
-      lprint(the_file, first, "Cold");
-    }
-    else if (rel_temp < -2.0) {
-      lprint(the_file, first, "Cool");
-    }
-    else if (rel_temp < 3.0) {
-      lprint(the_file, first, "Mild");
-    }
-    else if (rel_temp < 7.5) {
-      lprint(the_file, first, "Warm");
-    }
-    else {
-      lprint(the_file, first, "Hot");
+    // Temperature description
+    switch (static_cast<int>(rel_temp + 5) / 5) {
+        case 0: lprint(the_file, first, "Cold"); break;
+        case 1: lprint(the_file, first, "Cool"); break;
+        case 2: lprint(the_file, first, "Mild"); break;
+        case 3: lprint(the_file, first, "Warm"); break;
+        default: lprint(the_file, first, "Hot"); break;
     }
 
-
-
+    // Iron core description
     if (the_planet->getType() != tIron && the_planet->getType() != tAsteroids) {
-      if (iron > 90.0) {
-        lprint(the_file, first, "'Cannonball'");
-      } else if (iron > 60) {
-        lprint(the_file, first, "Large Iron Core");
-      } else if (iron >= 20) {
-        lprint(the_file, first, "Medium Iron Core");
-      } else if (iron < 1) {
-        lprint(the_file, first, "Coreless");
-      } else if (iron < 20) {
-        lprint(the_file, first, "Small Iron Core");
-      }
+        switch (static_cast<int>(iron / 20)) {
+            case 5: lprint(the_file, first, "'Cannonball'"); break;
+            case 4: case 3: lprint(the_file, first, "Large Iron Core"); break;
+            case 2: case 1: lprint(the_file, first, "Medium Iron Core"); break;
+            case 0: 
+                if (iron < 1) lprint(the_file, first, "Coreless");
+                else lprint(the_file, first, "Small Iron Core");
+                break;
+        }
     } else if (the_planet->getType() == tAsteroids) {
-      if (iron > 80) {
-        lprint(the_file, first, "Metallic");
-      } else if (iron < 20) {
-        lprint(the_file, first, "Rocky");
-      }
+        if (iron > 80) lprint(the_file, first, "Metallic");
+        else if (iron < 20) lprint(the_file, first, "Rocky");
     }
 
-    if (the_planet->getType() != tIce) {
-      if (ice > 90.0) {
+    // Ice description
+    if (the_planet->getType() == tIce) {
+        switch (static_cast<int>(ice / 25)) {
+            case 4: case 3: lprint(the_file, first, "Mostly Ice"); break;
+            case 2: lprint(the_file, first, "Half Ice"); break;
+            case 1: lprint(the_file, first, "Significant Ice"); break;
+            default: 
+                if (ice > 10.0) lprint(the_file, first, "A Bit Icey");
+                break;
+        }
+    } else if (ice > 90.0) {
         lprint(the_file, first, "Ice Covered");
-      }
-    } else if (ice > 75.0) {
-        lprint(the_file, first, "Mostly Ice");
-      }
-      else if (ice > 50.0) {
-        lprint(the_file, first, "Half Ice");
-      }
-      else if (ice > 25.0) {
-        lprint(the_file, first, "Significant Ice");
-      }
-      else if (ice > 10.0) {
-        lprint(the_file, first, "A Bit Icey");
-      }
+    }
 
+    // Atmosphere and surface description
     if (atmosphere < 0.001) {
-      lprint(the_file, first, "Airless");
+        lprint(the_file, first, "Airless");
     } else {
-      if (the_planet->getType() != tWater) {
-        if (seas < 10.0) {
-          lprint(the_file, first, "Desert");
-        } 
-        else if (seas < 15.0) {
-          lprint(the_file, first, "Semi-Arid");
+        if (the_planet->getType() != tWater) {
+            switch (static_cast<int>(seas / 10)) {
+                case 0: lprint(the_file, first, "Desert"); break;
+                case 1: lprint(the_file, first, "Semi-Arid"); break;
+                case 2: lprint(the_file, first, "Arid"); break;
+                case 3: case 4: lprint(the_file, first, "Dry"); break;
+                case 5: case 6: case 7: lprint(the_file, first, "Moist"); break;
+                case 8: lprint(the_file, first, "Wet"); break;
+                default: lprint(the_file, first, "Water World"); break;
+            }
         }
-        else if (seas < 25.0) {
-          lprint(the_file, first, "Arid");
-        }
-        else if (seas < 50.0) {
-          lprint(the_file, first, "Dry");
-        }
-        else if (seas <= 75.0) {
-          lprint(the_file, first, "Moist");
-        }
-        else if (seas < 85.00) {
-          lprint(the_file, first, "Wet");
-        }
-        else {
-          lprint(the_file, first, "Water World");
-        }
-      }
 
-      if (clouds < 10.0) {
-        lprint(the_file, first, "Cloudless");
-      } else if (clouds < 40.0) {
-        lprint(the_file, first, "Few clouds");
-      } else if (clouds > 80.0) {
-        lprint(the_file, first, "Cloudy");
-      }
+        if (clouds < 10.0) lprint(the_file, first, "Cloudless");
+        else if (clouds < 40.0) lprint(the_file, first, "Few clouds");
+        else if (clouds > 80.0) lprint(the_file, first, "Cloudy");
 
-      if (the_planet->getMaxTemp() > the_planet->getBoilPoint() && seas > 0.0) {
-        lprint(the_file, first, "Boiling ocean");
-      }
+        if (the_planet->getMaxTemp() > the_planet->getBoilPoint() && seas > 0.0) {
+            lprint(the_file, first, "Boiling ocean");
+        }
 
-      if (atmosphere < (MIN_O2_IPP / EARTH_SURF_PRES_IN_MILLIBARS)) {
-        lprint(the_file, first, "Unbreathably thin atmosphere");
-      } else if (atmosphere < 0.5) {
-        lprint(the_file, first, "Thin atmosphere");
-      } else if (atmosphere >
-                 (MAX_HABITABLE_PRESSURE / EARTH_SURF_PRES_IN_MILLIBARS)) {
-        lprint(the_file, first, "Unbreathably thick atmosphere");
-      } else if (atmosphere > 2.0) {
-        lprint(the_file, first, "Thick atmosphere");
-      } else if (the_planet->getType() != tTerrestrial) {
-        lprint(the_file, first, "Normal atmosphere");
-      }
+        if (atmosphere < (MIN_O2_IPP / EARTH_SURF_PRES_IN_MILLIBARS)) {
+            lprint(the_file, first, "Unbreathably thin atmosphere");
+        } else if (atmosphere < 0.5) {
+            lprint(the_file, first, "Thin atmosphere");
+        } else if (atmosphere > (MAX_HABITABLE_PRESSURE / EARTH_SURF_PRES_IN_MILLIBARS)) {
+            lprint(the_file, first, "Unbreathably thick atmosphere");
+        } else if (atmosphere > 2.0) {
+            lprint(the_file, first, "Thick atmosphere");
+        } else if (the_planet->getType() != tTerrestrial) {
+            lprint(the_file, first, "Normal atmosphere");
+        }
     }
 
     if (is_earth_like(the_planet)) {
@@ -1087,59 +1040,40 @@ void print_description(fstream& the_file, const string &opening, planet* the_pla
   long double max_r_ecosphere = habitable_zone_distance(
       the_sun, EARLY_MARS, the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES);
 
-  if (the_planet->getA() < min_r_ecosphere) {
-    if (is_habitable_extended(the_planet)) {
-      the_file << "Habitable (Extended Definition) ";
-    } else if (is_potentialy_habitable_extended(the_planet)) {
-      the_file << "Potentially Habitable (Extended Definition) ";
-    }
-    the_file << "Hot ";
-  } else if (the_planet->getA() > max_r_ecosphere) {
-    if (is_habitable_extended(the_planet)) {
-      the_file << "Habitable (Extended Definition) ";
-    } else if (is_potentialy_habitable_extended(the_planet)) {
-      the_file << "Potentially Habitable (Extended Definition) ";
-    }
-    the_file << "Cold ";
-  } else {
-    if (is_habitable(the_planet)) {
-      if (is_habitable_earth_like(the_planet)) {
-        the_file << "Habitable (Earth-like Definition) ";
-      } else if (is_habitable_conservative(the_planet)) {
-        the_file << "Habitable (Conservative Definition) ";
-      } else if (is_habitable_optimistic(the_planet)) {
-        the_file << "Habitable (Optimistic Definition) ";
-      } else if (is_habitable_extended(the_planet)) {
-        the_file << "Habitable (Extended Definition) ";
-      }
-    } else if (is_potentialy_habitable(the_planet)) {
-      if (is_potentialy_habitable_earth_like(the_planet)) {
-        the_file << "Potentially Habitable (Earth-like Definition) ";
-      } else if (is_potentialy_habitable_conservative(the_planet)) {
-        the_file << "Potentially Habitable (Conservative Definition) ";
-      } else if (is_potentialy_habitable_optimistic(the_planet)) {
-        the_file << "Potentially Habitable (Optimistic Definition) ";
+  if (the_planet->getA() < min_r_ecosphere || the_planet->getA() > max_r_ecosphere) {
+      if (is_habitable_extended(the_planet)) {
+          the_file << "Habitable (Extended Definition) ";
       } else if (is_potentialy_habitable_extended(the_planet)) {
-        the_file << "Potentially Habitable (Extended Definition) ";
+          the_file << "Potentially Habitable (Extended Definition) ";
       }
-    }
-    the_file << "Warm ";
+      the_file << (the_planet->getA() < min_r_ecosphere ? "Hot " : "Cold ");
+  } else {
+      if (is_habitable(the_planet)) {
+          switch (0) {
+              case 0: if (is_habitable_earth_like(the_planet)) { the_file << "Habitable (Earth-like Definition) "; break; }
+              case 1: if (is_habitable_conservative(the_planet)) { the_file << "Habitable (Conservative Definition) "; break; }
+              case 2: if (is_habitable_optimistic(the_planet)) { the_file << "Habitable (Optimistic Definition) "; break; }
+              case 3: if (is_habitable_extended(the_planet)) { the_file << "Habitable (Extended Definition) "; break; }
+          }
+      } else if (is_potentialy_habitable(the_planet)) {
+          switch (0) {
+              case 0: if (is_potentialy_habitable_earth_like(the_planet)) { the_file << "Potentially Habitable (Earth-like Definition) "; break; }
+              case 1: if (is_potentialy_habitable_conservative(the_planet)) { the_file << "Potentially Habitable (Conservative Definition) "; break; }
+              case 2: if (is_potentialy_habitable_optimistic(the_planet)) { the_file << "Potentially Habitable (Optimistic Definition) "; break; }
+              case 3: if (is_potentialy_habitable_extended(the_planet)) { the_file << "Potentially Habitable (Extended Definition) "; break; }
+          }
+      }
+      the_file << "Warm ";
   }
 
-  if (earth_masses <= 0.00001 || earth_radii <= 0.03) {
-    the_file << "Asteroidan";
-  } else if (earth_masses <= 0.1 || earth_radii <= 0.4) {
-    the_file << "Mercurian";
-  } else if (earth_masses <= 0.5 || earth_radii <= 0.8) {
-    the_file << "Subterran";
-  } else if (earth_masses <= 5.0 || earth_radii <= 1.5) {
-    the_file << "Terran";
-  } else if (earth_masses <= 10.0 || earth_radii <= 2.5) {
-    the_file << "Superterran";
-  } else if (earth_masses <= 50.0 || earth_radii <= 6.0) {
-    the_file << "Neptunian";
-  } else {
-    the_file << "Jovian";
+  switch (0) {
+      case 0: if (earth_masses <= 0.00001 || earth_radii <= 0.03) { the_file << "Asteroidan"; break; }
+      case 1: if (earth_masses <= 0.1 || earth_radii <= 0.4) { the_file << "Mercurian"; break; }
+      case 2: if (earth_masses <= 0.5 || earth_radii <= 0.8) { the_file << "Subterran"; break; }
+      case 3: if (earth_masses <= 5.0 || earth_radii <= 1.5) { the_file << "Terran"; break; }
+      case 4: if (earth_masses <= 10.0 || earth_radii <= 2.5) { the_file << "Superterran"; break; }
+      case 5: if (earth_masses <= 50.0 || earth_radii <= 6.0) { the_file << "Neptunian"; break; }
+      default: the_file << "Jovian";
   }
 
   the_file << " (" << the_planet->getOrbPeriod() << " day long orbit)";
