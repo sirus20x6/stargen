@@ -18,7 +18,7 @@
  */
 void accrete::set_initial_conditions(long double inner_limit_of_dust,
                             long double outer_limit_of_dust) {
-    planet_head = nullptr;
+  planet_head = nullptr;
   hist_head = nullptr;
 
   dust_head = new dust();
