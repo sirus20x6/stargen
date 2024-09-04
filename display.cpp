@@ -497,49 +497,43 @@ void jsonRow(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
  * @param the_planet 
  * @return string 
  */
-string type_string(planet* the_planet) {
-    stringstream ss;
-  planet_type type = the_planet->getType();
-  string ptype;
-
-  ss.str("");
-  if (type == tUnknown) {
-    ss << "Unknown";
-  } else if (type == tRock) {
-    ss << "Rock";
-  } else if (type == tVenusian) {
-    ss << "Venusian";
-  } else if (type == tTerrestrial) {
-    ss << "Terrestrial";
-  } else if (type == tSubSubGasGiant) {
-    ss << cloud_type_string(the_planet) << " Gas Dwarf";
-  } else if (type == tSubGasGiant) {
-    ss << cloud_type_string(the_planet) << " Neptunian";
-  } else if (type == tGasGiant) {
-    ss << cloud_type_string(the_planet) << " Jovian";
-  } else if (type == tMartian) {
-    ss << "Martian";
-  } else if (type == tWater) {
-    ss << "Water";
-  } else if (type == tIce) {
-    ss << "Ice";
-  } else if (type == tAsteroids) {
-    ss << "Asteroids";
-  } else if (type == t1Face) {
-    ss << "1Face";
-  } else if (type == tBrownDwarf) {
-    ss << "Brown Dwarf";
-  } else if (type == tIron) {
-    ss << "Iron";
-  } else if (type == tCarbon) {
-    ss << "Carbon";
-  } else if (type == tOil) {
-    ss << "Oil";
-  }
-
-  ptype = ss.str();
-  ZoneScoped;  
-  return ptype;
+std::string type_string(planet* the_planet) {
+    switch (the_planet->getType()) {
+        case tUnknown:
+            return "Unknown";
+        case tRock:
+            return "Rock";
+        case tVenusian:
+            return "Venusian";
+        case tTerrestrial:
+            return "Terrestrial";
+        case tSubSubGasGiant:
+            return format("{} Gas Dwarf", cloud_type_string(the_planet));
+        case tSubGasGiant:
+            return format("{} Neptunian", cloud_type_string(the_planet));
+        case tGasGiant:
+            return format("{} Jovian", cloud_type_string(the_planet));
+        case tMartian:
+            return "Martian";
+        case tWater:
+            return "Water";
+        case tIce:
+            return "Ice";
+        case tAsteroids:
+            return "Asteroids";
+        case t1Face:
+            return "1Face";
+        case tBrownDwarf:
+            return "Brown Dwarf";
+        case tIron:
+            return "Iron";
+        case tCarbon:
+            return "Carbon";
+        case tOil:
+            return "Oil";
+        default:
+            return "Unknown";
+    }
 }
 
 /**
