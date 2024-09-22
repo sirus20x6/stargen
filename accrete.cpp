@@ -407,15 +407,11 @@ void accrete::accrete_dust(long double &seed_mass, long double &new_dust,
   long double temp_mass = NAN, temp_mass2 = NAN;
 
   do {
-    // cout << "test1\n";
     temp_mass = new_mass;
     // fixed point algorithm: accumulate more mass until the difference is less 
     // than .01% of the old mass
     new_mass =
         collect_dust(new_mass, new_dust, new_gas, a, e, crit_mass, dust_head);
-    // cout << "test2\n";
-    // cout << "Old mass: " << (temp_mass * SUN_MASS_IN_EARTH_MASSES) << endl;
-    // cout << "New mass: " << (new_mass * SUN_MASS_IN_EARTH_MASSES) << endl;
     if (new_mass < temp_mass) {
       new_mass = temp_mass;
       break;
@@ -427,7 +423,6 @@ void accrete::accrete_dust(long double &seed_mass, long double &new_dust,
   // update the dust lanes with the new seed mass
   update_dust_lanes(r_inner, r_outer, seed_mass, crit_mass, body_inner_bound,
                     body_outer_bound);
-  // cout << "test\n";
   ZoneScoped;
 }
 

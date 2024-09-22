@@ -94,5 +94,7 @@ long double solid_iron_calc(double x);
 
 long double water_radius_calc(double x);
 
+long double earthlike_radius_calc(double x);
+
 void initRadii();
 #endif

@@ -28,9 +28,10 @@ auto rms_vel(long double, long double) -> long double;
 auto molecule_limit(long double, long double, long double) -> long double;
 auto min_molec_weight(planet *) -> long double;
 auto acceleration(long double, long double) -> long double;
+auto acceleration(planet *the_planet) -> long double;
+auto acceleration_oblateness_refinement(planet *the_planet) -> long double;
 auto gravity(long double) -> long double;
-auto vol_inventory(long double, long double, long double, long double, int,
-                   bool, bool) -> long double;
+auto vol_inventory(long double, long double, long double, long double, int, bool, bool) -> long double;
 auto pressure(long double, long double, long double) -> long double;
 auto boiling_point(long double) -> long double;
 auto hydro_fraction(long double, long double) -> long double;
@@ -79,8 +80,7 @@ auto calcHzc(planet *) -> long double;
 auto calcHza(planet *) -> long double;
 auto calcEsi(planet *) -> long double;
 auto calcSph(planet *) -> long double;
-auto calcEsiHelper(long double value, long double ref_value, long double weight,
-                   long double n = 4) -> long double;
+auto calcEsiHelper(long double value, long double ref_value, long double weight,long double n = 4) -> long double;
 auto is_potentialy_habitable_conservative(planet *) -> bool;
 auto is_potentialy_habitable_optimistic(planet *) -> bool;
 auto calcRelHumidity(planet *) -> long double;

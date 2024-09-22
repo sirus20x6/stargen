@@ -1025,7 +1025,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
       volume_radius(the_planet->getMass(), the_planet->getDensity()));
 
   the_planet->setSurfAccel(
-      acceleration(the_planet->getMass(), the_planet->getRadius()));
+      acceleration(the_planet));
   the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
 
   the_planet->setMolecWeight(min_molec_weight(the_planet));
@@ -1065,7 +1065,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
         volume_density(the_planet->getMass(), the_planet->getRadius()));
 
     the_planet->setSurfAccel(
-        acceleration(the_planet->getMass(), the_planet->getRadius()));
+        acceleration(the_planet));
     the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
 
     if ((the_planet->getGasMass() / the_planet->getMass()) > 0.000001) {
@@ -1084,7 +1084,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
         the_planet->setGasMass(the_planet->getGasMass() - h2_loss);
 
         the_planet->setSurfAccel(
-            acceleration(the_planet->getMass(), the_planet->getRadius()));
+            acceleration(the_planet));
         the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
       }
 
@@ -1094,7 +1094,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
         the_planet->setGasMass(the_planet->getGasMass() - he_loss);
 
         the_planet->setSurfAccel(
-            acceleration(the_planet->getMass(), the_planet->getRadius()));
+            acceleration(the_planet));
         the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
       }
 

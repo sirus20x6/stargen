@@ -90,11 +90,15 @@ map<long double, long double> solid_0point264_iron_0point736_water;
 map<long double, long double> earth_like;
 
 long double solid_iron_calc(double x){
-return 0.79250f + 0.22077f * log(x) + 0.01845 * log(x)*log(x);
+return 0.79250 + 0.22077 * log(x) + 0.01845 * log(x)*log(x);
 }
 
 long double water_radius_calc(double x){
   return 1.52452 + 0.42613 * log(x) + 0.02165 * log(x)*log(x);
+}
+
+long double earthlike_radius_calc(double x){
+  return 1.02349 + 0.27752 * log(x) + 0.02054 * log(x)*log(x);
 }
 
 void initRadii() {
@@ -1291,31 +1295,4 @@ void initRadii() {
   solid_0point264_iron_0point736_water[79.43] = 3.592;
   solid_0point264_iron_0point736_water[100.0] = 3.718;
 
-  earth_like[0.01] = 0.24;
-  earth_like[0.032] = 0.34;
-  earth_like[0.1] = 0.5;
-  earth_like[0.2] = 0.592384;
-  earth_like[0.32] = 0.71;
-  earth_like[0.4] = 0.736224;
-  earth_like[0.6] = 0.833926;
-  earth_like[0.8] = 0.909741;
-  earth_like[1] = 1.0;
-  earth_like[2] = 1.18850;
-  earth_like[3] = 1.32962;
-  earth_like[3.16] = 1.36;
-  earth_like[4] = 1.43571;
-  earth_like[5] = 1.52093;
-  earth_like[6] = 1.59214;
-  earth_like[7] = 1.65321;
-  earth_like[8] = 1.70657;
-  earth_like[9] = 1.75383;
-  earth_like[10] = 1.79616;
-  earth_like[12] = 1.86914;
-  earth_like[14] = 1.93012;
-  earth_like[16] = 1.98200;
-  earth_like[18] = 2.02670;
-  earth_like[20] = 2.06553;
-  earth_like[31.6] = 2.31;
-  earth_like[100] = 2.84;
-  earth_like[316] = 3.12;
 }

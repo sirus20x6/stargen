@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <random>
 
 #include "structs.h"
 
@@ -50,6 +51,27 @@ void celestia_describe_system(planet *, string, string, long, long double,
                               long double, bool);
 void celestia_describe_world(planet *, const string&, const string&, long, long double,
                              long double, int, sun &, bool, int);
+void celestia_describe_world(const planet* the_planet, std::string_view designation,
+                             std::string_view system_name, long int seed, long double inc,
+                             long double an, int counter, const sun& the_sun,
+                             bool is_moon, int planet_num);
+void handle_gas_planet_texture(planet* the_planet);
+void handle_rocky_planet_texture(planet* the_planet);
+void handle_ice_planet_texture(planet* the_planet);
+void handle_water_planet_texture(planet* the_planet);
+void handle_rocky_texture(planet* the_planet);
+void handle_1face_planet_texture(planet* the_planet);
+void handle_venusian_texture(planet* the_planet);
+void handle_martian_texture(planet* the_planet);
+void handle_terrestrial_texture(planet* the_planet);
+void handle_asteroid_texture(planet* the_planet);
+void print_planet_details(planet* the_planet);
+void print_atmosphere_composition(planet* the_planet);
+int find_gas_index(int gas_num);
+int random_numberInt(int min, int max);
+void assignTemperatureColors(planet* the_planet, double temp1, double red1, double green1, double blue1,
+                             double temp2, double red2, double green2, double blue2);
+void assignDistanceColors(planet* the_planet, double red, double green, double blue);
 void moongen_describe_system(planet *, const string&, const string&, long);
 void lprint(fstream &, bool &, const string&);
 auto image_type_string(planet *) -> string;
@@ -58,9 +80,6 @@ void mol_print(fstream &, bool &, int &, int, long double, string, long double);
 auto texture_name(planet_type) -> string;
 void display_clouds(planet *);
 void assignDistanceColors(planet *, long double, long double, long double);
-void assignTemperatureColors(planet *, long double, long double, long double,
-                             long double, long double, long double, long double,
-                             long double);
 fraction stern_brocot_search(long double f, long double tol);
 
 #endif

@@ -7,6 +7,7 @@
 #include <map>                     // for map, map<>::mapped_type
 #include <string>                  // for string, operator<<, operator==
 #include <vector>                  // for vector
+#include <functional>
 #include "const.h"                 // for SUN_MASS_IN_EARTH_MASSES, AVE, pow2
 #include "elements.h"              // for gases
 #include "gas_radius_helpers.h"    // for mini_neptune_radius, gas_dwarf_radius
@@ -71,45 +72,18 @@ auto luminosity_to_mass(long double luminosity) -> long double {
  * @param spec_type 
  * @return int 
  */
-auto getLumIndex(const string& spec_type) -> int {
-  const char *strPtr = nullptr;
-
-  strPtr = strstr(spec_type.c_str(), "Ia0");
-  if (strPtr != nullptr) {
-    return 2;
-  } else {
-    strPtr = strstr(spec_type.c_str(), "Ia");
-    if (strPtr != nullptr) {
-      return 2;
-    } else {
-      strPtr = strstr(spec_type.c_str(), "Ib");
-      if (strPtr != nullptr) {
+int getLumIndex(const string& spec_type) {
+    if (spec_type.find("Ia0") != string::npos || 
+        spec_type.find("Ia") != string::npos || 
+        spec_type.find("Ib") != string::npos || 
+        spec_type.find("II") != string::npos) {
         return 2;
-      } else {
-        strPtr = strstr(spec_type.c_str(), "III");
-        if (strPtr != nullptr) {
-          return 1;
-        } else {
-          strPtr = strstr(spec_type.c_str(), "II");
-          if (strPtr != nullptr) {
-            return 2;
-          } else {
-            strPtr = strstr(spec_type.c_str(), "IV");
-            if (strPtr != nullptr) {
-              return 1;
-            } else {
-              strPtr = strstr(spec_type.c_str(), "VI");
-              if (strPtr != nullptr) {
-                return 0;
-              } else {
-                return 0;
-              }
-            }
-          }
-        }
-      }
     }
-  }
+    if (spec_type.find("III") != string::npos || 
+        spec_type.find("IV") != string::npos) {
+        return 1;
+    }
+    return 0;
 }
 
 /**
@@ -118,146 +92,25 @@ auto getLumIndex(const string& spec_type) -> int {
  * @param spec_type 
  * @return string 
  */
-auto getStarType(string spec_type) -> string {
-  spec_type = my_strtoupper(spec_type);
-  const char *strPtr = nullptr;
-
-  strPtr = strstr(spec_type.c_str(), "DA");
-  if (strPtr != nullptr) {
-    return "WD";
-  } else {
-    strPtr = strstr(spec_type.c_str(), "DB");
-    if (strPtr != nullptr) {
-      return "WD";
-    } else {
-      strPtr = strstr(spec_type.c_str(), "DC");
-      if (strPtr != nullptr) {
-        return "WD";
-      } else {
-        strPtr = strstr(spec_type.c_str(), "DO");
-        if (strPtr != nullptr) {
-          return "WD";
-        } else {
-          strPtr = strstr(spec_type.c_str(), "DQ");
-          if (strPtr != nullptr) {
-            return "WD";
-          } else {
-            strPtr = strstr(spec_type.c_str(), "DZ");
-            if (strPtr != nullptr) {
-              return "WD";
-            } else {
-              strPtr = strstr(spec_type.c_str(), "WN");
-              if (strPtr != nullptr) {
-                return "WN";
-              } else {
-                strPtr = strstr(spec_type.c_str(), "WC");
-                if (strPtr != nullptr) {
-                  return "WC";
-                } else {
-                  strPtr = strstr(spec_type.c_str(), "O");
-                  if (strPtr != nullptr) {
-                    return "O";
-                  } else {
-                    strPtr = strstr(spec_type.c_str(), "B");
-                    if (strPtr != nullptr) {
-                      return "B";
-                    } else {
-                      strPtr = strstr(spec_type.c_str(), "A");
-                      if (strPtr != nullptr) {
-                        return "A";
-                      } else {
-                        strPtr = strstr(spec_type.c_str(), "F");
-                        if (strPtr != nullptr) {
-                          return "F";
-                        } else {
-                          strPtr = strstr(spec_type.c_str(), "G");
-                          if (strPtr != nullptr) {
-                            return "G";
-                          } else {
-                            strPtr = strstr(spec_type.c_str(), "K");
-                            if (strPtr != nullptr) {
-                              return "K";
-                            } else {
-                              strPtr = strstr(spec_type.c_str(), "M");
-                              if (strPtr != nullptr) {
-                                return "M";
-                              } else {
-                                strPtr = strstr(spec_type.c_str(), "L");
-                                if (strPtr != nullptr) {
-                                  return "L";
-                                } else {
-                                  strPtr = strstr(spec_type.c_str(), "T");
-                                  if (strPtr != nullptr) {
-                                    return "T";
-                                  } else {
-                                    strPtr = strstr(spec_type.c_str(), "Y");
-                                    if (strPtr != nullptr) {
-                                      return "Y";
-                                    } else {
-                                      strPtr = strstr(spec_type.c_str(), "H");
-                                      if (strPtr != nullptr) {
-                                        return "H";
-                                      } else {
-                                        strPtr = strstr(spec_type.c_str(), "E");
-                                        if (strPtr != nullptr) {
-                                          return "E";
-                                        } else {
-                                          strPtr =
-                                              strstr(spec_type.c_str(), "I");
-                                          if (strPtr != nullptr) {
-                                            return "I";
-                                          } else {
-                                            strPtr =
-                                                strstr(spec_type.c_str(), "R");
-                                            if (strPtr != nullptr) {
-                                              return "K";
-                                            } else {
-                                              strPtr = strstr(spec_type.c_str(),
-                                                              "S");
-                                              if (strPtr != nullptr) {
-                                                return "M";
-                                              } else {
-                                                strPtr = strstr(
-                                                    spec_type.c_str(), "N");
-                                                if (strPtr != nullptr) {
-                                                  return "M";
-                                                } else {
-                                                  strPtr = strstr(
-                                                      spec_type.c_str(), "C");
-                                                  if (strPtr != nullptr) {
-                                                    return "M";
-                                                  } else {
-                                                    // cerr << "test1\n";
-                                                    cerr << "Unsupported star "
-                                                            "type: "
-                                                         << spec_type << endl;
-                                                    exit(EXIT_FAILURE);
-                                                    return nullptr;
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+string getStarType(string spec_type) {
+    spec_type = my_strtoupper(spec_type);
+    
+    const vector<pair<string, string>> starTypes = {
+        {"DA", "WD"}, {"DB", "WD"}, {"DC", "WD"}, {"DO", "WD"}, {"DQ", "WD"}, {"DZ", "WD"},
+        {"WN", "WN"}, {"WC", "WC"},
+        {"O", "O"}, {"B", "B"}, {"A", "A"}, {"F", "F"}, {"G", "G"}, {"K", "K"},
+        {"M", "M"}, {"L", "L"}, {"T", "T"}, {"Y", "Y"}, {"H", "H"}, {"E", "E"}, {"I", "I"},
+        {"R", "K"}, {"S", "M"}, {"N", "M"}, {"C", "M"}
+    };
+    
+    for (const auto& [prefix, type] : starTypes) {
+        if (spec_type.find(prefix) != string::npos) {
+            return type;
         }
-      }
     }
-  }
+    
+    cerr << "Unsupported star type: " << spec_type << endl;
+    exit(EXIT_FAILURE);
 }
 
 /**
@@ -286,60 +139,38 @@ auto getSubType(string spec_type) -> int {
  * @param spec_type 
  * @return long double 
  */
-auto spec_type_to_eff_temp(const string& spec_type) -> long double {
-  if (spec_type.empty()) {
-    return 0;
-  }
-  string star_type;
-  int lumIndex = 0;
-  int sub_type = 0;
+long double spec_type_to_eff_temp(const string& spec_type) {
+    if (spec_type.empty()) {
+        return 0;
+    }
 
-  // cout << "test3\n";
-  star_type = getStarType(spec_type);
-  // cout << "test4\n";
-  sub_type = getSubType(spec_type);
-  lumIndex = getLumIndex(spec_type);
+    string star_type = getStarType(spec_type);
+    int sub_type = getSubType(spec_type);
+    int lumIndex = getLumIndex(spec_type);
 
-  if (strcmp(star_type.c_str(), "WD") == 0) {
-    return tempWD[sub_type];
-  } else if (strcmp(star_type.c_str(), "WN") == 0) {
-    return tempWN[sub_type];
-  } else if (strcmp(star_type.c_str(), "WC") == 0) {
-    return tempWC[sub_type];
-  } else if (strcmp(star_type.c_str(), "O") == 0) {
-    return tempO[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "B") == 0) {
-    return tempB[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "A") == 0) {
-    return tempA[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "F") == 0) {
-    return tempF[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "G") == 0) {
-    return tempG[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "K") == 0) {
-    // fprintf(stderr, "%u %u %8.8LG\n", lumIndex, sub_type,
-    // tempK[lumIndex][sub_type]); exit(EXIT_FAILURE);
-    return tempK[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "M") == 0) {
-    return tempM[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "L") == 0) {
-    return tempL[sub_type];
-  } else if (strcmp(star_type.c_str(), "T") == 0) {
-    return tempT[sub_type];
-  } else if (strcmp(star_type.c_str(), "Y") == 0) {
-    return tempY[sub_type];
-  } else if (strcmp(star_type.c_str(), "H") == 0) {
-    return tempH[sub_type];
-  } else if (strcmp(star_type.c_str(), "I") == 0) {
-    return tempI[sub_type];
-  } else if (strcmp(star_type.c_str(), "E") == 0) {
-    return tempE[sub_type];
-  } else {
-    // cerr << "test2\n";
+    switch (star_type[0]) {
+        case 'W':
+            if (star_type == "WD") return tempWD[sub_type];
+            if (star_type == "WN") return tempWN[sub_type];
+            if (star_type == "WC") return tempWC[sub_type];
+            break;
+        case 'O': return tempO[lumIndex][sub_type];
+        case 'B': return tempB[lumIndex][sub_type];
+        case 'A': return tempA[lumIndex][sub_type];
+        case 'F': return tempF[lumIndex][sub_type];
+        case 'G': return tempG[lumIndex][sub_type];
+        case 'K': return tempK[lumIndex][sub_type];
+        case 'M': return tempM[lumIndex][sub_type];
+        case 'L': return tempL[sub_type];
+        case 'T': return tempT[sub_type];
+        case 'Y': return tempY[sub_type];
+        case 'H': return tempH[sub_type];
+        case 'I': return tempI[sub_type];
+        case 'E': return tempE[sub_type];
+    }
+
     cerr << "Unsupported star type: " << star_type << endl;
     exit(EXIT_FAILURE);
-    return EXIT_FAILURE;
-  }
 }
 
 /**
@@ -349,170 +180,48 @@ auto spec_type_to_eff_temp(const string& spec_type) -> long double {
  * @param luminosity 
  * @return string 
  */
-auto eff_temp_to_spec_type(long double eff_temp, long double luminosity) -> string {
-  string clums[] = {"I-a0", "I-a", "I-b", "II", "III", "IV"};
-  long double rlums[] = {200000.0, 20000.0, 3000.0, 400.0, 11.5, 4.0};
-  string classes[] = {"x", "O", "B", "A", "F", "G", "K", "M", "L", "T", "Y"};
-  long double tclass[] = {52000,  30000.0, 10000.0, 7500.0, 6000.0, 5000.0,
-                          3500.0, 2000.0,  1300.0,  700.0,  0.0};
+string eff_temp_to_spec_type(long double eff_temp, long double luminosity) {
+    const vector<pair<long double, string>> temp_classes = {
+        {52000, "O"}, {30000, "B"}, {10000, "A"}, {7500, "F"}, 
+        {6000, "G"}, {5000, "K"}, {3500, "M"}, {2000, "L"}, 
+        {1300, "T"}, {700, "Y"}
+    };
 
-  int at = 0;
-  long double csiz = NAN, cdel = NAN, cfrac = NAN, dt = NAN;
-  string aclass, ac, clum;
-  char temp[33];
-  long double xmag = NAN;
-  string output;
+    auto get_spec_class = [&]() {
+        for (size_t i = 0; i < temp_classes.size(); ++i) {
+            const auto& [temp, class_name] = temp_classes[i];
+            if (eff_temp > temp) {
+                long double prev_temp = (i > 0) ? temp_classes[i-1].first : 200000; // Assuming 200000 as max temp
+                int subclass = floor(10.0 - 10.0 * (eff_temp - temp) / (prev_temp - temp));
+                return class_name + to_string(max(0, min(9, subclass)));
+            }
+        }
+        return string("Y9");
+    };
 
-  if (luminosity == 0) {
-    luminosity = 0.0000001;  // avoid getting an undefined answer for log(xlum)
-  }
-  xmag = 4.83 - (2.5 * (log(luminosity) / log(10.0)));
+    string spec_class = eff_temp > 52000 ? "WN" + to_string(min(9, max(0, int(10 - 10 * (eff_temp - 52000) / 148000))))
+                                         : get_spec_class();
 
-  // determine spectral clas
-  output = aclass = "????";
-  // at = 0;
-  for (int i = 1; i <= 10; i++) {
-    if (eff_temp > tclass[i]) {
-      ac = classes[i];
-      csiz = tclass[i - 1] - tclass[i];
-      cdel = eff_temp - tclass[i];
-      cfrac = cdel / csiz;
-      dt = 10.0 - (10.0 * cfrac);
-      if (dt < 0.0) {
-        dt = 0.0;
-      }
-      at = floor(dt);
-      aclass = ac.append(std::to_string(at));
-      break;
+    if (luminosity == 0) luminosity = 1e-7;
+    long double xmag = 4.83 - 2.5 * log10(luminosity);
+
+    const vector<pair<string, std::function<string(double)>>> lum_classes = {
+        {"O", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -6 ? "Ib" : m < -4.9 ? "II" : m < -4 ? "III" : "V"; }},
+        {"B", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -5 ? "Ib" : m < -4.5 ? "II" : m < -0.5 ? "III" : "V"; }},
+        {"A", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2.25 ? "II" : m < 0 ? "III" : m < 0.125 ? "IV" : "V"; }},
+        {"F", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2 ? "II" : m < 1.75 ? "III" : m < 3 ? "IV" : "V"; }},
+        {"G", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2.25 ? "II" : m < 1.75 ? "III" : m < 3 ? "IV" : "V"; }},
+        {"K", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2 ? "II" : m < 2 ? "III" : m < 4 ? "IV" : "V"; }},
+        {"M", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2 ? "II" : m < 2.5 ? "III" : "V"; }}
+    };
+
+    for (const auto& [prefix, lum_func] : lum_classes) {
+        if (spec_class[0] == prefix[0]) {
+            return spec_class + lum_func(xmag);
+        }
     }
-  }
-  clum = " ";
-  if (eff_temp > 52000)  // the hotest a type O star can get is 52000. Any
-                         // hotter and the star is most likely a Wolf–Rayet star
-  {
-    ac = "WN";
-    csiz = 200000 - 52000;
-    cdel = eff_temp - 52000;
-    cfrac = cdel / csiz;
-    dt = 10.0 - (10.0 * cfrac);
-    if (dt < 0.0) {
-      dt = 0.0;
-    }
-    at = floor(dt);
-    aclass = ac.append(std::to_string(at));
-  } else {
-    if (compare_string_char(aclass, 1, "O")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -6) {
-        aclass.append("Ib");
-      } else if (xmag < -4.9) {
-        aclass.append("II");
-      } else if (xmag < -4) {
-        aclass.append("III");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "B")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -5) {
-        aclass.append("Ib");
-      } else if (xmag < -4.5) {
-        aclass.append("II");
-      } else if (xmag < -0.5) {
-        aclass.append("III");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "A")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -4.5) {
-        aclass.append("Ib");
-      } else if (xmag < -2.25) {
-        aclass.append("II");
-      } else if (xmag < 0) {
-        aclass.append("III");
-      } else if (xmag < 0.125) {
-        aclass.append("IV");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "F")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -4.5) {
-        aclass.append("Ib");
-      } else if (xmag < -2) {
-        aclass.append("II");
-      } else if (xmag < 1.75) {
-        aclass.append("III");
-      } else if (xmag < 3) {
-        aclass.append("IV");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "G")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -4.5) {
-        aclass.append("Ib");
-      } else if (xmag < -2.25) {
-        aclass.append("II");
-      } else if (xmag < 1.75) {
-        aclass.append("III");
-      } else if (xmag < 3) {
-        aclass.append("IV");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "K")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -4.5) {
-        aclass.append("Ib");
-      } else if (xmag < -2) {
-        aclass.append("II");
-      } else if (xmag < 2) {
-        aclass.append("III");
-      } else if (xmag < 4) {
-        aclass.append("IV");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "M")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -4.5) {
-        aclass.append("Ib");
-      } else if (xmag < -2) {
-        aclass.append("II");
-      } else if (xmag < 2.5) {
-        aclass.append("III");
-      } else {
-        aclass.append("V");
-      }
-    } else {
-      aclass.append("V");
-    }
-  }
-  output = aclass;
-  return output;
+
+    return spec_class + "V";
 }
 
 /**
@@ -832,6 +541,128 @@ auto molecule_limit(long double mass, long double equat_radius,
 auto acceleration(long double mass, long double radius) -> long double {
   return GRAV_CONSTANT * (mass * SOLAR_MASS_IN_GRAMS) /
          pow2(radius * CM_PER_KM);
+}
+
+auto acceleration(planet *the_planet) -> long double {
+    const long double G = 6.67430e-11;  // gravitational constant in m^3 kg^-1 s^-2
+    const long double SOLAR_MASS_KG = 1.989e30;  // kg
+    const long double EARTH_MASS_KG = 5.97e24;   // kg
+    const long double EARTH_RADIUS_KM = 6371.0;  // km
+    const long double EARTH_GRAVITY_CM_S2 = 980.665;  // cm/s^2
+
+    // Convert planet mass to Earth masses
+    long double mass_earth_masses = the_planet->getMass() * (SOLAR_MASS_KG / EARTH_MASS_KG);
+    
+    // Get planet radius in Earth radii
+    long double radius_earth_radii = the_planet->getRadius() / EARTH_RADIUS_KM;
+
+    // Get composition fractions
+    long double ice_fraction = the_planet->getImf();
+    long double rock_fraction = the_planet->getRmf();
+    long double carbon_fraction = rock_fraction * the_planet->getCmf();
+    long double silicate_fraction = rock_fraction * (1.0 - the_planet->getCmf());
+    long double iron_fraction = 1.0 - ice_fraction - rock_fraction;
+
+    // Density factors (relative to Earth's average density)
+    const long double ICE_DENSITY_FACTOR = 0.26;
+    const long double SILICATE_DENSITY_FACTOR = 0.94;
+    const long double CARBON_DENSITY_FACTOR = 1.0;
+    const long double IRON_DENSITY_FACTOR = 2.25;
+
+    // Calculate average density factor
+    long double avg_density_factor = (ice_fraction * ICE_DENSITY_FACTOR +
+                                      silicate_fraction * SILICATE_DENSITY_FACTOR +
+                                      carbon_fraction * CARBON_DENSITY_FACTOR +
+                                      iron_fraction * IRON_DENSITY_FACTOR);
+
+    // Calculate surface gravity relative to Earth
+    long double fudge_factor = .6; // densities are too high, probably not considering enough elements
+    long double relative_gravity = (mass_earth_masses / std::pow(radius_earth_radii, 2)) * avg_density_factor * fudge_factor;
+
+    // Convert to cm/s^2
+    long double calculated_gravity_cm_s2 = relative_gravity * EARTH_GRAVITY_CM_S2;
+
+    // Log the results
+    // std::cout << "Planet mass (Earth masses): " << mass_earth_masses << "\n";
+    // std::cout << "Planet radius (Earth radii): " << radius_earth_radii << "\n";
+    // std::cout << "Calculated gravity (Earth g): " << relative_gravity << "\n";
+    // std::cout << "Calculated gravity (cm/s^2): " << calculated_gravity_cm_s2 << "\n";
+    // std::cout << "Ice fraction: " << ice_fraction << "\n";
+    // std::cout << "Rock fraction: " << rock_fraction << "\n";
+    // std::cout << "Carbon fraction: " << carbon_fraction << "\n";
+    // std::cout << "Silicate fraction: " << silicate_fraction << "\n";
+    // std::cout << "Iron fraction: " << iron_fraction << "\n";
+    // std::cout << "Average density factor: " << avg_density_factor << "\n";
+
+    return calculated_gravity_cm_s2;
+}
+
+auto acceleration_oblateness_refinement(planet *the_planet) -> long double {
+  const long double G              = 6.67430e-11;  // gravitational constant in m^3 kg^-1 s^-2
+  const long double EARTH_MASS     = 5.97e24;      // kg
+  const long double EARTH_RADIUS_M = 6.371e6;      // meters (Earth's radius)
+  const long double EARTH_GRAVITY  = 9.80665;      // m/s^2
+
+  // Constants for transition masses
+  const long double ROCKY_TRANSITION_MASS_KG     = 10.0 * EARTH_MASS;   // 10 Earth masses
+  const long double GAS_GIANT_TRANSITION_MASS_KG = 100.0 * EARTH_MASS;  // 100 Earth masses
+
+  // Convert planet mass to kilograms
+  long double mass_kg = (the_planet->getDustMass() + the_planet->getGasMass()) *
+                        1.989e30;                   // Convert solar masses to kg
+  long double radius_km = the_planet->getRadius();  // Equatorial radius in km
+
+  // Check if radius and mass are valid
+  if (radius_km == 0 || mass_kg == 0) {
+    return 0.0;  // Avoid divide by zero
+  }
+
+  // Calculate the radius based on mass regimes
+  long double radius_m;
+  if (mass_kg < ROCKY_TRANSITION_MASS_KG) {
+    // Rocky planets (mass < 10 Earth masses), R ∝ M^0.25
+    radius_m = EARTH_RADIUS_M * std::pow(mass_kg / EARTH_MASS, 0.25);
+  } else if (mass_kg < GAS_GIANT_TRANSITION_MASS_KG) {
+    // Transition zone (10 to 100 Earth masses), R ∝ M^0.5
+    radius_m = EARTH_RADIUS_M * std::pow(mass_kg / EARTH_MASS, 0.5);
+  } else {
+    // Gas giants (mass ≥ 100 Earth masses), radius approximately constant (around Jupiter's radius)
+    radius_m = 71.5e6;  // Set to approximately Jupiter's radius (71,500 km)
+  }
+
+  // Adjust for oblateness (if oblateness > 0)
+  long double oblateness_factor = the_planet->getOblateness();
+  long double polar_radius_m =
+      radius_m * (1.0 - oblateness_factor);  // Polar radius is reduced by oblateness
+
+  // Angular velocity (omega) based on day length (convert hours to seconds)
+  long double day_seconds      = the_planet->getDay() * 3600;
+  long double angular_velocity = (day_seconds > 0) ? (2 * M_PI / day_seconds) : 0.0;
+
+  // Adjust gravity for centrifugal force at the equator
+  long double centrifugal_force =
+      angular_velocity * angular_velocity * radius_m;  // Centrifugal force at equator
+  long double gravity_equator = G * mass_kg / std::pow(radius_m, 2) - centrifugal_force;
+
+  // Gravity at the poles (no centrifugal force)
+  long double gravity_pole = G * mass_kg / std::pow(polar_radius_m, 2);
+
+  // Average gravity (you could use a weighted average if necessary)
+  long double average_gravity = (gravity_equator + gravity_pole) / 2.0;
+
+  // Handle different mass regimes for the final gravity calculation
+  long double mass_earth_masses = mass_kg / EARTH_MASS;
+
+  if (mass_earth_masses < 1.0) {
+    // Rocky bodies below Earth mass: gs ~ M^(1/2)
+    average_gravity = EARTH_GRAVITY * std::pow(mass_earth_masses, 0.5);
+  } else if (mass_earth_masses < 100.0) {
+    // Transition zone: gravity remains roughly constant
+    average_gravity = std::max(0.8 * EARTH_GRAVITY, std::min(average_gravity, 1.2 * EARTH_GRAVITY));
+  }
+  // For gas giants (mass > 100 Earth masses), we'll use the calculated gravity directly
+
+  return average_gravity;
 }
 
 /*---------------------------------------------------------------------*/
