@@ -32,7 +32,7 @@ map<map<long double, long double>, vector<long double> > polynomial_cache;
  * @return long double 
  */
 // updated from wikipedia https://en.wikipedia.org/wiki/Mass%E2%80%93luminosity_relation#cite_note-evolutionofstars-2
-double mass_to_luminosity(double mass) {
+long double mass_to_luminosity(long double mass) {
     if (mass < 0.43) {
         return 0.23 * std::pow(mass, 2.3);
     } else if (mass < 2) {
@@ -51,18 +51,15 @@ double mass_to_luminosity(double mass) {
  * @return long double 
  */
 auto luminosity_to_mass(long double luminosity) -> long double {
-  long double a = luminosity;
-  if (a <= (0.3815 * std::pow(0.6224, 2.5185))) {
-    return 1.46613 * std::pow(a, 0.3970617431010522);
-  } else if (a <= 1) {
-    return std::pow(a, 0.2197319270490002);
-  } else if (a <= std::pow(3.1623, 4.351)) {
-    return std::pow(a, 0.2298322224775914);
-  } else if (a <= (2.7563 * std::pow(16, 3.4704))) {
-    return 0.746654 * std::pow(a, 0.2881512217611803);
-  } else {
-    return 0.221579 * std::pow(a, 0.4023659115599726);
-  }
+    if (luminosity < 0.23) {
+        return std::pow(luminosity / 0.23, 1.0 / 2.3);
+    } else if (luminosity < 1) {
+        return std::pow(luminosity, 1.0 / 4.0);
+    } else if (luminosity < 1.4 * std::pow(55, 3.5)) {
+        return std::pow(luminosity / 1.4, 1.0 / 3.5);
+    } else {
+        return luminosity / 32000;
+    }
 }
 
 /**
