@@ -969,47 +969,50 @@ auto planet_albedo(planet *the_planet) -> long double {
 /* planet.                                                             */
 /*---------------------------------------------------------------------*/
 
-auto opacity(long double molecular_weight, long double surf_pressure) -> long double {
-  long double optical_depth = NAN;
+#include <cmath>
 
-  optical_depth = 0.0;
-  if (molecular_weight >= 0.0 && molecular_weight < 10.0) {
-    optical_depth += 3.0;
-  }
-  if (molecular_weight >= 10.0 && molecular_weight < 20.0) {
-    optical_depth += 2.34;
-  }
-  if (molecular_weight >= 20.0 && molecular_weight < 30.0) {
-    optical_depth += 1.0;
-  }
-  if (molecular_weight >= 30.0 && molecular_weight < 45.0) {
-    optical_depth += 0.15;
-  }
-  if (molecular_weight >= 45.0 && molecular_weight < 100.0) {
-    optical_depth += 0.05;
-  }
+long double opacity(long double molecular_weight, long double surf_pressure, long double effective_temp) {
+    // Base opacity calculation
+    double base_opacity = 0.0;
 
-  if (surf_pressure >= (70.0 * EARTH_SURF_PRES_IN_MILLIBARS)) {
-    optical_depth *= 8.333;
-  } else {
-    if (surf_pressure >= (50.0 * EARTH_SURF_PRES_IN_MILLIBARS)) {
-      optical_depth *= 6.666;
-    } else {
-      if (surf_pressure >= (30.0 * EARTH_SURF_PRES_IN_MILLIBARS)) {
-        optical_depth *= 3.333;
-      } else {
-        if (surf_pressure >= (10.0 * EARTH_SURF_PRES_IN_MILLIBARS)) {
-          optical_depth *= 2.0;
-        } else {
-          if (surf_pressure >= (5.0 * EARTH_SURF_PRES_IN_MILLIBARS)) {
-            optical_depth *= 1.5;
-          }
-        }
-      }
+    if (molecular_weight < 10.0) {
+        base_opacity = 3.0 - 0.066 * (10.0 - molecular_weight);
+    } else if (molecular_weight < 20.0) {
+        base_opacity = 2.34 - 0.134 * (20.0 - molecular_weight);
+    } else if (molecular_weight < 30.0) {
+        base_opacity = 1.0 - 0.085 * (30.0 - molecular_weight);
+    } else if (molecular_weight < 45.0) {
+        base_opacity = 0.15 - 0.057 * (45.0 - molecular_weight);
+    } else if (molecular_weight < 100.0) {
+        base_opacity = 0.05 - 0.0009 * (100.0 - molecular_weight);
     }
-  }
 
-  return optical_depth;
+    // Pressure contribution
+    double pressure_in_earth = surf_pressure / EARTH_SURF_PRES_IN_MILLIBARS;
+    double pressure_factor = 1.0;
+    
+    if (pressure_in_earth >= 70.0) {
+        pressure_factor = 8.333;
+    } else if (pressure_in_earth >= 50.0) {
+        pressure_factor = 6.666 + (8.333 - 6.666) * (pressure_in_earth - 50.0) / 20.0;
+    } else if (pressure_in_earth >= 30.0) {
+        pressure_factor = 3.333 + (6.666 - 3.333) * (pressure_in_earth - 30.0) / 20.0;
+    } else if (pressure_in_earth >= 10.0) {
+        pressure_factor = 2.0 + (3.333 - 2.0) * (pressure_in_earth - 10.0) / 20.0;
+    } else if (pressure_in_earth >= 5.0) {
+        pressure_factor = 1.5 + (2.0 - 1.5) * (pressure_in_earth - 5.0) / 5.0;
+    } else {
+        pressure_factor = 1.0 + (1.5 - 1.0) * (pressure_in_earth - 0.0) / 5.0;
+    }
+
+    // Temperature dependence
+    // Assuming opacity increases with temperature (simplified model)
+    double temp_factor = 1.0 + 0.01 * (effective_temp - 273.15); // 273.15 is 0°C in Kelvin
+
+    // Combine all factors
+    double optical_depth = base_opacity * pressure_factor * temp_factor;
+
+    return optical_depth;
 }
 
 /*
@@ -1071,7 +1074,7 @@ void calculate_surface_temp(planet *the_planet, bool first,
                      the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
                  the_planet->getA(), the_planet->getAlbedo());
     greenhouse_temp = green_rise(
-        opacity(the_planet->getMolecWeight(), the_planet->getSurfPressure()),
+        opacity(the_planet->getMolecWeight(), the_planet->getSurfPressure(), effective_temp),
         effective_temp, the_planet->getSurfPressure());
     the_planet->setSurfTemp(effective_temp + greenhouse_temp);
     set_temp_range(the_planet);
@@ -1178,9 +1181,9 @@ void calculate_surface_temp(planet *the_planet, bool first,
       eff_temp(the_planet->getTheSun().getREcosphere(the_planet->getMass() *
                                                      SUN_MASS_IN_EARTH_MASSES),
                the_planet->getA(), the_planet->getAlbedo());
-  greenhouse_temp = green_rise(
-      opacity(the_planet->getMolecWeight(), the_planet->getSurfPressure()),
-      effective_temp, the_planet->getSurfPressure());
+      greenhouse_temp = green_rise(
+        opacity(the_planet->getMolecWeight(), the_planet->getSurfPressure(), effective_temp),
+        effective_temp, the_planet->getSurfPressure());
   the_planet->setSurfTemp(effective_temp + greenhouse_temp);
 
   if (!first) {

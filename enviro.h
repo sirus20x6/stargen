@@ -43,7 +43,7 @@ auto est_temp(long double, long double, long double) -> long double;
 auto grnhouse(long double, long double) -> bool;
 auto green_rise(long double, long double, long double) -> long double;
 auto planet_albedo(planet *) -> long double;
-auto opacity(long double, long double) -> long double;
+long double opacity(long double molecular_weight, long double surf_pressure, long double effective_temp);
 auto gas_life(long double, planet *) -> long double;
 void calculate_surface_temp(planet *, bool, long double, long double,
                             long double, long double, long double, bool);
