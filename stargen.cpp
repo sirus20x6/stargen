@@ -2,7 +2,7 @@
 #include <cmath>       // for pow, NAN, exp, log
 #include <cstdlib>     // for EXIT_SUCCESS, srand, rand
 #include <ctime>       // for time, time_t
-#include <iostream>    // for operator<<, basic_ostream, ostream, endl, stri...
+#include <iostream>    // for operator<<, basic_ostream, ostream, "\n", stri...
 #include "accrete.h"   // for accrete
 #include "const.h"     // for SUN_MASS_IN_EARTH_MASSES, KM_PER_AU, EARTH_AVE...
 #include "display.h"   // for type_string, close_html_file, create_svg_file
@@ -201,11 +201,9 @@ auto stargen(actions action, const string &flag_char, string path,
     prognam = "StarGen";
   }
 
-  // cout << path << endl;
   if (path.empty()) {
     path = default_path;
   }
-  // cout << path << endl;
 
   if (graphic_format == 0) {
     graphic_format = gfGIF;
@@ -219,12 +217,10 @@ auto stargen(actions action, const string &flag_char, string path,
   ss << path.substr(path.find_last_of('/') + 1) << DIRSEP;
   subdir = ss.str();
   ss.str("");
-  // cout << subdir << endl;
 
   if (path.find_last_of('/') != path.size()) {
     path.append(DIRSEP);
   }
-  // cout << path << endl;
 
   switch (action) {
     case aListGases: {
@@ -240,9 +236,9 @@ auto stargen(actions action, const string &flag_char, string path,
         // " mb - " << toString(gases[i].getMaxIpp()) << " mb\n";
       }
       cout << gases;
-      cout << "Total Max ipp: " << toString(total) << endl;
+      cout << "Total Max ipp: " << toString(total) << "\n";
       cout << "Max pressure: " << toString(MAX_HABITABLE_PRESSURE) << " atm"
-           << endl;
+           << "\n";
       return EXIT_SUCCESS;
     }
     case aListCatalog: {
@@ -264,9 +260,9 @@ auto stargen(actions action, const string &flag_char, string path,
       long double tempU = est_temp(1.0, 19.1913, GAS_GIANT_ALBEDO);
       long double tempN = est_temp(1.0, 30.0690, GAS_GIANT_ALBEDO);
 
-      cout << "Size of float: " << sizeof(float) << endl;
-      cout << "Size of doubles: " << sizeof(double) << endl;
-      cout << "Size of long doubles: " << sizeof(long double) << endl;
+      cout << "Size of float: " << sizeof(float) << "\n";
+      cout << "Size of doubles: " << sizeof(double) << "\n";
+      cout << "Size of long doubles: " << sizeof(long double) << "\n";
       cout << "Earth Eff Temp: " << toString(tempE) << " K, "
            << toString(tempE - FREEZING_POINT_OF_WATER)
            << " C, Earth rel: " << toString(tempE - EARTH_AVERAGE_KELVIN)
@@ -278,28 +274,28 @@ auto stargen(actions action, const string &flag_char, string path,
       return EXIT_SUCCESS;
     }
     case aListVerbosity: {
-      cout << "Stargen " << stargen_revision << endl;
-      cout << "Verbosity flags are hexidecimal numbers:\n";
-      cout << "\t0001\tEarthlike count\n";
-      cout << "\t0002\tTrace Min/Max\n";
-      cout << "\t0004\tList Habitable\n";
-      cout << "\t0008\tList Earthlike & Sphinxlike\n\n";
-      cout << "\t0010\tList Gases\n";
-      cout << "\t0020\tTrace temp iterations\n";
-      cout << "\t0040\tGas lifetimes\n";
-      cout << "\t0080\tList loss of accreted gas mass\n\n";
-      cout << "\t0100\tInjecting, collision\n";
-      cout << "\t0200\tChecking..., Failed...\n";
-      cout << "\t0400\tList binary info\n";
-      cout << "\t0800\tList accreted atmospheres\n\n";
-      cout << "\t1000\tMoons (experimental)\n";
-      cout << "\t2000\tOxygen poisoned (experimental)\n";
-      cout << "\t4000\tTrace gas percentages\n";
-      cout << "\t8000\tList Jovians in the ecosphere\n\n";
-      cout << "\t10000\tList type diversity\n";
-      cout << "\t20000\tTrace Surface temp interations\n";
-      cout << "\t40000\tDisplay Roche Limits and Hill Sphere distances\n";
-      cout << "\t80000\tDisplay mass-radius maps\n";
+      cout << "Stargen " << stargen_revision << "\n"
+      << "Verbosity flags are hexidecimal numbers:\n"
+      << "\t0001\tEarthlike count\n"
+      << "\t0002\tTrace Min/Max\n"
+      << "\t0004\tList Habitable\n"
+      << "\t0008\tList Earthlike & Sphinxlike\n\n"
+      << "\t0010\tList Gases\n"
+      << "\t0020\tTrace temp iterations\n"
+      << "\t0040\tGas lifetimes\n"
+      << "\t0080\tList loss of accreted gas mass\n\n"
+      << "\t0100\tInjecting, collision\n"
+      << "\t0200\tChecking..., Failed...\n"
+      << "\t0400\tList binary info\n"
+      << "\t0800\tList accreted atmospheres\n\n"
+      << "\t1000\tMoons (experimental)\n"
+      << "\t2000\tOxygen poisoned (experimental)\n"
+      << "\t4000\tTrace gas percentages\n"
+      << "\t8000\tList Jovians in the ecosphere\n\n"
+      << "\t10000\tList type diversity\n"
+      << "\t20000\tTrace Surface temp interations\n"
+      << "\t40000\tDisplay Roche Limits and Hill Sphere distances\n"
+      << "\t80000\tDisplay mass-radius maps\n";
       return EXIT_SUCCESS;
     }
     case aGenerate:
@@ -368,8 +364,6 @@ auto stargen(actions action, const string &flag_char, string path,
   }
 
   for (index = 0; index < system_count; index++) {
-    // cout << "test " << index << endl;
-    cout << "";
     string system_name;
     string designation;
     string cp;
@@ -387,7 +381,6 @@ auto stargen(actions action, const string &flag_char, string path,
 
     if (do_catalog || (sys_no_arg != 0)) {
       if (sys_no_arg != 0) {
-        // sys_no = sys_no_arg - 1;
         sys_no = sys_no_arg;
       } else {
         if (index >= catalog_count) {
@@ -396,7 +389,6 @@ auto stargen(actions action, const string &flag_char, string path,
           sys_no = index;
         }
       }
-      // sys_no += 1;
 
       sys_inc = cat_arg[sys_no].getInc();
       sys_an = cat_arg[sys_no].getAn();
@@ -415,7 +407,7 @@ auto stargen(actions action, const string &flag_char, string path,
 
       // cout << cat_arg[sys_no].getMass() << " " <<
       // cat_arg[sys_no].getLuminosity() << " " << cat_arg[sys_no].getEffTemp()
-      // << " " << cat_arg[sys_no].getSpecType() << endl;
+      // << " " << cat_arg[sys_no].getSpecType() << "\n";
 
       the_sun.setMass(cat_arg[sys_no].getMass());
       the_sun.setLuminosity(cat_arg[sys_no].getLuminosity());
@@ -517,7 +509,7 @@ auto stargen(actions action, const string &flag_char, string path,
     the_sun.setName(system_name);
 
     if (((flag_verbose & 0x0400) != 0) && outer_limit > 0.0) {
-      cerr << system_name << ", Outer Limit: " << toString(outer_limit) << endl;
+      cerr << system_name << ", Outer Limit: " << toString(outer_limit) << "\n";
     }
     if (system_count == 1 && !filename_arg.empty()) {
       file_name = filename_arg;
@@ -551,7 +543,7 @@ auto stargen(actions action, const string &flag_char, string path,
       type_count = 0;
     }
     type_count = 0;
-    // cout << index << endl;
+    // cout << index << "\n";
     the_sun_clone = the_sun;
     generate_stellar_system(the_sun, use_seed_system, seed_planets, flag_char,
                             sys_no, system_name, inner_dust_limit, outer_limit,
@@ -744,23 +736,23 @@ auto stargen(actions action, const string &flag_char, string path,
   }
 
   if (((flag_verbose & 0x0001) != 0) || ((flag_verbose & 0x0002) != 0)) {
-    cerr << "Earthlike planets: " << total_earthlike << endl;
-    cerr << "Breathable atmospheres: " << total_habitable << endl;
+    cerr << "Earthlike planets: " << total_earthlike << "\n";
+    cerr << "Breathable atmospheres: " << total_habitable << "\n";
     cerr << "Breathable g range: " << toString(min_breathable_g) << " - "
-         << toString(max_breathable_g) << endl;
+         << toString(max_breathable_g) << "\n";
     cerr << "Terrestrial g range: " << toString(min_breathable_terrestrial_g)
-         << " - " << toString(max_breathable_terrestrial_g) << endl;
+         << " - " << toString(max_breathable_terrestrial_g) << "\n";
     cerr << "Breathable pressure range: " << toString(min_breathable_p) << " - "
-         << toString(max_breathable_p) << endl;
+         << toString(max_breathable_p) << "\n";
     cerr << "Breathable temp range: "
          << toString(min_breathable_temp - EARTH_AVERAGE_KELVIN) << " C - "
          << toString(max_breathable_temp - EARTH_AVERAGE_KELVIN) << " C"
-         << endl;
+         << "\n";
     cerr << "Breathable illumination range: " << toString(min_breathable_l)
-         << " - " << toString(max_breathable_l) << endl;
+         << " - " << toString(max_breathable_l) << "\n";
     cerr << "Terrestrial illumination range: "
          << toString(min_breathable_terrestrial_l) << " - "
-         << toString(max_breathable_terrestrial_l) << endl;
+         << toString(max_breathable_terrestrial_l) << "\n";
     cerr << "Max moon mass: "
          << toString(max_moon_mass * SUN_MASS_IN_EARTH_MASSES)
          << " Earth Masses\n";
@@ -839,7 +831,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
   }
 
   if (the_sun.getMass() == 0) {
-    // cout << system_name << " " << sys_no << endl;
+    // cout << system_name << " " << sys_no << "\n";
   }
 
   if (the_sun.getEffTemp() == 0) {
@@ -859,7 +851,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
     if (min_age > max_age_of_star) {
       min_age = max_age_of_star;
     }
-    // cout << min_age << " " << max_age << endl;
+    // cout << min_age << " " << max_age << "\n";
     the_sun.setAge(random_number(min_age, max_age));
   } else {
     long double max_age_of_star = the_sun.getLife();
@@ -872,14 +864,14 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
     if (min_age > max_age_of_star) {
       min_age = max_age_of_star;
     }
-    // cout << min_age << " " << max_age << endl;
+    // cout << min_age << " " << max_age << "\n";
     innermost_planet =
         myAccreteObject.dist_planetary_masses(the_sun, inner_dust_limit, outer_dust_limit,
                               outer_planet_limit, dust_density_coeff, ecc_coef,
                               inner_planet_factor, seed_system, do_moons);
     the_sun.setAge(random_number(min_age, max_age));
   }
-  // cout << "test" << system_counter << endl;
+  // cout << "test" << system_counter << "\n";
   generate_planets(the_sun, !use_seed_system, flag_char, sys_no,
                    system_name, do_gases, do_moons);
   ZoneScoped;
@@ -915,7 +907,7 @@ void generate_planets(sun &the_sun, bool random_tilt, const string &flag_char,
     ss << system_name << " (-s" << toString(flag_seed) << " -" << flag_char
        << toString(sys_no) << ") " << toString(planet_no);
     planet_id = ss.str();
-    // cout << planet_id << endl;
+    // cout << planet_id << "\n";
     if (!(the_planet->getKnownRadius() > 0)) {
       the_planet->setImf(0);
       the_planet->setRmf(0);
@@ -1385,7 +1377,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                    << " -> " << toString(hill_sphere) << " km\n";
               cerr << moon_id << " Moon orbit: a = "
                    << toString(ptr->getMoonA() * KM_PER_AU)
-                   << " km, e = " << toString(ptr->getMoonE()) << endl;
+                   << " km, e = " << toString(ptr->getMoonE()) << "\n";
             }
 
             if ((flag_verbose & 0x1000) != 0) {
@@ -1569,7 +1561,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                  << toString(new_moon->getMass() * SUN_MASS_IN_EARTH_MASSES)
                  << " EU) at " << toString(distance2)
                  << " km with eccentricity of " << toString(eccentricity2)
-                 << endl;
+                 << "\n";
           }
 
           for (ref = the_planet->first_moon; ref != nullptr;
@@ -1583,7 +1575,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                     1.0 / 3.0);
             // cout << toString(distance2) << " " << toString(distance2 -
             // temp_hill_sphere) << " " << toString(distance2 +
-            // temp_hill_sphere) << endl;
+            // temp_hill_sphere) << "\n";
             if (((ref->getMoonA() * KM_PER_AU) >=
                      (distance2 - temp_hill_sphere) &&
                  (ref->getMoonA() * KM_PER_AU) <=
@@ -1642,7 +1634,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                  << " -> " << toString(hill_sphere3) << " km\n";
             cerr << moon_id << " Moon orbit: a = "
                  << toString(new_moon->getMoonA() * KM_PER_AU)
-                 << " km, e = " << toString(new_moon->getMoonE()) << endl;
+                 << " km, e = " << toString(new_moon->getMoonE()) << "\n";
           }
 
           if ((flag_verbose & 0x1000) != 0) {
@@ -1707,39 +1699,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
 void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
     int tIndex = 0;
 
-  if (the_planet->getType() == tUnknown) {
-    tIndex = 0;
-  } else if (the_planet->getType() == tRock) {
-    tIndex = 1;
-  } else if (the_planet->getType() == tVenusian) {
-    tIndex = 2;
-  } else if (the_planet->getType() == tTerrestrial) {
-    tIndex = 3;
-  } else if (the_planet->getType() == tSubSubGasGiant) {
-    tIndex = 4;
-  } else if (the_planet->getType() == tSubGasGiant) {
-    tIndex = 5;
-  } else if (the_planet->getType() == tGasGiant) {
-    tIndex = 6;
-  } else if (the_planet->getType() == tMartian) {
-    tIndex = 7;
-  } else if (the_planet->getType() == tWater) {
-    tIndex = 8;
-  } else if (the_planet->getType() == tIce) {
-    tIndex = 9;
-  } else if (the_planet->getType() == tAsteroids) {
-    tIndex = 10;
-  } else if (the_planet->getType() == t1Face) {
-    tIndex = 11;
-  } else if (the_planet->getType() == tBrownDwarf) {
-    tIndex = 12;
-  } else if (the_planet->getType() == tIron) {
-    tIndex = 13;
-  } else if (the_planet->getType() == tCarbon) {
-    tIndex = 14;
-  } else if (the_planet->getType() == tOil) {
-    tIndex = 15;
-  }
+  tIndex = the_planet->getType();
 
   if (type_counts[tIndex] == 0) {
     ++type_count;
@@ -1908,7 +1868,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
            << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
            << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN)
-           << "\tl=" << toString(illumination) << "\t" << planet_id << endl;
+           << "\tl=" << toString(illumination) << "\t" << planet_id << "\n";
     }
   } else if (is_potentialy_habitable(the_planet)) {
     potential_habitable++;
@@ -2058,7 +2018,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
            << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
            << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN)
-           << "\tl=" << toString(illumination) << "\t" << planet_id << endl;
+           << "\tl=" << toString(illumination) << "\t" << planet_id << "\n";
     }
   }
 
@@ -2071,7 +2031,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
            << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
            << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN) << "\t"
-           << planet_id << endl;
+           << planet_id << "\n";
     }
   }
 
@@ -2089,7 +2049,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
            << "\tp=" << toString(the_planet->getCoreRadius())
            << "\tr=" << toString(the_planet->getRadius()) << "\tm="
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) << "\t"
-           << planet_id << "\t" << (50 - core_size) << endl;
+           << planet_id << "\t" << (50 - core_size) << "\n";
     }
   }
 
@@ -2253,7 +2213,7 @@ void assign_type(sun &the_sun, planet *the_planet, const string &planet_id,
              << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
              << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
              << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN)
-             << "\t" << planet_id << "\t Unknown " << one_face_string << endl;
+             << "\t" << planet_id << "\t Unknown " << one_face_string << "\n";
       }
     }
   }

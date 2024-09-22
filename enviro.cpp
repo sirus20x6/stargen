@@ -31,18 +31,17 @@ map<map<long double, long double>, vector<long double> > polynomial_cache;
  * @param mass 
  * @return long double 
  */
-auto mass_to_luminosity(long double mass) -> long double {
-  if (mass <= 0.6224) {
-    return 0.3815 * std::pow(mass, 2.5185);
-  } else if (mass <= 1.0) {
-    return std::pow(mass, 4.551);
-  } else if (mass <= 3.1623) {
-    return std::pow(mass, 4.351);
-  } else if (mass <= 16.0) {
-    return 2.7563 * std::pow(mass, 3.4704);
-  } else {
-    return 42.321 * std::pow(mass, 2.4853);
-  }
+// updated from wikipedia https://en.wikipedia.org/wiki/Mass%E2%80%93luminosity_relation#cite_note-evolutionofstars-2
+double mass_to_luminosity(double mass) {
+    if (mass < 0.43) {
+        return 0.23 * std::pow(mass, 2.3);
+    } else if (mass < 2) {
+        return std::pow(mass, 4);
+    } else if (mass < 55) {
+        return 1.4 * std::pow(mass, 3.5);
+    } else {
+        return 32000 * mass;
+    }
 }
 
 /**
@@ -2253,10 +2252,10 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
                 // planet_id << endl; if (planet_id == "1.05853286955409876162
                 // 0.00153819919909735927041")
                 {
-                  for (int i = 0; i < gases.count(); i++) {
+                  //for (int i = 0; i < gases.count(); i++) {
                     // cout << gases[i].getName() << ": " << toString(amount[i])
                     // << endl;
-                  }
+                  //}
                   // exit(EXIT_FAILURE);
                 }
                 // cout << toString(amount[i]) << " " << toString(ipp) << " " <<
@@ -2285,7 +2284,6 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
           if (is_potentialy_habitable(the_planet)) {
             if (the_planet->getSurfPressure() >= (1.2 * MIN_O2_IPP) &&
                 the_planet->getSurfPressure() <= MAX_HABITABLE_PRESSURE) {
-              // cout << "test2 " << planet_id << endl;
               if (new_values[i] > 0.0) {
                 amount[i] = new_values[i] * totalamount;
               }
@@ -2296,18 +2294,12 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
                 bad_air = true;
                 do_overs_less[i] = true;
                 do_overs_more[i] = false;
-                // cout << i << ". " << gases[i].getName() << " Too high: " <<
-                // ipp << " (Max allowed: " << gases[i].getMaxIpp() << ")" <<
-                // endl;
                 break;
               } else if (ipp < gases[i].getMinIpp() &&
                          gases[i].getNum() == AN_O) {
                 bad_air = true;
                 do_overs_less[i] = false;
                 do_overs_more[i] = true;
-                // cout << i << ". " << gases[i].getName() << " Too low: " <<
-                // ipp << " (Min allowed: " << gases[i].getMinIpp() << ")" <<
-                // endl;
                 break;
               } else {
                 do_overs_less[i] = false;
@@ -2325,8 +2317,6 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
 
       for (int i = 0, n = 0; i < gases.count(); i++) {
         if (amount[i] > 0.0) {
-          // cout << "test 2\n";
-          // cout << planet_id << endl;
           gas substance;
           substance.setNum(gases[i].getNum());
           if (new_values[i] > 0.0) {
@@ -2474,74 +2464,37 @@ auto is_earth_like_size(planet *the_planet) -> bool {
   return false;
 }
 
-auto is_earth_like(planet *the_planet) -> bool {
-  long double rel_temp = (the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER) -
-                         EARTH_AVERAGE_CELSIUS;
-  long double seas = the_planet->getHydrosphere() * 100.0;
-  long double clouds = the_planet->getCloudCover() * 100.0;
-  long double pressure =
-      the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS;
-  long double ice = the_planet->getIceCover() * 100.0;
-  long double gravity = the_planet->getSurfGrav();
-  long double iron =
-      (1.0 - (the_planet->getRmf() + the_planet->getImf())) * 100.0;
+bool is_earth_like(planet* the_planet) {
+    // Early checks for basic habitability and size
+    if (!is_habitable(the_planet) || !is_earth_like_size(the_planet) || the_planet->getEsi() < 0.8) {
+        return false;
+    }
 
-  if (!is_habitable(the_planet)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
-    // habitable\n";
-    return false;
-  } else if (!is_earth_like_size(the_planet)) {
-    return false;
-  } else if (the_planet->getEsi() < 0.8) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Low ESI" <<
-    // endl;
-    return false;
-  } else if (the_planet->getImf() > 0.0) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Has too much
-    // ice\n";
-    return false;
-  } else if (iron < 20 || iron > 60) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too big or
-    // too small a core\n";
-    return false;
-  } else if (gravity < 0.8 || gravity > 1.2) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too low or
-    // too high gravity\n";
-    return false;
-  } else if (rel_temp < -2.0 || rel_temp > 3.0) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too cold or
-    // too hot\n";
-    return false;
-  } else if (seas < 50.0 || seas > 80.0) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too dry or
-    // too wet\n";
-    return false;
-  } else if (ice > 10) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too much
-    // surface ice\n";
-    return false;
-  } else if (clouds < 40.0 || clouds > 80.0) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too few or
-    // too many clouds\n";
-    return false;
-  } else if (pressure < 0.5 || pressure > 2.0) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too low or
-    // too high a surface pressure\n";
-    return false;
-  } else if (the_planet->getType() == tWater) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Water world!"
-    // << endl;
-    return false;
-  } else if (the_planet->getType() == tOil) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Carbon
-    // planet!\n";
-    return false;
-  } else if (the_planet->getMaxTemp() >= the_planet->getBoilPoint()) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Sometime too
-    // hot!\n";
-    return false;
-  }
-  return true;
+    // Calculate derived values
+    long double rel_temp = (the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER) - EARTH_AVERAGE_CELSIUS;
+    long double seas = the_planet->getHydrosphere() * 100.0;
+    long double clouds = the_planet->getCloudCover() * 100.0;
+    long double pressure = the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS;
+    long double ice = the_planet->getIceCover() * 100.0;
+    long double gravity = the_planet->getSurfGrav();
+    long double iron = (1.0 - (the_planet->getRmf() + the_planet->getImf())) * 100.0;
+
+    // Check various conditions
+    if (the_planet->getImf() > 0.0 ||
+        iron < 20 || iron > 60 ||
+        gravity < 0.8 || gravity > 1.2 ||
+        rel_temp < -2.0 || rel_temp > 3.0 ||
+        seas < 50.0 || seas > 80.0 ||
+        ice > 10 ||
+        clouds < 40.0 || clouds > 80.0 ||
+        pressure < 0.5 || pressure > 2.0 ||
+        the_planet->getType() == tWater ||
+        the_planet->getType() == tOil ||
+        the_planet->getMaxTemp() >= the_planet->getBoilPoint()) {
+        return false;
+    }
+
+    return true;
 }
 
 auto is_habitable_jovian_conservative(planet *the_planet) -> bool {
