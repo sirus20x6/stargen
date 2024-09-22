@@ -25,7 +25,8 @@ void text_describe_system(planet *, bool, long, bool);
 void csv_describe_system(fstream &, planet *, bool, long, bool);
 void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
                          bool do_gases, long int seed, bool do_moons);
-void csv_row(fstream &, planet *, bool, bool, string, stringstream &);
+void csv_row(std::fstream& the_file, planet* the_planet, bool do_gases, bool is_moon, 
+             const std::string& id, std::stringstream& ss) ;
 void jsonRow(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
              string id, stringstream& ss);
 auto type_string(planet *) -> string;
@@ -68,6 +69,7 @@ void handle_asteroid_texture(planet* the_planet);
 void print_planet_details(planet* the_planet);
 void print_atmosphere_composition(planet* the_planet);
 int find_gas_index(int gas_num);
+std::string generate_atmosphere_string(planet* the_planet, bool do_gases);
 int random_numberInt(int min, int max);
 void assignTemperatureColors(planet* the_planet, double temp1, double red1, double green1, double blue1,
                              double temp2, double red2, double green2, double blue2);

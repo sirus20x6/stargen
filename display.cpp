@@ -37,8 +37,8 @@ void text_describe_system(planet* innermost_planet, bool do_gases,
     sun the_sun = innermost_planet->getTheSun();
     int counter;
 
-    std::cout << std::format("Stargen - V{}; seed={}\n", stargen_revision, seed);
-    std::cout << "                          SYSTEM  CHARACTERISTICS\n";
+    std::cout << std::format("Stargen - V{}; seed={}\n", stargen_revision, seed)
+    << "                          SYSTEM  CHARACTERISTICS\n";
     if (!the_sun.getIsCircumbinary()) {
         std::cout << std::format("Stellar mass: {} solar masses\n", the_sun.getMass());
         std::cout << std::format("Stellar luminosity: {}\n", the_sun.getLuminosity());
@@ -83,42 +83,33 @@ void text_describe_system(planet* innermost_planet, bool do_gases,
         } else if (the_planet->getResonantPeriod()) {
             std::cout << "Planet's rotation is in a resonant spin lock with the star.\n";
         }
-        std::cout << std::format("   Distance from primary star:\t{} AU\n", the_planet->getA());
-        std::cout << std::format("   Eccentricity of orbit:\t{}\n", the_planet->getE());
-        std::cout << std::format("   Length of year:\t\t{} days\n", the_planet->getOrbPeriod());
-        std::cout << std::format("   Length of day:\t\t{} hours\n", the_planet->getDay());
-        std::cout << std::format("   Mass:\t\t\t{} Earth masses\n", the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES);
+        std::cout << std::format("   Distance from primary star:\t{} AU\n", the_planet->getA())
+        << std::format("   Eccentricity of orbit:\t{}\n", the_planet->getE())
+        << std::format("   Length of year:\t\t{} days\n", the_planet->getOrbPeriod())
+        << std::format("   Length of day:\t\t{} hours\n", the_planet->getDay())
+        << std::format("   Mass:\t\t\t{} Earth masses\n", the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES);
         if (!is_gas_planet(the_planet)) {
-            std::cout << std::format("   Surface gravity:\t\t{} Earth gees\n", the_planet->getSurfGrav());
-            std::cout << std::format("   Surface pressure:\t\t{} Earth atmospheres",
-                                     the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS);
+            std::cout << std::format("   Surface gravity:\t\t{} Earth gees\n", the_planet->getSurfGrav())
+            << std::format("   Surface pressure:\t\t{} Earth atmospheres", the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS);
             if (the_planet->getGreenhouseEffect() &&
                 the_planet->getSurfPressure() > 0.0) {
                 std::cout << " GREENHOUSE EFFECT";
             }
-            std::cout << '\n';
-            std::cout << std::format("   Surface temperature:\t\t{} degrees Celcius\n",
-                                     the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER);
-            std::cout << std::format("   Boiling point of water:\t{} degrees Celcius\n",
-                                     the_planet->getBoilPoint() - FREEZING_POINT_OF_WATER);
-            std::cout << std::format("   Hydrosphere percentage:\t{}%\n",
-                                     the_planet->getHydrosphere() * 100.0);
-            std::cout << std::format("   Cloud cover percentage:\t{}%\n",
-                                     the_planet->getCloudCover() * 100.0);
-            std::cout << std::format("   Ice cover percentage:\t{}%\n",
-                                     the_planet->getIceCover() * 100.0);
+            std::cout << '\n'
+            << std::format("   Surface temperature:\t\t{} degrees Celcius\n", the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER)
+            << std::format("   Boiling point of water:\t{} degrees Celcius\n", the_planet->getBoilPoint() - FREEZING_POINT_OF_WATER)
+            << std::format("   Hydrosphere percentage:\t{}%\n", the_planet->getHydrosphere() * 100.0)
+            << std::format("   Cloud cover percentage:\t{}%\n", the_planet->getCloudCover() * 100.0)
+            << std::format("   Ice cover percentage:\t{}%\n", the_planet->getIceCover() * 100.0);
         }
-        std::cout << std::format("   Equatorial radius:\t\t{} Km\n", the_planet->getRadius());
-        std::cout << std::format("   Density:\t\t\t{} grams/cc\n", the_planet->getDensity());
-        std::cout << std::format("   Escape Velocity:\t\t{} Km/sec\n",
-                                 the_planet->getEscVelocity() / CM_PER_KM);
-        std::cout << std::format("   Molecular weight retained:\t{} and above\n",
-                                 the_planet->getMolecWeight());
-        std::cout << std::format("   Surface acceleration:\t{} cm/sec2\n",
-                                 the_planet->getSurfAccel());
-        std::cout << std::format("   Axial tilt:\t\t\t{} degrees\n", the_planet->getAxialTilt());
-        std::cout << std::format("   Planetary albedo:\t\t{}\n", the_planet->getAlbedo());
-        std::cout << "\n\n";
+        std::cout << std::format("   Equatorial radius:\t\t{} Km\n", the_planet->getRadius())
+        << std::format("   Density:\t\t\t{} grams/cc\n", the_planet->getDensity())
+        << std::format("   Escape Velocity:\t\t{} Km/sec\n", the_planet->getEscVelocity() / CM_PER_KM)
+        << std::format("   Molecular weight retained:\t{} and above\n", the_planet->getMolecWeight())
+        << std::format("   Surface acceleration:\t{} cm/sec2\n", the_planet->getSurfAccel())
+        << std::format("   Axial tilt:\t\t\t{} degrees\n", the_planet->getAxialTilt())
+        << std::format("   Planetary albedo:\t\t{}\n", the_planet->getAlbedo())
+        << "\n\n";
     }
 }
 
@@ -299,101 +290,76 @@ void jsonDescribeSystem(fstream& the_file, planet* innermost_planet,
  * @param id 
  * @param ss 
  */
-void csv_row(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
-             string id, stringstream& ss) {
+void csv_row(std::fstream& the_file, planet* the_planet, bool do_gases, bool is_moon, 
+             const std::string& id, std::stringstream& ss) {
     do_gases = (flags_arg_clone & fDoGases) != 0;
-  string atmosphere;
-  long double ipp;
-  int index;
-  bool poisonous;
 
-  if (do_gases) {
-    ss.str();
-    for (int i = 0; i < the_planet->getNumGases(); i++) {
-      index = gases.count();
-      poisonous = false;
+    std::string atmosphere = generate_atmosphere_string(the_planet, do_gases);
 
-      for (int n = 0; n < gases.count(); n++) {
-        if (gases[n].getNum() == the_planet->getGas(i).getNum()) {
-          index = n;
-          break;
-        }
-      }
+    using variant_type = std::variant<double, long double, int, bool, std::string>;
+    std::vector<variant_type> planet_data = {
+        id,
+        is_moon ? the_planet->getMoonA() : the_planet->getA(),
+        is_moon ? the_planet->getMoonE() : the_planet->getE(),
+        the_planet->getInclination(), the_planet->getAscendingNode(), the_planet->getLongitudeOfPericenter(),
+        the_planet->getMeanLongitude(), the_planet->getAxialTilt(), the_planet->getImf(), the_planet->getRmf(),
+        the_planet->getCmf(), the_planet->getMass(), the_planet->getGasGiant(), the_planet->getDustMass(),
+        the_planet->getGasMass(), the_planet->getCoreRadius(), the_planet->getRadius(), the_planet->getOrbitZone(),
+        the_planet->getDensity(), the_planet->getOrbPeriod(), the_planet->getDay(), the_planet->getResonantPeriod(),
+        the_planet->getEscVelocity(), the_planet->getSurfAccel(), the_planet->getSurfGrav(), the_planet->getRmsVelocity(),
+        the_planet->getMolecWeight(), the_planet->getVolatileGasInventory(), the_planet->getSurfPressure(),
+        the_planet->getGreenhouseEffect(), the_planet->getBoilPoint(), the_planet->getAlbedo(),
+        the_planet->getExosphericTemp(), the_planet->getEstimatedTemp(), the_planet->getEstimatedTerrTemp(),
+        the_planet->getSurfTemp(), the_planet->getGreenhsRise(), the_planet->getHighTemp(), the_planet->getLowTemp(),
+        the_planet->getMaxTemp(), the_planet->getMinTemp(), the_planet->getHydrosphere(), the_planet->getCloudCover(),
+        the_planet->getIceCover(), atmosphere, type_string(the_planet), the_planet->getMinorMoons()
+    };
 
-      ipp = inspired_partial_pressure(the_planet->getSurfPressure(),
-                                      the_planet->getGas(i).getSurfPressure());
-      if (ipp < 0.0) {
-        ipp = 0.0;
-      }
-      if (ipp > gases[index].getMaxIpp()) {
-        poisonous = true;
-      }
-      ss << gases[index].getSymbol() << " "
-         << toString(100.0 * (the_planet->getGas(i).getSurfPressure() /
-                              the_planet->getSurfPressure()))
-         << " " << toString(the_planet->getGas(i).getSurfPressure()) << " ("
-         << toString(ipp) << ")";
-      if (poisonous) {
-        ss << " poisonous";
-      }
-      ss << ";";
+    std::string row;
+    for (const auto& data : planet_data) {
+        row += std::visit([](const auto& value) {
+            using T = std::decay_t<decltype(value)>;
+            if constexpr (std::is_same_v<T, std::string>) {
+                return std::format("'{}'", value);
+            } else if constexpr (std::is_floating_point_v<T>) {
+                return std::format("{:.6f}", value);
+            } else {
+                return std::format("{}", value);
+            }
+        }, data);
+        row += ", ";
     }
-    atmosphere = ss.str();
-    ss.str("");
-  }
 
-  the_file << "'" << id << "', ";
-  if (!is_moon) {
-    the_file << toString(the_planet->getA()) << ", "
-             << toString(the_planet->getE());
-  } else {
-    the_file << toString(the_planet->getMoonA()) << ", "
-             << toString(the_planet->getMoonE());
-  }
-  the_file << ", " << toString(the_planet->getInclination()) << ", "
-           << toString(the_planet->getAscendingNode()) << ", "
-           << toString(the_planet->getLongitudeOfPericenter()) << ", "
-           << toString(the_planet->getMeanLongitude()) << ", "
-           << toString(the_planet->getAxialTilt()) << ", "
-           << toString(the_planet->getImf()) << ", "
-           << toString(the_planet->getRmf()) << ", "
-           << toString(the_planet->getCmf()) << ", "
-           << toString(the_planet->getMass()) << ", "
-           << the_planet->getGasGiant() << ", "
-           << toString(the_planet->getDustMass()) << ", "
-           << toString(the_planet->getGasMass()) << ", "
-           << toString(the_planet->getCoreRadius()) << ", "
-           << toString(the_planet->getRadius()) << ", "
-           << the_planet->getOrbitZone() << ", "
-           << toString(the_planet->getDensity()) << ", "
-           << toString(the_planet->getOrbPeriod()) << ", "
-           << toString(the_planet->getDay()) << ", "
-           << the_planet->getResonantPeriod() << ", "
-           << toString(the_planet->getEscVelocity()) << ", "
-           << toString(the_planet->getSurfAccel()) << ", "
-           << toString(the_planet->getSurfGrav()) << ", "
-           << toString(the_planet->getRmsVelocity()) << ", "
-           << toString(the_planet->getMolecWeight()) << ", "
-           << toString(the_planet->getVolatileGasInventory()) << ", "
-           << toString(the_planet->getSurfPressure()) << ", "
-           << toString(the_planet->getGreenhouseEffect()) << ", "
-           << toString(the_planet->getBoilPoint()) << ", "
-           << toString(the_planet->getAlbedo()) << ", "
-           << toString(the_planet->getExosphericTemp()) << ", "
-           << toString(the_planet->getEstimatedTemp()) << ", "
-           << toString(the_planet->getEstimatedTerrTemp()) << ", "
-           << toString(the_planet->getSurfTemp()) << ", "
-           << toString(the_planet->getGreenhsRise()) << ", "
-           << toString(the_planet->getHighTemp()) << ", "
-           << toString(the_planet->getLowTemp()) << ", "
-           << toString(the_planet->getMaxTemp()) << ", "
-           << toString(the_planet->getMinTemp()) << ", "
-           << toString(the_planet->getHydrosphere()) << ", "
-           << toString(the_planet->getCloudCover()) << ", "
-           << toString(the_planet->getIceCover()) << ", '" << atmosphere
-           << "', '" << type_string(the_planet) << "', "
-           << the_planet->getMinorMoons() << "\n";
-  ZoneScoped;  
+    // Remove the trailing ", " and add a newline
+    row.pop_back();
+    row.pop_back();
+    row += '\n';
+
+    the_file << row;
+
+    ZoneScoped;
+}
+
+std::string generate_atmosphere_string(planet* the_planet, bool do_gases) {
+    if (!do_gases) return "";
+
+    std::string atmosphere;
+    for (int i = 0; i < the_planet->getNumGases(); i++) {
+        auto gas = the_planet->getGas(i);
+        auto gas_info = gases[find_gas_index(gas.getNum())];
+
+        long double ipp = std::max(0.0L, inspired_partial_pressure(the_planet->getSurfPressure(), gas.getSurfPressure()));
+        bool poisonous = ipp > gas_info.getMaxIpp();
+
+        atmosphere += std::format("{} {:.2f} {:.2f} ({:.2f}){};",
+            gas_info.getSymbol(),
+            100.0 * (gas.getSurfPressure() / the_planet->getSurfPressure()),
+            gas.getSurfPressure(),
+            ipp,
+            poisonous ? " poisonous" : "");
+    }
+
+    return atmosphere;
 }
 
 void jsonRow(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
