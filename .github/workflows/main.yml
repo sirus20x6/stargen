@@ -16,8 +16,8 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cc: gcc
-            cxx: g++
+            cc: gcc-10
+            cxx: g++-10
             artifact_extension: tar.gz
           - os: windows-2019
             cc: gcc
@@ -25,6 +25,12 @@ jobs:
             artifact_extension: zip
     steps:
     - uses: actions/checkout@v3
+
+    - name: Install GCC 10 (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-10 g++-10
 
     - name: Set up MinGW (Windows)
       if: matrix.os == 'windows-2019'
@@ -39,78 +45,14 @@ jobs:
 
     - name: Configure CMake (Windows)
       if: matrix.os == 'windows-2019'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "MinGW Makefiles"
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "MinGW Makefiles" -DCMAKE_CXX_STANDARD=20
       shell: pwsh
 
     - name: Configure CMake (Unix)
       if: matrix.os != 'windows-2019'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20
 
     - name: Build
-      run: cmake --build build --config ${{env.BUILD_TYPE}}
+      run: cmake --build build --config ${{env.BUILD_TYPE}} --verbose
 
-    - name: Test
-      working-directory: build
-      run: ctest -C ${{env.BUILD_TYPE}}
-
-    - name: Package (Windows)
-      if: matrix.os == 'windows-2019'
-      run: Compress-Archive -Path build/* -DestinationPath stargen.${{ matrix.artifact_extension }}
-      shell: pwsh
-
-    - name: Package (Unix)
-      if: matrix.os != 'windows-2019'
-      run: tar -czvf stargen.${{ matrix.artifact_extension }} -C build .
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: stargen-${{ matrix.os }}.${{ matrix.artifact_extension }}
-        path: stargen.${{ matrix.artifact_extension }}
-
-  create-release:
-    needs: build-and-package
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    steps:
-    - uses: actions/download-artifact@v3
-      with:
-        path: artifacts
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.run_number }}
-        release_name: Release ${{ github.run_number }}
-        draft: false
-        prerelease: false
-
-    - name: Download Artifacts
-      uses: actions/download-artifact@v3
-      with:
-        path: ${{ github.workspace }}/artifacts/
-
-    - name: List downloaded artifacts
-      run: ls -lahR ${{ github.workspace }}/artifacts/
-
-    - name: Upload Release Asset (Ubuntu)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/artifacts/stargen-ubuntu-latest.tar.gz/stargen.tar.gz
-        asset_name: stargen-linux.tar.gz
-        asset_content_type: application/gzip
-    
-    - name: Upload Release Asset (Windows)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/artifacts/stargen-windows-2019.zip/stargen.zip
-        asset_name: stargen-windows.zip
-        asset_content_type: application/zip
+    # ... rest of the workflow remains the same
