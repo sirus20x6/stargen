@@ -49,9 +49,29 @@ jobs:
         echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
         echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
 
+    - name: Debug Environment
+      run: |
+        echo "Operating System: ${{ runner.os }}"
+        echo "Chocolatey version:"
+        choco --version
+        echo "MinGW installation:"
+        choco list --local-only | findstr mingw
+        echo "Directory structure:"
+        dir C:\ProgramData\chocolatey\lib\mingw /s
+        echo "Environment variables:"
+        env
+      shell: pwsh
+
     - name: List installed MinGW libraries
       if: matrix.os == 'windows-latest'
-      run: dir "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\x86_64-w64-mingw32\lib"
+      run: |
+        $mingwPath = "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\x86_64-w64-mingw32\lib"
+        if (Test-Path $mingwPath) {
+            dir $mingwPath
+        } else {
+            Write-Error "MinGW lib path not found: $mingwPath"
+            dir C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64 /s
+        }
       shell: pwsh
 
     - name: Configure CMake (MinGW Windows)
