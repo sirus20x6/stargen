@@ -49,6 +49,11 @@ jobs:
         echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
         echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
 
+    - name: List installed MinGW libraries
+      if: matrix.os == 'windows-latest'
+      run: dir "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\x86_64-w64-mingw32\lib"
+      shell: pwsh
+
     - name: Configure CMake (MinGW Windows)
       if: matrix.os == 'windows-latest' && matrix.compiler != 'msvc'
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20 -A x64
