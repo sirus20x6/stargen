@@ -51,12 +51,12 @@ jobs:
 
     - name: Debug Environment
       run: |
-        echo "Operating System: ${{ runner.os }}"
-        echo "Chocolatey version:"
+        Write-Output "Operating System: ${{ runner.os }}"
+        Write-Output "Chocolatey version:"
         choco --version
-        echo "MinGW installation:"
-        choco list --local-only | findstr mingw
-        echo "Searching for MinGW installation:"
+        Write-Output "MinGW installation:"
+        choco list --local-only | Select-String mingw
+        Write-Output "Searching for MinGW installation:"
         $possiblePaths = @(
           "C:\ProgramData\chocolatey\lib\mingw",
           "C:\ProgramData\chocolatey\lib\mingw64",
@@ -65,20 +65,20 @@ jobs:
         )
         foreach ($path in $possiblePaths) {
           if (Test-Path $path) {
-            echo "Found MinGW at: $path"
-            dir $path /s
+            Write-Output "Found MinGW at: $path"
+            Get-ChildItem $path -Recurse | Select-Object FullName | ForEach-Object { Write-Output $_.FullName }
           } else {
-            echo "Not found: $path"
+            Write-Output "Not found: $path"
           }
         }
-        echo "Environment variables:"
+        Write-Output "Environment variables:"
         Get-ChildItem env:
-        echo "System PATH:"
+        Write-Output "System PATH:"
         $env:PATH -split ';'
-        echo "Which gcc:"
-        where.exe gcc
-        echo "GCC version:"
-        gcc --version
+        Write-Output "Which gcc:"
+        Get-Command gcc -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
+        Write-Output "GCC version:"
+        & gcc --version
       shell: pwsh
 
     - name: List installed MinGW libraries
@@ -93,14 +93,14 @@ jobs:
         $found = $false
         foreach ($path in $possiblePaths) {
           if (Test-Path $path) {
-            echo "Found MinGW libraries at: $path"
-            dir $path
+            Write-Output "Found MinGW libraries at: $path"
+            Get-ChildItem $path | ForEach-Object { Write-Output $_.Name }
             $found = $true
             break
           }
         }
         if (-not $found) {
-          echo "MinGW libraries not found in any of the expected locations"
+          Write-Output "MinGW libraries not found in any of the expected locations"
           exit 1
         }
       shell: pwsh
