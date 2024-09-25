@@ -1,0 +1,133 @@
+name: Windows CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build-and-package:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - compiler: mingw
+            cc: gcc
+            cxx: g++
+            mingw_version: 13.1.0
+          - compiler: msvc
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up MinGW
+      if: matrix.compiler == 'mingw'
+      uses: egor-tensin/setup-mingw@v2.2.0
+      with:
+        version: ${{ matrix.mingw_version }}
+
+    - name: Set up environment variables
+      if: matrix.compiler == 'mingw'
+      run: |
+        echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
+        echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
+
+    - name: Debug Environment
+      run: |
+        Write-Output "Operating System: ${{ runner.os }}"
+        Write-Output "Compiler: ${{ matrix.compiler }}"
+        if (${{ matrix.compiler == 'mingw' }}) {
+          Write-Output "MinGW version: ${{ matrix.mingw_version }}"
+          Write-Output "Searching for MinGW installation:"
+          $possiblePaths = @(
+            "C:\ProgramData\chocolatey\lib\mingw",
+            "C:\ProgramData\chocolatey\lib\mingw64",
+            "C:\tools\mingw64",
+            "C:\msys64\mingw64"
+          )
+          foreach ($path in $possiblePaths) {
+            if (Test-Path $path) {
+              Write-Output "Found MinGW at: $path"
+              Get-ChildItem $path -Recurse | Select-Object FullName | ForEach-Object { Write-Output $_.FullName }
+            } else {
+              Write-Output "Not found: $path"
+            }
+          }
+          Write-Output "GCC version:"
+          & gcc --version
+        }
+        Write-Output "Environment variables:"
+        Get-ChildItem env:
+        Write-Output "System PATH:"
+        $env:PATH -split ';'
+      shell: pwsh
+
+    - name: Configure CMake (MinGW)
+      if: matrix.compiler == 'mingw'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20 -G "MinGW Makefiles"
+      shell: pwsh
+
+    - name: Configure CMake (MSVC)
+      if: matrix.compiler == 'msvc'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20
+      shell: pwsh
+
+    - name: Build
+      run: cmake --build build --config ${{env.BUILD_TYPE}} --verbose
+
+    - name: Test
+      working-directory: build
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: Package
+      run: Compress-Archive -Path build/* -DestinationPath stargen.zip
+      shell: pwsh
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: stargen-windows-${{ matrix.compiler }}.zip
+        path: stargen.zip
+
+  create-release:
+    needs: build-and-package
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+    - uses: actions/download-artifact@v3
+      with:
+        path: artifacts
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset (Windows MinGW)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/stargen-windows-mingw.zip/stargen.zip
+        asset_name: stargen-windows-mingw.zip
+        asset_content_type: application/zip
+
+    - name: Upload Release Asset (Windows MSVC)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/stargen-windows-msvc.zip/stargen.zip
+        asset_name: stargen-windows-msvc.zip
+        asset_content_type: application/zip

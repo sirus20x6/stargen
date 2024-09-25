@@ -1,0 +1,76 @@
+name: Ubuntu CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install GCC 13
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get install -y gcc-13 g++-13
+
+    - name: Set up environment variables
+      run: |
+        echo "CC=gcc-13" >> $GITHUB_ENV
+        echo "CXX=g++-13" >> $GITHUB_ENV
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20
+
+    - name: Build
+      run: cmake --build build --config ${{env.BUILD_TYPE}} --verbose
+
+    - name: Test
+      working-directory: build
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: Package
+      run: tar -czvf stargen.tar.gz -C build .
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: stargen-ubuntu-latest.tar.gz
+        path: stargen.tar.gz
+
+  create-release:
+    needs: build-and-package
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: stargen-ubuntu-latest.tar.gz
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./stargen.tar.gz
+        asset_name: stargen-linux.tar.gz
+        asset_content_type: application/gzip
