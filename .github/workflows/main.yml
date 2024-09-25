@@ -16,8 +16,8 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cc: gcc-10
-            cxx: g++-10
+            cc: gcc-11
+            cxx: g++-11
             artifact_extension: tar.gz
           - os: windows-2019
             cc: gcc
@@ -26,11 +26,12 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install GCC 10 (Ubuntu)
+    - name: Install GCC 11 (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
-        sudo apt-get install -y gcc-10 g++-10
+        sudo apt-get install -y gcc-11 g++-11
 
     - name: Set up MinGW (Windows)
       if: matrix.os == 'windows-2019'
