@@ -33,10 +33,10 @@ jobs:
         key: mingw-${{ matrix.mingw_version }}
         restore-keys: mingw-
 
-    # MinGW Setup with increased timeout for installation
+    # MinGW Setup with a 20-minute timeout for installation
     - name: Install MinGW
       if: matrix.compiler == 'mingw'
-      timeout-minutes: 20  # Increase timeout to avoid premature cancellation
+      timeout-minutes: 20  # Set the timeout to 20 minutes
       run: choco install mingw --version ${{ matrix.mingw_version }}
       shell: cmd
 
