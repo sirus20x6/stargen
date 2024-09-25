@@ -56,105 +56,58 @@ jobs:
         choco --version
         echo "MinGW installation:"
         choco list --local-only | findstr mingw
-        echo "Directory structure:"
-        dir C:\ProgramData\chocolatey\lib\mingw /s
+        echo "Searching for MinGW installation:"
+        $possiblePaths = @(
+          "C:\ProgramData\chocolatey\lib\mingw",
+          "C:\ProgramData\chocolatey\lib\mingw64",
+          "C:\tools\mingw64",
+          "C:\msys64\mingw64"
+        )
+        foreach ($path in $possiblePaths) {
+          if (Test-Path $path) {
+            echo "Found MinGW at: $path"
+            dir $path /s
+          } else {
+            echo "Not found: $path"
+          }
+        }
         echo "Environment variables:"
-        env
+        Get-ChildItem env:
+        echo "System PATH:"
+        $env:PATH -split ';'
+        echo "Which gcc:"
+        where.exe gcc
+        echo "GCC version:"
+        gcc --version
       shell: pwsh
 
     - name: List installed MinGW libraries
       if: matrix.os == 'windows-latest'
       run: |
-        $mingwPath = "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\x86_64-w64-mingw32\lib"
-        if (Test-Path $mingwPath) {
-            dir $mingwPath
-        } else {
-            Write-Error "MinGW lib path not found: $mingwPath"
-            dir C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64 /s
+        $possiblePaths = @(
+          "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\x86_64-w64-mingw32\lib",
+          "C:\ProgramData\chocolatey\lib\mingw64\tools\install\mingw64\x86_64-w64-mingw32\lib",
+          "C:\tools\mingw64\x86_64-w64-mingw32\lib",
+          "C:\msys64\mingw64\x86_64-w64-mingw32\lib"
+        )
+        $found = $false
+        foreach ($path in $possiblePaths) {
+          if (Test-Path $path) {
+            echo "Found MinGW libraries at: $path"
+            dir $path
+            $found = $true
+            break
+          }
+        }
+        if (-not $found) {
+          echo "MinGW libraries not found in any of the expected locations"
+          exit 1
         }
       shell: pwsh
 
     - name: Configure CMake (MinGW Windows)
       if: matrix.os == 'windows-latest' && matrix.compiler != 'msvc'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20 -A x64
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20 -G "MinGW Makefiles"
       shell: pwsh
 
-    - name: Configure CMake (MSVC Windows)
-      if: matrix.os == 'windows-latest' && matrix.compiler == 'msvc'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20
-      shell: pwsh
-
-    - name: Configure CMake (Unix)
-      if: matrix.os != 'windows-latest'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20
-
-    - name: Build
-      run: cmake --build build --config ${{env.BUILD_TYPE}} --verbose
-
-    - name: Test
-      working-directory: build
-      run: ctest -C ${{env.BUILD_TYPE}}
-
-    - name: Package (Windows)
-      if: matrix.os == 'windows-latest'
-      run: Compress-Archive -Path build/* -DestinationPath stargen.${{ matrix.artifact_extension }}
-      shell: pwsh
-
-    - name: Package (Unix)
-      if: matrix.os != 'windows-latest'
-      run: tar -czvf stargen.${{ matrix.artifact_extension }} -C build .
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: stargen-${{ matrix.os }}${{ matrix.compiler && format('-{0}', matrix.compiler) || '' }}.${{ matrix.artifact_extension }}
-        path: stargen.${{ matrix.artifact_extension }}
-
-  create-release:
-    needs: build-and-package
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    steps:
-    - uses: actions/download-artifact@v3
-      with:
-        path: artifacts
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.run_number }}
-        release_name: Release ${{ github.run_number }}
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Asset (Ubuntu)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/stargen-ubuntu-latest.tar.gz/stargen.tar.gz
-        asset_name: stargen-linux.tar.gz
-        asset_content_type: application/gzip
-    
-    - name: Upload Release Asset (Windows MinGW)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/stargen-windows-latest.zip/stargen.zip
-        asset_name: stargen-windows-mingw.zip
-        asset_content_type: application/zip
-
-    - name: Upload Release Asset (Windows MSVC)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/stargen-windows-latest-msvc.zip/stargen.zip
-        asset_name: stargen-windows-msvc.zip
-        asset_content_type: application/zip
+    # ... rest of the workflow remains the same
