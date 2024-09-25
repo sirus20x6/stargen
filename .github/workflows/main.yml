@@ -51,7 +51,7 @@ jobs:
 
     - name: Configure CMake (MinGW Windows)
       if: matrix.os == 'windows-latest' && matrix.compiler != 'msvc'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "MinGW Makefiles" -DCMAKE_CXX_STANDARD=20
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20 -A x64
       shell: pwsh
 
     - name: Configure CMake (MSVC Windows)
