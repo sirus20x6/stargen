@@ -79,5 +79,11 @@ if(WIN32)
   target_link_libraries(stargen PRIVATE Dbghelp Ws2_32)
 endif()
 
-install(TARGETS stargen RUNTIME DESTINATION bin)
-install(DIRECTORY html ref DESTINATION bin)
+# Set the binary output directory to the source directory
+set_target_properties(stargen PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+)
+
+# Remove install commands since the binary will be in the source directory
+# install(TARGETS stargen RUNTIME DESTINATION bin)
+# install(DIRECTORY html ref DESTINATION bin)

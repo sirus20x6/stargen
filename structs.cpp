@@ -10,6 +10,8 @@
 #include "utils.h"      // for quicksort, fix_inclination, my_strtoupper
 
 using namespace std;
+int dust::activeCount = 0;
+int dust::peakCount = 0;
 
 /**
  * @brief Construct a new star::star object
@@ -1640,23 +1642,6 @@ auto planet::operator==(planet& right) -> bool {
   }
   return false;
 }
-
-dust::dust() : innerEdge(0), outerEdge(0), dustPresent(true), gasPresent(true), next_band(NULL) {
-  
-  
-  
-  
-  
-}
-
-dust::~dust() {
-  innerEdge = 0;
-  outerEdge = 0;
-  dustPresent = false;
-  gasPresent = false;
-  // next_band = NULL;
-}
-
 auto dust::getDustPresent() -> bool { return dustPresent; }
 
 auto dust::getGasPresent() -> bool { return gasPresent; }
