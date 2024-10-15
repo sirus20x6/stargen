@@ -12,72 +12,31 @@ env:
 jobs:
   build-and-package-windows:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        include:
-          - compiler: mingw
-            artifact_extension: zip
-            mingw_version: 13.1.0
-          - compiler: clang
-            artifact_extension: zip
 
     steps:
     - uses: actions/checkout@v3
 
-    # Cache MinGW installation to speed up repeated builds
-    - name: Cache MinGW Package
-      if: matrix.compiler == 'mingw'
-      uses: actions/cache@v3
-      with:
-        path: C:\ProgramData\chocolatey\lib\mingw
-        key: mingw-${{ matrix.mingw_version }}
-        restore-keys: mingw-
-
-    # MinGW Setup with a 20-minute timeout for installation
-    - name: Install MinGW
-      if: matrix.compiler == 'mingw'
-      timeout-minutes: 20
-      shell: cmd
-      run: choco install mingw --version ${{ matrix.mingw_version }} -y
-
-    - name: Set up MinGW environment variables
-      if: matrix.compiler == 'mingw'
-      shell: cmd
-      run: |
-        echo CC=gcc>>%GITHUB_ENV%
-        echo CXX=g++>>%GITHUB_ENV%
-
-    # Install LLVM for Clang
+    # Install LLVM (Clang)
     - name: Install LLVM
-      if: matrix.compiler == 'clang'
       shell: cmd
       run: choco install llvm -y
 
     - name: Add LLVM to PATH
-      if: matrix.compiler == 'clang'
       shell: pwsh
       run: |
         echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Check Clang Version
-      if: matrix.compiler == 'clang'
       shell: pwsh
       run: clang++ --version
 
-    # Configure CMake for Clang
-    - name: Configure CMake for Clang
-      if: matrix.compiler == 'clang'
+    # Configure CMake to use Clang
+    - name: Configure CMake
       shell: pwsh
       run: |
         cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_STANDARD=20 -A x64
 
-    - name: Configure CMake for MinGW
-      if: matrix.compiler == 'mingw'
-      shell: pwsh
-      run: |
-        cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "MinGW Makefiles" -DCMAKE_CXX_STANDARD=20
-
-    # Build
+    # Build the project
     - name: Build Project
       shell: pwsh
       run: cmake --build build --config ${{ env.BUILD_TYPE }} --verbose
@@ -91,10 +50,10 @@ jobs:
     # Package
     - name: Package the Build (Windows)
       shell: pwsh
-      run: Compress-Archive -Path build\* -DestinationPath stargen.${{ matrix.artifact_extension }}
+      run: Compress-Archive -Path build\* -DestinationPath stargen.zip
 
     # Upload Artifact
     - uses: actions/upload-artifact@v3
       with:
-        name: stargen-${{ matrix.compiler }}.${{ matrix.artifact_extension }}
-        path: stargen.${{ matrix.artifact_extension }}
+        name: stargen-clang.zip
+        path: stargen.zip
