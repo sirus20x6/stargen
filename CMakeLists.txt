@@ -11,12 +11,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON) 
 
-# Add this block to include /bigobj when compiling with MSVC
-if (MSVC)
-    add_compile_options(/bigobj)
-    add_compile_options(/std:c++20)
-endif()
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
 cmake_host_system_information(RESULT logical QUERY NUMBER_OF_LOGICAL_CORES)
