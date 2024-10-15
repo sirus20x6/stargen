@@ -9,7 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF) # This line ensures -std=c++20 rather than -std=gnu++20
+set(CMAKE_CXX_EXTENSIONS ON) 
 
 # Add this block to include /bigobj when compiling with MSVC
 if (MSVC)
@@ -79,11 +79,6 @@ target_include_directories(stargen PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
 # Link libraries
 target_link_libraries(stargen PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(stargen PRIVATE m)
-
-# Windows-specific libraries
-if(WIN32)
-  target_link_libraries(stargen PRIVATE Dbghelp Ws2_32)
-endif()
 
 # Set the binary output directory to the source directory
 set_target_properties(stargen PROPERTIES
