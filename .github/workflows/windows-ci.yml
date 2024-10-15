@@ -40,9 +40,7 @@ jobs:
     - name: Configure CMake
       shell: pwsh
       run: |
-        cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} ^
-          -DCMAKE_C_COMPILER=clang ^
-          -DCMAKE_CXX_COMPILER=clang++
+        cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 
     # Build the project
     - name: Build Project
