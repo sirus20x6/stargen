@@ -9,7 +9,6 @@
 #include "structs.h"  // for planet, dust, gen, sun
 #include "utils.h"    // for toString, random_eccentricity, random_number
 
-DustPool dustPool;
 
 /**
  * @brief Set Initial Conditions
@@ -22,7 +21,7 @@ void accrete::set_initial_conditions(long double inner_limit_of_dust,
   planet_head = nullptr;
   hist_head = nullptr;
 
-  dust_head = dustPool.acquireDust();
+  dust_head = new dust();
   dust_head->next_band = nullptr;
   dust_head->setOuterEdge(outer_limit_of_dust);
   dust_head->setInnerEdge(inner_limit_of_dust);
@@ -167,7 +166,7 @@ void accrete::update_dust_lanes(long double min, long double max, long double ma
   node1 = dust_head;
   while (node1 != nullptr) {
     if (node1->getInnerEdge() < min && node1->getOuterEdge() > max) {
-      node2 = dustPool.acquireDust();
+      node2 = new dust();
       node2->setInnerEdge(min);
       node2->setOuterEdge(max);
       if (node1->getGasPresent()) {
@@ -176,7 +175,7 @@ void accrete::update_dust_lanes(long double min, long double max, long double ma
         node2->setGasPresent(false);
       }
       node2->setDustPresent(false);
-      node3 = dustPool.acquireDust();
+      node3 = new dust();
       node3->setInnerEdge(max);
       node3->setOuterEdge(node1->getOuterEdge());
       node3->setGasPresent(node1->getGasPresent());
@@ -188,7 +187,7 @@ void accrete::update_dust_lanes(long double min, long double max, long double ma
       node1 = node3->next_band;
     } else {
       if (node1->getInnerEdge() < max && node1->getOuterEdge() > max) {
-        node2 = dustPool.acquireDust();
+        node2 = new dust();
         node2->next_band = node1->next_band;
         node2->setDustPresent(node1->getDustPresent());
         node2->setGasPresent(node1->getGasPresent());
@@ -205,7 +204,7 @@ void accrete::update_dust_lanes(long double min, long double max, long double ma
         node1 = node2->next_band;
       } else {
         if (node1->getInnerEdge() < min && node1->getOuterEdge() > min) {
-          node2 = dustPool.acquireDust();
+          node2 = new dust();
           node2->next_band = node1->next_band;
           node2->setDustPresent(false);
           if (node1->getGasPresent()) {
@@ -962,8 +961,7 @@ void accrete::free_generations() {
     next = node->next;
 
     if (node->dusts != nullptr) {
-      //free_dust(node->dusts);
-    dustPool.releaseDust(node->dusts);
+      free_dust(node->dusts);
     }
 
     if (node->planets != nullptr) {

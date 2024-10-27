@@ -5,8 +5,6 @@
 #include <iosfwd>  // for ostream, std
 #include <string>  // for string, basic_string
 #include <vector>  // for vector
-#include <iostream>
-#include <memory>
 class ChemTable;  // lines 496-496
 class Chemical;  // lines 427-427
 class catalog;  // lines 395-395
@@ -311,40 +309,15 @@ class planet {
 };
 
 class dust {
-private:
-    long double innerEdge{0};
-    long double outerEdge{0};
-    bool dustPresent{true};
-    bool gasPresent{true};
-    bool inUse{false};
+ private:
+  long double innerEdge{0};
+  long double outerEdge{0};
+  bool dustPresent{true};
+  bool gasPresent{true};
 
-    static int activeCount;
-    static int peakCount;
-
-public:
-    dust() = default;
-
-    void reset() {
-        innerEdge = 0;
-        outerEdge = 0;
-        dustPresent = true;
-        gasPresent = true;
-        inUse = false;
-    }
-
-    static void resetCounts() {
-        activeCount = 0;
-        peakCount = 0;
-        std::cout << "Dust counts reset." << std::endl;
-    }
-
-    static int getActiveCount() { return activeCount; }
-    static int getPeakCount() { return peakCount; }
-
-    friend class DustPool;
-
-// Initialize static members
-
+ public:
+  dust();
+  ~dust();
   void setInnerEdge(long double);
   auto getInnerEdge() -> long double;
   void setOuterEdge(long double);
@@ -355,53 +328,6 @@ public:
   auto getGasPresent() -> bool;
   dust *next_band;
 };
-
-class DustPool {
-private:
-    static const int POOL_SIZE = 20;  // Adjust based on your maximum observed usage
-    std::vector<std::unique_ptr<dust>> pool;
-
-public:
-    DustPool() {
-        for (int i = 0; i < POOL_SIZE; ++i) {
-            pool.push_back(std::make_unique<dust>());
-        }
-        std::cout << "Dust pool initialized with " << POOL_SIZE << " objects." << std::endl;
-    }
-
-    dust* acquireDust() {
-        for (auto& dustPtr : pool) {
-            if (!dustPtr->inUse) {
-                dustPtr->inUse = true;
-                dust::activeCount++;
-                if (dust::activeCount > dust::peakCount) {
-                    dust::peakCount = dust::activeCount;
-                }
-                std::cout << "Dust object acquired. Active count: " << dust::activeCount 
-                          << ", Peak count: " << dust::peakCount << std::endl;
-                return dustPtr.get();
-            }
-        }
-        std::cerr << "Warning: Dust pool exhausted!" << std::endl;
-        return nullptr;
-    }
-
-    void releaseDust(dust* d) {
-        if (d && d->inUse) {
-            d->reset();
-            d->inUse = false;
-            dust::activeCount--;
-            std::cout << "Dust object released. Active count: " << dust::activeCount << std::endl;
-        }
-    }
-
-    ~DustPool() {
-        std::cout << "Dust pool destroyed. Final active count: " << dust::activeCount 
-                  << ", Peak count: " << dust::peakCount << std::endl;
-    }
-};
-
-
 
 class star;
 
