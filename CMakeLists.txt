@@ -60,6 +60,7 @@ add_executable(stargen
     star_trek.cpp
     structs.cpp
     utils.cpp
+    PerformanceMonitor.cpp
     _deps/tracy-src/public/TracyClient.cpp
 )
 
