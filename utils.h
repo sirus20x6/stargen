@@ -9,6 +9,7 @@
 #include <string>     // for string, to_string
 #include <vector>     // for vector
 #include "stargen.h"  // for decimals_arg
+#include "_deps/tracy-src/public/tracy/Tracy.hpp"
 
 using namespace std;
 

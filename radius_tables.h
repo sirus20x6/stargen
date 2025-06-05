@@ -90,5 +90,11 @@ extern map<long double, long double> solid_0point51_iron_0point49_water;
 extern map<long double, long double> solid_0point264_iron_0point736_water;
 extern map<long double, long double> earth_like;
 
+long double solid_iron_calc(double x);
+
+long double water_radius_calc(double x);
+
+long double earthlike_radius_calc(double x);
+
 void initRadii();
 #endif

@@ -38,6 +38,7 @@ void accrete::set_initial_conditions(long double inner_limit_of_dust,
   hist->planets = planet_head;
   hist->next = hist_head;
   hist_head = hist;
+  ZoneScoped;
 }
 
 /**
@@ -109,7 +110,7 @@ auto accrete::outer_effect_limit(long double a, long double e, long double mass)
  */
 auto accrete::dust_available(long double inside_range, long double outside_range)
     -> bool {
-  dust *current_dust_band = nullptr;
+    dust *current_dust_band = nullptr;
   bool dust_here = false;
 
   // this loop finds the dust band whose outer edge is within our inside range.
@@ -134,6 +135,7 @@ auto accrete::dust_available(long double inside_range, long double outside_range
   }
 
   // return whether or not we found a dust band in our range that still had dust
+  ZoneScoped;
   return dust_here;
 }
 
@@ -150,7 +152,7 @@ auto accrete::dust_available(long double inside_range, long double outside_range
 void accrete::update_dust_lanes(long double min, long double max, long double mass,
                        long double crit_mass, long double body_inner_bound,
                        long double body_outer_bound) {
-  bool gas = false;
+    bool gas = false;
   dust *node1 = nullptr;
   dust *node2 = nullptr;
   dust *node3 = nullptr;
@@ -248,6 +250,7 @@ void accrete::update_dust_lanes(long double min, long double max, long double ma
     }
     node1 = node1->next_band;
   }
+  ZoneScoped;
 }
 
 /**
@@ -265,7 +268,7 @@ void accrete::update_dust_lanes(long double min, long double max, long double ma
 auto accrete::collect_dust(long double last_mass, long double &new_dust,
                   long double &new_gas, long double a, long double e,
                   long double crit_mass, dust *dust_band) -> long double {
-  // cout << EM(last_mass) << " " << EM(new_dust) << " " << EM(new_gas) << " "
+    // cout << EM(last_mass) << " " << EM(new_dust) << " " << EM(new_gas) << " "
   // << a << " " << e << " " << EM(crit_mass) << endl;
   long double mass_density = NAN;
   long double temp1 = NAN;
@@ -354,6 +357,7 @@ auto accrete::collect_dust(long double last_mass, long double &new_dust,
       return new_mass + next_mass;
     }
   }
+  ZoneScoped;
 }
 
 
@@ -371,11 +375,12 @@ auto accrete::collect_dust(long double last_mass, long double &new_dust,
  */
 auto accrete::critical_limit(long double orb_radius, long double eccentricity,
                     long double stell_luminosity_ratio) -> long double {
-  long double temp = NAN;
+    long double temp = NAN;
   long double perihelion_dist = NAN;
 
   perihelion_dist = orb_radius - (orb_radius * eccentricity);
   temp = perihelion_dist * sqrt(stell_luminosity_ratio);
+  ZoneScoped;
   return B * std::pow(temp, -0.75);
 }
 
@@ -398,19 +403,15 @@ void accrete::accrete_dust(long double &seed_mass, long double &new_dust,
                   long double &new_gas, long double a, long double e,
                   long double crit_mass, long double body_inner_bound,
                   long double body_outer_bound) {
-  long double new_mass = seed_mass;
+    long double new_mass = seed_mass;
   long double temp_mass = NAN, temp_mass2 = NAN;
 
   do {
-    // cout << "test1\n";
     temp_mass = new_mass;
     // fixed point algorithm: accumulate more mass until the difference is less 
     // than .01% of the old mass
     new_mass =
         collect_dust(new_mass, new_dust, new_gas, a, e, crit_mass, dust_head);
-    // cout << "test2\n";
-    // cout << "Old mass: " << (temp_mass * SUN_MASS_IN_EARTH_MASSES) << endl;
-    // cout << "New mass: " << (new_mass * SUN_MASS_IN_EARTH_MASSES) << endl;
     if (new_mass < temp_mass) {
       new_mass = temp_mass;
       break;
@@ -422,7 +423,7 @@ void accrete::accrete_dust(long double &seed_mass, long double &new_dust,
   // update the dust lanes with the new seed mass
   update_dust_lanes(r_inner, r_outer, seed_mass, crit_mass, body_inner_bound,
                     body_outer_bound);
-  // cout << "test\n";
+  ZoneScoped;
 }
 
 /**
@@ -446,7 +447,7 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
                             long double stell_luminosity_ratio,
                             long double body_inner_bound,
                             long double body_outer_bound, bool do_moons) {
-  planet *the_planet = nullptr;
+    planet *the_planet = nullptr;
   planet *next_planet = nullptr;
   planet *prev_planet = nullptr;
   bool finished = false;
@@ -666,6 +667,7 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
   if (hist_head->planets == nullptr) {
     hist_head->planets = planet_head;
   }
+  ZoneScoped;
 }
 
 /**
@@ -689,7 +691,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
                            long double dust_density_coeff, long double ecc_coef,
                            long double nearest_planet_factor,
                            planet *seed_system, bool do_moons) -> planet * {
-  long double stell_mass_ratio = 0;
+    long double stell_mass_ratio = 0;
   long double stell_luminosity_ratio = 0;
   long double a = NAN;
   long double e = NAN;
@@ -703,7 +705,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
 
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   planet *seeds = seed_system;
-  // planet *seed_moons = NULL;
+  // planet *seed_moons = nullptr;
   planet *moon = nullptr;
   planet *temp_moons = nullptr;
   planet *new_moon = nullptr;
@@ -809,7 +811,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
       }
 
       dust_density = dust_density_coeff * sqrt(stell_mass_ratio) *
-                     exp(-ALPHA * std::pow(a, 1.0 / N));
+                     exp(-ALPHA * std::pow(a, 1.0 / NDENSITY));
       crit_mass = critical_limit(a, e, stell_luminosity_ratio);
       if (total_mass == PROTOPLANET_MASS && is_seed == false) {
         // cout << "test1\n";
@@ -906,6 +908,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
     }
     // cout << "test 3\n";
   }
+  ZoneScoped;
   return planet_head;
 }
 
@@ -916,7 +919,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
  */
 
 void accrete::free_dust(dust *head) {
-  dust *node = nullptr;
+    dust *node = nullptr;
   dust *next = nullptr;
 
   for (node = head; node != nullptr; node = next) {
@@ -924,6 +927,7 @@ void accrete::free_dust(dust *head) {
     delete node;
     // cout << "Deleted Dust\n";
   }
+  ZoneScoped;
 }
 
 /**
@@ -933,7 +937,7 @@ void accrete::free_dust(dust *head) {
  */
 
 void accrete::free_planet(planet *head) {
-  planet *node = nullptr;
+    planet *node = nullptr;
   planet *next = nullptr;
 
   for (node = head; node != nullptr; node = next) {
@@ -941,6 +945,7 @@ void accrete::free_planet(planet *head) {
     delete node;
     // cout << "Deleted World\n";
   }
+  ZoneScoped;
 }
 
 /**
@@ -949,7 +954,7 @@ void accrete::free_planet(planet *head) {
  */
 
 void accrete::free_generations() {
-  gen *node = nullptr;
+    gen *node = nullptr;
   gen *next = nullptr;
 
   for (node = hist_head; node != nullptr; node = next) {
@@ -966,6 +971,7 @@ void accrete::free_generations() {
     delete node;
     // cout << "Deleted Generation\n";
   }
+  ZoneScoped;
 }
 
 /**
@@ -979,8 +985,9 @@ void accrete::free_generations() {
 
 auto accrete::is_predefined_planet_helper(planet *the_planet, planet *predined_planet)
     -> bool {
-  // if (the_planet->getA() == predined_planet->getA() && the_planet->getE() ==
+        // if (the_planet->getA() == predined_planet->getA() && the_planet->getE() ==
   // predined_planet->getE())
+  ZoneScoped;
   if (is_close(the_planet->getA(), predined_planet->getA()) &&
       is_close(the_planet->getE(), predined_planet->getE())) {
     return true;
@@ -996,6 +1003,7 @@ auto accrete::is_predefined_planet_helper(planet *the_planet, planet *predined_p
  * @return false 
  */
 auto accrete::is_predefined_planet(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_in_eriEps(the_planet)) {
     return true;
   } else if (is_in_UMa47(the_planet)) {
@@ -1124,13 +1132,20 @@ auto accrete::is_predefined_planet(planet *the_planet) -> bool {
  * @return false 
  */
 auto accrete::is_in_eriEps(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, eriEpsI)) {
     return true;
   }
   return false;
 }
 
+/**
+* @brief Checks if the given planet is in the UMa47 star system.
+* @param the_planet The planet to check.
+* @return true if the planet is in the UMa47 system, false otherwise.
+*/
 auto accrete::is_in_UMa47(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, UMa47III)) {
     return true;
   } else if (is_predefined_planet_helper(the_planet, UMa47II)) {
@@ -1141,28 +1156,52 @@ auto accrete::is_in_UMa47(planet *the_planet) -> bool {
   return false;
 }
 
+/**
+* @brief Checks if the given planet is in the horIot star system.
+* @param the_planet The planet to check.
+* @return true if the planet is in the horIot system, false otherwise.
+*/
 auto accrete::is_in_horIot(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, horIotI)) {
     return true;
   }
   return false;
 }
 
+/**
+* @brief Checks if the given planet is in the xiumab star system.
+* @param the_planet The planet to check.
+* @return true if the planet is in the xiumab system, false otherwise.
+*/
 auto accrete::is_in_xiumab(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, xiumabb)) {
     return true;
   }
   return false;
 }
 
+/**
+* @brief Checks if the given planet is in the 51peg star system.
+* @param the_planet The planet to check.
+* @return true if the planet is in the 51peg system, false otherwise.
+*/
 auto accrete::is_in_51peg(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, Bellerophon)) {
     return true;
   }
   return false;
 }
 
+/**
+ * @brief Checks if the given planet is in the 55can star system.
+ * @param the_planet The planet to check.
+ * @return true if the planet is in the 55can system, false otherwise.
+ */
 auto accrete::is_in_55can(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, can55d)) {
     return true;
   } else if (is_predefined_planet_helper(the_planet, can55f)) {
@@ -1178,6 +1217,7 @@ auto accrete::is_in_55can(planet *the_planet) -> bool {
 }
 
 auto accrete::is_in_UPSAndA(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, UPSAndAe)) {
     return true;
   } else if (is_predefined_planet_helper(the_planet, UPSAndAd)) {
@@ -1190,7 +1230,13 @@ auto accrete::is_in_UPSAndA(planet *the_planet) -> bool {
   return false;
 }
 
+/**
+ * @brief Checks if the given planet is in the UPSAndA star system.
+ * @param the_planet The planet to check.
+ * @return true if the planet is in the UPSAndA system, false otherwise.
+ */
 auto accrete::is_in_hd10180(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, hd10180h)) {
     return true;
   } else if (is_predefined_planet_helper(the_planet, hd10180g)) {
@@ -1214,6 +1260,7 @@ auto accrete::is_in_hd10180(planet *the_planet) -> bool {
 }
 
 auto accrete::is_in_gliese581(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, gliese581f)) {
     return true;
   } else if (is_predefined_planet_helper(the_planet, gliese581d)) {
@@ -1231,6 +1278,7 @@ auto accrete::is_in_gliese581(planet *the_planet) -> bool {
 }
 
 auto accrete::is_in_hd10647(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, hd10647b)) {
     return true;
   }
@@ -1238,6 +1286,7 @@ auto accrete::is_in_hd10647(planet *the_planet) -> bool {
 }
 
 auto accrete::is_in_83leoB(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, leo83Bb)) {
     return true;
   } else if (is_predefined_planet_helper(the_planet, leo83Ba)) {
@@ -1247,6 +1296,7 @@ auto accrete::is_in_83leoB(planet *the_planet) -> bool {
 }
 
 auto accrete::is_in_muari(planet *the_planet) -> bool {
+    ZoneScoped;
   if (is_predefined_planet_helper(the_planet, muarie)) {
     return true;
   } else if (is_predefined_planet_helper(the_planet, muarib)) {

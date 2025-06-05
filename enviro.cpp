@@ -7,6 +7,7 @@
 #include <map>                     // for map, map<>::mapped_type
 #include <string>                  // for string, operator<<, operator==
 #include <vector>                  // for vector
+#include <functional>
 #include "const.h"                 // for SUN_MASS_IN_EARTH_MASSES, AVE, pow2
 #include "elements.h"              // for gases
 #include "gas_radius_helpers.h"    // for mini_neptune_radius, gas_dwarf_radius
@@ -30,18 +31,17 @@ map<map<long double, long double>, vector<long double> > polynomial_cache;
  * @param mass 
  * @return long double 
  */
-auto mass_to_luminosity(long double mass) -> long double {
-  if (mass <= 0.6224) {
-    return 0.3815 * std::pow(mass, 2.5185);
-  } else if (mass <= 1.0) {
-    return std::pow(mass, 4.551);
-  } else if (mass <= 3.1623) {
-    return std::pow(mass, 4.351);
-  } else if (mass <= 16.0) {
-    return 2.7563 * std::pow(mass, 3.4704);
-  } else {
-    return 42.321 * std::pow(mass, 2.4853);
-  }
+// updated from wikipedia https://en.wikipedia.org/wiki/Mass%E2%80%93luminosity_relation#cite_note-evolutionofstars-2
+long double mass_to_luminosity(long double mass) {
+    if (mass < 0.43) {
+        return 0.23 * std::pow(mass, 2.3);
+    } else if (mass < 2) {
+        return std::pow(mass, 4);
+    } else if (mass < 55) {
+        return 1.4 * std::pow(mass, 3.5);
+    } else {
+        return 32000 * mass;
+    }
 }
 
 /**
@@ -51,18 +51,15 @@ auto mass_to_luminosity(long double mass) -> long double {
  * @return long double 
  */
 auto luminosity_to_mass(long double luminosity) -> long double {
-  long double a = luminosity;
-  if (a <= (0.3815 * std::pow(0.6224, 2.5185))) {
-    return 1.46613 * std::pow(a, 0.3970617431010522);
-  } else if (a <= 1) {
-    return std::pow(a, 0.2197319270490002);
-  } else if (a <= std::pow(3.1623, 4.351)) {
-    return std::pow(a, 0.2298322224775914);
-  } else if (a <= (2.7563 * std::pow(16, 3.4704))) {
-    return 0.746654 * std::pow(a, 0.2881512217611803);
-  } else {
-    return 0.221579 * std::pow(a, 0.4023659115599726);
-  }
+    if (luminosity < 0.23) {
+        return std::pow(luminosity / 0.23, 1.0 / 2.3);
+    } else if (luminosity < 1) {
+        return std::pow(luminosity, 1.0 / 4.0);
+    } else if (luminosity < 1.4 * std::pow(55, 3.5)) {
+        return std::pow(luminosity / 1.4, 1.0 / 3.5);
+    } else {
+        return luminosity / 32000;
+    }
 }
 
 /**
@@ -71,45 +68,18 @@ auto luminosity_to_mass(long double luminosity) -> long double {
  * @param spec_type 
  * @return int 
  */
-auto getLumIndex(const string& spec_type) -> int {
-  const char *strPtr = nullptr;
-
-  strPtr = strstr(spec_type.c_str(), "Ia0");
-  if (strPtr != nullptr) {
-    return 2;
-  } else {
-    strPtr = strstr(spec_type.c_str(), "Ia");
-    if (strPtr != nullptr) {
-      return 2;
-    } else {
-      strPtr = strstr(spec_type.c_str(), "Ib");
-      if (strPtr != nullptr) {
+int getLumIndex(const string& spec_type) {
+    if (spec_type.find("Ia0") != string::npos || 
+        spec_type.find("Ia") != string::npos || 
+        spec_type.find("Ib") != string::npos || 
+        spec_type.find("II") != string::npos) {
         return 2;
-      } else {
-        strPtr = strstr(spec_type.c_str(), "III");
-        if (strPtr != nullptr) {
-          return 1;
-        } else {
-          strPtr = strstr(spec_type.c_str(), "II");
-          if (strPtr != nullptr) {
-            return 2;
-          } else {
-            strPtr = strstr(spec_type.c_str(), "IV");
-            if (strPtr != nullptr) {
-              return 1;
-            } else {
-              strPtr = strstr(spec_type.c_str(), "VI");
-              if (strPtr != nullptr) {
-                return 0;
-              } else {
-                return 0;
-              }
-            }
-          }
-        }
-      }
     }
-  }
+    if (spec_type.find("III") != string::npos || 
+        spec_type.find("IV") != string::npos) {
+        return 1;
+    }
+    return 0;
 }
 
 /**
@@ -118,146 +88,25 @@ auto getLumIndex(const string& spec_type) -> int {
  * @param spec_type 
  * @return string 
  */
-auto getStarType(string spec_type) -> string {
-  spec_type = my_strtoupper(spec_type);
-  const char *strPtr = nullptr;
-
-  strPtr = strstr(spec_type.c_str(), "DA");
-  if (strPtr != nullptr) {
-    return "WD";
-  } else {
-    strPtr = strstr(spec_type.c_str(), "DB");
-    if (strPtr != nullptr) {
-      return "WD";
-    } else {
-      strPtr = strstr(spec_type.c_str(), "DC");
-      if (strPtr != nullptr) {
-        return "WD";
-      } else {
-        strPtr = strstr(spec_type.c_str(), "DO");
-        if (strPtr != nullptr) {
-          return "WD";
-        } else {
-          strPtr = strstr(spec_type.c_str(), "DQ");
-          if (strPtr != nullptr) {
-            return "WD";
-          } else {
-            strPtr = strstr(spec_type.c_str(), "DZ");
-            if (strPtr != nullptr) {
-              return "WD";
-            } else {
-              strPtr = strstr(spec_type.c_str(), "WN");
-              if (strPtr != nullptr) {
-                return "WN";
-              } else {
-                strPtr = strstr(spec_type.c_str(), "WC");
-                if (strPtr != nullptr) {
-                  return "WC";
-                } else {
-                  strPtr = strstr(spec_type.c_str(), "O");
-                  if (strPtr != nullptr) {
-                    return "O";
-                  } else {
-                    strPtr = strstr(spec_type.c_str(), "B");
-                    if (strPtr != nullptr) {
-                      return "B";
-                    } else {
-                      strPtr = strstr(spec_type.c_str(), "A");
-                      if (strPtr != nullptr) {
-                        return "A";
-                      } else {
-                        strPtr = strstr(spec_type.c_str(), "F");
-                        if (strPtr != nullptr) {
-                          return "F";
-                        } else {
-                          strPtr = strstr(spec_type.c_str(), "G");
-                          if (strPtr != nullptr) {
-                            return "G";
-                          } else {
-                            strPtr = strstr(spec_type.c_str(), "K");
-                            if (strPtr != nullptr) {
-                              return "K";
-                            } else {
-                              strPtr = strstr(spec_type.c_str(), "M");
-                              if (strPtr != nullptr) {
-                                return "M";
-                              } else {
-                                strPtr = strstr(spec_type.c_str(), "L");
-                                if (strPtr != nullptr) {
-                                  return "L";
-                                } else {
-                                  strPtr = strstr(spec_type.c_str(), "T");
-                                  if (strPtr != nullptr) {
-                                    return "T";
-                                  } else {
-                                    strPtr = strstr(spec_type.c_str(), "Y");
-                                    if (strPtr != nullptr) {
-                                      return "Y";
-                                    } else {
-                                      strPtr = strstr(spec_type.c_str(), "H");
-                                      if (strPtr != nullptr) {
-                                        return "H";
-                                      } else {
-                                        strPtr = strstr(spec_type.c_str(), "E");
-                                        if (strPtr != nullptr) {
-                                          return "E";
-                                        } else {
-                                          strPtr =
-                                              strstr(spec_type.c_str(), "I");
-                                          if (strPtr != nullptr) {
-                                            return "I";
-                                          } else {
-                                            strPtr =
-                                                strstr(spec_type.c_str(), "R");
-                                            if (strPtr != nullptr) {
-                                              return "K";
-                                            } else {
-                                              strPtr = strstr(spec_type.c_str(),
-                                                              "S");
-                                              if (strPtr != nullptr) {
-                                                return "M";
-                                              } else {
-                                                strPtr = strstr(
-                                                    spec_type.c_str(), "N");
-                                                if (strPtr != nullptr) {
-                                                  return "M";
-                                                } else {
-                                                  strPtr = strstr(
-                                                      spec_type.c_str(), "C");
-                                                  if (strPtr != nullptr) {
-                                                    return "M";
-                                                  } else {
-                                                    // cerr << "test1\n";
-                                                    cerr << "Unsupported star "
-                                                            "type: "
-                                                         << spec_type << endl;
-                                                    exit(EXIT_FAILURE);
-                                                    return nullptr;
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+string getStarType(string spec_type) {
+    spec_type = my_strtoupper(spec_type);
+    
+    const vector<pair<string, string>> starTypes = {
+        {"DA", "WD"}, {"DB", "WD"}, {"DC", "WD"}, {"DO", "WD"}, {"DQ", "WD"}, {"DZ", "WD"},
+        {"WN", "WN"}, {"WC", "WC"},
+        {"O", "O"}, {"B", "B"}, {"A", "A"}, {"F", "F"}, {"G", "G"}, {"K", "K"},
+        {"M", "M"}, {"L", "L"}, {"T", "T"}, {"Y", "Y"}, {"H", "H"}, {"E", "E"}, {"I", "I"},
+        {"R", "K"}, {"S", "M"}, {"N", "M"}, {"C", "M"}
+    };
+    
+    for (const auto& [prefix, type] : starTypes) {
+        if (spec_type.find(prefix) != string::npos) {
+            return type;
         }
-      }
     }
-  }
+    
+    cerr << "Unsupported star type: " << spec_type << endl;
+    exit(EXIT_FAILURE);
 }
 
 /**
@@ -286,60 +135,38 @@ auto getSubType(string spec_type) -> int {
  * @param spec_type 
  * @return long double 
  */
-auto spec_type_to_eff_temp(const string& spec_type) -> long double {
-  if (spec_type.empty()) {
-    return 0;
-  }
-  string star_type;
-  int lumIndex = 0;
-  int sub_type = 0;
+long double spec_type_to_eff_temp(const string& spec_type) {
+    if (spec_type.empty()) {
+        return 0;
+    }
 
-  // cout << "test3\n";
-  star_type = getStarType(spec_type);
-  // cout << "test4\n";
-  sub_type = getSubType(spec_type);
-  lumIndex = getLumIndex(spec_type);
+    string star_type = getStarType(spec_type);
+    int sub_type = getSubType(spec_type);
+    int lumIndex = getLumIndex(spec_type);
 
-  if (strcmp(star_type.c_str(), "WD") == 0) {
-    return tempWD[sub_type];
-  } else if (strcmp(star_type.c_str(), "WN") == 0) {
-    return tempWN[sub_type];
-  } else if (strcmp(star_type.c_str(), "WC") == 0) {
-    return tempWC[sub_type];
-  } else if (strcmp(star_type.c_str(), "O") == 0) {
-    return tempO[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "B") == 0) {
-    return tempB[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "A") == 0) {
-    return tempA[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "F") == 0) {
-    return tempF[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "G") == 0) {
-    return tempG[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "K") == 0) {
-    // fprintf(stderr, "%u %u %8.8LG\n", lumIndex, sub_type,
-    // tempK[lumIndex][sub_type]); exit(EXIT_FAILURE);
-    return tempK[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "M") == 0) {
-    return tempM[lumIndex][sub_type];
-  } else if (strcmp(star_type.c_str(), "L") == 0) {
-    return tempL[sub_type];
-  } else if (strcmp(star_type.c_str(), "T") == 0) {
-    return tempT[sub_type];
-  } else if (strcmp(star_type.c_str(), "Y") == 0) {
-    return tempY[sub_type];
-  } else if (strcmp(star_type.c_str(), "H") == 0) {
-    return tempH[sub_type];
-  } else if (strcmp(star_type.c_str(), "I") == 0) {
-    return tempI[sub_type];
-  } else if (strcmp(star_type.c_str(), "E") == 0) {
-    return tempE[sub_type];
-  } else {
-    // cerr << "test2\n";
+    switch (star_type[0]) {
+        case 'W':
+            if (star_type == "WD") return tempWD[sub_type];
+            if (star_type == "WN") return tempWN[sub_type];
+            if (star_type == "WC") return tempWC[sub_type];
+            break;
+        case 'O': return tempO[lumIndex][sub_type];
+        case 'B': return tempB[lumIndex][sub_type];
+        case 'A': return tempA[lumIndex][sub_type];
+        case 'F': return tempF[lumIndex][sub_type];
+        case 'G': return tempG[lumIndex][sub_type];
+        case 'K': return tempK[lumIndex][sub_type];
+        case 'M': return tempM[lumIndex][sub_type];
+        case 'L': return tempL[sub_type];
+        case 'T': return tempT[sub_type];
+        case 'Y': return tempY[sub_type];
+        case 'H': return tempH[sub_type];
+        case 'I': return tempI[sub_type];
+        case 'E': return tempE[sub_type];
+    }
+
     cerr << "Unsupported star type: " << star_type << endl;
     exit(EXIT_FAILURE);
-    return EXIT_FAILURE;
-  }
 }
 
 /**
@@ -349,170 +176,48 @@ auto spec_type_to_eff_temp(const string& spec_type) -> long double {
  * @param luminosity 
  * @return string 
  */
-auto eff_temp_to_spec_type(long double eff_temp, long double luminosity) -> string {
-  string clums[] = {"I-a0", "I-a", "I-b", "II", "III", "IV"};
-  long double rlums[] = {200000.0, 20000.0, 3000.0, 400.0, 11.5, 4.0};
-  string classes[] = {"x", "O", "B", "A", "F", "G", "K", "M", "L", "T", "Y"};
-  long double tclass[] = {52000,  30000.0, 10000.0, 7500.0, 6000.0, 5000.0,
-                          3500.0, 2000.0,  1300.0,  700.0,  0.0};
+string eff_temp_to_spec_type(long double eff_temp, long double luminosity) {
+    const vector<pair<long double, string>> temp_classes = {
+        {52000, "O"}, {30000, "B"}, {10000, "A"}, {7500, "F"}, 
+        {6000, "G"}, {5000, "K"}, {3500, "M"}, {2000, "L"}, 
+        {1300, "T"}, {700, "Y"}
+    };
 
-  int at = 0;
-  long double csiz = NAN, cdel = NAN, cfrac = NAN, dt = NAN;
-  string aclass, ac, clum;
-  char temp[33];
-  long double xmag = NAN;
-  string output;
+    auto get_spec_class = [&]() {
+        for (size_t i = 0; i < temp_classes.size(); ++i) {
+            const auto& [temp, class_name] = temp_classes[i];
+            if (eff_temp > temp) {
+                long double prev_temp = (i > 0) ? temp_classes[i-1].first : 200000; // Assuming 200000 as max temp
+                int subclass = floor(10.0 - 10.0 * (eff_temp - temp) / (prev_temp - temp));
+                return class_name + to_string(max(0, min(9, subclass)));
+            }
+        }
+        return string("Y9");
+    };
 
-  if (luminosity == 0) {
-    luminosity = 0.0000001;  // avoid getting an undefined answer for log(xlum)
-  }
-  xmag = 4.83 - (2.5 * (log(luminosity) / log(10.0)));
+    string spec_class = eff_temp > 52000 ? "WN" + to_string(min(9, max(0, int(10 - 10 * (eff_temp - 52000) / 148000))))
+                                         : get_spec_class();
 
-  // determine spectral clas
-  output = aclass = "????";
-  // at = 0;
-  for (int i = 1; i <= 10; i++) {
-    if (eff_temp > tclass[i]) {
-      ac = classes[i];
-      csiz = tclass[i - 1] - tclass[i];
-      cdel = eff_temp - tclass[i];
-      cfrac = cdel / csiz;
-      dt = 10.0 - (10.0 * cfrac);
-      if (dt < 0.0) {
-        dt = 0.0;
-      }
-      at = floor(dt);
-      aclass = ac.append(std::to_string(at));
-      break;
+    if (luminosity == 0) luminosity = 1e-7;
+    long double xmag = 4.83 - 2.5 * log10(luminosity);
+
+    const vector<pair<string, std::function<string(double)>>> lum_classes = {
+        {"O", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -6 ? "Ib" : m < -4.9 ? "II" : m < -4 ? "III" : "V"; }},
+        {"B", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -5 ? "Ib" : m < -4.5 ? "II" : m < -0.5 ? "III" : "V"; }},
+        {"A", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2.25 ? "II" : m < 0 ? "III" : m < 0.125 ? "IV" : "V"; }},
+        {"F", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2 ? "II" : m < 1.75 ? "III" : m < 3 ? "IV" : "V"; }},
+        {"G", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2.25 ? "II" : m < 1.75 ? "III" : m < 3 ? "IV" : "V"; }},
+        {"K", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2 ? "II" : m < 2 ? "III" : m < 4 ? "IV" : "V"; }},
+        {"M", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2 ? "II" : m < 2.5 ? "III" : "V"; }}
+    };
+
+    for (const auto& [prefix, lum_func] : lum_classes) {
+        if (spec_class[0] == prefix[0]) {
+            return spec_class + lum_func(xmag);
+        }
     }
-  }
-  clum = " ";
-  if (eff_temp > 52000)  // the hotest a type O star can get is 52000. Any
-                         // hotter and the star is most likely a Wolf–Rayet star
-  {
-    ac = "WN";
-    csiz = 200000 - 52000;
-    cdel = eff_temp - 52000;
-    cfrac = cdel / csiz;
-    dt = 10.0 - (10.0 * cfrac);
-    if (dt < 0.0) {
-      dt = 0.0;
-    }
-    at = floor(dt);
-    aclass = ac.append(std::to_string(at));
-  } else {
-    if (compare_string_char(aclass, 1, "O")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -6) {
-        aclass.append("Ib");
-      } else if (xmag < -4.9) {
-        aclass.append("II");
-      } else if (xmag < -4) {
-        aclass.append("III");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "B")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -5) {
-        aclass.append("Ib");
-      } else if (xmag < -4.5) {
-        aclass.append("II");
-      } else if (xmag < -0.5) {
-        aclass.append("III");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "A")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -4.5) {
-        aclass.append("Ib");
-      } else if (xmag < -2.25) {
-        aclass.append("II");
-      } else if (xmag < 0) {
-        aclass.append("III");
-      } else if (xmag < 0.125) {
-        aclass.append("IV");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "F")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -4.5) {
-        aclass.append("Ib");
-      } else if (xmag < -2) {
-        aclass.append("II");
-      } else if (xmag < 1.75) {
-        aclass.append("III");
-      } else if (xmag < 3) {
-        aclass.append("IV");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "G")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -4.5) {
-        aclass.append("Ib");
-      } else if (xmag < -2.25) {
-        aclass.append("II");
-      } else if (xmag < 1.75) {
-        aclass.append("III");
-      } else if (xmag < 3) {
-        aclass.append("IV");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "K")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -4.5) {
-        aclass.append("Ib");
-      } else if (xmag < -2) {
-        aclass.append("II");
-      } else if (xmag < 2) {
-        aclass.append("III");
-      } else if (xmag < 4) {
-        aclass.append("IV");
-      } else {
-        aclass.append("V");
-      }
-    } else if (compare_string_char(aclass, 1, "M")) {
-      if (xmag < -9) {
-        aclass.append("O");
-      } else if (xmag < -7) {
-        aclass.append("Ia");
-      } else if (xmag < -4.5) {
-        aclass.append("Ib");
-      } else if (xmag < -2) {
-        aclass.append("II");
-      } else if (xmag < 2.5) {
-        aclass.append("III");
-      } else {
-        aclass.append("V");
-      }
-    } else {
-      aclass.append("V");
-    }
-  }
-  output = aclass;
-  return output;
+
+    return spec_class + "V";
 }
 
 /**
@@ -834,6 +539,128 @@ auto acceleration(long double mass, long double radius) -> long double {
          pow2(radius * CM_PER_KM);
 }
 
+auto acceleration(planet *the_planet) -> long double {
+    const long double G = 6.67430e-11;  // gravitational constant in m^3 kg^-1 s^-2
+    const long double SOLAR_MASS_KG = 1.989e30;  // kg
+    const long double EARTH_MASS_KG = 5.97e24;   // kg
+    const long double EARTH_RADIUS_KM = 6371.0;  // km
+    const long double EARTH_GRAVITY_CM_S2 = 980.665;  // cm/s^2
+
+    // Convert planet mass to Earth masses
+    long double mass_earth_masses = the_planet->getMass() * (SOLAR_MASS_KG / EARTH_MASS_KG);
+    
+    // Get planet radius in Earth radii
+    long double radius_earth_radii = the_planet->getRadius() / EARTH_RADIUS_KM;
+
+    // Get composition fractions
+    long double ice_fraction = the_planet->getImf();
+    long double rock_fraction = the_planet->getRmf();
+    long double carbon_fraction = rock_fraction * the_planet->getCmf();
+    long double silicate_fraction = rock_fraction * (1.0 - the_planet->getCmf());
+    long double iron_fraction = 1.0 - ice_fraction - rock_fraction;
+
+    // Density factors (relative to Earth's average density)
+    const long double ICE_DENSITY_FACTOR = 0.26;
+    const long double SILICATE_DENSITY_FACTOR = 0.94;
+    const long double CARBON_DENSITY_FACTOR = 1.0;
+    const long double IRON_DENSITY_FACTOR = 2.25;
+
+    // Calculate average density factor
+    long double avg_density_factor = (ice_fraction * ICE_DENSITY_FACTOR +
+                                      silicate_fraction * SILICATE_DENSITY_FACTOR +
+                                      carbon_fraction * CARBON_DENSITY_FACTOR +
+                                      iron_fraction * IRON_DENSITY_FACTOR);
+
+    // Calculate surface gravity relative to Earth
+    long double fudge_factor = .6; // densities are too high, probably not considering enough elements
+    long double relative_gravity = (mass_earth_masses / std::pow(radius_earth_radii, 2)) * avg_density_factor * fudge_factor;
+
+    // Convert to cm/s^2
+    long double calculated_gravity_cm_s2 = relative_gravity * EARTH_GRAVITY_CM_S2;
+
+    // Log the results
+    // std::cout << "Planet mass (Earth masses): " << mass_earth_masses << "\n";
+    // std::cout << "Planet radius (Earth radii): " << radius_earth_radii << "\n";
+    // std::cout << "Calculated gravity (Earth g): " << relative_gravity << "\n";
+    // std::cout << "Calculated gravity (cm/s^2): " << calculated_gravity_cm_s2 << "\n";
+    // std::cout << "Ice fraction: " << ice_fraction << "\n";
+    // std::cout << "Rock fraction: " << rock_fraction << "\n";
+    // std::cout << "Carbon fraction: " << carbon_fraction << "\n";
+    // std::cout << "Silicate fraction: " << silicate_fraction << "\n";
+    // std::cout << "Iron fraction: " << iron_fraction << "\n";
+    // std::cout << "Average density factor: " << avg_density_factor << "\n";
+
+    return calculated_gravity_cm_s2;
+}
+
+auto acceleration_oblateness_refinement(planet *the_planet) -> long double {
+  const long double G              = 6.67430e-11;  // gravitational constant in m^3 kg^-1 s^-2
+  const long double EARTH_MASS     = 5.97e24;      // kg
+  const long double EARTH_RADIUS_M = 6.371e6;      // meters (Earth's radius)
+  const long double EARTH_GRAVITY  = 9.80665;      // m/s^2
+
+  // Constants for transition masses
+  const long double ROCKY_TRANSITION_MASS_KG     = 10.0 * EARTH_MASS;   // 10 Earth masses
+  const long double GAS_GIANT_TRANSITION_MASS_KG = 100.0 * EARTH_MASS;  // 100 Earth masses
+
+  // Convert planet mass to kilograms
+  long double mass_kg = (the_planet->getDustMass() + the_planet->getGasMass()) *
+                        1.989e30;                   // Convert solar masses to kg
+  long double radius_km = the_planet->getRadius();  // Equatorial radius in km
+
+  // Check if radius and mass are valid
+  if (radius_km == 0 || mass_kg == 0) {
+    return 0.0;  // Avoid divide by zero
+  }
+
+  // Calculate the radius based on mass regimes
+  long double radius_m;
+  if (mass_kg < ROCKY_TRANSITION_MASS_KG) {
+    // Rocky planets (mass < 10 Earth masses), R ∝ M^0.25
+    radius_m = EARTH_RADIUS_M * std::pow(mass_kg / EARTH_MASS, 0.25);
+  } else if (mass_kg < GAS_GIANT_TRANSITION_MASS_KG) {
+    // Transition zone (10 to 100 Earth masses), R ∝ M^0.5
+    radius_m = EARTH_RADIUS_M * std::pow(mass_kg / EARTH_MASS, 0.5);
+  } else {
+    // Gas giants (mass ≥ 100 Earth masses), radius approximately constant (around Jupiter's radius)
+    radius_m = 71.5e6;  // Set to approximately Jupiter's radius (71,500 km)
+  }
+
+  // Adjust for oblateness (if oblateness > 0)
+  long double oblateness_factor = the_planet->getOblateness();
+  long double polar_radius_m =
+      radius_m * (1.0 - oblateness_factor);  // Polar radius is reduced by oblateness
+
+  // Angular velocity (omega) based on day length (convert hours to seconds)
+  long double day_seconds      = the_planet->getDay() * 3600;
+  long double angular_velocity = (day_seconds > 0) ? (2 * M_PI / day_seconds) : 0.0;
+
+  // Adjust gravity for centrifugal force at the equator
+  long double centrifugal_force =
+      angular_velocity * angular_velocity * radius_m;  // Centrifugal force at equator
+  long double gravity_equator = G * mass_kg / std::pow(radius_m, 2) - centrifugal_force;
+
+  // Gravity at the poles (no centrifugal force)
+  long double gravity_pole = G * mass_kg / std::pow(polar_radius_m, 2);
+
+  // Average gravity (you could use a weighted average if necessary)
+  long double average_gravity = (gravity_equator + gravity_pole) / 2.0;
+
+  // Handle different mass regimes for the final gravity calculation
+  long double mass_earth_masses = mass_kg / EARTH_MASS;
+
+  if (mass_earth_masses < 1.0) {
+    // Rocky bodies below Earth mass: gs ~ M^(1/2)
+    average_gravity = EARTH_GRAVITY * std::pow(mass_earth_masses, 0.5);
+  } else if (mass_earth_masses < 100.0) {
+    // Transition zone: gravity remains roughly constant
+    average_gravity = std::max(0.8 * EARTH_GRAVITY, std::min(average_gravity, 1.2 * EARTH_GRAVITY));
+  }
+  // For gas giants (mass > 100 Earth masses), we'll use the calculated gravity directly
+
+  return average_gravity;
+}
+
 /*---------------------------------------------------------------------*/
 /* This function calculates the surface gravity of a planet. The       */
 /* acceleration is in units of cm/sec2, and the gravity is returned in */
@@ -1142,47 +969,50 @@ auto planet_albedo(planet *the_planet) -> long double {
 /* planet.                                                             */
 /*---------------------------------------------------------------------*/
 
-auto opacity(long double molecular_weight, long double surf_pressure) -> long double {
-  long double optical_depth = NAN;
+#include <cmath>
 
-  optical_depth = 0.0;
-  if (molecular_weight >= 0.0 && molecular_weight < 10.0) {
-    optical_depth += 3.0;
-  }
-  if (molecular_weight >= 10.0 && molecular_weight < 20.0) {
-    optical_depth += 2.34;
-  }
-  if (molecular_weight >= 20.0 && molecular_weight < 30.0) {
-    optical_depth += 1.0;
-  }
-  if (molecular_weight >= 30.0 && molecular_weight < 45.0) {
-    optical_depth += 0.15;
-  }
-  if (molecular_weight >= 45.0 && molecular_weight < 100.0) {
-    optical_depth += 0.05;
-  }
+long double opacity(long double molecular_weight, long double surf_pressure, long double effective_temp) {
+    // Base opacity calculation
+    double base_opacity = 0.0;
 
-  if (surf_pressure >= (70.0 * EARTH_SURF_PRES_IN_MILLIBARS)) {
-    optical_depth *= 8.333;
-  } else {
-    if (surf_pressure >= (50.0 * EARTH_SURF_PRES_IN_MILLIBARS)) {
-      optical_depth *= 6.666;
-    } else {
-      if (surf_pressure >= (30.0 * EARTH_SURF_PRES_IN_MILLIBARS)) {
-        optical_depth *= 3.333;
-      } else {
-        if (surf_pressure >= (10.0 * EARTH_SURF_PRES_IN_MILLIBARS)) {
-          optical_depth *= 2.0;
-        } else {
-          if (surf_pressure >= (5.0 * EARTH_SURF_PRES_IN_MILLIBARS)) {
-            optical_depth *= 1.5;
-          }
-        }
-      }
+    if (molecular_weight < 10.0) {
+        base_opacity = 3.0 - 0.066 * (10.0 - molecular_weight);
+    } else if (molecular_weight < 20.0) {
+        base_opacity = 2.34 - 0.134 * (20.0 - molecular_weight);
+    } else if (molecular_weight < 30.0) {
+        base_opacity = 1.0 - 0.085 * (30.0 - molecular_weight);
+    } else if (molecular_weight < 45.0) {
+        base_opacity = 0.15 - 0.057 * (45.0 - molecular_weight);
+    } else if (molecular_weight < 100.0) {
+        base_opacity = 0.05 - 0.0009 * (100.0 - molecular_weight);
     }
-  }
 
-  return optical_depth;
+    // Pressure contribution
+    double pressure_in_earth = surf_pressure / EARTH_SURF_PRES_IN_MILLIBARS;
+    double pressure_factor = 1.0;
+    
+    if (pressure_in_earth >= 70.0) {
+        pressure_factor = 8.333;
+    } else if (pressure_in_earth >= 50.0) {
+        pressure_factor = 6.666 + (8.333 - 6.666) * (pressure_in_earth - 50.0) / 20.0;
+    } else if (pressure_in_earth >= 30.0) {
+        pressure_factor = 3.333 + (6.666 - 3.333) * (pressure_in_earth - 30.0) / 20.0;
+    } else if (pressure_in_earth >= 10.0) {
+        pressure_factor = 2.0 + (3.333 - 2.0) * (pressure_in_earth - 10.0) / 20.0;
+    } else if (pressure_in_earth >= 5.0) {
+        pressure_factor = 1.5 + (2.0 - 1.5) * (pressure_in_earth - 5.0) / 5.0;
+    } else {
+        pressure_factor = 1.0 + (1.5 - 1.0) * (pressure_in_earth - 0.0) / 5.0;
+    }
+
+    // Temperature dependence
+    // Assuming opacity increases with temperature (simplified model)
+    double temp_factor = 1.0 + 0.01 * (effective_temp - 273.15); // 273.15 is 0°C in Kelvin
+
+    // Combine all factors
+    double optical_depth = base_opacity * pressure_factor * temp_factor;
+
+    return optical_depth;
 }
 
 /*
@@ -1244,7 +1074,7 @@ void calculate_surface_temp(planet *the_planet, bool first,
                      the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
                  the_planet->getA(), the_planet->getAlbedo());
     greenhouse_temp = green_rise(
-        opacity(the_planet->getMolecWeight(), the_planet->getSurfPressure()),
+        opacity(the_planet->getMolecWeight(), the_planet->getSurfPressure(), effective_temp),
         effective_temp, the_planet->getSurfPressure());
     the_planet->setSurfTemp(effective_temp + greenhouse_temp);
     set_temp_range(the_planet);
@@ -1351,9 +1181,9 @@ void calculate_surface_temp(planet *the_planet, bool first,
       eff_temp(the_planet->getTheSun().getREcosphere(the_planet->getMass() *
                                                      SUN_MASS_IN_EARTH_MASSES),
                the_planet->getA(), the_planet->getAlbedo());
-  greenhouse_temp = green_rise(
-      opacity(the_planet->getMolecWeight(), the_planet->getSurfPressure()),
-      effective_temp, the_planet->getSurfPressure());
+      greenhouse_temp = green_rise(
+        opacity(the_planet->getMolecWeight(), the_planet->getSurfPressure(), effective_temp),
+        effective_temp, the_planet->getSurfPressure());
   the_planet->setSurfTemp(effective_temp + greenhouse_temp);
 
   if (!first) {
@@ -2422,10 +2252,10 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
                 // planet_id << endl; if (planet_id == "1.05853286955409876162
                 // 0.00153819919909735927041")
                 {
-                  for (int i = 0; i < gases.count(); i++) {
+                  //for (int i = 0; i < gases.count(); i++) {
                     // cout << gases[i].getName() << ": " << toString(amount[i])
                     // << endl;
-                  }
+                  //}
                   // exit(EXIT_FAILURE);
                 }
                 // cout << toString(amount[i]) << " " << toString(ipp) << " " <<
@@ -2454,7 +2284,6 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
           if (is_potentialy_habitable(the_planet)) {
             if (the_planet->getSurfPressure() >= (1.2 * MIN_O2_IPP) &&
                 the_planet->getSurfPressure() <= MAX_HABITABLE_PRESSURE) {
-              // cout << "test2 " << planet_id << endl;
               if (new_values[i] > 0.0) {
                 amount[i] = new_values[i] * totalamount;
               }
@@ -2465,18 +2294,12 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
                 bad_air = true;
                 do_overs_less[i] = true;
                 do_overs_more[i] = false;
-                // cout << i << ". " << gases[i].getName() << " Too high: " <<
-                // ipp << " (Max allowed: " << gases[i].getMaxIpp() << ")" <<
-                // endl;
                 break;
               } else if (ipp < gases[i].getMinIpp() &&
                          gases[i].getNum() == AN_O) {
                 bad_air = true;
                 do_overs_less[i] = false;
                 do_overs_more[i] = true;
-                // cout << i << ". " << gases[i].getName() << " Too low: " <<
-                // ipp << " (Min allowed: " << gases[i].getMinIpp() << ")" <<
-                // endl;
                 break;
               } else {
                 do_overs_less[i] = false;
@@ -2494,8 +2317,6 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
 
       for (int i = 0, n = 0; i < gases.count(); i++) {
         if (amount[i] > 0.0) {
-          // cout << "test 2\n";
-          // cout << planet_id << endl;
           gas substance;
           substance.setNum(gases[i].getNum());
           if (new_values[i] > 0.0) {
@@ -2643,74 +2464,37 @@ auto is_earth_like_size(planet *the_planet) -> bool {
   return false;
 }
 
-auto is_earth_like(planet *the_planet) -> bool {
-  long double rel_temp = (the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER) -
-                         EARTH_AVERAGE_CELSIUS;
-  long double seas = the_planet->getHydrosphere() * 100.0;
-  long double clouds = the_planet->getCloudCover() * 100.0;
-  long double pressure =
-      the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS;
-  long double ice = the_planet->getIceCover() * 100.0;
-  long double gravity = the_planet->getSurfGrav();
-  long double iron =
-      (1.0 - (the_planet->getRmf() + the_planet->getImf())) * 100.0;
+bool is_earth_like(planet* the_planet) {
+    // Early checks for basic habitability and size
+    if (!is_habitable(the_planet) || !is_earth_like_size(the_planet) || the_planet->getEsi() < 0.8) {
+        return false;
+    }
 
-  if (!is_habitable(the_planet)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
-    // habitable\n";
-    return false;
-  } else if (!is_earth_like_size(the_planet)) {
-    return false;
-  } else if (the_planet->getEsi() < 0.8) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Low ESI" <<
-    // endl;
-    return false;
-  } else if (the_planet->getImf() > 0.0) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Has too much
-    // ice\n";
-    return false;
-  } else if (iron < 20 || iron > 60) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too big or
-    // too small a core\n";
-    return false;
-  } else if (gravity < 0.8 || gravity > 1.2) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too low or
-    // too high gravity\n";
-    return false;
-  } else if (rel_temp < -2.0 || rel_temp > 3.0) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too cold or
-    // too hot\n";
-    return false;
-  } else if (seas < 50.0 || seas > 80.0) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too dry or
-    // too wet\n";
-    return false;
-  } else if (ice > 10) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too much
-    // surface ice\n";
-    return false;
-  } else if (clouds < 40.0 || clouds > 80.0) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too few or
-    // too many clouds\n";
-    return false;
-  } else if (pressure < 0.5 || pressure > 2.0) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Too low or
-    // too high a surface pressure\n";
-    return false;
-  } else if (the_planet->getType() == tWater) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Water world!"
-    // << endl;
-    return false;
-  } else if (the_planet->getType() == tOil) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Carbon
-    // planet!\n";
-    return false;
-  } else if (the_planet->getMaxTemp() >= the_planet->getBoilPoint()) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Sometime too
-    // hot!\n";
-    return false;
-  }
-  return true;
+    // Calculate derived values
+    long double rel_temp = (the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER) - EARTH_AVERAGE_CELSIUS;
+    long double seas = the_planet->getHydrosphere() * 100.0;
+    long double clouds = the_planet->getCloudCover() * 100.0;
+    long double pressure = the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS;
+    long double ice = the_planet->getIceCover() * 100.0;
+    long double gravity = the_planet->getSurfGrav();
+    long double iron = (1.0 - (the_planet->getRmf() + the_planet->getImf())) * 100.0;
+
+    // Check various conditions
+    if (the_planet->getImf() > 0.0 ||
+        iron < 20 || iron > 60 ||
+        gravity < 0.8 || gravity > 1.2 ||
+        rel_temp < -2.0 || rel_temp > 3.0 ||
+        seas < 50.0 || seas > 80.0 ||
+        ice > 10 ||
+        clouds < 40.0 || clouds > 80.0 ||
+        pressure < 0.5 || pressure > 2.0 ||
+        the_planet->getType() == tWater ||
+        the_planet->getType() == tOil ||
+        the_planet->getMaxTemp() >= the_planet->getBoilPoint()) {
+        return false;
+    }
+
+    return true;
 }
 
 auto is_habitable_jovian_conservative(planet *the_planet) -> bool {
@@ -3150,12 +2934,12 @@ auto planet_radius_helper(long double planet_mass, long double mass1,
          << endl;
     cout << "Input was:\n";
     cout << "planet_mass = " << planet_mass << endl;
-    cout << "mass1 = " << toString((long double)mass1) << endl;
-    cout << "radius1 = " << toString((long double)radius1) << endl;
-    cout << "mass2 = " << toString((long double)mass2) << endl;
-    cout << "radius2 = " << toString((long double)radius2) << endl;
-    cout << "mass3 = " << toString((long double)mass3) << endl;
-    cout << "radius3 = " << toString((long double)radius3) << endl;
+    cout << "mass1 = " << to_string((long double)mass1) << endl;
+    cout << "radius1 = " << to_string((long double)radius1) << endl;
+    cout << "mass2 = " << to_string((long double)mass2) << endl;
+    cout << "radius2 = " << to_string((long double)radius2) << endl;
+    cout << "mass3 = " << to_string((long double)mass3) << endl;
+    cout << "radius3 = " << to_string((long double)radius3) << endl;
     exit(EXIT_FAILURE);
   }
   long double radius = 0.0;

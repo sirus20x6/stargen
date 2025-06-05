@@ -28,9 +28,10 @@ auto rms_vel(long double, long double) -> long double;
 auto molecule_limit(long double, long double, long double) -> long double;
 auto min_molec_weight(planet *) -> long double;
 auto acceleration(long double, long double) -> long double;
+auto acceleration(planet *the_planet) -> long double;
+auto acceleration_oblateness_refinement(planet *the_planet) -> long double;
 auto gravity(long double) -> long double;
-auto vol_inventory(long double, long double, long double, long double, int,
-                   bool, bool) -> long double;
+auto vol_inventory(long double, long double, long double, long double, int, bool, bool) -> long double;
 auto pressure(long double, long double, long double) -> long double;
 auto boiling_point(long double) -> long double;
 auto hydro_fraction(long double, long double) -> long double;
@@ -42,7 +43,7 @@ auto est_temp(long double, long double, long double) -> long double;
 auto grnhouse(long double, long double) -> bool;
 auto green_rise(long double, long double, long double) -> long double;
 auto planet_albedo(planet *) -> long double;
-auto opacity(long double, long double) -> long double;
+long double opacity(long double molecular_weight, long double surf_pressure, long double effective_temp);
 auto gas_life(long double, planet *) -> long double;
 void calculate_surface_temp(planet *, bool, long double, long double,
                             long double, long double, long double, bool);
@@ -79,8 +80,7 @@ auto calcHzc(planet *) -> long double;
 auto calcHza(planet *) -> long double;
 auto calcEsi(planet *) -> long double;
 auto calcSph(planet *) -> long double;
-auto calcEsiHelper(long double value, long double ref_value, long double weight,
-                   long double n = 4) -> long double;
+auto calcEsiHelper(long double value, long double ref_value, long double weight,long double n = 4) -> long double;
 auto is_potentialy_habitable_conservative(planet *) -> bool;
 auto is_potentialy_habitable_optimistic(planet *) -> bool;
 auto calcRelHumidity(planet *) -> long double;

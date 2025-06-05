@@ -42,18 +42,18 @@ using namespace std;
 #define fIsCircubinaryStar 0x8000
 
 // Values of out_format
-#define ffHTML 'HTML'
-#define ffTEXT 'TEXT'
-#define ffCELESTIA '.SSC'
-#define ffMOONGEN '.BSH'
-#define ffCSV '.CSV'
-#define ffJSON '.JSO'
-#define ffCSVdl '+CSV'
-#define ffSVG '.SVG'
-
-// Values of graphic_format
-#define gfGIF '.GIF'
-#define gfSVG '.SVG'
+enum {
+  ffHTML,
+  ffTEXT,
+  ffCELESTIA,
+  ffMOONGEN,
+  ffCSV,
+  ffJSON,
+  ffCSVdl,
+  ffSVG,
+  gfGIF,
+  gfSVG
+};
 
 using actions = enum actions {  // Callable StarGen can:
   aGenerate,                    //	- Generate randon system(s)

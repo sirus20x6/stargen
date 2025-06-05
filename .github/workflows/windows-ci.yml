@@ -1,0 +1,65 @@
+name: CMake Windows Build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build-and-package-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    # Install LLVM (Clang)
+    - name: Install LLVM
+      shell: cmd
+      run: choco install llvm -y
+
+    # Install Ninja Build System
+    - name: Install Ninja
+      shell: cmd
+      run: choco install ninja -y
+
+    - name: Add LLVM and Ninja to PATH
+      shell: pwsh
+      run: |
+        echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "C:\ProgramData\chocolatey\lib\ninja\tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+    - name: Check Clang Version
+      shell: pwsh
+      run: clang++ --version
+
+    # Configure CMake to use Clang and Ninja
+    - name: Configure CMake
+      shell: pwsh
+      run: |
+        cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+
+    # Build the project
+    - name: Build Project
+      shell: pwsh
+      run: cmake --build build --config ${{ env.BUILD_TYPE }} --verbose
+
+    # Test
+    - name: Run Tests
+      shell: pwsh
+      working-directory: build
+      run: ctest -C ${{ env.BUILD_TYPE }}
+
+    # Package
+    - name: Package the Build (Windows)
+      shell: pwsh
+      run: Compress-Archive -Path build\* -DestinationPath stargen.zip
+
+    # Upload Artifact
+    - uses: actions/upload-artifact@v3
+      with:
+        name: stargen-clang.zip
+        path: stargen.zip

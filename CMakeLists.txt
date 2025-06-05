@@ -7,7 +7,10 @@ message(STATUS "CMAKE_PROJECT_VERSION: ${CMAKE_PROJECT_VERSION}")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON) 
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
 cmake_host_system_information(RESULT logical QUERY NUMBER_OF_LOGICAL_CORES)
@@ -19,10 +22,17 @@ set(CMAKE_BUILD_PARALLEL_LEVEL ${logical})
 
 include(FetchContent)
 
+# Fetch Tracy content
+FetchContent_Declare(
+    tracy
+    URL https://github.com/wolfpld/tracy/archive/master.zip
+)
+FetchContent_MakeAvailable(tracy)
+
+# Fetch nlohmann json
 cmake_policy(SET CMP0135 NEW)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.1/json.tar.xz)
 FetchContent_MakeAvailable(json)
-
 
 add_executable(stargen 
     accrete.cpp
@@ -49,10 +59,27 @@ add_executable(stargen
     star_temps.cpp
     star_trek.cpp
     structs.cpp
-    utils.cpp)
+    utils.cpp
+    PerformanceMonitor.cpp
+    _deps/tracy-src/public/TracyClient.cpp
+)
 
+# Include Tracy directories
+target_include_directories(stargen PRIVATE ${tracy_SOURCE_DIR})
+
+# Define Tracy enabling macro
+target_compile_definitions(stargen PRIVATE TRACY_ENABLE)
+target_include_directories(stargen PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
+
+# Link libraries
 target_link_libraries(stargen PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(stargen PRIVATE m)
 
-install(TARGETS stargen RUNTIME DESTINATION bin)
-install(DIRECTORY html ref DESTINATION bin)
+# Set the binary output directory to the source directory
+set_target_properties(stargen PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+)
+
+# Remove install commands since the binary will be in the source directory
+# install(TARGETS stargen RUNTIME DESTINATION bin)
+# install(DIRECTORY html ref DESTINATION bin)

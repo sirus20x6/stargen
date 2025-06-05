@@ -1,4 +1,5 @@
 #include "radius_tables.h"
+#include "cmath"
 
 using namespace std;
 
@@ -87,6 +88,18 @@ map<long double, long double> solid_0point953_iron_0point047_water;
 map<long double, long double> solid_0point51_iron_0point49_water;
 map<long double, long double> solid_0point264_iron_0point736_water;
 map<long double, long double> earth_like;
+
+long double solid_iron_calc(double x){
+return 0.79250 + 0.22077 * log(x) + 0.01845 * log(x)*log(x);
+}
+
+long double water_radius_calc(double x){
+  return 1.52452 + 0.42613 * log(x) + 0.02165 * log(x)*log(x);
+}
+
+long double earthlike_radius_calc(double x){
+  return 1.02349 + 0.27752 * log(x) + 0.02054 * log(x)*log(x);
+}
 
 void initRadii() {
   gas_300Myr_1960K_0core_mass[0] = 0.0;
@@ -956,56 +969,6 @@ void initRadii() {
   gas_4point5Gyr_78K_100core_mass[2154] = 1.023;
   gas_4point5Gyr_78K_100core_mass[3594] = 1.004;
 
-  solid_water[0.04663] = 0.58;
-  solid_water[0.06174] = 0.63;
-  solid_water[0.08208] = 0.6853;
-  solid_water[0.1091] = 0.7455;
-  solid_water[0.1445] = 0.8102;
-  solid_water[0.1904] = 0.879;
-  solid_water[0.2494] = 0.9515;
-  solid_water[0.3249] = 1.028;
-  solid_water[0.4206] = 1.107;
-  solid_water[0.5416] = 1.19;
-  solid_water[0.6938] = 1.276;
-  solid_water[0.8866] = 1.366;
-  solid_water[1.132] = 1.461;
-  solid_water[1.444] = 1.562;
-  solid_water[1.841] = 1.699;
-  solid_water[2.346] = 1.782;
-  solid_water[2.985] = 1.901;
-  solid_water[3.77] = 2.023;
-  solid_water[4.735] = 2.147;
-  solid_water[5.909] = 2.274;
-  solid_water[7.325] = 2.401;
-  solid_water[9.038] = 2.529;
-  solid_water[11.11] = 2.66;
-  solid_water[13.55] = 2.789;
-  solid_water[16.42] = 2.915;
-  solid_water[19.77] = 3.039;
-  solid_water[23.68] = 3.16;
-  solid_water[28.21] = 3.278;
-  solid_water[33.49] = 3.393;
-  solid_water[39.62] = 3.506;
-  solid_water[46.72] = 3.616;
-  solid_water[54.92] = 3.724;
-  solid_water[64.22] = 3.826;
-  solid_water[74.79] = 3.924;
-  solid_water[86.85] = 4.017;
-  solid_water[100.3] = 4.104;
-  solid_water[115.3] = 4.183;
-  solid_water[131.9] = 4.256;
-  solid_water[150.3] = 4.322;
-  solid_water[170.8] = 4.382;
-  solid_water[193.6] = 4.435;
-  solid_water[218.7] = 4.483;
-  solid_water[246.6] = 4.525;
-  solid_water[277.3] = 4.561;
-  solid_water[311.3] = 4.592;
-  solid_water[348.7] = 4.618;
-  solid_water[390.1] = 4.639;
-  solid_water[435.9] = 4.656;
-  solid_water[486.4] = 4.669;
-
   solid_one_quater_rock_three_fourths_water[0.01217] = 0.3616;
   solid_one_quater_rock_three_fourths_water[0.01699] = 0.4009;
   solid_one_quater_rock_three_fourths_water[0.02351] = 0.4432;
@@ -1206,56 +1169,6 @@ void initRadii() {
   solid_half_rock_half_iron[133.8] = 2.789;
   solid_half_rock_half_iron[153.1] = 2.829;
 
-  solid_iron[0.001496] = 0.09947;
-  solid_iron[0.002096] = 0.1112;
-  solid_iron[0.002931] = 0.1243;
-  solid_iron[0.00409] = 0.1387;
-  solid_iron[0.005694] = 0.1546;
-  solid_iron[0.007904] = 0.1722;
-  solid_iron[0.01094] = 0.1915;
-  solid_iron[0.01507] = 0.2126;
-  solid_iron[0.0207] = 0.2356;
-  solid_iron[0.02829] = 0.2606;
-  solid_iron[0.0385] = 0.2876;
-  solid_iron[0.05212] = 0.3167;
-  solid_iron[0.07021] = 0.348;
-  solid_iron[0.09408] = 0.3814;
-  solid_iron[0.1254] = 0.417;
-  solid_iron[0.1663] = 0.4548;
-  solid_iron[0.2193] = 0.4949;
-  solid_iron[0.2877] = 0.537;
-  solid_iron[0.3754] = 0.5814;
-  solid_iron[0.4875] = 0.6279;
-  solid_iron[0.6298] = 0.6765;
-  solid_iron[0.8096] = 0.727;
-  solid_iron[1.036] = 0.7796;
-  solid_iron[1.319] = 0.834;
-  solid_iron[1.671] = 0.8902;
-  solid_iron[2.108] = 0.9481;
-  solid_iron[2.648] = 1.007;
-  solid_iron[3.31] = 1.068;
-  solid_iron[4.119] = 1.13;
-  solid_iron[5.103] = 1.193;
-  solid_iron[6.293] = 1.257;
-  solid_iron[7.727] = 1.321;
-  solid_iron[9.445] = 1.386;
-  solid_iron[11.49] = 1.451;
-  solid_iron[13.92] = 1.515;
-  solid_iron[16.78] = 1.579;
-  solid_iron[20.14] = 1.642;
-  solid_iron[24.05] = 1.704;
-  solid_iron[28.6] = 1.765;
-  solid_iron[33.87] = 1.824;
-  solid_iron[39.94] = 1.881;
-  solid_iron[46.92] = 1.937;
-  solid_iron[54.93] = 1.99;
-  solid_iron[64.08] = 2.042;
-  solid_iron[74.51] = 2.091;
-  solid_iron[86.37] = 2.138;
-  solid_iron[99.8] = 2.183;
-  solid_iron[115.0] = 2.226;
-  solid_iron[132.1] = 2.266;
-
   solid_0point953_iron_0point047_water[0.1] = 0.4226;
   solid_0point953_iron_0point047_water[0.1259] = 0.4536;
   solid_0point953_iron_0point047_water[0.1585] = 0.4867;
@@ -1382,31 +1295,4 @@ void initRadii() {
   solid_0point264_iron_0point736_water[79.43] = 3.592;
   solid_0point264_iron_0point736_water[100.0] = 3.718;
 
-  earth_like[0.01] = 0.24;
-  earth_like[0.032] = 0.34;
-  earth_like[0.1] = 0.5;
-  earth_like[0.2] = 0.592384;
-  earth_like[0.32] = 0.71;
-  earth_like[0.4] = 0.736224;
-  earth_like[0.6] = 0.833926;
-  earth_like[0.8] = 0.909741;
-  earth_like[1] = 1.0;
-  earth_like[2] = 1.18850;
-  earth_like[3] = 1.32962;
-  earth_like[3.16] = 1.36;
-  earth_like[4] = 1.43571;
-  earth_like[5] = 1.52093;
-  earth_like[6] = 1.59214;
-  earth_like[7] = 1.65321;
-  earth_like[8] = 1.70657;
-  earth_like[9] = 1.75383;
-  earth_like[10] = 1.79616;
-  earth_like[12] = 1.86914;
-  earth_like[14] = 1.93012;
-  earth_like[16] = 1.98200;
-  earth_like[18] = 2.02670;
-  earth_like[20] = 2.06553;
-  earth_like[31.6] = 2.31;
-  earth_like[100] = 2.84;
-  earth_like[316] = 3.12;
 }
