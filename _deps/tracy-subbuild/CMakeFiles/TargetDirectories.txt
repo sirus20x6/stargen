@@ -1,3 +1,0 @@
-/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/CMakeFiles/tracy-populate.dir
-/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/CMakeFiles/edit_cache.dir
-/run/media/sirus/aux/code/git/stargen/_deps/tracy-subbuild/CMakeFiles/rebuild_cache.dir
