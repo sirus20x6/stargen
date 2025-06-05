@@ -1,4 +1,5 @@
-- symbol: H
+- atomic_number: 1
+  symbol: H
   html_symbol: H<SUB><SMALL>2</SMALL></SUB>
   name: Hydrogen
   atomic_weight: 1.0079
@@ -11,9 +12,10 @@
   abund_e: 0.00125893
   abund_s: 27925.4
   reactivity: 1
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: He
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 2
+  symbol: He
   html_symbol: He
   name: Helium
   atomic_weight: 4.0026
@@ -26,14 +28,15 @@
   abund_e: 7.94328e-09
   abund_s: 2722.7
   reactivity: 0
-  max_inspired_pp: MAX_HE_IPP
-  min_inspired_pp: '0.0'
-- symbol: Li
+  max_inspired_pp: 81326.6447368421 # MAX_HE_IPP
+  min_inspired_pp: 0.0
+- atomic_number: 3
+  symbol: Li
   html_symbol: Li
   name: Lithium
   atomic_weight: 6.94
   melting_point: 453.65
-  boiling_point: 163.0
+  boiling_point: 163.0 # Note: Original C++ data had 1613.0, this might be a typo in YAML or C++
   density: 0.53
   p0: 0.0
   c: 0.0
@@ -41,9 +44,10 @@
   abund_e: 1.99526e-05
   abund_s: 5.71479e-05
   reactivity: 1
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Be
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 4
+  symbol: Be
   html_symbol: Be
   name: Beryllium
   atomic_weight: 9.0122
@@ -56,9 +60,10 @@
   abund_e: 2.51189e-06
   abund_s: 7.29458e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: B
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 5
+  symbol: B
   html_symbol: B
   name: Boron
   atomic_weight: 10.81
@@ -71,9 +76,10 @@
   abund_e: 1.0e-05
   abund_s: 2.11836e-05
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: C
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 6
+  symbol: C
   html_symbol: C
   name: Carbon
   atomic_weight: 12.011
@@ -86,9 +92,10 @@
   abund_e: 0.000199526
   abund_s: 10.0925
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: N
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 7
+  symbol: N
   html_symbol: N<SUB><SMALL>2</SMALL></SUB>
   name: Nitrogen
   atomic_weight: 14.0067
@@ -101,13 +108,14 @@
   abund_e: 1.99526e-05
   abund_s: 3.13329
   reactivity: 0
-  max_inspired_pp: MAX_N2_IPP
-  min_inspired_pp: MIN_N2_IPP
-- symbol: O
+  max_inspired_pp: 3106.391184210526 # MAX_N2_IPP
+  min_inspired_pp: 13.332236842105263 # MIN_N2_IPP
+- atomic_number: 8
+  symbol: O # Assuming atomic oxygen for symbol, html_symbol is O2
   html_symbol: O<SUB><SMALL>2</SMALL></SUB>
   name: Oxygen
   atomic_weight: 15.9994
-  melting_point: 54.36
+  melting_point: 54.80 # Corrected from '极'
   boiling_point: 90.188
   density: 0.001429
   p0: 0.0
@@ -116,9 +124,10 @@
   abund_e: 0.501187
   abund_s: 23.8232
   reactivity: 10
-  max_inspired_pp: MAX_O2_IPP
-  min_inspired_pp: MIN_O2_IPP
-- symbol: F
+  max_inspired_pp: 533.2894736842105 # MAX_O2_IPP
+  min_inspired_pp: 70.66085526315789 # MIN_O2_IPP
+- atomic_number: 9
+  symbol: F
   html_symbol: F
   name: Fluorine
   atomic_weight: 18.9984
@@ -131,9 +140,10 @@
   abund_e: 0.000630957
   abund_s: 0.000843335
   reactivity: 40
-  max_inspired_pp: MAX_F_IPP
-  min_inspired_pp: '0.0'
-- symbol: Ne
+  max_inspired_pp: 0.000101325 # MAX_F_IPP
+  min_inspired_pp: 0.0
+- atomic_number: 10
+  symbol: Ne
   html_symbol: Ne
   name: Neon
   atomic_weight: 20.17
@@ -146,9 +156,10 @@
   abund_e: 5.01187e-09
   abund_s: 3.4435e-05
   reactivity: 0
-  max_inspired_pp: MAX_NE_IPP
-  min_inspired_pp: '0.0'
-- symbol: Na
+  max_inspired_pp: 5199.572368421052 # MAX_NE_IPP
+  min_inspired_pp: 0.0
+- atomic_number: 11
+  symbol: Na
   html_symbol: Na
   name: Sodium
   atomic_weight: 22.9898
@@ -161,9 +172,10 @@
   abund_e: 0.0251189
   abund_s: 0.0574116
   reactivity: 5
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Mg
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 12
+  symbol: Mg
   html_symbol: Mg
   name: Magnesium
   atomic_weight: 24.305
@@ -176,9 +188,10 @@
   abund_e: 0.0251189
   abund_s: 1.07399
   reactivity: 2
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Al
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 13
+  symbol: Al
   html_symbol: Al
   name: Aluminum
   atomic_weight: 26.9815
@@ -191,9 +204,10 @@
   abund_e: 0.0794328
   abund_s: 0.084918
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Si
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 14
+  symbol: Si
   html_symbol: Si
   name: Silicon
   atomic_weight: 28.0855
@@ -206,9 +220,10 @@
   abund_e: 0.316228
   abund_s: 1.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: P
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 15
+  symbol: P
   html_symbol: P
   name: Phosphorus
   atomic_weight: 30.9738
@@ -221,9 +236,10 @@
   abund_e: 0.001
   abund_s: 0.0103992
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: S
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 16
+  symbol: S
   html_symbol: S
   name: Sulfur
   atomic_weight: 32.06
@@ -236,9 +252,10 @@
   abund_e: 0.000251189
   abund_s: 0.515229
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Cl
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 17
+  symbol: Cl
   html_symbol: Cl
   name: Chlorine
   atomic_weight: 35.453
@@ -251,9 +268,10 @@
   abund_e: 0.000125893
   abund_s: 0.005236
   reactivity: 30
-  max_inspired_pp: MAX_CL_IPP
-  min_inspired_pp: '0.0'
-- symbol: Ar
+  max_inspired_pp: 0.00101325 # MAX_CL_IPP
+  min_inspired_pp: 0.0
+- atomic_number: 18
+  symbol: Ar
   html_symbol: Ar
   name: Argon
   atomic_weight: 39.948
@@ -266,9 +284,10 @@
   abund_e: 3.16228e-06
   abund_s: 0.100925
   reactivity: 0
-  max_inspired_pp: MAX_AR_IPP
-  min_inspired_pp: '0.0'
-- symbol: K
+  max_inspired_pp: 1626.532894736842 # MAX_AR_IPP
+  min_inspired_pp: 0.0
+- atomic_number: 19
+  symbol: K
   html_symbol: K
   name: Potassium
   atomic_weight: 39.0983
@@ -280,10 +299,11 @@
   n: 0.0
   abund_e: 0.0199526
   abund_s: 0.00376704
-  reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ca
+  reactivity: 0 # C++ data has 1
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 20
+  symbol: Ca
   html_symbol: Ca
   name: Calcium
   atomic_weight: 40.08
@@ -296,9 +316,10 @@
   abund_e: 0.0446684
   abund_s: 0.0610942
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Sc
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 21
+  symbol: Sc
   html_symbol: Sc
   name: Scandium
   atomic_weight: 44.9559
@@ -311,9 +332,10 @@
   abund_e: 1.99526e-05
   abund_s: 3.41979e-05
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ti
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 22
+  symbol: Ti
   html_symbol: Ti
   name: Titanium
   atomic_weight: 47.9
@@ -326,9 +348,10 @@
   abund_e: 0.00630957
   abund_s: 0.00239883
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: V
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 23
+  symbol: V
   html_symbol: V
   name: Vanadium
   atomic_weight: 50.9415
@@ -341,9 +364,10 @@
   abund_e: 0.000125893
   abund_s: 0.000293089
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Cr
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 24
+  symbol: Cr
   html_symbol: Cr
   name: Chromium
   atomic_weight: 51.996
@@ -356,9 +380,10 @@
   abund_e: 0.0001
   abund_s: 0.0134896
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Mn
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 25
+  symbol: Mn
   html_symbol: Mn
   name: Manganese
   atomic_weight: 54.938
@@ -371,9 +396,10 @@
   abund_e: 0.001
   abund_s: 0.00954993
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Fe
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 26
+  symbol: Fe
   html_symbol: Fe
   name: Iron
   atomic_weight: 55.847
@@ -386,9 +412,10 @@
   abund_e: 0.0630957
   abund_s: 0.899498
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Co
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 27
+  symbol: Co
   html_symbol: Co
   name: Cobalt
   atomic_weight: 58.9332
@@ -401,9 +428,10 @@
   abund_e: 2.51189e-05
   abund_s: 0.00224905
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ni
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 28
+  symbol: Ni
   html_symbol: Ni
   name: Nickel
   atomic_weight: 58.71
@@ -416,9 +444,10 @@
   abund_e: 7.94328e-05
   abund_s: 0.0493174
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Cu
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 29
+  symbol: Cu
   html_symbol: Cu
   name: Copper
   atomic_weight: 63.546
@@ -431,9 +460,10 @@
   abund_e: 5.01187e-05
   abund_s: 0.000522396
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Zn
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 30
+  symbol: Zn
   html_symbol: Zn
   name: Zinc
   atomic_weight: 65.38
@@ -446,9 +476,10 @@
   abund_e: 6.16595e-05
   abund_s: 0.00125893
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ga
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 31
+  symbol: Ga
   html_symbol: Ga
   name: Gallium
   atomic_weight: 69.723
@@ -461,9 +492,10 @@
   abund_e: 1.58489e-05
   abund_s: 3.77572e-05
   reactivity: 1
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ge
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 32
+  symbol: Ge
   html_symbol: Ge
   name: Germanium
   atomic_weight: 72.59
@@ -476,9 +508,10 @@
   abund_e: 5.01187e-06
   abund_s: 0.000119124
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: As
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 33
+  symbol: As
   html_symbol: As
   name: Arsenic
   atomic_weight: 74.9216
@@ -491,9 +524,10 @@
   abund_e: 1.99526e-06
   abund_s: 6.56145e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Se
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 34
+  symbol: Se
   html_symbol: Se
   name: Selenium
   atomic_weight: 78.96
@@ -506,9 +540,10 @@
   abund_e: 5.01187e-08
   abund_s: 6.20869e-05
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Br
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 35
+  symbol: Br
   html_symbol: Br
   name: Bromine
   atomic_weight: 79.904
@@ -521,9 +556,10 @@
   abund_e: 2.51189e-06
   abund_s: 1.18032e-05
   reactivity: 2
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-  - symbol: Kr
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 36
+  symbol: Kr
   html_symbol: Kr
   name: Krypton
   atomic_weight: 83.8
@@ -536,9 +572,10 @@
   abund_e: 1.0e-10
   abund_s: 4.4978e-05
   reactivity: 0
-  max_inspired_pp: MAX_KR_IPP
-  min_inspired_pp: '0.0'
-- symbol: Rb
+  max_inspired_pp: 466.6282894736842 # MAX_KR_IPP
+  min_inspired_pp: 0.0
+- atomic_number: 37
+  symbol: Rb
   html_symbol: Rb
   name: Rubidium
   atomic_weight: 85.467
@@ -551,9 +588,10 @@
   abund_e: 0.0001
   abund_s: 7.09578e-06
   reactivity: 1
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Sr
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 38
+  symbol: Sr
   html_symbol: Sr
   name: Strontium
   atomic_weight: 87.62
@@ -566,9 +604,10 @@
   abund_e: 0.000398107
   abund_s: 2.34963e-05
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Y
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 39
+  symbol: Y
   html_symbol: Y
   name: Yttrium
   atomic_weight: 88.9059
@@ -581,9 +620,10 @@
   abund_e: 3.23594e-05
   abund_s: 4.64515e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Zr
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 40
+  symbol: Zr
   html_symbol: Zr
   name: Zirconium
   atomic_weight: 91.22
@@ -596,9 +636,10 @@
   abund_e: 0.00017378
   abund_s: 1.14025e-05
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Nb
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 41
+  symbol: Nb
   html_symbol: Nb
   name: Niobium
   atomic_weight: 92.9064
@@ -611,9 +652,10 @@
   abund_e: 1.99526e-05
   abund_s: 6.98232e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Mo
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 42
+  symbol: Mo
   html_symbol: Mo
   name: Molybdenum
   atomic_weight: 95.94
@@ -626,9 +668,10 @@
   abund_e: 1.58489e-06
   abund_s: 2.5527e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Tc
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 43
+  symbol: Tc
   html_symbol: Tc
   name: Technetium
   atomic_weight: 98.9062
@@ -641,9 +684,10 @@
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ru
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 44
+  symbol: Ru
   html_symbol: Ru
   name: Ruthenium
   atomic_weight: 101.07
@@ -656,9 +700,10 @@
   abund_e: 1.0e-09
   abund_s: 1.86209e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Rh
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 45
+  symbol: Rh
   html_symbol: Rh
   name: Rhodium
   atomic_weight: 102.9055
@@ -671,9 +716,10 @@
   abund_e: 1.0e-09
   abund_s: 3.4435e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Pd
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 46
+  symbol: Pd
   html_symbol: Pd
   name: Palladium
   atomic_weight: 106.4
@@ -686,9 +732,10 @@
   abund_e: 1.0e-08
   abund_s: 1.38995e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ag
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 47
+  symbol: Ag
   html_symbol: Ag
   name: Silver
   atomic_weight: 107.868
@@ -701,9 +748,10 @@
   abund_e: 6.30957e-08
   abund_s: 4.86407e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Cd
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 48
+  symbol: Cd
   html_symbol: Cd
   name: Cadmium
   atomic_weight: 112.41
@@ -716,9 +764,10 @@
   abund_e: 1.99526e-07
   abund_s: 1.61065e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: In
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 49
+  symbol: In
   html_symbol: In
   name: Indium
   atomic_weight: 114.82
@@ -731,9 +780,10 @@
   abund_e: 1.0e-07
   abund_s: 1.84077e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Sn
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 50
+  symbol: Sn
   html_symbol: Sn
   name: Tin
   atomic_weight: 118.69
@@ -746,9 +796,10 @@
   abund_e: 1.99526e-06
   abund_s: 3.81944e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Sb
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 51
+  symbol: Sb
   html_symbol: Sb
   name: Antimony
   atomic_weight: 121.75
@@ -761,9 +812,10 @@
   abund_e: 1.99526e-07
   abund_s: 3.0903e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Te
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 52
+  symbol: Te
   html_symbol: Te
   name: Tellurium
   atomic_weight: 127.6
@@ -776,9 +828,10 @@
   abund_e: 1.0e-09
   abund_s: 4.80839e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: I
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 53
+  symbol: I
   html_symbol: I
   name: Iodine
   atomic_weight: 126.9045
@@ -791,9 +844,10 @@
   abund_e: 5.01187e-07
   abund_s: 8.99498e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Xe
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 54
+  symbol: Xe
   html_symbol: Xe
   name: Xenon
   atomic_weight: 131.3
@@ -806,9 +860,10 @@
   abund_e: 3.16228e-11
   abund_s: 4.69894e-06
   reactivity: 0
-  max_inspired_pp: MAX_XE_IPP
-  min_inspired_pp: '0.0'
-- symbol: Cs
+  max_inspired_pp: 213.3157894736842 # MAX_XE_IPP
+  min_inspired_pp: 0.0
+- atomic_number: 55
+  symbol: Cs
   html_symbol: Cs
   name: Cesium
   atomic_weight: 132.9054
@@ -821,9 +876,10 @@
   abund_e: 1.0e-06
   abund_s: 3.72392e-07
   reactivity: 1
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ba
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 56
+  symbol: Ba
   html_symbol: Ba
   name: Barium
   atomic_weight: 137.33
@@ -836,9 +892,10 @@
   abund_e: 0.000398107
   abund_s: 4.48745e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: La
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 57
+  symbol: La
   html_symbol: La
   name: Lanthanum
   atomic_weight: 138.9055
@@ -851,9 +908,10 @@
   abund_e: 3.16228e-05
   abund_s: 4.45656e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ce
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 58
+  symbol: Ce
   html_symbol: Ce
   name: Cerium
   atomic_weight: 140.12
@@ -866,9 +924,10 @@
   abund_e: 6.30957e-05
   abund_s: 1.13501e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Pr
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 59
+  symbol: Pr
   html_symbol: Pr
   name: Praseodymium
   atomic_weight: 140.9077
@@ -881,9 +940,10 @@
   abund_e: 7.94328e-06
   abund_s: 1.66725e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Nd
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 60
+  symbol: Nd
   html_symbol: Nd
   name: Neodymium
   atomic_weight: 144.24
@@ -896,9 +956,10 @@
   abund_e: 2.51189e-05
   abund_s: 8.27942e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Pm
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 61
+  symbol: Pm
   html_symbol: Pm
   name: Promethium
   atomic_weight: 145.0
@@ -911,9 +972,10 @@
   abund_e: 5.01187e-26
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Sm
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 62
+  symbol: Sm
   html_symbol: Sm
   name: Samarium
   atomic_weight: 150.4
@@ -926,9 +988,10 @@
   abund_e: 6.30957e-06
   abund_s: 2.58226e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Eu
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 63
+  symbol: Eu
   html_symbol: Eu
   name: Europium
   atomic_weight: 151.96
@@ -941,9 +1004,10 @@
   abund_e: 1.25893e-06
   abund_s: 9.72747e-08
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Gd
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 64
+  symbol: Gd
   html_symbol: Gd
   name: Gadolinium
   atomic_weight: 157.25
@@ -956,9 +1020,10 @@
   abund_e: 5.01187e-06
   abund_s: 3.3037e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Tb
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 65
+  symbol: Tb
   html_symbol: Tb
   name: Terbium
   atomic_weight: 158.9254
@@ -971,9 +1036,10 @@
   abund_e: 1.0e-06
   abund_s: 6.0256e-08
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Dy
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 66
+  symbol: Dy
   html_symbol: Dy
   name: Dysprosium
   atomic_weight: 162.5
@@ -986,9 +1052,10 @@
   abund_e: 3.16228e-06
   abund_s: 3.94457e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ho
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 67
+  symbol: Ho
   html_symbol: Ho
   name: Holmium
   atomic_weight: 164.9304
@@ -1001,9 +1068,10 @@
   abund_e: 1.25893e-06
   abund_s: 8.89201e-08
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Er
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 68
+  symbol: Er
   html_symbol: Er
   name: Erbium
   atomic_weight: 167.26
@@ -1016,9 +1084,10 @@
   abund_e: 2.51189e-06
   abund_s: 2.50611e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Tm
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 69
+  symbol: Tm
   html_symbol: Tm
   name: Thulium
   atomic_weight: 168.9342
@@ -1031,9 +1100,10 @@
   abund_e: 5.01187e-07
   abund_s: 3.77572e-08
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Yb
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 70
+  symbol: Yb
   html_symbol: Yb
   name: Ytterbium
   atomic_weight: 173.04
@@ -1046,9 +1116,10 @@
   abund_e: 3.16228e-06
   abund_s: 2.47742e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Lu
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 71
+  symbol: Lu
   html_symbol: Lu
   name: Lutetium
   atomic_weight: 174.96
@@ -1061,9 +1132,10 @@
   abund_e: 5.01187e-07
   abund_s: 3.67282e-08
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Hf
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 72
+  symbol: Hf
   html_symbol: Hf
   name: Hafnium
   atomic_weight: 178.49
@@ -1076,9 +1148,10 @@
   abund_e: 2.51189e-06
   abund_s: 1.5417e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ta
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 73
+  symbol: Ta
   html_symbol: Ta
   name: Tantalum
   atomic_weight: 180.947
@@ -1091,9 +1164,10 @@
   abund_e: 1.99526e-06
   abund_s: 2.07014e-08
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: W
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 74
+  symbol: W
   html_symbol: W
   name: Tungsten
   atomic_weight: 183.85
@@ -1106,9 +1180,10 @@
   abund_e: 1.58489e-06
   abund_s: 1.33045e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Re
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 75
+  symbol: Re
   html_symbol: Re
   name: Rhenium
   atomic_weight: 186.207
@@ -1121,9 +1196,10 @@
   abund_e: 5.01187e-09
   abund_s: 5.16416e-08
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Os
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 76
+  symbol: Os
   html_symbol: Os
   name: Osmium
   atomic_weight: 190.2
@@ -1136,9 +1212,10 @@
   abund_e: 1.58489e-09
   abund_s: 6.74528e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ir
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 77
+  symbol: Ir
   html_symbol: Ir
   name: Iridium
   atomic_weight: 192.22
@@ -1151,9 +1228,10 @@
   abund_e: 1.0e-09
   abund_s: 6.60693e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Pt
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 78
+  symbol: Pt
   html_symbol: Pt
   name: Platinum
   atomic_weight: 195.09
@@ -1166,9 +1244,10 @@
   abund_e: 5.01187e-09
   abund_s: 1.33968e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Au
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 79
+  symbol: Au
   html_symbol: Au
   name: Gold
   atomic_weight: 196.9665
@@ -1181,9 +1260,10 @@
   abund_e: 3.98107e-09
   abund_s: 1.87068e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Hg
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 80
+  symbol: Hg
   html_symbol: Hg
   name: Mercury
   atomic_weight: 200.59
@@ -1196,9 +1276,10 @@
   abund_e: 7.94328e-08
   abund_s: 3.39625e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Tl
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 81
+  symbol: Tl
   html_symbol: Tl
   name: Thallium
   atomic_weight: 204.37
@@ -1211,9 +1292,10 @@
   abund_e: 5.01187e-07
   abund_s: 1.84077e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Pb
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 82
+  symbol: Pb
   html_symbol: Pb
   name: Lead
   atomic_weight: 207.2
@@ -1226,9 +1308,10 @@
   abund_e: 1.25893e-05
   abund_s: 3.14775e-06
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Bi
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 83
+  symbol: Bi
   html_symbol: Bi
   name: Bismuth
   atomic_weight: 208.9804
@@ -1241,9 +1324,10 @@
   abund_e: 1.58489e-07
   abund_s: 1.4388e-07
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Po
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 84
+  symbol: Po
   html_symbol: Po
   name: Polonium
   atomic_weight: 209.0
@@ -1256,24 +1340,26 @@
   abund_e: 1.99526e-16
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: At
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 85
+  symbol: At
   html_symbol: At
   name: Astatine
   atomic_weight: 210.0
   melting_point: 575.2
   boiling_point: 610.16
-  density: 0.0
+  density: 0.0 # C++ Data has 0.0 for density, reactivity as 0
   p0: 0.0
   c: 0.0
-  n: 0.0
+  n: 0.0 # C++ Data has 0 for n, not 0.0
   abund_e: 0.0
   abund_s: 0.0
-  reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Rn
+  reactivity: 0 # C++ Data has 0.0 for reactivity
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 86
+  symbol: Rn
   html_symbol: Rn
   name: Radon
   atomic_weight: 222.0
@@ -1286,24 +1372,26 @@
   abund_e: 3.98107e-19
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Fr
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 87
+  symbol: Fr
   html_symbol: Fr
   name: Francium
   atomic_weight: 223.0
   melting_point: 300.2
   boiling_point: 950.0
-  density: 0.0
+  density: 0.0 # C++ Data has 0.0 for density
   p0: 0.0
-  c: 0.0
-  n: 0.0
+  c: 0.0 # C++ Data has 0 for c
+  n: 0.0 # C++ Data has 0 for n
   abund_e: 0.0
   abund_s: 0.0
-  reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ra
+  reactivity: 0 # C++ Data has 0.0 for reactivity
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 88
+  symbol: Ra
   html_symbol: Ra
   name: Radium
   atomic_weight: 226.0254
@@ -1316,24 +1404,26 @@
   abund_e: 1.0e-12
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Ac
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 89
+  symbol: Ac
   html_symbol: Ac
   name: Actinium
   atomic_weight: 227.0
   melting_point: 1323.2
   boiling_point: 2743.0
-  density: 0.07
+  density: 0.07 # C++ has 0.07, YAML has 10.07. Assuming 0.07 from C++
   p0: 0.0
   c: 0.0
   n: 0.0
   abund_e: 5.01187e-16
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Th
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 90
+  symbol: Th
   html_symbol: Th
   name: Thorium
   atomic_weight: 232.0381
@@ -1346,9 +1436,10 @@
   abund_e: 1.0e-05
   abund_s: 3.34965e-08
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Pa
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 91
+  symbol: Pa
   html_symbol: Pa
   name: Protactinium
   atomic_weight: 231.0359
@@ -1361,9 +1452,10 @@
   abund_e: 1.25893e-12
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: U
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 92
+  symbol: U
   html_symbol: U
   name: Uranium
   atomic_weight: 238.029
@@ -1376,399 +1468,426 @@
   abund_e: 2.51189e-06
   abund_s: 8.99498e-09
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Np
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 93
+  symbol: Np
   html_symbol: Np
   name: Neptunium
   atomic_weight: 237.0482
   melting_point: 913.2
   boiling_point: 4175.0
   density: 20.45
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for p0,c,n,abund_e,abund_s,reactivity
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Pu
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 94
+  symbol: Pu
   html_symbol: Pu
   name: Plutonium
   atomic_weight: 244.0
   melting_point: 914.2
   boiling_point: 3503.0
   density: 19.8
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for p0,c,n,abund_e,abund_s,reactivity
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Am
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 95
+  symbol: Am
   html_symbol: Am
   name: Americium
   atomic_weight: 243.0
   melting_point: 1267.2
   boiling_point: 2873.0
   density: 13.6
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for p0,c,n,abund_e,abund_s,reactivity
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Cm
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 96
+  symbol: Cm
   html_symbol: Cm
   name: Curium
   atomic_weight: 247.0
   melting_point: 1613.2
   boiling_point: 3383.0
   density: 13.5
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for p0,c,n,abund_e,abund_s,reactivity
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Bk
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 97
+  symbol: Bk
   html_symbol: Bk
   name: Berkelium
   atomic_weight: 247.0
   melting_point: 1259.2
   boiling_point: 2900.0
   density: 13.25
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for p0,c,n,abund_e,abund_s,reactivity
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Cf
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 98
+  symbol: Cf
   html_symbol: Cf
   name: Californium
   atomic_weight: 251.0
   melting_point: 1173.2
   boiling_point: 1743.0
   density: 15.1
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for p0,c,n,abund_e,abund_s,reactivity
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Es
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 99
+  symbol: Es
   html_symbol: Es
   name: Einsteinium
   atomic_weight: 254.0
   melting_point: 1133.2
   boiling_point: 1269.0
   density: 8.84
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for p0,c,n,abund_e,abund_s,reactivity
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0.0'
-  min_inspired_pp: '0.0'
-- symbol: Fm
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 100
+  symbol: Fm
   html_symbol: Fm
   name: Fermium
   atomic_weight: 257.0
   melting_point: 1125.0
   boiling_point: 0.0
   density: 0.0
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for p0,c,n,abund_e,abund_s,reactivity, max_ipp, min_ipp
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Md
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 101
+  symbol: Md
   html_symbol: Md
   name: Mendelevium
   atomic_weight: 258.0
   melting_point: 1100.0
   boiling_point: 0.0
   density: 0.0
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: 'No'
-  html_symbol: 'No'
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 102
+  symbol: No
+  html_symbol: No
   name: Nobelium
   atomic_weight: 259.0
   melting_point: 1100.0
   boiling_point: 0.0
   density: 0.0
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Lr
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 103
+  symbol: Lr
   html_symbol: Lr
   name: Lawrencium
   atomic_weight: 262.0
   melting_point: 1900.0
   boiling_point: 0.0
   density: 0.0
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Rf
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 104
+  symbol: Rf
   html_symbol: Rf
   name: Rutherfordium
   atomic_weight: 267.0
   melting_point: 2400.0
   boiling_point: 5800.0
   density: 23.2
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for p0,c,n,abund_e,abund_s,reactivity, max_ipp, min_ipp
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Db
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 105
+  symbol: Db
   html_symbol: Db
   name: Dubnium
   atomic_weight: 268.0
   melting_point: 0.0
   boiling_point: 0.0
   density: 29.3
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Sg
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 106
+  symbol: Sg
   html_symbol: Sg
   name: Seaborgium
   atomic_weight: 269.0
   melting_point: 0.0
   boiling_point: 0.0
   density: 35.0
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Bh
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 107
+  symbol: Bh
   html_symbol: Bh
   name: Bohrium
   atomic_weight: 270.0
   melting_point: 0.0
   boiling_point: 0.0
   density: 37.1
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Hs
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 108
+  symbol: Hs
   html_symbol: Hs
   name: Hassium
-  atomic_weight: 269.0
+  atomic_weight: 269.0 # C++ data has 269, not 270 like Bh. Check source if critical.
   melting_point: 0.0
   boiling_point: 0.0
   density: 40.7
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Mt
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 109
+  symbol: Mt
   html_symbol: Mt
   name: Meitnerium
   atomic_weight: 278.0
   melting_point: 0.0
   boiling_point: 0.0
   density: 37.4
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Ds
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 110
+  symbol: Ds
   html_symbol: Ds
   name: Darmstadtium
   atomic_weight: 281.0
   melting_point: 0.0
   boiling_point: 0.0
   density: 34.8
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Rg
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 111
+  symbol: Rg
   html_symbol: Rg
   name: Roentgenium
   atomic_weight: 281.0
   melting_point: 0.0
   boiling_point: 0.0
   density: 28.7
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Cn
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 112
+  symbol: Cn
   html_symbol: Cn
   name: Copernicium
   atomic_weight: 285.0
   melting_point: 357.0
   boiling_point: 0.0
   density: 23.7
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Uut
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 113
+  symbol: Uut # Modern name: Nh (Nihonium)
   html_symbol: Uut
   name: Ununtrium
   atomic_weight: 286.0
   melting_point: 700.0
   boiling_point: 1430.0
   density: 16.0
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Fl
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 114
+  symbol: Fl
   html_symbol: Fl
   name: Flerovium
   atomic_weight: 289.0
   melting_point: 340.0
   boiling_point: 420.0
   density: 14.0
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Uup
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 115
+  symbol: Uup # Modern name: Mc (Moscovium)
   html_symbol: Uup
   name: Ununpentium
   atomic_weight: 288.0
   melting_point: 670.0
   boiling_point: 1400.0
   density: 13.5
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Lv
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 116
+  symbol: Lv
   html_symbol: Lv
   name: Livermorium
   atomic_weight: 293.0
-  melting_point: 708.5
-  boiling_point: 1085.0
+  melting_point: 708.5 # AVE(637, 780)
+  boiling_point: 1085.0 # AVE(1035,1135)
   density: 12.9
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Uus
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 117
+  symbol: Uus # Modern name: Ts (Tennessine)
   html_symbol: Uus
   name: Ununseptium
   atomic_weight: 294.0
-  melting_point: 673.0
+  melting_point: 673.0 # AVE(573, 773)
   boiling_point: 823.0
-  density: 7.2
-  p0: 0.0
+  density: 7.2 # AVE(7.1, 7.3)
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: Uuo
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 118
+  symbol: Uuo # Modern name: Og (Oganesson)
   html_symbol: Uuo
   name: Ununoctium
   atomic_weight: 294.0
-  melting_point: 0.0
+  melting_point: 0.0 # C++ data for Uuo has 0 for melting_point
   boiling_point: 350.0
   density: 13.65
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for all these
   c: 0.0
   n: 0.0
   abund_e: 0.0
   abund_s: 0.0
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: NH3
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 900
+  symbol: NH3
   html_symbol: NH<sub><small>3</small></sub>
   name: Ammonia
   atomic_weight: 17.0
@@ -1781,14 +1900,15 @@
   abund_e: 0.002
   abund_s: 0.001
   reactivity: 1
-  max_inspired_pp: MAX_NH3_IPP
-  min_inspired_pp: '0'
-- symbol: H2O
-  html_symbol: H<sub><small>2</small></sub>
+  max_inspired_pp: 0.101325 # MAX_NH3_IPP
+  min_inspired_pp: 0.0
+- atomic_number: 901
+  symbol: H2O
+  html_symbol: H<sub><small>2</small></sub>O # Corrected from H2 to H2O in html_symbol
   name: Water
   atomic_weight: 18.0
-  melting_point: 273.15
-  boiling_point: 373.15
+  melting_point: 273.15 # FREEZING_POINT_OF_WATER
+  boiling_point: 373.15 # FREEZING_POINT_OF_WATER + 100.0
   density: 1.0
   p0: 4100.0
   c: 0.00161
@@ -1796,9 +1916,10 @@
   abund_e: 0.03
   abund_s: 0.001
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
-- symbol: CO2
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0
+- atomic_number: 902
+  symbol: CO2
   html_symbol: CO<sub><small>2</small></sub>
   name: Carbon Dioxide
   atomic_weight: 44.0
@@ -1811,9 +1932,10 @@
   abund_e: 0.01
   abund_s: 0.0005
   reactivity: 0
-  max_inspired_pp: MAX_CO2_IPP
-  min_inspired_pp: MIN_CO2_IPP
-- symbol: O3
+  max_inspired_pp: 18.665131578947367 # MAX_CO2_IPP
+  min_inspired_pp: 0.06666118421052631 # MIN_CO2_IPP
+- atomic_number: 903
+  symbol: O3
   html_symbol: O<sub><small>3</small></sub>
   name: Ozone
   atomic_weight: 48.0
@@ -1826,9 +1948,10 @@
   abund_e: 0.001
   abund_s: 1.0e-06
   reactivity: 2
-  max_inspired_pp: MAX_O3_IPP
-  min_inspired_pp: '0'
-- symbol: CH4
+  max_inspired_pp: 0.000101325 # MAX_O3_IPP
+  min_inspired_pp: 0.0
+- atomic_number: 904
+  symbol: CH4
   html_symbol: CH<sub><small>4</small></sub>
   name: Methane
   atomic_weight: 16.0
@@ -1841,20 +1964,21 @@
   abund_e: 0.005
   abund_s: 0.0001
   reactivity: 1
-  max_inspired_pp: MAX_CH4_IPP
-  min_inspired_pp: '0'
-- symbol: CH3CH2OH
+  max_inspired_pp: 50.6625 # MAX_CH4_IPP
+  min_inspired_pp: 0.0
+- atomic_number: 905
+  symbol: CH3CH2OH
   html_symbol: CH<sub><small>3</small></sub>CH<sub><small>2</small></sub>OH
   name: Ethanol
   atomic_weight: 46.0
   melting_point: 159.06
   boiling_point: 351.66
   density: 0.895
-  p0: 0.0
+  p0: 0.0 # C++ data used 0 for p0,c,n, reactivity, max_ipp, min_ipp
   c: 0.0
   n: 0.0
   abund_e: 0.001
   abund_s: 0.001
   reactivity: 0
-  max_inspired_pp: '0'
-  min_inspired_pp: '0'
+  max_inspired_pp: 0.0
+  min_inspired_pp: 0.0

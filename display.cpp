@@ -1,3 +1,4 @@
+#include <variant>
 #include "display.h"
 
 #include <cmath>
