@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.50...4.99)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 project(stargen VERSION 3.0.0.0 DESCRIPTION "A program for generating solar systems")
 
 # Assuming GIT_VERSION is set externally (e.g., by your CI, a FindGit.cmake module, or environment variable)
@@ -6,15 +7,21 @@ project(stargen VERSION 3.0.0.0 DESCRIPTION "A program for generating solar syst
 # you might want to use it in the project() command directly, e.g. project(stargen VERSION ${GIT_VERSION})
 # Ensure GIT_VERSION is actually populated, otherwise it will be empty.
 set(my_project_VERSION ${GIT_VERSION})
-message(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}") # This will be 3.0.0.0
-message(STATUS "CMAKE_PROJECT_VERSION: ${CMAKE_PROJECT_VERSION}") # This will be 3.0.0.0
+message(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}")
+message(STATUS "CMAKE_PROJECT_VERSION: ${CMAKE_PROJECT_VERSION}")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # The following line is redundant if the one above is set, but harmless.
 # set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON) # Explicitly enable compiler-specific extensions.
+
+option(CLANG "Use Clang instead of GCC" OFF)
+if(CLANG AND NOT CMAKE_C_COMPILER AND NOT CMAKE_CXX_COMPILER)
+  set(CMAKE_C_COMPILER clang)
+  set(CMAKE_CXX_COMPILER clang++)
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
