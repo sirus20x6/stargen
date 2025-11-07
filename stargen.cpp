@@ -110,6 +110,211 @@ long system_seed = 0;
 std::string stargen_revision = "$Revision: 3.0 $";
 
 /**
+ * @brief Handle aListGases action - list all gases with their properties
+ */
+static auto handle_list_gases_action() -> int {
+  long double total = 0.0;
+  int count = gases.count();
+  for (int i = 0; i < count; i++) {
+    if (gases[i].getWeight() >= AN_N &&
+        gases[i].getMaxIpp() < INCREDIBLY_LARGE_NUMBER) {
+      total += gases[i].getMaxIpp();
+    }
+  }
+  std::cout << gases;
+  std::cout << "Total Max ipp: " << toString(total) << "\n";
+  std::cout << "Max pressure: " << toString(MAX_HABITABLE_PRESSURE) << " atm\n";
+  return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Handle aListCatalog action - list star catalog
+ */
+static auto handle_list_catalog_action(catalog& cat_arg) -> int {
+  std::cout << cat_arg;
+  return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Handle aListCatalogAsHTML action - list catalog as HTML options
+ */
+static auto handle_list_catalog_html_action(catalog& cat_arg) -> int {
+  int count = cat_arg.count();
+  for (int i = 0; i < count; i++) {
+    std::cout << "\t<option value=" << i << ">" << cat_arg[i].getName()
+         << "</option>\n";
+  }
+  return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Handle aSizeCheck action - display type sizes and planet temperatures
+ */
+static auto handle_size_check_action() -> int {
+  long double tempE = est_temp(1.0, 1.0, EARTH_ALBEDO);
+  long double tempJ = est_temp(1.0, 5.2034, GAS_GIANT_ALBEDO);
+  long double tempS = est_temp(1.0, 9.5371, GAS_GIANT_ALBEDO);
+  long double tempU = est_temp(1.0, 19.1913, GAS_GIANT_ALBEDO);
+  long double tempN = est_temp(1.0, 30.0690, GAS_GIANT_ALBEDO);
+
+  std::cout << "Size of float: " << sizeof(float) << "\n";
+  std::cout << "Size of doubles: " << sizeof(double) << "\n";
+  std::cout << "Size of long doubles: " << sizeof(long double) << "\n";
+  std::cout << "Earth Eff Temp: " << toString(tempE) << " K, "
+       << toString(tempE - FREEZING_POINT_OF_WATER)
+       << " C, Earth rel: " << toString(tempE - EARTH_AVERAGE_KELVIN)
+       << " C\n";
+  std::cout << "Jupiter Eff Temp: " << toString(tempJ) << " K\n";
+  std::cout << "Saturn Eff Temp: " << toString(tempS) << " K\n";
+  std::cout << "Uranus Eff Temp: " << toString(tempU) << " K\n";
+  std::cout << "Neptune Eff Temp: " << toString(tempN) << " K\n";
+  return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Handle aListVerbosity action - show verbosity flag documentation
+ */
+static auto handle_list_verbosity_action() -> int {
+  std::cout << "Stargen " << stargen_revision << "\n"
+  << "Verbosity flags are hexidecimal numbers:\n"
+  << "\t0001\tEarthlike count\n"
+  << "\t0002\tTrace Min/Max\n"
+  << "\t0004\tList Habitable\n"
+  << "\t0008\tList Earthlike & Sphinxlike\n\n"
+  << "\t0010\tList Gases\n"
+  << "\t0020\tTrace temp iterations\n"
+  << "\t0040\tGas lifetimes\n"
+  << "\t0080\tList loss of accreted gas mass\n\n"
+  << "\t0100\tInjecting, collision\n"
+  << "\t0200\tChecking..., Failed...\n"
+  << "\t0400\tList binary info\n"
+  << "\t0800\tList accreted atmospheres\n\n"
+  << "\t1000\tMoons (experimental)\n"
+  << "\t2000\tOxygen poisoned (experimental)\n"
+  << "\t4000\tTrace gas percentages\n"
+  << "\t8000\tList Jovians in the ecosphere\n\n"
+  << "\t10000\tList type diversity\n"
+  << "\t20000\tTrace Surface temp interations\n"
+  << "\t40000\tDisplay Roche Limits and Hill Sphere distances\n"
+  << "\t80000\tDisplay mass-radius maps\n";
+  return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Normalize filter flags - handle mutually exclusive filters
+ */
+static void normalize_filter_flags(bool& only_habitable, bool& only_multi_habitable,
+                                   bool& only_earthlike, bool& only_three_habitable,
+                                   bool& only_superterrans) {
+  if (only_habitable && only_multi_habitable) {
+    only_habitable = false;
+  }
+  if (only_habitable && only_earthlike) {
+    only_habitable = false;
+  }
+  if (only_three_habitable) {
+    only_habitable = false;
+    only_earthlike = false;
+    only_multi_habitable = false;
+  }
+  if (only_superterrans) {
+    only_habitable = false;
+    only_earthlike = false;
+    only_multi_habitable = false;
+    only_three_habitable = false;
+  }
+}
+
+/**
+ * @brief Calculate weighted type count from type_counts array
+ * @param type_counts Array of counts for each planet type
+ * @param base_count Base count to add weights to
+ * @return Weighted type count
+ */
+static auto calculate_weighted_type_count(const int type_counts[], int base_count) -> int {
+  int wt_count = base_count;
+  if (type_counts[0] > 0) wt_count += 1;   // Unknown
+  if (type_counts[1] > 0) wt_count += 3;   // Rock
+  if (type_counts[2] > 0) wt_count += 16;  // Venusian
+  if (type_counts[3] > 0) wt_count += 20;  // Terrestrial
+  if (type_counts[4] > 0) wt_count += 12;  // Gas Dwarf
+  if (type_counts[5] > 0) wt_count += 11;  // Neptunian
+  if (type_counts[6] > 0) wt_count += 2;   // Jovian
+  if (type_counts[7] > 0) wt_count += 15;  // Martian
+  if (type_counts[8] > 0) wt_count += 18;  // Water
+  if (type_counts[9] > 0) wt_count += 14;  // Ice
+  if (type_counts[10] > 0) wt_count += 13; // Asteroids
+  if (type_counts[11] > 0) wt_count += 10; // 1-Face
+  return wt_count;
+}
+
+/**
+ * @brief Check if system passes filter criteria and should be output
+ */
+static auto should_output_system(bool only_habitable, bool only_multi_habitable,
+                                bool only_jovian_habitable, bool only_earthlike,
+                                bool only_three_habitable, bool only_superterrans,
+                                bool only_potential_habitable, int habitable,
+                                int habitable_jovians, int earthlike,
+                                int habitable_superterrans, int potential_habitable) -> bool {
+  // No filters active - output everything
+  if (!(only_habitable || only_multi_habitable || only_jovian_habitable ||
+        only_earthlike || only_three_habitable || only_superterrans ||
+        only_potential_habitable)) {
+    return true;
+  }
+
+  // Check each filter condition
+  if (only_habitable && (habitable > 0) && !only_jovian_habitable) return true;
+  if (only_habitable && only_jovian_habitable && habitable > 0 &&
+      habitable_jovians > 0) return true;
+  if (only_multi_habitable && (habitable > 1) && !only_jovian_habitable) return true;
+  if (only_multi_habitable && only_jovian_habitable && habitable > 1 &&
+      habitable_jovians > 0) return true;
+  if (only_earthlike && (earthlike > 0) && !only_jovian_habitable) return true;
+  if (only_earthlike && only_jovian_habitable && earthlike > 0 &&
+      habitable_jovians > 0) return true;
+  if (only_jovian_habitable && (habitable_jovians > 0) &&
+      !(only_earthlike || only_multi_habitable || only_habitable ||
+        only_three_habitable)) return true;
+  if (only_three_habitable && only_jovian_habitable && habitable > 2 &&
+      habitable_jovians > 0) return true;
+  if (only_three_habitable && (habitable > 2)) return true;
+  if (only_superterrans && habitable_superterrans > 0) return true;
+  if (only_potential_habitable && potential_habitable > 0) return true;
+
+  return false;
+}
+
+/**
+ * @brief Print summary statistics at the end of generation
+ */
+static void print_summary_statistics() {
+  if (((flag_verbose & 0x0001) != 0) || ((flag_verbose & 0x0002) != 0)) {
+    std::cerr << "Earthlike planets: " << total_earthlike << "\n";
+    std::cerr << "Breathable atmospheres: " << total_habitable << "\n";
+    std::cerr << "Breathable g range: " << toString(min_breathable_g) << " - "
+         << toString(max_breathable_g) << "\n";
+    std::cerr << "Terrestrial g range: " << toString(min_breathable_terrestrial_g)
+         << " - " << toString(max_breathable_terrestrial_g) << "\n";
+    std::cerr << "Breathable pressure range: " << toString(min_breathable_p) << " - "
+         << toString(max_breathable_p) << "\n";
+    std::cerr << "Breathable temp range: "
+         << toString(min_breathable_temp - EARTH_AVERAGE_KELVIN) << " C - "
+         << toString(max_breathable_temp - EARTH_AVERAGE_KELVIN) << " C"
+         << "\n";
+    std::cerr << "Breathable illumination range: " << toString(min_breathable_l)
+         << " - " << toString(max_breathable_l) << "\n";
+    std::cerr << "Terrestrial illumination range: "
+         << toString(min_breathable_terrestrial_l) << " - "
+         << toString(max_breathable_terrestrial_l) << "\n";
+    std::cerr << "Max moon mass: "
+         << toString(max_moon_mass * SUN_MASS_IN_EARTH_MASSES)
+         << " Earth Masses\n";
+  }
+}
+
+/**
  * @brief stargen
  * 
  * @param action 
@@ -186,26 +391,9 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     catalog_count = cat_arg.count();
   }
 
-  if (only_habitable && only_multi_habitable) {
-    only_habitable = false;
-  }
-
-  if (only_habitable && only_earthlike) {
-    only_habitable = false;
-  }
-
-  if (only_three_habitable) {
-    only_habitable = false;
-    only_earthlike = false;
-    only_multi_habitable = false;
-  }
-
-  if (only_superterrans) {
-    only_habitable = false;
-    only_earthlike = false;
-    only_multi_habitable = false;
-    only_three_habitable = false;
-  }
+  // Normalize mutually exclusive filter flags
+  normalize_filter_flags(only_habitable, only_multi_habitable, only_earthlike,
+                        only_three_habitable, only_superterrans);
 
   if (prognam.empty()) {
     prognam = "StarGen";
@@ -233,81 +421,16 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
   }
 
   switch (action) {
-    case aListGases: {
-      long double total = 0.0;
-      int count = gases.count();
-      for (int i = 0; i < count; i++) {
-        if (gases[i].getWeight() >= AN_N &&
-            gases[i].getMaxIpp() < INCREDIBLY_LARGE_NUMBER) {
-          total += gases[i].getMaxIpp();
-        }
-        // std::cout << " " << gases[i].getNum() << ": " << gases[i].getSymbol() << "
-        // - " << gases[i].getName() << " " << toString(gases[i].getMinIpp()) <<
-        // " mb - " << toString(gases[i].getMaxIpp()) << " mb\n";
-      }
-      std::cout << gases;
-      std::cout << "Total Max ipp: " << toString(total) << "\n";
-      std::cout << "Max pressure: " << toString(MAX_HABITABLE_PRESSURE) << " atm"
-           << "\n";
-      return EXIT_SUCCESS;
-    }
-    case aListCatalog: {
-      std::cout << cat_arg;
-      return EXIT_SUCCESS;
-    }
-    case aListCatalogAsHTML: {
-      int count = cat_arg.count();
-      for (int i = 0; i < count; i++) {
-        std::cout << "\t<option value=" << i << ">" << cat_arg[i].getName()
-             << "</option>\n";
-      }
-      return EXIT_SUCCESS;
-    }
-    case aSizeCheck: {
-      long double tempE = est_temp(1.0, 1.0, EARTH_ALBEDO);
-      long double tempJ = est_temp(1.0, 5.2034, GAS_GIANT_ALBEDO);
-      long double tempS = est_temp(1.0, 9.5371, GAS_GIANT_ALBEDO);
-      long double tempU = est_temp(1.0, 19.1913, GAS_GIANT_ALBEDO);
-      long double tempN = est_temp(1.0, 30.0690, GAS_GIANT_ALBEDO);
-
-      std::cout << "Size of float: " << sizeof(float) << "\n";
-      std::cout << "Size of doubles: " << sizeof(double) << "\n";
-      std::cout << "Size of long doubles: " << sizeof(long double) << "\n";
-      std::cout << "Earth Eff Temp: " << toString(tempE) << " K, "
-           << toString(tempE - FREEZING_POINT_OF_WATER)
-           << " C, Earth rel: " << toString(tempE - EARTH_AVERAGE_KELVIN)
-           << " C\n";
-      std::cout << "Jupiter Eff Temp: " << toString(tempJ) << " K\n";
-      std::cout << "Saturn Eff Temp: " << toString(tempS) << " K\n";
-      std::cout << "Uranus Eff Temp: " << toString(tempU) << " K\n";
-      std::cout << "Neptune Eff Temp: " << toString(tempN) << " K\n";
-      return EXIT_SUCCESS;
-    }
-    case aListVerbosity: {
-      std::cout << "Stargen " << stargen_revision << "\n"
-      << "Verbosity flags are hexidecimal numbers:\n"
-      << "\t0001\tEarthlike count\n"
-      << "\t0002\tTrace Min/Max\n"
-      << "\t0004\tList Habitable\n"
-      << "\t0008\tList Earthlike & Sphinxlike\n\n"
-      << "\t0010\tList Gases\n"
-      << "\t0020\tTrace temp iterations\n"
-      << "\t0040\tGas lifetimes\n"
-      << "\t0080\tList loss of accreted gas mass\n\n"
-      << "\t0100\tInjecting, collision\n"
-      << "\t0200\tChecking..., Failed...\n"
-      << "\t0400\tList binary info\n"
-      << "\t0800\tList accreted atmospheres\n\n"
-      << "\t1000\tMoons (experimental)\n"
-      << "\t2000\tOxygen poisoned (experimental)\n"
-      << "\t4000\tTrace gas percentages\n"
-      << "\t8000\tList Jovians in the ecosphere\n\n"
-      << "\t10000\tList type diversity\n"
-      << "\t20000\tTrace Surface temp interations\n"
-      << "\t40000\tDisplay Roche Limits and Hill Sphere distances\n"
-      << "\t80000\tDisplay mass-radius maps\n";
-      return EXIT_SUCCESS;
-    }
+    case aListGases:
+      return handle_list_gases_action();
+    case aListCatalog:
+      return handle_list_catalog_action(cat_arg);
+    case aListCatalogAsHTML:
+      return handle_list_catalog_html_action(cat_arg);
+    case aSizeCheck:
+      return handle_size_check_action();
+    case aListVerbosity:
+      return handle_list_verbosity_action();
     case aGenerate:
       break;
   }
@@ -567,45 +690,8 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
     planet *a_planet = nullptr;
     int counter = 0;
-    int wt_type_count = type_count;
+    int wt_type_count = calculate_weighted_type_count(type_counts, type_count);
     int norm_type_count = 0;
-
-    if (type_counts[0] > 0) {
-      wt_type_count += 1;  // Unknown
-    }
-    if (type_counts[1] > 0) {
-      wt_type_count += 3;  // Rock
-    }
-    if (type_counts[2] > 0) {
-      wt_type_count += 16;  // Venusian
-    }
-    if (type_counts[3] > 0) {
-      wt_type_count += 20;  // Terrestrial
-    }
-    if (type_counts[4] > 0) {
-      wt_type_count += 12;  // Gas Dwarf
-    }
-    if (type_counts[5] > 0) {
-      wt_type_count += 11;  // Neptunian
-    }
-    if (type_counts[6] > 0) {
-      wt_type_count += 2;  // Jovian
-    }
-    if (type_counts[7] > 0) {
-      wt_type_count += 15;  // Martian
-    }
-    if (type_counts[8] > 0) {
-      wt_type_count += 18;  // Water
-    }
-    if (type_counts[9] > 0) {
-      wt_type_count += 14;  // Ice
-    }
-    if (type_counts[10] > 0) {
-      wt_type_count += 13;  // Asteroids
-    }
-    if (type_counts[11] > 0) {
-      wt_type_count += 10;  // 1-Face
-    }
 
 // why is there an empty for loop here? will investigate old versions to see
 // what used to be here
@@ -630,26 +716,10 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     total_habitable += habitable;
     total_potentially_habitable += potential_habitable;
     total_earthlike += earthlike;
-    if ((!(only_habitable || only_multi_habitable || only_jovian_habitable ||
-           only_earthlike || only_three_habitable || only_superterrans ||
-           only_potential_habitable)) ||
-        (only_habitable && (habitable > 0) && !only_jovian_habitable) ||
-        (only_habitable && only_jovian_habitable && habitable > 0 &&
-         habitable_jovians > 0) ||
-        (only_multi_habitable && (habitable > 1) && !only_jovian_habitable) ||
-        (only_multi_habitable && only_jovian_habitable && habitable > 1 &&
-         habitable_jovians > 0) ||
-        (only_earthlike && (earthlike > 0) && !only_jovian_habitable) ||
-        (only_earthlike && only_jovian_habitable && earthlike > 0 &&
-         habitable_jovians > 0) ||
-        (only_jovian_habitable && (habitable_jovians > 0) &&
-         !(only_earthlike || only_multi_habitable || only_habitable ||
-           only_three_habitable)) ||
-        (only_three_habitable && only_jovian_habitable && habitable > 2 &&
-         habitable_jovians > 0) ||
-        (only_three_habitable && (habitable > 2)) ||
-        (only_superterrans && habitable_superterrans > 0) ||
-        (only_potential_habitable && potential_habitable > 0)) {
+    if (should_output_system(only_habitable, only_multi_habitable, only_jovian_habitable,
+                            only_earthlike, only_three_habitable, only_superterrans,
+                            only_potential_habitable, habitable, habitable_jovians,
+                            earthlike, habitable_superterrans, potential_habitable)) {
       std::string system_url;
       std::string svg_url;
 
@@ -750,28 +820,7 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     }
   }
 
-  if (((flag_verbose & 0x0001) != 0) || ((flag_verbose & 0x0002) != 0)) {
-    std::cerr << "Earthlike planets: " << total_earthlike << "\n";
-    std::cerr << "Breathable atmospheres: " << total_habitable << "\n";
-    std::cerr << "Breathable g range: " << toString(min_breathable_g) << " - "
-         << toString(max_breathable_g) << "\n";
-    std::cerr << "Terrestrial g range: " << toString(min_breathable_terrestrial_g)
-         << " - " << toString(max_breathable_terrestrial_g) << "\n";
-    std::cerr << "Breathable pressure range: " << toString(min_breathable_p) << " - "
-         << toString(max_breathable_p) << "\n";
-    std::cerr << "Breathable temp range: "
-         << toString(min_breathable_temp - EARTH_AVERAGE_KELVIN) << " C - "
-         << toString(max_breathable_temp - EARTH_AVERAGE_KELVIN) << " C"
-         << "\n";
-    std::cerr << "Breathable illumination range: " << toString(min_breathable_l)
-         << " - " << toString(max_breathable_l) << "\n";
-    std::cerr << "Terrestrial illumination range: "
-         << toString(min_breathable_terrestrial_l) << " - "
-         << toString(max_breathable_terrestrial_l) << "\n";
-    std::cerr << "Max moon mass: "
-         << toString(max_moon_mass * SUN_MASS_IN_EARTH_MASSES)
-         << " Earth Masses\n";
-  }
+  print_summary_statistics();
 
   if (system_count > 1) {
     if (out_format == ffHTML) {
