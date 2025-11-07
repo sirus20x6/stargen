@@ -793,7 +793,7 @@ long double one_quater_rock_three_fourths_water_radius(
   if (adjust_for_carbon) {
     carbon_fraction = rmf * cmf;
     grow_factor =
-        (0.05 * carbon_fraction) + 1.0;  // not very scientific but guested by
+        (0.05 * carbon_fraction) + 1.0;  // not very std::scientific but guested by
                                          // eye-balling an image on wikipedia.
     radius *= grow_factor;
   }
@@ -1202,7 +1202,7 @@ long double half_rock_half_water_radius(
   if (adjust_for_carbon) {
     carbon_fraction = rmf * cmf;
     grow_factor =
-        (0.05 * carbon_fraction) + 1.0;  // not very scientific but guested by
+        (0.05 * carbon_fraction) + 1.0;  // not very std::scientific but guested by
                                          // eye-balling an image on wikipedia.
     radius *= grow_factor;
   }
@@ -1611,7 +1611,7 @@ long double rock_radius(long double mass, long double cmf, planet *the_planet,
   if (adjust_for_carbon) {
     carbon_fraction = rmf * cmf;
     grow_factor =
-        (0.05 * carbon_fraction) + 1.0;  // not very scientific but guested by
+        (0.05 * carbon_fraction) + 1.0;  // not very std::scientific but guested by
                                          // eye-balling an image on wikipedia.
     radius *= grow_factor;
   }
@@ -2032,7 +2032,7 @@ long double half_rock_half_iron_radius(
   if (adjust_for_carbon) {
     carbon_fraction = rmf * cmf;
     grow_factor =
-        (0.05 * carbon_fraction) + 1.0;  // not very scientific but guested by
+        (0.05 * carbon_fraction) + 1.0;  // not very std::scientific but guested by
                                          // eye-balling an image on wikipedia.
     radius *= grow_factor;
   }

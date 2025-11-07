@@ -57,7 +57,7 @@ void text_describe_system(planet* innermost_planet, bool do_gases, long int seed
     std::cout << std::format("Mass of Secondary: {} solar masses\n", the_sun.getSecondaryMass());
     std::cout << std::format("Luminosity of Secondary: {}\n", the_sun.getSecondaryLuminosity());
   }
-  std::cout << std::format("Age: {} billion years\t({} billion left on main sequence)\n",
+  std::cout << std::format("Age: {} billion years\t({} billion std::left on main sequence)\n",
                            the_sun.getAge() / 1.0E9,
                            (the_sun.getAge() - the_sun.getLife()) / 1.0E9);
   std::cout << std::format("Habitable ecosphere radius: {} AU\n\n",
@@ -1246,7 +1246,7 @@ void html_star_details_helper(std::fstream& the_file, const std::string& header,
   the_file << "\t<td>" << spec_type << "</td></tr>\n";
   the_file << "<tr><td>Age</td>\n";
   the_file << "\t<td>" << toString(age / 1.0E9) << " billion years<br>("
-           << toString((life - age) / 1.0E9) << " billion left on main sequence)<br></td></tr>";
+           << toString((life - age) / 1.0E9) << " billion std::left on main sequence)<br></td></tr>";
 }
 
 /**
@@ -1453,7 +1453,7 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
     }
     the_file << "</td>\n";
   }
-  the_file << "<td bgcolor='" << BGSPACE << "' align=right valign=bottom>";
+  the_file << "<td bgcolor='" << BGSPACE << "' align=std::right valign=bottom>";
   the_file << "<a href='" << url_path << "ref/Key.html'><font size='-3' color='" << TXSPACE
            << "'>See<br>Key</font></a></td>\n";
   the_file << "</tr></table>\n";
@@ -1473,7 +1473,7 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
          the_planet = the_planet->next_planet, counter++) {
       if (is_habitable_jovian(the_planet) || is_terrestrial(the_planet) ||
           is_potentialy_habitable(the_planet)) {
-        the_file << "\n\t<tr><td align=right width='5%'>";
+        the_file << "\n\t<tr><td align=std::right width='5%'>";
         the_file << "<a href='" << (int_link ? "" : system_url) << "#" << counter << "'><small>#"
                  << counter << "</small></a>";
         the_file << "</td>\n\t\t<td><small>" << type_string(the_planet) << ": </small>";
@@ -1487,7 +1487,7 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
         for (moon = the_planet->first_moon, moons = 1; moon != nullptr;
              moon = moon->next_planet, moons++) {
           if (is_habitable_jovian(moon) || is_terrestrial(moon) || is_potentialy_habitable(moon)) {
-            the_file << "\n\t<tr><td align=right width='5%'>";
+            the_file << "\n\t<tr><td align=std::right width='5%'>";
             the_file << "<a href='" << (int_link ? "" : system_url) << "#" << counter << "."
                      << moons << "'><small>#" << counter << "." << moons << "</small></a>";
             the_file << "</td>\n\t\t<td><small>" << type_string(moon) << ": </small>";
@@ -1577,7 +1577,7 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
 void html_thumbnail_totals(std::fstream& the_file) {
   const std::string row_template = R"(
     <tr bgcolor='{0}'>
-        <td align=right>{1}</td>
+        <td align=std::right>{1}</td>
         <td align=center>{2}</td>
     </tr>)";
 
@@ -1663,8 +1663,8 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
 <p>
 <a name='{0}'></a>
 <table border=3 cellspacing=2 cellpadding=2 align=center bgcolor='{1}' width='{2}%'>
-<colgroup span=1 align=left valign=middle>
-<colgroup span=2 align=left valign=middle>
+<colgroup span=1 align=std::left valign=middle>
+<colgroup span=2 align=std::left valign=middle>
 <tr><th colspan=3 bgcolor='{3}' align=center>
 <font size='+2' color='{4}'>{5} #{0} Statistics</font></th></tr>
 )",
@@ -1733,9 +1733,9 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
 
     if (core_size <= 49) {
       the_file << std::format(R"(
-<table border=0 cellspacing=0 cellpadding=0 bgcolor='#000000' background='{0}ref/Atmosphere.gif' align=right>
-<tr align=right valign=bottom background='{0}ref/Atmosphere.gif'>
-<td width=50 height=50 align=right valign=bottom bgcolor='#000000' background='{0}ref/Atmosphere.gif'>
+<table border=0 cellspacing=0 cellpadding=0 bgcolor='#000000' background='{0}ref/Atmosphere.gif' align=std::right>
+<tr align=std::right valign=bottom background='{0}ref/Atmosphere.gif'>
+<td width=50 height=50 align=std::right valign=bottom bgcolor='#000000' background='{0}ref/Atmosphere.gif'>
 <img src='{0}ref/Core.gif' alt='' width={1} height={1}>
 </td></tr></table>
 )",
@@ -1935,11 +1935,11 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
           100.0 * (the_planet->getGas(i).getSurfPressure() / the_planet->getSurfPressure());
       if (percentage > 0.001 || poisonous) {
         the_file << std::format(R"(
-<tr><th align=left>{}&nbsp;</th>
-<td align=right>{:.3f}%&nbsp;</td>
-<td align=right>{:.2f} mb&nbsp;</td>
-<td align=right>(ipp:{:.2f})</td>
-<td align=right>&nbsp;{}</td></tr>
+<tr><th align=std::left>{}&nbsp;</th>
+<td align=std::right>{:.3f}%&nbsp;</td>
+<td align=std::right>{:.2f} mb&nbsp;</td>
+<td align=std::right>(ipp:{:.2f})</td>
+<td align=std::right>&nbsp;{}</td></tr>
 )",
                                 gases[index].getName(), percentage,
                                 the_planet->getGas(i).getSurfPressure(), ipp,
@@ -2058,7 +2058,7 @@ void html_describe_system(planet* innermost_planet, bool do_gases, bool do_moons
        the_planet = the_planet->next_planet, counter++) {
     typeString = type_string(the_planet);
 
-    the_file << "<tr align=right>\n\t<td><a href='#" << counter << "'>" << counter
+    the_file << "<tr align=std::right>\n\t<td><a href='#" << counter << "'>" << counter
              << "</a></td>\n\t<td align=center><img alt='" << typeString << "' src='" << url_path
              << "ref/" << image_type_string(the_planet) << "Planet.webp' width='600'></td>\n\t<td>"
              << typeString << "</td>\n\t<td>" << toString(the_planet->getA(), 4)
@@ -2075,7 +2075,7 @@ void html_describe_system(planet* innermost_planet, bool do_gases, bool do_moons
            moon = moon->next_planet, moons++) {
         typeString = type_string(moon);
 
-        the_file << "<tr align=right>\n";
+        the_file << "<tr align=std::right>\n";
         the_file << "\n";
         the_file << "\t<td align=center><a href='#" << counter << "." << moons << "'>" << counter
                  << "." << moons << "</a></td>\n";
@@ -2137,7 +2137,7 @@ void celestia_describe_system(planet* innermost_planet, std::string designation,
             << "# Stellar temperature: " << toString(the_sun.getEffTemp()) << " Kelvin\n"
             << "# Age: " << toString(the_sun.getAge() / 1.0E9) << "  billion years\t("
             << toString((the_sun.getLife() - the_sun.getAge()) / 1.0E9)
-            << " billion left on main sequence)\n"
+            << " billion std::left on main sequence)\n"
             << "# Habitable ecosphere: " << toString(min_r_ecosphere) << " AU to "
             << toString(max_r_ecosphere) << " AU\n\n";
   for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;

@@ -408,7 +408,7 @@ void accrete::accrete_dust(long double &seed_mass, long double &new_dust,
 
   do {
     temp_mass = new_mass;
-    // fixed point algorithm: accumulate more mass until the difference is less 
+    // std::fixed point algorithm: accumulate more mass until the difference is less 
     // than .01% of the old mass
     new_mass =
         collect_dust(new_mass, new_dust, new_gas, a, e, crit_mass, dust_head);
@@ -746,7 +746,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
 
   // std::cout << planet_inner_bound << " " << planet_outer_bound << std::endl;
 
-  // while there's still dust left...
+  // while there's still dust std::left...
   while (dust_left) {
     if (seeds != nullptr) {
       // give us a random proto planet within the inner and outer bounds
