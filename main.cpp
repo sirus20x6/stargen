@@ -107,7 +107,9 @@ int main(int argc, char **argv) {
 
   // need to somehow parse arguments
   bool first_part_of_name = true;
+  std::cerr << "DEBUG: Starting argument loop, argc=" << argc << std::endl;
   for (int i = 0; i < argc; i++) {
+    std::cerr << "DEBUG: Processing arg[" << i << "]: " << argv[i] << std::endl;
     skip        = false;
     temp_string = argv[i];
     if (compare_string_char(temp_string, 0, "-")) {
@@ -362,6 +364,7 @@ int main(int argc, char **argv) {
       i++;
     }
   }
+  std::cerr << "DEBUG: Finished argument loop" << std::endl;
 
   // std::cout << arg_name << " blada\n";
 
@@ -407,6 +410,7 @@ int main(int argc, char **argv) {
 
   flags_arg_clone = flags_arg;
   ZoneScoped;
+  std::cerr << "DEBUG: About to call stargen() function" << std::endl;
   return stargen(action, flag_char, path, url_path_arg, filename_arg, arg_name, prognam, mass_arg,
                  luminosity_arg, seed_arg, count_arg, increment_arg, star_catalog, sys_no_arg,
                  ratio_arg, ecc_coef_arg, inner_planet_factor_arg, flags_arg, out_format,
