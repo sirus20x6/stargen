@@ -4,6 +4,9 @@
 #include <string>     // for std::string
 #include "structs.h"  // for sun
 class accrete;
+class Config;
+class SimulationContext;
+class RandomContext;
 
 #ifdef macintosh
 #define SUBDIR "html"
@@ -61,71 +64,75 @@ using actions = enum actions {  // Callable StarGen can:
   aListVerbosity,               //  - List values of the -v option
 };
 
-extern int flags_arg_clone;
-extern sun the_sun_clone;
+// Global instances for configuration, simulation state, and RNG
+extern Config g_config;
+extern SimulationContext g_sim_context;
+extern RandomContext g_random_context;
 
-extern int flag_verbose;
-extern bool allow_planet_migration;
-extern bool is_circumbinary;
-extern long double compainion_mass_arg;
-extern long double compainion_eccentricity_arg;
-extern long double compainion_distant_arg;
-extern long double compainion_lum_arg;
-extern long double compainion_eff_arg;
-extern std::string companion_spec_arg;
-extern long double min_age;
-extern long double max_age;
-extern long double max_age_backup;
-extern long double temp_arg;
-extern std::string type_arg;
-extern int decimals_arg;
-extern long double max_distance_arg;
+// Backward-compatible references to global instances
+extern int& flags_arg_clone;
+extern sun& the_sun_clone;
+extern int& flag_verbose;
+extern bool& allow_planet_migration;
+extern bool& is_circumbinary;
+extern long double& compainion_mass_arg;
+extern long double& compainion_eccentricity_arg;
+extern long double& compainion_distant_arg;
+extern long double& compainion_lum_arg;
+extern long double& compainion_eff_arg;
+extern std::string& companion_spec_arg;
+extern long double& min_age;
+extern long double& max_age;
+extern long double& max_age_backup;
+extern long double& temp_arg;
+extern std::string& type_arg;
+extern int& decimals_arg;
+extern long double& max_distance_arg;
+extern long& flag_seed;
 
 // Various statistics that are kept:
-extern int total_earthlike;
-extern int total_habitable;
-extern int total_habitable_earthlike;
-extern int total_habitable_conservative;
-extern int total_habitable_optimistic;
-extern int total_potentially_habitable;
-extern int total_potentially_habitable_earthlike;
-extern int total_potentially_habitable_conservative;
-extern int total_potentially_habitable_optimistic;
-extern int total_worlds;
+extern int& total_earthlike;
+extern int& total_habitable;
+extern int& total_habitable_earthlike;
+extern int& total_habitable_conservative;
+extern int& total_habitable_optimistic;
+extern int& total_potentially_habitable;
+extern int& total_potentially_habitable_earthlike;
+extern int& total_potentially_habitable_conservative;
+extern int& total_potentially_habitable_optimistic;
+extern int& total_worlds;
 
-extern long double min_breathable_terrestrial_g;
-extern long double min_breathable_g;
-extern long double max_breathable_terrestrial_g;
-extern long double max_breathable_g;
-extern long double min_breathable_terrestrial_l;
-extern long double min_breathable_l;
-extern long double max_breathable_terrestrial_l;
-extern long double max_breathable_l;
-extern long double min_breathable_temp;
-extern long double max_breathable_temp;
-extern long double min_breathable_p;
-extern long double max_breathable_p;
-extern long double min_breathable_mass;
-extern long double max_breathable_mass;
+extern long double& min_breathable_terrestrial_g;
+extern long double& min_breathable_g;
+extern long double& max_breathable_terrestrial_g;
+extern long double& max_breathable_g;
+extern long double& min_breathable_terrestrial_l;
+extern long double& min_breathable_l;
+extern long double& max_breathable_terrestrial_l;
+extern long double& max_breathable_l;
+extern long double& min_breathable_temp;
+extern long double& max_breathable_temp;
+extern long double& min_breathable_p;
+extern long double& max_breathable_p;
+extern long double& min_breathable_mass;
+extern long double& max_breathable_mass;
 
-extern long double min_potential_terrestrial_g;
-extern long double min_potential_g;
-extern long double max_potential_terrestrial_g;
-extern long double max_potential_g;
-extern long double min_potential_terrestrial_l;
-extern long double min_potential_l;
-extern long double max_potential_terrestrial_l;
-extern long double max_potential_l;
-extern long double min_potential_temp;
-extern long double max_potential_temp;
-extern long double min_potential_p;
-extern long double max_potential_p;
-extern long double min_potential_mass;
-extern long double max_potential_mass;
+extern long double& min_potential_terrestrial_g;
+extern long double& min_potential_g;
+extern long double& max_potential_terrestrial_g;
+extern long double& max_potential_g;
+extern long double& min_potential_terrestrial_l;
+extern long double& min_potential_l;
+extern long double& max_potential_terrestrial_l;
+extern long double& max_potential_l;
+extern long double& min_potential_temp;
+extern long double& max_potential_temp;
+extern long double& min_potential_p;
+extern long double& max_potential_p;
+extern long double& min_potential_mass;
+extern long double& max_potential_mass;
 
 extern std::string stargen_revision;
-
-extern long flag_seed;
 
 void init();
 void generate_planet(planet* /*the_planet*/, int /*planet_no*/,

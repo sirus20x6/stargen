@@ -10,90 +10,104 @@
 #include "enviro.h"    // for makeHabitable, est_temp, gravity, acceleration
 #include "planets.h"   // for earth, mercury
 #include "utils.h"     // for toString, random_number, replaceStrChar, about
+#include "Config.h"    // for Config
+#include "SimulationContext.h"  // for SimulationContext
+#include "RandomContext.h"  // for RandomContext
 
+// Global instances for configuration, simulation state, and RNG
+Config g_config;
+SimulationContext g_sim_context;
+RandomContext g_random_context;
 
-int flags_arg_clone = 0;
+// Initialize Config defaults
+void initConfig() {
+    g_config.dust_density_ratio = DUST_DENSITY_COEFF;
+    g_config.max_age = 10.0E9;
+    g_config.max_age_backup = 10.0E9;
+}
 
-sun the_sun_clone;
+// Legacy global references - these now point to Config members for compatibility
+int& flags_arg_clone = g_config.flags;
+sun& the_sun_clone = g_sim_context.current_sun;
+int& flag_verbose = g_config.verbose_level;
+long& flag_seed = g_config.random_seed;
+long double& min_age = g_config.min_age;
+long double& max_age = g_config.max_age;
+long double& max_age_backup = g_config.max_age_backup;
+bool& is_circumbinary = g_config.is_circumbinary;
+long double& compainion_mass_arg = g_config.companion_mass;
+long double& compainion_eccentricity_arg = g_config.companion_eccentricity;
+long double& compainion_distant_arg = g_config.companion_distance;
+long double& compainion_lum_arg = g_config.companion_luminosity;
+long double& compainion_eff_arg = g_config.companion_temperature;
+std::string& companion_spec_arg = g_config.companion_spectral_type;
+int& decimals_arg = g_config.decimals;
+long double& temp_arg = g_config.stellar_temperature;
+std::string& type_arg = g_config.stellar_type;
+long double& max_distance_arg = g_config.max_distance;
+bool& allow_planet_migration = g_config.do_migration;
 
-int flag_verbose = 0;
 /*  These are the global variables used during accretion:  */
 planet *innermost_planet;
 long double dust_density_coeff = DUST_DENSITY_COEFF;
 
-long flag_seed = 0;
+// Statistics globals - now point to SimulationContext members
+int& total_earthlike = g_sim_context.total_earthlike;
+int& total_habitable = g_sim_context.total_habitable;
+int& total_worlds = g_sim_context.total_worlds;
+int& total_habitable_earthlike = g_sim_context.total_habitable_earthlike;
+int& total_habitable_conservative = g_sim_context.total_habitable_conservative;
+int& total_habitable_optimistic = g_sim_context.total_habitable_optimistic;
+int& total_potentially_habitable = g_sim_context.total_potentially_habitable;
+int& total_potentially_habitable_earthlike = g_sim_context.total_potentially_habitable_earthlike;
+int& total_potentially_habitable_conservative = g_sim_context.total_potentially_habitable_conservative;
+int& total_potentially_habitable_optimistic = g_sim_context.total_potentially_habitable_optimistic;
 
-long double min_age = 0;
-long double max_age = 10.0E9;
-long double max_age_backup = 10.0E9;
+long double& min_breathable_terrestrial_g = g_sim_context.min_breathable_terrestrial_g;
+long double& min_breathable_g = g_sim_context.min_breathable_g;
+long double& max_breathable_terrestrial_g = g_sim_context.max_breathable_terrestrial_g;
+long double& max_breathable_g = g_sim_context.max_breathable_g;
+long double& min_breathable_temp = g_sim_context.min_breathable_temp;
+long double& max_breathable_temp = g_sim_context.max_breathable_temp;
+long double& min_breathable_p = g_sim_context.min_breathable_p;
+long double& max_breathable_p = g_sim_context.max_breathable_p;
+long double& min_breathable_terrestrial_l = g_sim_context.min_breathable_terrestrial_l;
+long double& min_breathable_l = g_sim_context.min_breathable_l;
+long double& max_breathable_terrestrial_l = g_sim_context.max_breathable_terrestrial_l;
+long double& max_breathable_l = g_sim_context.max_breathable_l;
+long double& min_breathable_mass = g_sim_context.min_breathable_mass;
+long double& max_breathable_mass = g_sim_context.max_breathable_mass;
 
-bool is_circumbinary = false;
-long double compainion_mass_arg = 0;
-long double compainion_eccentricity_arg = 0;
-long double compainion_distant_arg = 0;
-long double compainion_lum_arg = 0;
-long double compainion_eff_arg = 0;
-std::string companion_spec_arg;
-int decimals_arg = 0;
+long double& min_potential_terrestrial_g = g_sim_context.min_potential_terrestrial_g;
+long double& min_potential_g = g_sim_context.min_potential_g;
+long double& max_potential_terrestrial_g = g_sim_context.max_potential_terrestrial_g;
+long double& max_potential_g = g_sim_context.max_potential_g;
+long double& min_potential_temp = g_sim_context.min_potential_temp;
+long double& max_potential_temp = g_sim_context.max_potential_temp;
+long double& min_potential_p = g_sim_context.min_potential_p;
+long double& max_potential_p = g_sim_context.max_potential_p;
+long double& min_potential_terrestrial_l = g_sim_context.min_potential_terrestrial_l;
+long double& min_potential_l = g_sim_context.min_potential_l;
+long double& max_potential_terrestrial_l = g_sim_context.max_potential_terrestrial_l;
+long double& max_potential_l = g_sim_context.max_potential_l;
+long double& min_potential_mass = g_sim_context.min_potential_mass;
+long double& max_potential_mass = g_sim_context.max_potential_mass;
 
-long double temp_arg = 0;
-std::string type_arg;
-
-long double max_distance_arg = 0;
-
+// Per-system statistics (kept as true globals, reset each system)
 int earthlike = 0;
-int total_earthlike = 0;
 int habitable = 0;
 int habitable_jovians = 0;
 int habitable_superterrans = 0;
-int total_habitable = 0;
 int potential_habitable = 0;
-int total_worlds = 0;
-int total_habitable_earthlike = 0;
-int total_habitable_conservative = 0;
-int total_habitable_optimistic = 0;
-int total_potentially_habitable = 0;
-int total_potentially_habitable_earthlike = 0;
-int total_potentially_habitable_conservative = 0;
-int total_potentially_habitable_optimistic = 0;
-
-long double min_breathable_terrestrial_g = 1000.0;
-long double min_breathable_g = 1000.0;
-long double max_breathable_terrestrial_g = 0.0;
-long double max_breathable_g = 0.0;
-long double min_breathable_temp = 1000.0;
-long double max_breathable_temp = 0.0;
-long double min_breathable_p = 100000.0;
-long double max_breathable_p = 0.0;
-long double min_breathable_terrestrial_l = 1000.0;
-long double min_breathable_l = 1000.0;
-long double max_breathable_terrestrial_l = 0.0;
-long double max_breathable_l = 0.0;
 long double max_moon_mass = 0.0;
-long double min_breathable_mass = 0;
-long double max_breathable_mass = 0;
-
-long double min_potential_terrestrial_g = 1000.0;
-long double min_potential_g = 1000.0;
-long double max_potential_terrestrial_g = 0.0;
-long double max_potential_g = 0.0;
-long double min_potential_temp = 1000.0;
-long double max_potential_temp = 0.0;
-long double min_potential_p = 100000.0;
-long double max_potential_p = 0.0;
-long double min_potential_terrestrial_l = 1000.0;
-long double min_potential_l = 1000.0;
-long double max_potential_terrestrial_l = 0.0;
-long double max_potential_l = 0.0;
-long double min_potential_mass = 0;
-long double max_potential_mass = 0;
 
 int type_counts[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // seb
 int type_count = 0;
 int max_type_count = 0;
 
-bool allow_planet_migration = false;
-
+// RNG state - now point to RandomContext members
+long& seed = g_random_context.seed;
+long& jseed = g_random_context.jseed;
 long system_seed = 0;
 
 std::string stargen_revision = "$Revision: 3.0 $";

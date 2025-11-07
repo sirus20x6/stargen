@@ -23,6 +23,7 @@
 
 
 void initData();
+void initConfig();  // Initialize configuration defaults
 void usage(std::string);
 
 void printAknowledgement() {
@@ -416,6 +417,7 @@ int main(int argc, char **argv) {
  *
  */
 void initData() {
+  initConfig();  // Initialize configuration defaults
   initRadii();
   initGases();
   initPlanets();

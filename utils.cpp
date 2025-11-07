@@ -12,12 +12,13 @@
 #include <immintrin.h>
 #include <cpuid.h>
 #include "utils.h"
+#include "RandomContext.h"          // for RandomContext
+#include "stargen.h"                // for g_random_context
 
-
-long seed = 0;
-long jseed = 0;
-long ifrst = 0;
-long nextn = 0;
+// RNG state - now references to RandomContext members (defined in stargen.cpp)
+extern RandomContext g_random_context;
+long& ifrst = g_random_context.ifrst;
+long& nextn = g_random_context.nextn;
 
 auto compare_string_char(std::string &a_string, int place, const char *a_character,
                          int length) -> bool {

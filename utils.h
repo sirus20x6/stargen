@@ -11,10 +11,11 @@
 #include "stargen.h"  // for decimals_arg
 #include "tracy/Tracy.hpp"
 
-extern long seed;
-extern long jseed;
-extern long ifrst;
-extern long nextn;
+// RNG state - now references to RandomContext members
+extern long& seed;
+extern long& jseed;
+extern long& ifrst;
+extern long& nextn;
 
 auto compare_string_char(std::string& a_string, int place, const char* a_character,
                          int length = 1) -> bool;
