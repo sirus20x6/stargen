@@ -89,8 +89,8 @@ int getLumIndex(const std::string& spec_type) {
  */
 std::string getStarType(std::string spec_type) {
     spec_type = my_strtoupper(spec_type);
-    
-    const std::vector<pair<std::string, std::string>> starTypes = {
+
+    static const std::vector<std::pair<std::string, std::string>> starTypes = {
         {"DA", "WD"}, {"DB", "WD"}, {"DC", "WD"}, {"DO", "WD"}, {"DQ", "WD"}, {"DZ", "WD"},
         {"WN", "WN"}, {"WC", "WC"},
         {"O", "O"}, {"B", "B"}, {"A", "A"}, {"F", "F"}, {"G", "G"}, {"K", "K"},
@@ -176,7 +176,7 @@ long double spec_type_to_eff_temp(const std::string& spec_type) {
  * @return std::string 
  */
 std::string eff_temp_to_spec_type(long double eff_temp, long double luminosity) {
-    const std::vector<pair<long double, std::string>> temp_classes = {
+    static const std::vector<std::pair<long double, std::string>> temp_classes = {
         {52000, "O"}, {30000, "B"}, {10000, "A"}, {7500, "F"}, 
         {6000, "G"}, {5000, "K"}, {3500, "M"}, {2000, "L"}, 
         {1300, "T"}, {700, "Y"}
@@ -200,7 +200,7 @@ std::string eff_temp_to_spec_type(long double eff_temp, long double luminosity) 
     if (luminosity == 0) luminosity = 1e-7;
     long double xmag = 4.83 - 2.5 * log10(luminosity);
 
-    const std::vector<pair<std::string, std::function<std::string(double)>>> lum_classes = {
+    static const std::vector<std::pair<std::string, std::function<std::string(double)>>> lum_classes = {
         {"O", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -6 ? "Ib" : m < -4.9 ? "II" : m < -4 ? "III" : "V"; }},
         {"B", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -5 ? "Ib" : m < -4.5 ? "II" : m < -0.5 ? "III" : "V"; }},
         {"A", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2.25 ? "II" : m < 0 ? "III" : m < 0.125 ? "IV" : "V"; }},
