@@ -1115,6 +1115,509 @@ static void finalize_gas_giant_properties(planet *the_planet, sun &the_sun,
 }
 
 /**
+ * @brief Generate moons for a planet
+ * @param the_planet Planet to generate moons for
+ * @param planet_no Planet number for ID generation
+ * @param the_sun Parent star
+ * @param random_tilt Whether to randomize tilt
+ * @param planet_id Planet identifier for logging
+ * @param do_gases Whether to calculate detailed atmospheric gases
+ * @param do_moons Whether to generate moons
+ * @param is_moon Whether this planet is itself a moon
+ */
+static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
+                          bool random_tilt, const std::string &planet_id,
+                          bool do_gases, bool do_moons, bool is_moon) {
+  if (!do_moons || is_moon) {
+    return;
+  }
+
+  bool skip_minor_moons = false;
+  long double moon_mass = 0.0;
+  int n = 0;
+  std::stringstream ss;
+  std::string moon_id;
+  long double temp_hill_sphere = 0;
+  long double min_rand_distance = 0;
+
+  if (the_planet->first_moon != nullptr) {
+    planet *ptr = nullptr;
+    planet *prev = nullptr;
+    planet *next_moon = nullptr;
+
+    // reset moon distances for predefined moons
+    /*for (n = 0, ptr = the_planet->first_moon; ptr != NULL; ptr = next_moon)
+    {
+      next_moon = ptr->next_planet;
+      ptr->setMoonA(0);
+      ptr->setMoonE(0);
+    }*/
+
+    long double hill_sphere = 0.0;
+
+    hill_sphere =
+        the_planet->getA() * KM_PER_AU *
+        std::pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
+
+    for (n = 0, ptr = the_planet->first_moon; ptr != nullptr; ptr = next_moon)
+    // for (n = 0; n < the_planet->getMoonCount(); n++)
+    {
+      next_moon = ptr->next_planet;
+      moon_mass += ptr->getMass() * SUN_MASS_IN_EARTH_MASSES;
+
+      long double roche_limit = 0.0;
+      long double distance = 0.0;
+      long double eccentricity = 0.0;
+
+      ptr->setA(the_planet->getA());
+      ptr->setE(the_planet->getE());
+      ptr->setOrbitZone(the_planet->getOrbitZone());
+
+      assign_composition(ptr, the_sun, true);
+
+      ss.str("");
+      ss << planet_id << "-" << toString(n + 1);
+      moon_id = ss.str();
+      ss.str("");
+
+      // generate_planet(ptr, n, the_sun, random_tilt, moon_id, do_gases,
+      // do_moons, true, the_planet->getMass());
+      ptr->setRadius(radius_improved(ptr->getMass(), ptr->getImf(),
+                                     ptr->getRmf(), ptr->getCmf(), false,
+                                     ptr->getOrbitZone(), ptr));
+      ptr->setDensity(volume_density(ptr->getMass(), ptr->getRadius()));
+
+      roche_limit =
+          2.44 * the_planet->getRadius() *
+          std::pow(the_planet->getDensity() / ptr->getDensity(), 1.0 / 3.0);
+
+      if ((roche_limit * 1.5) < (hill_sphere / 3.0) &&
+          (hill_sphere / 3.0) > (the_planet->getRadius() * 2.5)) {
+        bool done = false;
+        bool bad_place = false;
+        bool to_many_tries = false;
+        planet *the_moon = nullptr;
+        long double hill_sphere2 = 0;
+        int tries = 0;
+        while (!done) {
+          tries++;
+          if (tries > 20) {
+            to_many_tries = true;
+            break;
+          }
+          bad_place = false;
+
+          if ((roche_limit * 1.5) > (the_planet->getRadius() * 2.5)) {
+            min_rand_distance = roche_limit * 1.5;
+          } else {
+            min_rand_distance = the_planet->getRadius() * 2.5;
+          }
+
+          distance = random_number(min_rand_distance, hill_sphere / 3.0);
+          eccentricity = random_number(
+              0, 0.01);  // I know I should use random_eccentricity here but I
+                         // want to prevent orbits from crossing each other
+          for (the_moon = the_planet->first_moon; the_moon != nullptr;
+               the_moon = the_moon->next_planet) {
+            hill_sphere2 =
+                the_moon->getMoonA() * KM_PER_AU *
+                std::pow(the_moon->getMass() / (3.0 * the_planet->getMass()),
+                    1.0 / 3.0);
+            temp_hill_sphere =
+                distance * std::pow(ptr->getMass() / (3.0 * the_planet->getMass()),
+                               1.0 / 3.0);
+            if (((the_moon->getMoonA() * KM_PER_AU) >=
+                     (distance - temp_hill_sphere) &&
+                 (the_moon->getMoonA() * KM_PER_AU) <=
+                     (distance + temp_hill_sphere)) ||
+                (distance >=
+                     ((the_moon->getMoonA() * KM_PER_AU) - hill_sphere2) &&
+                 distance <=
+                     ((the_moon->getMoonA() * KM_PER_AU) + hill_sphere2))) {
+              bad_place = true;
+              break;
+            }
+          }
+          if (!bad_place) {
+            done = true;
+          }
+        }
+
+        if (to_many_tries) {
+          bool dont_break = false;
+          if ((flag_verbose & 0x1000) != 0) {
+            std::cerr << "  " << planet_id << ": can't fit anymore moons!\n";
+          }
+          skip_minor_moons = true;
+          planet *node = nullptr;
+          planet *next = nullptr;
+          for (node = ptr; node != nullptr; node = next) {
+            next = node->next_planet;
+            if (node->getDeletable()) {
+              delete node;
+            } else {
+              node->next_planet = node->reconnect_to;
+              n = 0;
+              the_planet->first_moon = the_planet->first_moon_backup;
+              // ptr = the_planet->first_moon;
+              dont_break = true;
+              continue;
+            }
+          }
+          if (prev != nullptr) {
+            prev->next_planet = nullptr;
+          } else {
+            the_planet->first_moon = nullptr;
+          }
+          /*for (int m = n; m < the_planet->getMoonCount(); m++)
+          {
+            the_planet->deleteMoon(m);
+          }*/
+          if (!dont_break) {
+            break;
+          }
+        } else {
+          ptr->setMoonA(distance / KM_PER_AU);
+          ptr->setMoonE(eccentricity);
+
+          ptr->setOrbPeriod(
+              period(ptr->getMoonA(), ptr->getMass(), the_planet->getMass()));
+          ptr->setType(tUnknown);
+          generate_planet(ptr, n, the_sun, random_tilt, moon_id, do_gases,
+                          do_moons, true, the_planet->getMass());
+
+          if ((flag_verbose & 0x40000) != 0) {
+            std::cerr << "   Roche limit: R = "
+                 << toString(the_planet->getRadius())
+                 << ", rM = " << toString(the_planet->getDensity())
+                 << ", rm = " << toString(ptr->getDensity()) << " -> "
+                 << toString(roche_limit) << " km\n";
+            std::cerr << "   Hill Sphere: a = "
+                 << toString(the_planet->getA() * KM_PER_AU) << ", m = "
+                 << toString(the_planet->getMass() * SOLAR_MASS_IN_KILOGRAMS)
+                 << ", M = "
+                 << toString(the_sun.getMass() * SOLAR_MASS_IN_KILOGRAMS)
+                 << " -> " << toString(hill_sphere) << " km\n";
+            std::cerr << moon_id << " Moon orbit: a = "
+                 << toString(ptr->getMoonA() * KM_PER_AU)
+                 << " km, e = " << toString(ptr->getMoonE()) << "\n";
+          }
+
+          if ((flag_verbose & 0x1000) != 0) {
+            std::cerr << "  " << planet_id << ": ("
+                 << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
+                 << " EM) " << n << " "
+                 << toString(ptr->getMass() * SUN_MASS_IN_EARTH_MASSES)
+                 << " EM\n";
+          }
+          prev = ptr;
+        }
+      } else {
+        if ((flag_verbose & 0x1000) != 0) {
+          std::cerr << "  " << planet_id
+               << " lost moons due to gravity of the sun!\n";
+        }
+        skip_minor_moons = true;
+        // delete moons
+        planet *node = nullptr;
+        planet *next = nullptr;
+        for (node = the_planet->first_moon; node != nullptr; node = next) {
+          next = node->next_planet;
+          if (node->getDeletable()) {
+            delete node;
+          } else {
+            node->next_planet = node->reconnect_to;
+            // n = 0;
+            the_planet->first_moon = the_planet->first_moon_backup;
+            // ptr = the_planet->first_moon;
+            continue;
+          }
+        }
+        n = 0;
+        the_planet->first_moon = nullptr;
+        /*for (int m = 0; m < the_planet->getMoonCount(); m++)
+         *	    {
+         *	      the_planet->deleteMoon(m);
+         }*/
+        break;
+      }
+    }
+  }
+
+  if (skip_minor_moons) {
+    the_planet->setMinorMoons(0);
+  } else {
+    the_planet->setMinorMoons(
+        poisson(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES));
+  }
+
+  if (the_planet->getMinorMoons() > 0) {
+    long double max_total_moon_mass = NAN;
+    long double remaining_moon_mass = NAN;
+    long double new_moon_mass = NAN;
+    long double new_moon_gas_mass = NAN;
+    long double min_new_moon_mass = 1.0 / 100000000000.0;
+    planet *tmp = nullptr;
+    planet *ref = nullptr;
+    int attempts = 0;
+    bool done2 = false;
+    bool too_many_tries = false;
+    bool bad_place2 = false;
+    long double hill_sphere3 = 0;
+    long double hill_sphere4 = 0;
+    long double roche_limit2 = 0;
+    int tries2 = 0;
+
+    hill_sphere3 =
+        the_planet->getA() * KM_PER_AU *
+        std::pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
+    if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 1000.0) {
+      max_total_moon_mass =
+          the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.05;
+    } else if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 10.0) {
+      max_total_moon_mass =
+          the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * (1.5 / 10000.0);
+    } else if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 0.5) {
+      if (the_planet->getRadius() > 15000.0) {
+        max_total_moon_mass =
+            the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.01;
+      } else {
+        max_total_moon_mass =
+            the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.05;
+      }
+    } else {
+      max_total_moon_mass =
+          the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * (1.5 / 10000.0);
+    }
+    remaining_moon_mass = max_total_moon_mass - moon_mass;
+
+    // get the pointer to the last moon in the list
+    if (the_planet->first_moon != nullptr) {
+      tmp = the_planet->first_moon;
+      while (true) {
+        if (tmp->next_planet == nullptr) {
+          break;
+        }
+        tmp = tmp->next_planet;
+      }
+    } else {
+      tmp = nullptr;
+    }
+
+    n++;
+    int moon_count = 0;
+    while (true) {
+      done2 = false;
+      ss.str("");
+      ss << planet_id << "-" << toString(n);
+      moon_id = ss.str();
+      ss.str("");
+
+      if (remaining_moon_mass <= 0.0 || attempts > 5 ||
+          moon_count > the_planet->getMinorMoons() ||
+          (hill_sphere3 / 3.0) <= the_planet->getRadius()) {
+        break;
+      }
+      planet *new_moon = nullptr;
+      new_moon = new planet();
+      new_moon->setPlanetNo(n);
+      new_moon->setOrbitZone(the_planet->getOrbitZone());
+      new_moon->setA(the_planet->getA());
+      new_moon->setE(the_planet->getE());
+      new_moon->setHzd(the_planet->getHzd());
+
+      double r1 = randf();
+      double maxln = exp(1.0);
+      double r2 = log(1.0 + (maxln * r1)) / 1.33;
+
+      new_moon_mass = r2 * remaining_moon_mass;
+
+      if (new_moon_mass < min_new_moon_mass) {
+        new_moon_mass = min_new_moon_mass;
+      }
+
+      if (new_moon_mass > 10.0) {
+        new_moon_gas_mass = new_moon_mass * random_number(0.05, 1.0);
+        new_moon->setGasGiant(true);
+      } else {
+        new_moon_gas_mass = 0;
+        new_moon->setGasGiant(false);
+      }
+      new_moon->setDustMass((new_moon_mass - new_moon_gas_mass) /
+                            SUN_MASS_IN_EARTH_MASSES);
+      new_moon->setGasMass(new_moon_gas_mass / SUN_MASS_IN_EARTH_MASSES);
+
+      assign_composition(new_moon, the_sun, true);
+
+      // generate_planet(new_moon, n, the_sun, random_tilt, moon_id, do_gases,
+      // do_moons, true, the_planet->getMass());
+      new_moon->setRadius(radius_improved(
+          new_moon->getMass(), new_moon->getImf(), new_moon->getRmf(),
+          new_moon->getCmf(), false, new_moon->getOrbitZone(), new_moon));
+      new_moon->setDensity(
+          volume_density(new_moon->getMass(), new_moon->getRadius()));
+
+      long double distance2 = NAN;
+      long double eccentricity2 = NAN;
+
+      roche_limit2 =
+          2.44 * the_planet->getRadius() *
+          std::pow(the_planet->getDensity() / new_moon->getDensity(), 1.0 / 3.0);
+      if ((roche_limit2 * 1.5) >= (hill_sphere3 / 3.0)) {
+        if ((flag_verbose & 0x1000) != 0) {
+          std::cerr << "  " << planet_id << ": Can't add anymore moons!\n";
+        }
+        delete new_moon;
+        break;
+      }
+      tries2 = 0;
+      while (!done2) {
+        tries2++;
+        bad_place2 = false;
+        too_many_tries = false;
+        distance2 = random_number(roche_limit2 * 1.5, hill_sphere3 / 3.0);
+        eccentricity2 = random_number(
+            0, 0.01);  // I know I should use random_eccentricity here but I
+                       // want to prevent orbits from crossing each other
+        if ((flag_verbose & 0x1000) != 0) {
+          std::cerr << "  " << planet_id << ": Attempting to add moon ("
+               << toString(new_moon->getMass() * SUN_MASS_IN_EARTH_MASSES)
+               << " EU) at " << toString(distance2)
+               << " km with eccentricity of " << toString(eccentricity2)
+               << "\n";
+        }
+
+        for (ref = the_planet->first_moon; ref != nullptr;
+             ref = ref->next_planet) {
+          hill_sphere4 =
+              ref->getMoonA() * KM_PER_AU *
+              std::pow(ref->getMass() / (3.0 * the_planet->getMass()), 1.0 / 3.0);
+          temp_hill_sphere =
+              distance2 *
+              std::pow(new_moon->getMass() / (3.0 * the_planet->getMass()),
+                  1.0 / 3.0);
+          // std::cout << toString(distance2) << " " << toString(distance2 -
+          // temp_hill_sphere) << " " << toString(distance2 +
+          // temp_hill_sphere) << "\n";
+          if (((ref->getMoonA() * KM_PER_AU) >=
+                   (distance2 - temp_hill_sphere) &&
+               (ref->getMoonA() * KM_PER_AU) <=
+                   (distance2 + temp_hill_sphere)) ||
+              (distance2 >= ((ref->getMoonA() * KM_PER_AU) - hill_sphere4) &&
+               distance2 <= ((ref->getMoonA() * KM_PER_AU) + hill_sphere4))) {
+            bad_place2 = true;
+            if ((flag_verbose & 0x1000) != 0) {
+              std::cerr << "  Failed due to neighboring moon.\n";
+            }
+            break;
+          }
+        }
+        if (!bad_place2 || tries2 > 20) {
+          done2 = true;
+        }
+        if (tries2 > 20) {
+          too_many_tries = true;
+        }
+      }
+      new_moon->setMoonA(distance2 / KM_PER_AU);
+      new_moon->setMoonE(eccentricity2);
+      if (bad_place2 || too_many_tries) {
+        delete new_moon;
+        attempts++;
+        if ((flag_verbose & 0x1000) != 0) {
+          std::cerr << "  Failed to add moon.\n";
+        }
+      } else {
+        attempts = 0;
+        generate_planet(new_moon, n, the_sun, random_tilt, moon_id, do_gases,
+                        do_moons, true, the_planet->getMass());
+        if (tmp != nullptr) {
+          tmp->next_planet = new_moon;
+          tmp = tmp->next_planet;
+        } else {
+          the_planet->first_moon = new_moon;
+          tmp = the_planet->first_moon;
+        }
+        // the_planet->addMoon(new_moon);
+        remaining_moon_mass -= new_moon_mass;
+        moon_mass += new_moon_mass;
+        n++;
+        moon_count++;
+
+        if ((flag_verbose & 0x40000) != 0) {
+          std::cerr << "   Roche limit: R = " << toString(the_planet->getRadius())
+               << ", rM = " << toString(the_planet->getDensity())
+               << ", rm = " << toString(new_moon->getDensity()) << " -> "
+               << toString(roche_limit2) << " km\n";
+          std::cerr << "   Hill Sphere: a = "
+               << toString(the_planet->getA() * KM_PER_AU) << ", m = "
+               << toString(the_planet->getMass() * SOLAR_MASS_IN_KILOGRAMS)
+               << ", M = "
+               << toString(the_sun.getMass() * SOLAR_MASS_IN_KILOGRAMS)
+               << " -> " << toString(hill_sphere3) << " km\n";
+          std::cerr << moon_id << " Moon orbit: a = "
+               << toString(new_moon->getMoonA() * KM_PER_AU)
+               << " km, e = " << toString(new_moon->getMoonE()) << "\n";
+        }
+
+        if ((flag_verbose & 0x1000) != 0) {
+          std::cerr << "  New Moon for " << planet_id << ": ("
+               << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
+               << " EM) " << n << " "
+               << toString(new_moon->getMass() * SUN_MASS_IN_EARTH_MASSES)
+               << " EM\n";
+        }
+      }
+    }
+
+    if (the_planet->first_moon != nullptr) {
+      // reorder the moons
+      the_planet->sortMoons();
+
+      // make some modifications to the moons
+      int moon_number = 0;
+      for (tmp = the_planet->first_moon, moon_number = 1; tmp != nullptr;
+           tmp = tmp->next_planet, moon_number++) {
+        tmp->setPlanetNo(moon_number);
+        ss.str("");
+        ss << planet_id << "-" << tmp->getPlanetNo();
+        moon_id = ss.str();
+
+        // change inclinations
+        long double fdist =
+            (tmp->getMoonA() * KM_PER_AU) / (hill_sphere3 / 3.0);
+        long double fmass =
+            std::pow(moon_mass / (tmp->getMass() * SUN_MASS_IN_EARTH_MASSES), 0.2);
+        tmp->setInclination(fdist * fmass * tmp->getInclination());
+
+        if (tmp->getGasMass() == 0) {
+          // we don't want moons with too thick an atmosphere
+          if (tmp->getSurfPressure() > 6000) {
+            tmp->setType(tUnknown);
+            tmp->setSurfPressure(calcPhlPressure(tmp) *
+                                 EARTH_SURF_PRES_IN_MILLIBARS);
+            while (tmp->getSurfPressure() > 6000) {
+              tmp->setSurfPressure(tmp->getSurfPressure() - 1.0);
+            }
+            iterate_surface_temp(tmp, do_gases);
+            if (do_gases) {
+              tmp->clearGases();
+              calculate_gases(the_sun, tmp, moon_id);
+            }
+            assign_type(the_sun, tmp, moon_id, true, do_gases, false);
+          }
+        }
+
+        tmp->setHzc(calcHzc(tmp));
+        tmp->setHza(calcHza(tmp));
+        tmp->setEsi(calcEsi(tmp));
+        tmp->setSph(calcSph(tmp));
+      }
+    }
+  }
+}
+
+/**
  * @brief Finalize rocky planet properties (atmosphere, temperature, type)
  * @param the_planet Planet to finalize
  * @param the_sun Parent star
@@ -1311,490 +1814,10 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
   the_planet->setEsi(calcEsi(the_planet));
   the_planet->setSph(calcSph(the_planet));
 
-  if (do_moons && !is_moon) {
-    bool skip_minor_moons = false;
-    long double moon_mass = 0.0;
-    int n = 0;
-    std::stringstream ss;
-    std::string moon_id;
-    long double temp_hill_sphere = 0;
-    long double min_rand_distance = 0;
-    if (the_planet->first_moon != nullptr) {
-      planet *ptr = nullptr;
-      planet *prev = nullptr;
-      planet *next_moon = nullptr;
+  // Generate moons for this planet (if not a moon itself)
+  generate_moons(the_planet, planet_no, the_sun, random_tilt, planet_id,
+                 do_gases, do_moons, is_moon);
 
-      // reset moon distances for predefined moons
-      /*for (n = 0, ptr = the_planet->first_moon; ptr != NULL; ptr = next_moon)
-      {
-        next_moon = ptr->next_planet;
-        ptr->setMoonA(0);
-        ptr->setMoonE(0);
-      }*/
-
-      long double hill_sphere = 0.0;
-
-      hill_sphere =
-          the_planet->getA() * KM_PER_AU *
-          std::pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
-
-      for (n = 0, ptr = the_planet->first_moon; ptr != nullptr; ptr = next_moon)
-      // for (n = 0; n < the_planet->getMoonCount(); n++)
-      {
-        next_moon = ptr->next_planet;
-        moon_mass += ptr->getMass() * SUN_MASS_IN_EARTH_MASSES;
-
-        long double roche_limit = 0.0;
-        long double distance = 0.0;
-        long double eccentricity = 0.0;
-
-        ptr->setA(the_planet->getA());
-        ptr->setE(the_planet->getE());
-        ptr->setOrbitZone(the_planet->getOrbitZone());
-
-        assign_composition(ptr, the_sun, true);
-
-        ss.str("");
-        ss << planet_id << "-" << toString(n + 1);
-        moon_id = ss.str();
-        ss.str("");
-
-        // generate_planet(ptr, n, the_sun, random_tilt, moon_id, do_gases,
-        // do_moons, true, the_planet->getMass());
-        ptr->setRadius(radius_improved(ptr->getMass(), ptr->getImf(),
-                                       ptr->getRmf(), ptr->getCmf(), false,
-                                       ptr->getOrbitZone(), ptr));
-        ptr->setDensity(volume_density(ptr->getMass(), ptr->getRadius()));
-
-        roche_limit =
-            2.44 * the_planet->getRadius() *
-            std::pow(the_planet->getDensity() / ptr->getDensity(), 1.0 / 3.0);
-
-        if ((roche_limit * 1.5) < (hill_sphere / 3.0) &&
-            (hill_sphere / 3.0) > (the_planet->getRadius() * 2.5)) {
-          bool done = false;
-          bool bad_place = false;
-          bool to_many_tries = false;
-          planet *the_moon = nullptr;
-          long double hill_sphere2 = 0;
-          int tries = 0;
-          while (!done) {
-            tries++;
-            if (tries > 20) {
-              to_many_tries = true;
-              break;
-            }
-            bad_place = false;
-
-            if ((roche_limit * 1.5) > (the_planet->getRadius() * 2.5)) {
-              min_rand_distance = roche_limit * 1.5;
-            } else {
-              min_rand_distance = the_planet->getRadius() * 2.5;
-            }
-
-            distance = random_number(min_rand_distance, hill_sphere / 3.0);
-            eccentricity = random_number(
-                0, 0.01);  // I know I should use random_eccentricity here but I
-                           // want to prevent orbits from crossing each other
-            for (the_moon = the_planet->first_moon; the_moon != nullptr;
-                 the_moon = the_moon->next_planet) {
-              hill_sphere2 =
-                  the_moon->getMoonA() * KM_PER_AU *
-                  std::pow(the_moon->getMass() / (3.0 * the_planet->getMass()),
-                      1.0 / 3.0);
-              temp_hill_sphere =
-                  distance * std::pow(ptr->getMass() / (3.0 * the_planet->getMass()),
-                                 1.0 / 3.0);
-              if (((the_moon->getMoonA() * KM_PER_AU) >=
-                       (distance - temp_hill_sphere) &&
-                   (the_moon->getMoonA() * KM_PER_AU) <=
-                       (distance + temp_hill_sphere)) ||
-                  (distance >=
-                       ((the_moon->getMoonA() * KM_PER_AU) - hill_sphere2) &&
-                   distance <=
-                       ((the_moon->getMoonA() * KM_PER_AU) + hill_sphere2))) {
-                bad_place = true;
-                break;
-              }
-            }
-            if (!bad_place) {
-              done = true;
-            }
-          }
-
-          if (to_many_tries) {
-            bool dont_break = false;
-            if ((flag_verbose & 0x1000) != 0) {
-              std::cerr << "  " << planet_id << ": can't fit anymore moons!\n";
-            }
-            skip_minor_moons = true;
-            planet *node = nullptr;
-            planet *next = nullptr;
-            for (node = ptr; node != nullptr; node = next) {
-              next = node->next_planet;
-              if (node->getDeletable()) {
-                delete node;
-              } else {
-                node->next_planet = node->reconnect_to;
-                n = 0;
-                the_planet->first_moon = the_planet->first_moon_backup;
-                // ptr = the_planet->first_moon;
-                dont_break = true;
-                continue;
-              }
-            }
-            if (prev != nullptr) {
-              prev->next_planet = nullptr;
-            } else {
-              the_planet->first_moon = nullptr;
-            }
-            /*for (int m = n; m < the_planet->getMoonCount(); m++)
-            {
-              the_planet->deleteMoon(m);
-            }*/
-            if (!dont_break) {
-              break;
-            }
-          } else {
-            ptr->setMoonA(distance / KM_PER_AU);
-            ptr->setMoonE(eccentricity);
-
-            ptr->setOrbPeriod(
-                period(ptr->getMoonA(), ptr->getMass(), the_planet->getMass()));
-            ptr->setType(tUnknown);
-            generate_planet(ptr, n, the_sun, random_tilt, moon_id, do_gases,
-                            do_moons, true, the_planet->getMass());
-
-            if ((flag_verbose & 0x40000) != 0) {
-              std::cerr << "   Roche limit: R = "
-                   << toString(the_planet->getRadius())
-                   << ", rM = " << toString(the_planet->getDensity())
-                   << ", rm = " << toString(ptr->getDensity()) << " -> "
-                   << toString(roche_limit) << " km\n";
-              std::cerr << "   Hill Sphere: a = "
-                   << toString(the_planet->getA() * KM_PER_AU) << ", m = "
-                   << toString(the_planet->getMass() * SOLAR_MASS_IN_KILOGRAMS)
-                   << ", M = "
-                   << toString(the_sun.getMass() * SOLAR_MASS_IN_KILOGRAMS)
-                   << " -> " << toString(hill_sphere) << " km\n";
-              std::cerr << moon_id << " Moon orbit: a = "
-                   << toString(ptr->getMoonA() * KM_PER_AU)
-                   << " km, e = " << toString(ptr->getMoonE()) << "\n";
-            }
-
-            if ((flag_verbose & 0x1000) != 0) {
-              std::cerr << "  " << planet_id << ": ("
-                   << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                   << " EM) " << n << " "
-                   << toString(ptr->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                   << " EM\n";
-            }
-            prev = ptr;
-          }
-        } else {
-          if ((flag_verbose & 0x1000) != 0) {
-            std::cerr << "  " << planet_id
-                 << " lost moons due to gravity of the sun!\n";
-          }
-          skip_minor_moons = true;
-          // delete moons
-          planet *node = nullptr;
-          planet *next = nullptr;
-          for (node = the_planet->first_moon; node != nullptr; node = next) {
-            next = node->next_planet;
-            if (node->getDeletable()) {
-              delete node;
-            } else {
-              node->next_planet = node->reconnect_to;
-              // n = 0;
-              the_planet->first_moon = the_planet->first_moon_backup;
-              // ptr = the_planet->first_moon;
-              continue;
-            }
-          }
-          n = 0;
-          the_planet->first_moon = nullptr;
-          /*for (int m = 0; m < the_planet->getMoonCount(); m++)
-           *	    {
-           *	      the_planet->deleteMoon(m);
-           }*/
-          break;
-        }
-      }
-    }
-
-    if (skip_minor_moons) {
-      the_planet->setMinorMoons(0);
-    } else {
-      the_planet->setMinorMoons(
-          poisson(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES));
-    }
-
-    if (the_planet->getMinorMoons() > 0) {
-      long double max_total_moon_mass = NAN;
-      long double remaining_moon_mass = NAN;
-      long double new_moon_mass = NAN;
-      long double new_moon_gas_mass = NAN;
-      long double min_new_moon_mass = 1.0 / 100000000000.0;
-      planet *tmp = nullptr;
-      planet *ref = nullptr;
-      int attempts = 0;
-      bool done2 = false;
-      bool too_many_tries = false;
-      bool bad_place2 = false;
-      long double hill_sphere3 = 0;
-      long double hill_sphere4 = 0;
-      long double roche_limit2 = 0;
-      int tries2 = 0;
-
-      hill_sphere3 =
-          the_planet->getA() * KM_PER_AU *
-          std::pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
-      if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 1000.0) {
-        max_total_moon_mass =
-            the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.05;
-      } else if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 10.0) {
-        max_total_moon_mass =
-            the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * (1.5 / 10000.0);
-      } else if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 0.5) {
-        if (the_planet->getRadius() > 15000.0) {
-          max_total_moon_mass =
-              the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.01;
-        } else {
-          max_total_moon_mass =
-              the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.05;
-        }
-      } else {
-        max_total_moon_mass =
-            the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * (1.5 / 10000.0);
-      }
-      remaining_moon_mass = max_total_moon_mass - moon_mass;
-
-      // get the pointer to the last moon in the list
-      if (the_planet->first_moon != nullptr) {
-        tmp = the_planet->first_moon;
-        while (true) {
-          if (tmp->next_planet == nullptr) {
-            break;
-          }
-          tmp = tmp->next_planet;
-        }
-      } else {
-        tmp = nullptr;
-      }
-
-      n++;
-      int moon_count = 0;
-      while (true) {
-        done2 = false;
-        ss.str("");
-        ss << planet_id << "-" << toString(n);
-        moon_id = ss.str();
-        ss.str("");
-
-        if (remaining_moon_mass <= 0.0 || attempts > 5 ||
-            moon_count > the_planet->getMinorMoons() ||
-            (hill_sphere3 / 3.0) <= the_planet->getRadius()) {
-          break;
-        }
-        planet *new_moon = nullptr;
-        new_moon = new planet();
-        new_moon->setPlanetNo(n);
-        new_moon->setOrbitZone(the_planet->getOrbitZone());
-        new_moon->setA(the_planet->getA());
-        new_moon->setE(the_planet->getE());
-        new_moon->setHzd(the_planet->getHzd());
-
-        double r1 = randf();
-        double maxln = exp(1.0);
-        double r2 = log(1.0 + (maxln * r1)) / 1.33;
-
-        new_moon_mass = r2 * remaining_moon_mass;
-
-        if (new_moon_mass < min_new_moon_mass) {
-          new_moon_mass = min_new_moon_mass;
-        }
-
-        if (new_moon_mass > 10.0) {
-          new_moon_gas_mass = new_moon_mass * random_number(0.05, 1.0);
-          new_moon->setGasGiant(true);
-        } else {
-          new_moon_gas_mass = 0;
-          new_moon->setGasGiant(false);
-        }
-        new_moon->setDustMass((new_moon_mass - new_moon_gas_mass) /
-                              SUN_MASS_IN_EARTH_MASSES);
-        new_moon->setGasMass(new_moon_gas_mass / SUN_MASS_IN_EARTH_MASSES);
-
-        assign_composition(new_moon, the_sun, true);
-
-        // generate_planet(new_moon, n, the_sun, random_tilt, moon_id, do_gases,
-        // do_moons, true, the_planet->getMass());
-        new_moon->setRadius(radius_improved(
-            new_moon->getMass(), new_moon->getImf(), new_moon->getRmf(),
-            new_moon->getCmf(), false, new_moon->getOrbitZone(), new_moon));
-        new_moon->setDensity(
-            volume_density(new_moon->getMass(), new_moon->getRadius()));
-
-        long double distance2 = NAN;
-        long double eccentricity2 = NAN;
-
-        roche_limit2 =
-            2.44 * the_planet->getRadius() *
-            std::pow(the_planet->getDensity() / new_moon->getDensity(), 1.0 / 3.0);
-        if ((roche_limit2 * 1.5) >= (hill_sphere3 / 3.0)) {
-          if ((flag_verbose & 0x1000) != 0) {
-            std::cerr << "  " << planet_id << ": Can't add anymore moons!\n";
-          }
-          delete new_moon;
-          break;
-        }
-        tries2 = 0;
-        while (!done2) {
-          tries2++;
-          bad_place2 = false;
-          too_many_tries = false;
-          distance2 = random_number(roche_limit2 * 1.5, hill_sphere3 / 3.0);
-          eccentricity2 = random_number(
-              0, 0.01);  // I know I should use random_eccentricity here but I
-                         // want to prevent orbits from crossing each other
-          if ((flag_verbose & 0x1000) != 0) {
-            std::cerr << "  " << planet_id << ": Attempting to add moon ("
-                 << toString(new_moon->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                 << " EU) at " << toString(distance2)
-                 << " km with eccentricity of " << toString(eccentricity2)
-                 << "\n";
-          }
-
-          for (ref = the_planet->first_moon; ref != nullptr;
-               ref = ref->next_planet) {
-            hill_sphere4 =
-                ref->getMoonA() * KM_PER_AU *
-                std::pow(ref->getMass() / (3.0 * the_planet->getMass()), 1.0 / 3.0);
-            temp_hill_sphere =
-                distance2 *
-                std::pow(new_moon->getMass() / (3.0 * the_planet->getMass()),
-                    1.0 / 3.0);
-            // std::cout << toString(distance2) << " " << toString(distance2 -
-            // temp_hill_sphere) << " " << toString(distance2 +
-            // temp_hill_sphere) << "\n";
-            if (((ref->getMoonA() * KM_PER_AU) >=
-                     (distance2 - temp_hill_sphere) &&
-                 (ref->getMoonA() * KM_PER_AU) <=
-                     (distance2 + temp_hill_sphere)) ||
-                (distance2 >= ((ref->getMoonA() * KM_PER_AU) - hill_sphere4) &&
-                 distance2 <= ((ref->getMoonA() * KM_PER_AU) + hill_sphere4))) {
-              bad_place2 = true;
-              if ((flag_verbose & 0x1000) != 0) {
-                std::cerr << "  Failed due to neighboring moon.\n";
-              }
-              break;
-            }
-          }
-          if (!bad_place2 || tries2 > 20) {
-            done2 = true;
-          }
-          if (tries2 > 20) {
-            too_many_tries = true;
-          }
-        }
-        new_moon->setMoonA(distance2 / KM_PER_AU);
-        new_moon->setMoonE(eccentricity2);
-        if (bad_place2 || too_many_tries) {
-          delete new_moon;
-          attempts++;
-          if ((flag_verbose & 0x1000) != 0) {
-            std::cerr << "  Failed to add moon.\n";
-          }
-        } else {
-          attempts = 0;
-          generate_planet(new_moon, n, the_sun, random_tilt, moon_id, do_gases,
-                          do_moons, true, the_planet->getMass());
-          if (tmp != nullptr) {
-            tmp->next_planet = new_moon;
-            tmp = tmp->next_planet;
-          } else {
-            the_planet->first_moon = new_moon;
-            tmp = the_planet->first_moon;
-          }
-          // the_planet->addMoon(new_moon);
-          remaining_moon_mass -= new_moon_mass;
-          moon_mass += new_moon_mass;
-          n++;
-          moon_count++;
-
-          if ((flag_verbose & 0x40000) != 0) {
-            std::cerr << "   Roche limit: R = " << toString(the_planet->getRadius())
-                 << ", rM = " << toString(the_planet->getDensity())
-                 << ", rm = " << toString(new_moon->getDensity()) << " -> "
-                 << toString(roche_limit2) << " km\n";
-            std::cerr << "   Hill Sphere: a = "
-                 << toString(the_planet->getA() * KM_PER_AU) << ", m = "
-                 << toString(the_planet->getMass() * SOLAR_MASS_IN_KILOGRAMS)
-                 << ", M = "
-                 << toString(the_sun.getMass() * SOLAR_MASS_IN_KILOGRAMS)
-                 << " -> " << toString(hill_sphere3) << " km\n";
-            std::cerr << moon_id << " Moon orbit: a = "
-                 << toString(new_moon->getMoonA() * KM_PER_AU)
-                 << " km, e = " << toString(new_moon->getMoonE()) << "\n";
-          }
-
-          if ((flag_verbose & 0x1000) != 0) {
-            std::cerr << "  New Moon for " << planet_id << ": ("
-                 << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                 << " EM) " << n << " "
-                 << toString(new_moon->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                 << " EM\n";
-          }
-        }
-      }
-
-      if (the_planet->first_moon != nullptr) {
-        // reorder the moons
-        the_planet->sortMoons();
-
-        // make some modifications to the moons
-        int moon_number = 0;
-        for (tmp = the_planet->first_moon, moon_number = 1; tmp != nullptr;
-             tmp = tmp->next_planet, moon_number++) {
-          tmp->setPlanetNo(moon_number);
-          ss.str("");
-          ss << planet_id << "-" << tmp->getPlanetNo();
-          moon_id = ss.str();
-
-          // change inclinations
-          long double fdist =
-              (tmp->getMoonA() * KM_PER_AU) / (hill_sphere3 / 3.0);
-          long double fmass =
-              std::pow(moon_mass / (tmp->getMass() * SUN_MASS_IN_EARTH_MASSES), 0.2);
-          tmp->setInclination(fdist * fmass * tmp->getInclination());
-
-          if (tmp->getGasMass() == 0) {
-            // we don't want moons with too thick an atmosphere
-            if (tmp->getSurfPressure() > 6000) {
-              tmp->setType(tUnknown);
-              tmp->setSurfPressure(calcPhlPressure(tmp) *
-                                   EARTH_SURF_PRES_IN_MILLIBARS);
-              while (tmp->getSurfPressure() > 6000) {
-                tmp->setSurfPressure(tmp->getSurfPressure() - 1.0);
-              }
-              iterate_surface_temp(tmp, do_gases);
-              if (do_gases) {
-                tmp->clearGases();
-                calculate_gases(the_sun, tmp, moon_id);
-              }
-              assign_type(the_sun, tmp, moon_id, true, do_gases, false);
-            }
-          }
-
-          tmp->setHzc(calcHzc(tmp));
-          tmp->setHza(calcHza(tmp));
-          tmp->setEsi(calcEsi(tmp));
-          tmp->setSph(calcSph(tmp));
-        }
-      }
-    }
-  }
   ZoneScoped;
 }
 
