@@ -92,12 +92,14 @@ int main(int argc, char **argv) {
 #endif
 
   initData();
+  std::cerr << "DEBUG: initData() done, starting argument parsing" << std::endl;
 
   prognam = argv[0];
   if ((c = strrchr(prognam.c_str(), DIRSEP[0])) != nullptr) {
     prognam = c + 1;
   }
 
+  std::cerr << "DEBUG: About to check argc=" << argc << std::endl;
   if (argc <= 1) {
     usage(prognam);
     return EXIT_FAILURE;
@@ -416,18 +418,31 @@ int main(int argc, char **argv) {
  *
  */
 void initData() {
+  std::cerr << "DEBUG: Starting initRadii()" << std::endl;
   initRadii();
+  std::cerr << "DEBUG: Starting initGases()" << std::endl;
   initGases();
+  std::cerr << "DEBUG: Starting initPlanets()" << std::endl;
   initPlanets();
+  std::cerr << "DEBUG: Starting initDole()" << std::endl;
   initDole();
+  std::cerr << "DEBUG: Starting initSolStation()" << std::endl;
   initSolStation();
+  std::cerr << "DEBUG: Starting initJimb()" << std::endl;
   initJimb();
+  std::cerr << "DEBUG: Starting initOmegaGalaxy()" << std::endl;
   initOmegaGalaxy();
+  std::cerr << "DEBUG: Starting initRingUniverse()" << std::endl;
   initRingUniverse();
+  std::cerr << "DEBUG: Starting initIC3094()" << std::endl;
   initIC3094();
+  std::cerr << "DEBUG: Starting initAndromeda()" << std::endl;
   initAndromeda();
+  std::cerr << "DEBUG: Starting initStarTrek()" << std::endl;
   initStarTrek();
+  std::cerr << "DEBUG: Starting initPlanetaryHabitabilityLaboratory()" << std::endl;
   initPlanetaryHabitabilityLaboratory();
+  std::cerr << "DEBUG: initData() completed" << std::endl;
 }
 
 void usage(std::string program) {
