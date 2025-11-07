@@ -1009,17 +1009,176 @@ void generate_planets(sun &the_sun, bool random_tilt, const std::string &flag_ch
 }
 
 /**
+ * @brief Calculate atmospheric gas loss for rocky planets (H2 and He)
+ * @param the_planet Planet to calculate gas loss for
+ * @param the_sun Parent star
+ * @param planet_id Planet identifier for logging
+ */
+static void calculate_gas_loss(planet *the_planet, sun &the_sun, const std::string &planet_id) {
+  if ((the_planet->getGasMass() / the_planet->getMass()) <= 0.000001) {
+    return;  // No significant gas to lose
+  }
+
+  long double h2_mass = the_planet->getGasMass() * 0.85;
+  long double he_mass = (the_planet->getGasMass() - h2_mass) * 0.999;
+
+  long double h2_loss = 0.0;
+  long double he_loss = 0.0;
+
+  long double h2_life = gas_life(MOL_HYDROGEN, the_planet);
+  long double he_life = gas_life(HELIUM, the_planet);
+
+  if (h2_life < the_sun.getAge()) {
+    h2_loss = ((1.0 - (1.0 / exp(the_sun.getAge() / h2_life))) * h2_mass);
+    the_planet->setGasMass(the_planet->getGasMass() - h2_loss);
+    the_planet->setSurfAccel(acceleration(the_planet));
+    the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
+  }
+
+  if (he_life < the_sun.getAge()) {
+    he_loss = ((1.0 - (1.0 / exp(the_sun.getAge() / he_life))) * he_mass);
+    the_planet->setGasMass(the_planet->getGasMass() - he_loss);
+    the_planet->setSurfAccel(acceleration(the_planet));
+    the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
+  }
+
+  if ((h2_loss + he_loss) > .000001 && ((flag_verbose & 0x0080) != 0)) {
+    std::cerr << planet_id << "\tLosing gas: H2: "
+         << toString(h2_loss * SUN_MASS_IN_EARTH_MASSES)
+         << " EM, He: " << toString(he_loss * SUN_MASS_IN_EARTH_MASSES)
+         << " EM\n";
+  }
+}
+
+/**
+ * @brief Finalize gas giant properties (temperature, albedo, atmosphere)
+ * @param the_planet Planet to finalize
+ * @param the_sun Parent star
+ * @param planet_id Planet identifier for logging
+ * @param do_gases Whether to calculate detailed atmospheric gases
+ * @param force_gas_giant Whether this is a forced gas giant classification
+ * @param parent_mass Mass of parent body (for moons)
+ * @param is_moon Whether this is a moon
+ */
+static void finalize_gas_giant_properties(planet *the_planet, sun &the_sun,
+                                         const std::string &planet_id, bool do_gases,
+                                         bool force_gas_giant, long double parent_mass,
+                                         bool is_moon) {
+  the_planet->setGreenhouseEffect(false);
+  the_planet->setVolatileGasInventory(INCREDIBLY_LARGE_NUMBER);
+  the_planet->setSurfPressure(INCREDIBLY_LARGE_NUMBER);
+  the_planet->setBoilPoint(INCREDIBLY_LARGE_NUMBER);
+  the_planet->setGreenhsRise(0);
+  the_planet->setHydrosphere(1);
+  the_planet->setCloudCover(1);
+  the_planet->setIceCover(0);
+  the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
+
+  if (force_gas_giant) {
+    the_planet->setMolecWeight(about(0.5, 0.1));
+  } else {
+    the_planet->setMolecWeight(min_molec_weight(the_planet));
+  }
+
+  gas_giant_temperature_albedo(the_planet, parent_mass, is_moon);
+
+  the_planet->setDensity(
+      volume_density(the_planet->getMass(), the_planet->getRadius()));
+
+  the_planet->setEstimatedTerrTemp(est_temp(
+      the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
+      the_planet->getA(), EARTH_ALBEDO));
+
+  if (do_gases) {
+    the_sun = the_planet->getTheSun();
+    calculate_gases(the_sun, the_planet, planet_id);
+  }
+
+  long double temp = the_planet->getEstimatedTerrTemp();
+
+  if (is_habitable_jovian(the_planet)) {
+    habitable_jovians++;
+
+    if ((flag_verbose & 0x8000) != 0) {
+      std::string planet_type = type_string(the_planet);
+      std::string moon_string = the_planet->first_moon != nullptr ? " WITH MOON" : "";
+
+      std::cerr << planet_id << "\t" << planet_type << " ("
+           << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
+           << " EM " << toString(the_sun.getAge() / 1.0E9) << " By)"
+           << moon_string << " with earth-like temperature ("
+           << toString(temp - FREEZING_POINT_OF_WATER) << " C, "
+           << toString(32.0 + ((temp - FREEZING_POINT_OF_WATER) * 1.8))
+           << " F, " << (temp - EARTH_AVERAGE_KELVIN) << " C Earth).\n";
+    }
+  }
+}
+
+/**
+ * @brief Finalize rocky planet properties (atmosphere, temperature, type)
+ * @param the_planet Planet to finalize
+ * @param the_sun Parent star
+ * @param planet_id Planet identifier for logging
+ * @param do_gases Whether to calculate detailed atmospheric gases
+ * @param is_moon Whether this is a moon
+ * @param the_fudged_radius Fudged radius for calculations
+ */
+static void finalize_rocky_planet_properties(planet *the_planet, sun &the_sun,
+                                            const std::string &planet_id, bool do_gases,
+                                            bool is_moon, long double the_fudged_radius) {
+  the_planet->setEstimatedTemp(est_temp(
+      the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
+      the_planet->getA(), EARTH_ALBEDO));
+  the_planet->setEstimatedTerrTemp(est_temp(
+      the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
+      the_planet->getA(), EARTH_ALBEDO));
+
+  the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
+  the_planet->setMolecWeight(min_molec_weight(the_planet));
+
+  the_planet->setGreenhouseEffect(grnhouse(
+      the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
+      the_planet->getA()));
+
+  long double fudged_escape_velocity =
+      escape_vel(the_planet->getMass(), the_fudged_radius);
+  the_planet->setVolatileGasInventory(vol_inventory(
+      the_planet->getMass(), fudged_escape_velocity,
+      the_planet->getRmsVelocity(), the_sun.getMass(),
+      the_planet->getOrbitZone(), the_planet->getGreenhouseEffect(),
+      the_planet->getGasMass() > 0.0));
+  the_planet->setSurfPressure(pressure(the_planet->getVolatileGasInventory(),
+                                       the_fudged_radius,
+                                       the_planet->getSurfGrav()));
+
+  if (the_planet->getSurfPressure() == 0.0) {
+    the_planet->setBoilPoint(0.0);
+  } else {
+    the_planet->setBoilPoint(boiling_point(the_planet->getSurfPressure()));
+  }
+
+  iterate_surface_temp(the_planet, do_gases);
+
+  if (do_gases) {
+    the_sun = the_planet->getTheSun();
+    calculate_gases(the_sun, the_planet, planet_id);
+  }
+
+  assign_type(the_sun, the_planet, planet_id, is_moon, do_gases, false);
+}
+
+/**
  * @brief generate planet
- * 
- * @param the_planet 
- * @param planet_no 
- * @param the_sun 
- * @param random_tilt 
- * @param planet_id 
- * @param do_gases 
- * @param do_moons 
- * @param is_moon 
- * @param parent_mass 
+ *
+ * @param the_planet
+ * @param planet_no
+ * @param the_sun
+ * @param random_tilt
+ * @param planet_id
+ * @param do_gases
+ * @param do_moons
+ * @param is_moon
+ * @param parent_mass
  */
 void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
                      bool random_tilt, const std::string &planet_id, bool do_gases,
@@ -1128,43 +1287,8 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
         acceleration(the_planet));
     the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
 
-    if ((the_planet->getGasMass() / the_planet->getMass()) > 0.000001) {
-      long double h2_mass = the_planet->getGasMass() * 0.85;
-      long double he_mass = (the_planet->getGasMass() - h2_mass) * 0.999;
-
-      long double h2_loss = 0.0;
-      long double he_loss = 0.0;
-
-      long double h2_life = gas_life(MOL_HYDROGEN, the_planet);
-      long double he_life = gas_life(HELIUM, the_planet);
-
-      if (h2_life < the_sun.getAge()) {
-        h2_loss = ((1.0 - (1.0 / exp(the_sun.getAge() / h2_life))) * h2_mass);
-
-        the_planet->setGasMass(the_planet->getGasMass() - h2_loss);
-
-        the_planet->setSurfAccel(
-            acceleration(the_planet));
-        the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
-      }
-
-      if (he_life < the_sun.getAge()) {
-        he_loss = ((1.0 - (1.0 / exp(the_sun.getAge() / he_life))) * he_mass);
-
-        the_planet->setGasMass(the_planet->getGasMass() - he_loss);
-
-        the_planet->setSurfAccel(
-            acceleration(the_planet));
-        the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
-      }
-
-      if ((h2_loss + he_loss) > .000001 && ((flag_verbose & 0x0080) != 0)) {
-        std::cerr << planet_id << "\tLosing gas: H2: "
-             << toString(h2_loss * SUN_MASS_IN_EARTH_MASSES)
-             << " EM, He: " << toString(he_loss * SUN_MASS_IN_EARTH_MASSES)
-             << " EM\n";
-      }
-    }
+    // Calculate and apply atmospheric gas loss (H2 and He)
+    calculate_gas_loss(the_planet, the_sun, planet_id);
   }
 
   the_planet->setDay(day_length(the_planet, parent_mass, is_moon));
@@ -1173,103 +1297,13 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
   the_planet->setEscVelocity(
       escape_vel(the_planet->getMass(), the_planet->getRadius()));
 
+  // Finalize planet properties based on type
   if (is_gas_planet(the_planet)) {
-    the_planet->setGreenhouseEffect(false);
-    the_planet->setVolatileGasInventory(INCREDIBLY_LARGE_NUMBER);
-    the_planet->setSurfPressure(INCREDIBLY_LARGE_NUMBER);
-
-    the_planet->setBoilPoint(INCREDIBLY_LARGE_NUMBER);
-
-    the_planet->setGreenhsRise(0);
-
-    the_planet->setHydrosphere(1);
-    the_planet->setCloudCover(1);
-    the_planet->setIceCover(0);
-    the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
-    if (force_gas_giant) {
-      the_planet->setMolecWeight(about(0.5, 0.1));
-    } else {
-      the_planet->setMolecWeight(min_molec_weight(the_planet));
-    }
-
-    gas_giant_temperature_albedo(the_planet, parent_mass, is_moon);
-    // the_planet->setDay(day_length(the_planet, parent_mass, is_moon));
-    // the_planet->setOblateness(calcOblateness(the_planet));
-
-    the_planet->setDensity(
-        volume_density(the_planet->getMass(), the_planet->getRadius()));
-
-    the_planet->setEstimatedTerrTemp(est_temp(
-        the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
-        the_planet->getA(), EARTH_ALBEDO));
-
-    if (do_gases) {
-      the_sun = the_planet->getTheSun();
-      calculate_gases(the_sun, the_planet, planet_id);
-    }
-
-    long double temp = the_planet->getEstimatedTerrTemp();
-
-    if (is_habitable_jovian(the_planet)) {
-      habitable_jovians++;
-
-      if ((flag_verbose & 0x8000) != 0) {
-        std::string planet_type;
-        std::string moon_string;
-        planet_type = type_string(the_planet);
-        if (the_planet->first_moon != nullptr) {
-          moon_string = " WITH MOON";
-        } else {
-          moon_string = "";
-        }
-        std::cerr << planet_id << "\t" << planet_type << " ("
-             << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
-             << " EM " << toString(the_sun.getAge() / 1.0E9) << " By)"
-             << moon_string << " with earth-like temperature ("
-             << toString(temp - FREEZING_POINT_OF_WATER) << " C, "
-             << toString(32.0 + ((temp - FREEZING_POINT_OF_WATER) * 1.8))
-             << " F, " << (temp - EARTH_AVERAGE_KELVIN) << " C Earth).\n";
-      }
-    }
+    finalize_gas_giant_properties(the_planet, the_sun, planet_id, do_gases,
+                                  force_gas_giant, parent_mass, is_moon);
   } else {
-    the_planet->setEstimatedTemp(est_temp(
-        the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
-        the_planet->getA(), EARTH_ALBEDO));
-    the_planet->setEstimatedTerrTemp(est_temp(
-        the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
-        the_planet->getA(), EARTH_ALBEDO));
-
-    the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
-    the_planet->setMolecWeight(min_molec_weight(the_planet));
-
-    the_planet->setGreenhouseEffect(grnhouse(
-        the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
-        the_planet->getA()));
-    long double fudged_escape_velocity =
-        escape_vel(the_planet->getMass(), the_fudged_radius);
-    the_planet->setVolatileGasInventory(vol_inventory(
-        the_planet->getMass(), fudged_escape_velocity,
-        the_planet->getRmsVelocity(), the_sun.getMass(),
-        the_planet->getOrbitZone(), the_planet->getGreenhouseEffect(),
-        the_planet->getGasMass() > 0.0));
-    the_planet->setSurfPressure(pressure(the_planet->getVolatileGasInventory(),
-                                         the_fudged_radius,
-                                         the_planet->getSurfGrav()));
-
-    if (the_planet->getSurfPressure() == 0.0) {
-      the_planet->setBoilPoint(0.0);
-    } else {
-      the_planet->setBoilPoint(boiling_point(the_planet->getSurfPressure()));
-    }
-
-    iterate_surface_temp(the_planet, do_gases);
-
-    if (do_gases) {
-      the_sun = the_planet->getTheSun();
-      calculate_gases(the_sun, the_planet, planet_id);
-    }
-
-    assign_type(the_sun, the_planet, planet_id, is_moon, do_gases, false);
+    finalize_rocky_planet_properties(the_planet, the_sun, planet_id, do_gases,
+                                     is_moon, the_fudged_radius);
   }
 
   the_planet->setHzc(calcHzc(the_planet));
