@@ -28,33 +28,35 @@ public:
     int total_worlds = 0;
 
     // Breathable planet statistics (min/max values)
-    long double min_breathable_terrestrial_g = 0.0;
-    long double min_breathable_g = 0.0;
+    // Min values initialized high so first real value will be less
+    long double min_breathable_terrestrial_g = 1000.0;
+    long double min_breathable_g = 1000.0;
     long double max_breathable_terrestrial_g = 0.0;
     long double max_breathable_g = 0.0;
-    long double min_breathable_terrestrial_l = 0.0;
-    long double min_breathable_l = 0.0;
+    long double min_breathable_terrestrial_l = 1000.0;
+    long double min_breathable_l = 1000.0;
     long double max_breathable_terrestrial_l = 0.0;
     long double max_breathable_l = 0.0;
-    long double min_breathable_temp = 0.0;
+    long double min_breathable_temp = 1000.0;
     long double max_breathable_temp = 0.0;
-    long double min_breathable_p = 0.0;
+    long double min_breathable_p = 100000.0;
     long double max_breathable_p = 0.0;
     long double min_breathable_mass = 0.0;
     long double max_breathable_mass = 0.0;
 
     // Potentially habitable planet statistics (min/max values)
-    long double min_potential_terrestrial_g = 0.0;
-    long double min_potential_g = 0.0;
+    // Min values initialized high so first real value will be less
+    long double min_potential_terrestrial_g = 1000.0;
+    long double min_potential_g = 1000.0;
     long double max_potential_terrestrial_g = 0.0;
     long double max_potential_g = 0.0;
-    long double min_potential_terrestrial_l = 0.0;
-    long double min_potential_l = 0.0;
+    long double min_potential_terrestrial_l = 1000.0;
+    long double min_potential_l = 1000.0;
     long double max_potential_terrestrial_l = 0.0;
     long double max_potential_l = 0.0;
-    long double min_potential_temp = 0.0;
+    long double min_potential_temp = 1000.0;
     long double max_potential_temp = 0.0;
-    long double min_potential_p = 0.0;
+    long double min_potential_p = 100000.0;
     long double max_potential_p = 0.0;
     long double min_potential_mass = 0.0;
     long double max_potential_mass = 0.0;

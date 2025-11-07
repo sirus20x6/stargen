@@ -105,9 +105,6 @@ int type_counts[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // seb
 int type_count = 0;
 int max_type_count = 0;
 
-// RNG state - now point to RandomContext members
-long& seed = g_random_context.seed;
-long& jseed = g_random_context.jseed;
 long system_seed = 0;
 
 std::string stargen_revision = "$Revision: 3.0 $";
@@ -1718,8 +1715,95 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
   ZoneScoped;
 }
 
+/**
+ * @brief Update min/max statistic for a value
+ * @param value The current value to check
+ * @param min_stat Reference to minimum statistic to update
+ * @param max_stat Reference to maximum statistic to update
+ * @return true if a new min or max was set, false otherwise
+ */
+static auto update_min_max_stat(long double value, long double& min_stat, long double& max_stat) -> bool {
+  bool updated = false;
+  if (min_stat > value || min_stat == 0.0) {
+    min_stat = value;
+    updated = true;
+  }
+  if (max_stat < value) {
+    max_stat = value;
+    updated = true;
+  }
+  return updated;
+}
+
+/**
+ * @brief Update breathable planet statistics
+ * @param the_planet The planet to track statistics for
+ * @param illumination The planet's illumination value
+ * @return true if any new min/max was set (for verbose logging)
+ */
+static auto update_breathable_statistics(planet* the_planet, long double illumination) -> bool {
+  bool stats_updated = false;
+
+  stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), min_breathable_temp, max_breathable_temp);
+  stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_breathable_g, max_breathable_g);
+  stats_updated |= update_min_max_stat(illumination, min_breathable_l, max_breathable_l);
+  stats_updated |= update_min_max_stat(the_planet->getSurfPressure(), min_breathable_p, max_breathable_p);
+  stats_updated |= update_min_max_stat(the_planet->getMass(), min_breathable_mass, max_breathable_mass);
+
+  // Update terrestrial-specific stats if applicable
+  if (the_planet->getType() == tTerrestrial) {
+    stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_breathable_terrestrial_g, max_breathable_terrestrial_g);
+    stats_updated |= update_min_max_stat(illumination, min_breathable_terrestrial_l, max_breathable_terrestrial_l);
+  }
+
+  return stats_updated;
+}
+
+/**
+ * @brief Update potentially habitable planet statistics
+ * @param the_planet The planet to track statistics for
+ * @param illumination The planet's illumination value
+ * @return true if any new min/max was set (for verbose logging)
+ */
+static auto update_potential_statistics(planet* the_planet, long double illumination) -> bool {
+  bool stats_updated = false;
+
+  stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), min_potential_temp, max_potential_temp);
+  stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_potential_g, max_potential_g);
+  stats_updated |= update_min_max_stat(illumination, min_potential_l, max_potential_l);
+  stats_updated |= update_min_max_stat(the_planet->getSurfPressure(), min_potential_p, max_potential_p);
+  stats_updated |= update_min_max_stat(the_planet->getMass(), min_potential_mass, max_potential_mass);
+
+  // Update terrestrial-specific stats if applicable
+  if (the_planet->getType() == tTerrestrial ||
+      (the_planet->getType() == t1Face &&
+       the_planet->getHydrosphere() >= 0.05 &&
+       the_planet->getHydrosphere() <= 0.8)) {
+    stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_potential_terrestrial_g, max_potential_terrestrial_g);
+    stats_updated |= update_min_max_stat(illumination, min_potential_terrestrial_l, max_potential_terrestrial_l);
+  }
+
+  return stats_updated;
+}
+
+/**
+ * @brief Log planet information for verbose output
+ */
+static void log_planet_info(planet* the_planet, const std::string& planet_id, long double illumination) {
+  std::cerr << type_string(the_planet)
+       << "\tp=" << toString(the_planet->getSurfPressure())
+       << "\tm=" << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
+       << "\tg=" << toString(the_planet->getSurfGrav())
+       << "\tt=" << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN)
+       << "\tl=" << toString(illumination)
+       << "\t" << planet_id << "\n";
+}
+
+/**
+ * @brief Check planet and update statistics
+ */
 void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon) {
-    int tIndex = 0;
+  int tIndex = 0;
 
   tIndex = the_planet->getType();
 
@@ -1760,124 +1844,9 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
       habitable_superterrans++;
     }
 
-    if (min_breathable_temp > the_planet->getSurfTemp() ||
-        min_breathable_temp == 0.0) {
-      min_breathable_temp = the_planet->getSurfTemp();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_breathable_temp < the_planet->getSurfTemp()) {
-      max_breathable_temp = the_planet->getSurfTemp();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_breathable_g > the_planet->getSurfGrav() ||
-        min_breathable_g == 0.0) {
-      min_breathable_g = the_planet->getSurfGrav();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_breathable_g < the_planet->getSurfGrav()) {
-      max_breathable_g = the_planet->getSurfGrav();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_breathable_l > illumination || min_breathable_l == 0.0) {
-      min_breathable_l = illumination;
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_breathable_l < illumination) {
-      max_breathable_l = illumination;
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (the_planet->getType() == tTerrestrial) {
-      if (min_breathable_terrestrial_g > the_planet->getSurfGrav() ||
-          min_breathable_terrestrial_g == 0.0) {
-        min_breathable_terrestrial_g = the_planet->getSurfGrav();
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (max_breathable_terrestrial_g < the_planet->getSurfGrav()) {
-        max_breathable_terrestrial_g = the_planet->getSurfGrav();
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (min_breathable_terrestrial_l > illumination ||
-          min_breathable_terrestrial_l == 0.0) {
-        min_breathable_terrestrial_l = illumination;
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (max_breathable_terrestrial_l < illumination) {
-        max_breathable_terrestrial_l = illumination;
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-    }
-
-    if (min_breathable_p > the_planet->getSurfPressure() ||
-        min_breathable_p == 0.0) {
-      min_breathable_p = the_planet->getSurfPressure();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_breathable_p < the_planet->getSurfPressure()) {
-      max_breathable_p = the_planet->getSurfPressure();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_breathable_mass > the_planet->getMass() ||
-        min_breathable_mass == 0.0) {
-      min_breathable_mass = the_planet->getMass();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_breathable_mass < the_planet->getMass()) {
-      max_breathable_mass = the_planet->getMass();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
+    // Update breathable planet statistics
+    if (update_breathable_statistics(the_planet, illumination) && ((flag_verbose & 0x0002) != 0)) {
+      list_it = true;
     }
 
     if ((flag_verbose & 0x0004) != 0) {
@@ -1885,12 +1854,7 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
     }
 
     if (list_it) {
-      std::cerr << type_string(the_planet)
-           << "\tp=" << toString(the_planet->getSurfPressure()) << "\tm="
-           << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
-           << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
-           << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN)
-           << "\tl=" << toString(illumination) << "\t" << planet_id << "\n";
+      log_planet_info(the_planet, planet_id, illumination);
     }
   } else if (is_potentialy_habitable(the_planet)) {
     potential_habitable++;
@@ -1908,126 +1872,9 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
       total_potentially_habitable_optimistic++;
     }
 
-    if (min_potential_temp > the_planet->getSurfTemp() ||
-        min_potential_temp == 0.0) {
-      min_potential_temp = the_planet->getSurfTemp();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_potential_temp < the_planet->getSurfTemp()) {
-      max_potential_temp = the_planet->getSurfTemp();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_potential_g > the_planet->getSurfGrav() || min_potential_g == 0.0) {
-      min_potential_g = the_planet->getSurfGrav();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_potential_g < the_planet->getSurfGrav()) {
-      max_potential_g = the_planet->getSurfGrav();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_potential_l > illumination || min_potential_l == 0.0) {
-      min_potential_l = illumination;
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_potential_l < illumination) {
-      max_potential_l = illumination;
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (the_planet->getType() == tTerrestrial ||
-        (the_planet->getType() == t1Face &&
-         the_planet->getHydrosphere() >= 0.05 &&
-         the_planet->getHydrosphere() <= 0.8)) {
-      if (min_breathable_terrestrial_g > the_planet->getSurfGrav() ||
-          min_breathable_terrestrial_g == 0.0) {
-        min_breathable_terrestrial_g = the_planet->getSurfGrav();
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (max_breathable_terrestrial_g < the_planet->getSurfGrav()) {
-        max_breathable_terrestrial_g = the_planet->getSurfGrav();
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (min_breathable_terrestrial_l > illumination ||
-          min_breathable_terrestrial_l == 0.0) {
-        min_breathable_terrestrial_l = illumination;
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (max_breathable_terrestrial_l < illumination) {
-        max_breathable_terrestrial_l = illumination;
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-    }
-
-    if (min_potential_p > the_planet->getSurfPressure() ||
-        min_potential_p == 0.0) {
-      min_potential_p = the_planet->getSurfPressure();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_potential_p < the_planet->getSurfPressure()) {
-      max_potential_p = the_planet->getSurfPressure();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_potential_mass > the_planet->getMass() ||
-        min_potential_mass == 0.0) {
-      min_potential_mass = the_planet->getMass();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_potential_mass < the_planet->getMass()) {
-      max_potential_mass = the_planet->getMass();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
+    // Update potentially habitable planet statistics
+    if (update_potential_statistics(the_planet, illumination) && ((flag_verbose & 0x0002) != 0)) {
+      list_it = true;
     }
 
     if ((flag_verbose & 0x0004) != 0) {
@@ -2035,12 +1882,7 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
     }
 
     if (list_it) {
-      std::cerr << type_string(the_planet)
-           << "\tp=" << toString(the_planet->getSurfPressure()) << "\tm="
-           << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
-           << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
-           << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN)
-           << "\tl=" << toString(illumination) << "\t" << planet_id << "\n";
+      log_planet_info(the_planet, planet_id, illumination);
     }
   }
 

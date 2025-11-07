@@ -17,6 +17,8 @@
 
 // RNG state - now references to RandomContext members (defined in stargen.cpp)
 extern RandomContext g_random_context;
+long& seed = g_random_context.seed;
+long& jseed = g_random_context.jseed;
 long& ifrst = g_random_context.ifrst;
 long& nextn = g_random_context.nextn;
 
