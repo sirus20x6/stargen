@@ -740,13 +740,20 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
     planet_outer_bound = max_distance_arg;
   }
 
+  // Safety check: if stellar mass is zero, we can't compute planetary bounds
+  if (stell_mass_ratio <= 0) {
+    std::cerr << "ERROR: Stellar mass is zero or negative. Cannot generate planets." << std::endl;
+    std::cerr << "Please specify star mass (-m) or luminosity (-y) or use a predefined star catalog." << std::endl;
+    return nullptr;
+  }
+
   while (planet_outer_bound <= planet_inner_bound) {
     planet_outer_bound = farthest_planet(stell_mass_ratio);
   }
 
   // std::cout << planet_inner_bound << " " << planet_outer_bound << std::endl;
 
-  // while there's still dust std::left...
+  // while there's still dust left...
   while (dust_left) {
     if (seeds != nullptr) {
       // give us a random proto planet within the inner and outer bounds

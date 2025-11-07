@@ -131,9 +131,7 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
              long double ratio_arg, long double ecc_coef_arg,
              long double inner_planet_factor_arg, int flags_arg, int out_format,
              int graphic_format) -> int {
-  std::cerr << "DEBUG: Entered stargen() function" << std::endl;
   sun the_sun;
-  std::cerr << "DEBUG: Created sun object" << std::endl;
   long double min_mass = 0.4;
   long double inc_mass = 0.05;
   long double max_mass = 2.35;
@@ -171,9 +169,7 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
   is_circumbinary = (flags_arg & fIsCircubinaryStar) != 0;
   std::stringstream ss;
 
-  std::cerr << "DEBUG: About to create accrete object" << std::endl;
   accrete myAccreteObject;
-  std::cerr << "DEBUG: Created accrete object" << std::endl;
 
   if (do_catalog) {
     catalog_count = cat_arg.count();
@@ -217,7 +213,6 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
   }
 
   // Find the last sub-dir in the path
-  std::cerr << "DEBUG: About to process path string, path='" << path << "'" << std::endl;
   ss << path.substr(path.find_last_of('/') + 1) << DIRSEP;
   subdir = ss.str();
   ss.str("");
@@ -226,7 +221,6 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     path.append(DIRSEP);
   }
 
-  std::cerr << "DEBUG: About to enter switch(action), action=" << action << std::endl;
   switch (action) {
     case aListGases: {
       long double total = 0.0;
@@ -304,22 +298,17 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
       return EXIT_SUCCESS;
     }
     case aGenerate:
-      std::cerr << "DEBUG: In aGenerate case" << std::endl;
       break;
   }
-  std::cerr << "DEBUG: Exited switch statement" << std::endl;
 
   flag_seed = seed_arg;
-  std::cerr << "DEBUG: About to set sun parameters" << std::endl;
   the_sun.setMass(mass_arg);
   the_sun.setLuminosity(luminosity_arg);
   if (the_sun.getMass() == 0 && the_sun.getLuminosity() != 0) {
     the_sun.setMass(luminosity_to_mass(the_sun.getLuminosity()));
   }
   the_sun.setEffTemp(temp_arg);
-  std::cerr << "DEBUG: About to call setSpecType('" << type_arg << "')" << std::endl;
   the_sun.setSpecType(type_arg);
-  std::cerr << "DEBUG: Finished setting sun parameters" << std::endl;
 
   system_count = count_arg;
   seed_increment = incr_arg;
@@ -373,9 +362,7 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
   }
 
-  std::cerr << "DEBUG: About to enter system generation loop, system_count=" << system_count << std::endl;
   for (index = 0; index < system_count; index++) {
-    std::cerr << "DEBUG: Starting system " << (index+1) << " of " << system_count << std::endl;
     std::string system_name;
     std::string designation;
     std::string cp;
@@ -387,13 +374,10 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     bool use_seed_system = false;
     bool in_celestia = false;
 
-    std::cerr << "DEBUG: About to call init()" << std::endl;
     init();
-    std::cerr << "DEBUG: Finished init()" << std::endl;
 
     outer_limit = 0;
 
-    std::cerr << "DEBUG: do_catalog=" << do_catalog << ", sys_no_arg=" << sys_no_arg << std::endl;
     if (do_catalog || (sys_no_arg != 0)) {
       if (sys_no_arg != 0) {
         sys_no = sys_no_arg;
@@ -483,7 +467,6 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
       outer_limit = 0;
     } else {
-      std::cerr << "DEBUG: In else branch, sys_name_arg='" << sys_name_arg << "'" << std::endl;
       std::stringstream ss;
       if (!sys_name_arg.empty()) {
         system_name = sys_name_arg;
@@ -498,7 +481,6 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
       ss << designation << "-" << flag_seed << "-" << the_sun.getMass();
       file_name = ss.str();
     }
-    std::cerr << "DEBUG: System name set to '" << system_name << "', file_name='" << file_name << "'" << std::endl;
 
     if (compainion_mass_arg > .001) {
       long double m1 = the_sun.getMass();
@@ -562,12 +544,15 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     type_count = 0;
     // std::cout << index << "\n";
     the_sun_clone = the_sun;
-    std::cerr << "DEBUG: About to call generate_stellar_system()" << std::endl;
     generate_stellar_system(the_sun, use_seed_system, seed_planets, flag_char,
                             sys_no, system_name, inner_dust_limit, outer_limit,
                             ecc_coef_arg, inner_planet_factor_arg, do_gases,
                             do_moons, myAccreteObject);
-    std::cerr << "DEBUG: Finished generate_stellar_system()" << std::endl;
+
+    // If planet generation failed (e.g., zero stellar mass), skip this system
+    if (innermost_planet == nullptr) {
+      continue;
+    }
 
     planet *a_planet = nullptr;
     int counter = 0;
@@ -831,7 +816,6 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
                              long double ecc_coef,
                              long double inner_planet_factor, bool do_gases,
                              bool do_moons, accrete &myAccreteObject) {
-  std::cerr << "DEBUG: Inside generate_stellar_system()" << std::endl;
   do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   system_counter++;
@@ -885,12 +869,14 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
       min_age = max_age_of_star;
     }
     // std::cout << min_age << " " << max_age << "\n";
-    std::cerr << "DEBUG: About to call dist_planetary_masses()" << std::endl;
     innermost_planet =
         myAccreteObject.dist_planetary_masses(the_sun, inner_dust_limit, outer_dust_limit,
                               outer_planet_limit, dust_density_coeff, ecc_coef,
                               inner_planet_factor, seed_system, do_moons);
-    std::cerr << "DEBUG: Finished dist_planetary_masses()" << std::endl;
+    if (innermost_planet == nullptr) {
+      // Failed to generate planets (e.g., zero stellar mass)
+      return;
+    }
     the_sun.setAge(random_number(min_age, max_age));
   }
   // std::cout << "test" << system_counter << "\n";

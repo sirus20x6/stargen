@@ -92,14 +92,12 @@ int main(int argc, char **argv) {
 #endif
 
   initData();
-  std::cerr << "DEBUG: initData() done, starting argument parsing" << std::endl;
 
   prognam = argv[0];
   if ((c = strrchr(prognam.c_str(), DIRSEP[0])) != nullptr) {
     prognam = c + 1;
   }
 
-  std::cerr << "DEBUG: About to check argc=" << argc << std::endl;
   if (argc <= 1) {
     usage(prognam);
     return EXIT_FAILURE;
@@ -107,9 +105,7 @@ int main(int argc, char **argv) {
 
   // need to somehow parse arguments
   bool first_part_of_name = true;
-  std::cerr << "DEBUG: Starting argument loop, argc=" << argc << std::endl;
   for (int i = 0; i < argc; i++) {
-    std::cerr << "DEBUG: Processing arg[" << i << "]: " << argv[i] << std::endl;
     skip        = false;
     temp_string = argv[i];
     if (compare_string_char(temp_string, 0, "-")) {
@@ -364,7 +360,6 @@ int main(int argc, char **argv) {
       i++;
     }
   }
-  std::cerr << "DEBUG: Finished argument loop" << std::endl;
 
   // std::cout << arg_name << " blada\n";
 
@@ -410,7 +405,6 @@ int main(int argc, char **argv) {
 
   flags_arg_clone = flags_arg;
   ZoneScoped;
-  std::cerr << "DEBUG: About to call stargen() function" << std::endl;
   return stargen(action, flag_char, path, url_path_arg, filename_arg, arg_name, prognam, mass_arg,
                  luminosity_arg, seed_arg, count_arg, increment_arg, star_catalog, sys_no_arg,
                  ratio_arg, ecc_coef_arg, inner_planet_factor_arg, flags_arg, out_format,
@@ -422,31 +416,18 @@ int main(int argc, char **argv) {
  *
  */
 void initData() {
-  std::cerr << "DEBUG: Starting initRadii()" << std::endl;
   initRadii();
-  std::cerr << "DEBUG: Starting initGases()" << std::endl;
   initGases();
-  std::cerr << "DEBUG: Starting initPlanets()" << std::endl;
   initPlanets();
-  std::cerr << "DEBUG: Starting initDole()" << std::endl;
   initDole();
-  std::cerr << "DEBUG: Starting initSolStation()" << std::endl;
   initSolStation();
-  std::cerr << "DEBUG: Starting initJimb()" << std::endl;
   initJimb();
-  std::cerr << "DEBUG: Starting initOmegaGalaxy()" << std::endl;
   initOmegaGalaxy();
-  std::cerr << "DEBUG: Starting initRingUniverse()" << std::endl;
   initRingUniverse();
-  std::cerr << "DEBUG: Starting initIC3094()" << std::endl;
   initIC3094();
-  std::cerr << "DEBUG: Starting initAndromeda()" << std::endl;
   initAndromeda();
-  std::cerr << "DEBUG: Starting initStarTrek()" << std::endl;
   initStarTrek();
-  std::cerr << "DEBUG: Starting initPlanetaryHabitabilityLaboratory()" << std::endl;
   initPlanetaryHabitabilityLaboratory();
-  std::cerr << "DEBUG: initData() completed" << std::endl;
 }
 
 void usage(std::string program) {
