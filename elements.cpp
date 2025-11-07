@@ -10,16 +10,16 @@ using namespace std;
 
 ChemTable gases;
 
-void loadElementsFromYAML(const string& filename) {
+void loadElementsFromYAML(const std::string& filename) {
     try {
         YAML::Node config = YAML::LoadFile(filename);
         
         for (const auto& node : config) {
             Chemical chem(
                 node["atomic_number"].as<int>(),
-                node["symbol"].as<string>(),
-                node["html_symbol"].as<string>(),
-                node["name"].as<string>(),
+                node["symbol"].as<std::string>(),
+                node["html_symbol"].as<std::string>(),
+                node["name"].as<std::string>(),
                 node["atomic_weight"].as<double>(),
                 node["melting_point"].as<double>(),
                 node["boiling_point"].as<double>(),
@@ -36,7 +36,7 @@ void loadElementsFromYAML(const string& filename) {
             gases.addChemicle(chem);
         }
     } catch (const YAML::Exception& e) {
-        cerr << "Error loading elements from YAML: " << e.what() << endl;
+        std::cerr << "Error loading elements from YAML: " << e.what() << std::endl;
         exit(1);
     }
 }

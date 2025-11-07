@@ -15,7 +15,6 @@
 #include "stargen.h"
 #include "utils.h"
 
-using namespace std;
 
 void ensure_directory_exists(const std::string& path) {
   std::filesystem::path dir_path(path);
@@ -132,15 +131,15 @@ void text_describe_system(planet* innermost_planet, bool do_gases, long int seed
  * @param seed
  * @param do_moons
  */
-void csv_describe_system(fstream& the_file, planet* innermost_planet, bool do_gases, long int seed,
+void csv_describe_system(std::fstream& the_file, planet* innermost_planet, bool do_gases, long int seed,
                          bool do_moons) {
   performanceMonitor.recordFileOperation("csv_output");
   do_gases = (flags_arg_clone & fDoGases) != 0;
   planet*      the_planet;
   sun          the_sun = innermost_planet->getTheSun();
   int          counter;
-  stringstream ss;
-  string       id;
+  std::stringstream ss;
+  std::string       id;
   planet*      moon;
   int          moons;
 
@@ -213,15 +212,15 @@ void csv_describe_system(fstream& the_file, planet* innermost_planet, bool do_ga
  * @param seed
  * @param do_moons
  */
-void jsonDescribeSystem(fstream& the_file, planet* innermost_planet, bool do_gases, long int seed,
+void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool do_gases, long int seed,
                         bool do_moons) {
   performanceMonitor.recordFileOperation("json_output");
   do_gases = (flags_arg_clone & fDoGases) != 0;
   planet*      the_planet;
   sun          the_sun = innermost_planet->getTheSun();
   int          counter;
-  stringstream ss;
-  string       id;
+  std::stringstream ss;
+  std::string       id;
   planet*      moon;
   int          moons;
 
@@ -394,10 +393,10 @@ std::string generate_atmosphere_string(planet* the_planet, bool do_gases) {
   return atmosphere;
 }
 
-void jsonRow(fstream& the_file, planet* the_planet, bool do_gases, bool is_moon, string id,
-             stringstream& ss) {
+void jsonRow(std::fstream& the_file, planet* the_planet, bool do_gases, bool is_moon, std::string id,
+             std::stringstream& ss) {
   do_gases = (flags_arg_clone & fDoGases) != 0;
-  string      atmosphere;
+  std::string      atmosphere;
   long double ipp;
   int         index;
   bool        poisonous;
@@ -511,11 +510,11 @@ std::string type_string(planet* the_planet) {
     case tTerrestrial:
       return "Terrestrial";
     case tSubSubGasGiant:
-      return format("{} Gas Dwarf", cloud_type_string(the_planet));
+      return std::format("{} Gas Dwarf", cloud_type_string(the_planet));
     case tSubGasGiant:
-      return format("{} Neptunian", cloud_type_string(the_planet));
+      return std::format("{} Neptunian", cloud_type_string(the_planet));
     case tGasGiant:
-      return format("{} Jovian", cloud_type_string(the_planet));
+      return std::format("{} Jovian", cloud_type_string(the_planet));
     case tMartian:
       return "Martian";
     case tWater:
@@ -545,7 +544,7 @@ std::string type_string(planet* the_planet) {
  * @param the_planet
  * @return string
  */
-string cloud_type_string(planet* the_planet) {
+std::string cloud_type_string(planet* the_planet) {
   long double temp = the_planet->getEstimatedTemp();
   ZoneScoped;
   if (temp > 2240) {
@@ -577,14 +576,14 @@ string cloud_type_string(planet* the_planet) {
  * @param prognam
  * @param do_moons
  */
-void create_svg_file(planet* innermost_planet, string path, string file_name, string svg_ext,
-                     string prognam, bool do_moons) {
+void create_svg_file(planet* innermost_planet, std::string path, std::string file_name, std::string svg_ext,
+                     std::string prognam, bool do_moons) {
   performanceMonitor.recordFileOperation("svg_output");
   planet*      outermost_planet;
   planet*      a_planet;
-  fstream      output;
-  string       the_file_spec;
-  stringstream ss;
+  std::fstream      output;
+  std::string       the_file_spec;
+  std::stringstream ss;
 
   ss.str("");
   ss << path << file_name << svg_ext;
@@ -594,7 +593,7 @@ void create_svg_file(planet* innermost_planet, string path, string file_name, st
   _fcreator = 'MSIE';
   _ftype    = 'TEXT';
 #endif
-  output.open(the_file_spec.c_str(), ios::out);
+  output.open(the_file_spec.c_str(), std::ios::out);
 #ifdef macintosh
   _fcreator = 'R*ch';
   _ftype    = 'TEXT';
@@ -735,10 +734,10 @@ void create_svg_file(planet* innermost_planet, string path, string file_name, st
  * @param the_filename
  * @param output
  */
-void openCVSorJson(string path, string the_filename, fstream& output) {
+void openCVSorJson(std::string path, std::string the_filename, std::fstream& output) {
   ensure_directory_exists(path);
-  string       the_file_spec;
-  stringstream ss;
+  std::string       the_file_spec;
+  std::stringstream ss;
 
   ss.str("");
   ss << path << the_filename;
@@ -748,7 +747,7 @@ void openCVSorJson(string path, string the_filename, fstream& output) {
   _fcreator = 'MSIE';
   _ftype    = 'TEXT';
 #endif
-  output.open(the_file_spec.c_str(), ios::out);
+  output.open(the_file_spec.c_str(), std::ios::out);
 #ifdef macintosh
   _fcreator = 'R*ch';
   _ftype    = 'TEXT';
@@ -767,10 +766,10 @@ void openCVSorJson(string path, string the_filename, fstream& output) {
  * @param file_name
  * @param ext
  */
-void refresh_file_stream(fstream& output, const string& path, const string& file_name,
-                         const string& ext) {
-  string       the_file_spec;
-  stringstream ss;
+void refresh_file_stream(std::fstream& output, const std::string& path, const std::string& file_name,
+                         const std::string& ext) {
+  std::string       the_file_spec;
+  std::stringstream ss;
 
   output.close();
 
@@ -778,7 +777,7 @@ void refresh_file_stream(fstream& output, const string& path, const string& file
   ss << path << file_name << ext;
   the_file_spec = ss.str();
 
-  output.open(the_file_spec.c_str(), fstream::out | fstream::app);
+  output.open(the_file_spec.c_str(), std::fstream::out | std::fstream::app);
   if (!output) {
     exit(EXIT_FAILURE);
   }
@@ -796,13 +795,13 @@ void refresh_file_stream(fstream& output, const string& path, const string& file
  * @param prognam
  * @param output
  */
-void open_html_file(const string& system_name, long seed, const string& path,
-                    const string& url_path, const string& file_name, const string& ext,
-                    const string& prognam, fstream& output) {
+void open_html_file(const std::string& system_name, long seed, const std::string& path,
+                    const std::string& url_path, const std::string& file_name, const std::string& ext,
+                    const std::string& prognam, std::fstream& output) {
   ensure_directory_exists(path);
-  string       the_file_spec;
+  std::string       the_file_spec;
   bool         noname = system_name.empty();
-  stringstream ss;
+  std::stringstream ss;
 
   ss.str("");
   ss << path << file_name << ext;
@@ -812,7 +811,7 @@ void open_html_file(const string& system_name, long seed, const string& path,
   _fcreator = 'MSIE';
   _ftype    = 'TEXT';
 #endif
-  output.open(the_file_spec.c_str(), fstream::out);
+  output.open(the_file_spec.c_str(), std::fstream::out);
 #ifdef macintosh
   _fcreator = 'R*ch';
   _ftype    = 'TEXT';
@@ -845,7 +844,7 @@ void open_html_file(const string& system_name, long seed, const string& path,
  *
  * @param the_file
  */
-void close_html_file(fstream& the_file) {
+void close_html_file(std::fstream& the_file) {
   the_file << "<p>\n\n";
   the_file << "<center>\n";
   the_file << "This page was created by omega13a's variant of <a href='" << STARGEN_URL
@@ -864,12 +863,12 @@ void close_html_file(fstream& the_file) {
  * @param the_planet
  * @param closing
  */
-void print_description(fstream& the_file, const string& opening, planet* the_planet,
-                       const string& closing) {
+void print_description(std::fstream& the_file, const std::string& opening, planet* the_planet,
+                       const std::string& closing) {
   bool         first        = true;
   long double  earth_masses = the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES;
   long double  earth_radii  = convert_km_to_eu(the_planet->getRadius());
-  stringstream ss;
+  std::stringstream ss;
 
   the_file << opening;
 
@@ -886,8 +885,8 @@ void print_description(fstream& the_file, const string& opening, planet* the_pla
 
   if (is_gas_planet(the_planet)) {
     long double temp = the_planet->getEstimatedTemp() - FREEZING_POINT_OF_WATER;
-    lprint(the_file, first, format("{} Earth Masses", earth_masses));
-    lprint(the_file, first, format("{} C", temp));
+    lprint(the_file, first, std::format("{} Earth Masses", earth_masses));
+    lprint(the_file, first, std::format("{} C", temp));
   } else {
     long double rel_temp =
         (the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER) - EARTH_AVERAGE_CELSIUS;
@@ -1188,7 +1187,7 @@ void print_description(fstream& the_file, const string& opening, planet* the_pla
  * @param the_file
  * @param weight
  */
-void list_molecules(fstream& the_file, long double weight) {
+void list_molecules(std::fstream& the_file, long double weight) {
   int  count = 0;
   int  max   = 8;
   bool first = true;
@@ -1231,9 +1230,9 @@ void list_molecules(fstream& the_file, long double weight) {
  * @param life
  * @param spec_type
  */
-void html_star_details_helper(fstream& the_file, const string& header, long double mass,
+void html_star_details_helper(std::fstream& the_file, const std::string& header, long double mass,
                               long double luminosity, long double temperature, long double age,
-                              long double life, const string& spec_type) {
+                              long double life, const std::string& spec_type) {
   the_file << "<tr><td colspan=2 bgcolor='" << BGHEADER << "' align=center>";
   the_file << "<font size='+1' color='" << TXHEADER << "'><b>" << header << "</b></font>";
   the_file << "</td></tr>\n";
@@ -1267,9 +1266,9 @@ void html_star_details_helper(fstream& the_file, const string& header, long doub
  * @param graphic_format
  * @param do_gases
  */
-void html_thumbnails(planet* innermost_planet, fstream& the_file, const string& system_name,
-                     const string& url_path, const string& system_url, const string& svg_url,
-                     const string& file_name, bool details, bool terrestrials, bool int_link,
+void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std::string& system_name,
+                     const std::string& url_path, const std::string& system_url, const std::string& svg_url,
+                     const std::string& file_name, bool details, bool terrestrials, bool int_link,
                      bool do_moons, int graphic_format, bool do_gases) {
   planet*      the_planet;
   sun          the_sun = innermost_planet->getTheSun();
@@ -1284,8 +1283,8 @@ void html_thumbnails(planet* innermost_planet, fstream& the_file, const string& 
   int          asteroid_belt_count = 0;
   int          moon_count          = 0;
   int          object_count        = 0;
-  stringstream ss;
-  string       planet_id;
+  std::stringstream ss;
+  std::string       planet_id;
 
   if (!the_file) {
     std::cout << "We have a serious error!\n";
@@ -1349,8 +1348,8 @@ void html_thumbnails(planet* innermost_planet, fstream& the_file, const string& 
        the_planet = the_planet->next_planet, counter++) {
     ss.str("");
     int    ppixels = ((int)(sqrt(convert_km_to_eu(the_planet->getRadius())) * 50.0)) + 1;
-    string ptype   = type_string(the_planet);
-    string info;
+    std::string ptype   = type_string(the_planet);
+    std::string info;
 
     if ((the_planet->getSurfPressure() > 0 || the_planet->getGasGiant()) &&
         the_planet->getNumGases() == 0 && do_gases) {
@@ -1407,7 +1406,7 @@ void html_thumbnails(planet* innermost_planet, fstream& the_file, const string& 
       for (moon = the_planet->first_moon, moons = 1; do_moons && moon != nullptr;
            moon = moon->next_planet, moons++) {
         ss.str("");
-        string mtype   = type_string(moon);
+        std::string mtype   = type_string(moon);
         int    mpixels = ((int)(sqrt(convert_km_to_eu(moon->getRadius())) * 100.)) + 1;
 
         if ((the_planet->getSurfPressure() > 0 || the_planet->getGasGiant()) &&
@@ -2037,14 +2036,14 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
  * @param the_file
  */
 void html_describe_system(planet* innermost_planet, bool do_gases, bool do_moons,
-                          const string& url_path, fstream& the_file) {
+                          const std::string& url_path, std::fstream& the_file) {
   performanceMonitor.recordFileOperation("html_output");
   do_gases = (flags_arg_clone & fDoGases) != 0;
   planet* the_planet;
   int     counter;
   planet* moon;
   int     moons;
-  string  typeString;
+  std::string  typeString;
 
   the_file << "\n<table border=3 cellspacing=2 cellpadding=2 align=center bgcolor='" << BGTABLE
            << "' width='90%'>\n";
@@ -2121,7 +2120,7 @@ void html_describe_system(planet* innermost_planet, bool do_gases, bool do_moons
  * @param an
  * @param do_moons
  */
-void celestia_describe_system(planet* innermost_planet, string designation, string system_name,
+void celestia_describe_system(planet* innermost_planet, std::string designation, std::string system_name,
                               long int seed, long double inc, long double an, bool do_moons) {
   planet *    the_planet, *moon;
   sun         the_sun = innermost_planet->getTheSun();
@@ -2501,8 +2500,8 @@ void assignDistanceColors(planet* the_planet, double red, double green, double b
 }
 
 /*
-void moongen_describe_system(planet* innermost_planet, string designation,
-string system_name, long int seed)
+void moongen_describe_system(planet* innermost_planet, std::string designation,
+std::string system_name, long int seed)
 {
   planet *the_planet, *moon;
   sun the_sun = innermost_planet->getTheSun();
@@ -2553,7 +2552,7 @@ designation << "\n";
  * @param first
  * @param text
  */
-void lprint(fstream& the_file, bool& first, const string& text) {
+void lprint(std::fstream& the_file, bool& first, const std::string& text) {
   if (first) {
     first = false;
   } else {
@@ -2568,9 +2567,9 @@ void lprint(fstream& the_file, bool& first, const string& text) {
  * @param the_planet
  * @return string
  */
-string image_type_string(planet* the_planet) {
-  string       typeString;
-  stringstream ss;
+std::string image_type_string(planet* the_planet) {
+  std::string       typeString;
+  std::stringstream ss;
   if (is_gas_planet(the_planet) && the_planet->getType() != tBrownDwarf) {
     ss << cloud_type_string(the_planet) << " Gas";
     typeString = ss.str();
@@ -2608,7 +2607,7 @@ fraction stern_brocot_search(long double f, long double tol) {
  * @param eccentricity
  * @return string
  */
-string printSpinResonanceFactor(long double eccentricity) {
+std::string printSpinResonanceFactor(long double eccentricity) {
   long double top       = 1.0 - eccentricity;
   long double bottom    = 1.0 + eccentricity;
   long double fraction  = top / bottom;
@@ -2636,8 +2635,8 @@ string printSpinResonanceFactor(long double eccentricity) {
  * @param molecule
  * @param weight
  */
-void mol_print(fstream& the_file, bool& first, int& count, int max, long double min_weight,
-               string molecule, long double weight) {
+void mol_print(std::fstream& the_file, bool& first, int& count, int max, long double min_weight,
+               std::string molecule, long double weight) {
   if (weight >= min_weight) {
     count++;
     if (count > max) {
@@ -2654,8 +2653,8 @@ void mol_print(fstream& the_file, bool& first, int& count, int max, long double 
  * @param type
  * @return string
  */
-string texture_name(planet_type type) {
-  string typeString = "Unknown";
+std::string texture_name(planet_type type) {
+  std::string typeString = "Unknown";
   switch (type) {
     case tUnknown:
       typeString = "tunknown.*";

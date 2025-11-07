@@ -8,7 +8,6 @@
 #include "stargen.h"
 #include "utils.h"
 
-using namespace std;
 
 // the following equations are derived from Tables 2, 3, and 4 from "Planetary
 // Radii Across Five Orders of Magnitude in Mass And Stellar Insolation:
@@ -17,7 +16,7 @@ using namespace std;
 
 long double gas_radius_300Myr_1960K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -147,7 +146,7 @@ long double gas_radius_300Myr_1960K_0core_mass(
 
 long double gas_radius_300Myr_1960K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -305,7 +304,7 @@ long double gas_radius_300Myr_1960K_10core_mass(
 
 long double gas_radius_300Myr_1960K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -452,7 +451,7 @@ long double gas_radius_300Myr_1960K_25core_mass(
 
 long double gas_radius_300Myr_1960K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -577,7 +576,7 @@ long double gas_radius_300Myr_1960K_50core_mass(
 
 long double gas_radius_300Myr_1960K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -695,7 +694,7 @@ long double gas_radius_300Myr_1960K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_300Myr_1960K_0core_mass(
       total_earth_masses, the_planet, gas_300Myr_1960K_0core_mass);
   core_mass_radii[10] = gas_radius_300Myr_1960K_10core_mass(
@@ -773,7 +772,7 @@ long double gas_radius_300Myr_1960K(long double core_earth_masses,
 
 long double gas_radius_300Myr_1300K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -917,7 +916,7 @@ long double gas_radius_300Myr_1300K_0core_mass(
 
 long double gas_radius_300Myr_1300K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -1075,7 +1074,7 @@ long double gas_radius_300Myr_1300K_10core_mass(
 
 long double gas_radius_300Myr_1300K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -1222,7 +1221,7 @@ long double gas_radius_300Myr_1300K_25core_mass(
 
 long double gas_radius_300Myr_1300K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -1347,7 +1346,7 @@ long double gas_radius_300Myr_1300K_50core_mass(
 
 long double gas_radius_300Myr_1300K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -1465,7 +1464,7 @@ long double gas_radius_300Myr_1300K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_300Myr_1300K_0core_mass(
       total_earth_masses, the_planet, gas_300Myr_1300K_0core_mass);
   core_mass_radii[10] = gas_radius_300Myr_1300K_10core_mass(
@@ -1537,7 +1536,7 @@ long double gas_radius_300Myr_1300K(long double core_earth_masses,
 
 long double gas_radius_300Myr_875K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -1679,7 +1678,7 @@ long double gas_radius_300Myr_875K_0core_mass(
 
 long double gas_radius_300Myr_875K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -1837,7 +1836,7 @@ long double gas_radius_300Myr_875K_10core_mass(
 
 long double gas_radius_300Myr_875K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -1984,7 +1983,7 @@ long double gas_radius_300Myr_875K_25core_mass(
 
 long double gas_radius_300Myr_875K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -2107,7 +2106,7 @@ long double gas_radius_300Myr_875K_50core_mass(
 
 long double gas_radius_300Myr_875K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -2223,7 +2222,7 @@ long double gas_radius_300Myr_875K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_300Myr_875K_0core_mass(
       total_earth_masses, the_planet, gas_300Myr_875K_0core_mass);
   core_mass_radii[10] = gas_radius_300Myr_875K_10core_mass(
@@ -2301,7 +2300,7 @@ long double gas_radius_300Myr_875K(long double core_earth_masses,
 
 long double gas_radius_300Myr_260K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -2443,7 +2442,7 @@ long double gas_radius_300Myr_260K_0core_mass(
 
 long double gas_radius_300Myr_260K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -2601,7 +2600,7 @@ long double gas_radius_300Myr_260K_10core_mass(
 
 long double gas_radius_300Myr_260K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -2748,7 +2747,7 @@ long double gas_radius_300Myr_260K_25core_mass(
 
 long double gas_radius_300Myr_260K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -2873,7 +2872,7 @@ long double gas_radius_300Myr_260K_50core_mass(
 
 long double gas_radius_300Myr_260K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -2991,7 +2990,7 @@ long double gas_radius_300Myr_260K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_300Myr_260K_0core_mass(
       total_earth_masses, the_planet, gas_300Myr_260K_0core_mass);
   core_mass_radii[10] = gas_radius_300Myr_260K_10core_mass(
@@ -3069,7 +3068,7 @@ long double gas_radius_300Myr_260K(long double core_earth_masses,
 
 long double gas_radius_300Myr_78K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -3211,7 +3210,7 @@ long double gas_radius_300Myr_78K_0core_mass(
 
 long double gas_radius_300Myr_78K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -3369,7 +3368,7 @@ long double gas_radius_300Myr_78K_10core_mass(
 
 long double gas_radius_300Myr_78K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -3516,7 +3515,7 @@ long double gas_radius_300Myr_78K_25core_mass(
 
 long double gas_radius_300Myr_78K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -3641,7 +3640,7 @@ long double gas_radius_300Myr_78K_50core_mass(
 
 long double gas_radius_300Myr_78K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -3759,7 +3758,7 @@ long double gas_radius_300Myr_78K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_300Myr_78K_0core_mass(
       total_earth_masses, the_planet, gas_300Myr_78K_0core_mass);
   core_mass_radii[10] = gas_radius_300Myr_78K_10core_mass(
@@ -3842,7 +3841,7 @@ long double gas_radius_300Myr(long double temperature,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> temperature_radii;
+  std::map<int, long double> temperature_radii;
   temperature_radii[1960] = gas_radius_300Myr_1960K(
       core_earth_masses, total_earth_masses, the_planet);
   temperature_radii[1300] = gas_radius_300Myr_1300K(
@@ -3967,7 +3966,7 @@ long double gas_radius_300Myr(long double temperature,
 
 long double gas_radius_1Gyr_1960K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -4098,7 +4097,7 @@ long double gas_radius_1Gyr_1960K_0core_mass(
 
 long double gas_radius_1Gyr_1960K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -4256,7 +4255,7 @@ long double gas_radius_1Gyr_1960K_10core_mass(
 
 long double gas_radius_1Gyr_1960K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -4403,7 +4402,7 @@ long double gas_radius_1Gyr_1960K_25core_mass(
 
 long double gas_radius_1Gyr_1960K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -4529,7 +4528,7 @@ long double gas_radius_1Gyr_1960K_50core_mass(
 
 long double gas_radius_1Gyr_1960K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -4647,7 +4646,7 @@ long double gas_radius_1Gyr_1960K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_1Gyr_1960K_0core_mass(
       total_earth_masses, the_planet, gas_1Gyr_1960K_0core_mass);
   core_mass_radii[10] = gas_radius_1Gyr_1960K_10core_mass(
@@ -4703,7 +4702,7 @@ long double gas_radius_1Gyr_1960K(long double core_earth_masses,
 
 long double gas_radius_1Gyr_1300K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -4845,7 +4844,7 @@ long double gas_radius_1Gyr_1300K_0core_mass(
 
 long double gas_radius_1Gyr_1300K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -5003,7 +5002,7 @@ long double gas_radius_1Gyr_1300K_10core_mass(
 
 long double gas_radius_1Gyr_1300K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -5150,7 +5149,7 @@ long double gas_radius_1Gyr_1300K_25core_mass(
 
 long double gas_radius_1Gyr_1300K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -5276,7 +5275,7 @@ long double gas_radius_1Gyr_1300K_50core_mass(
 
 long double gas_radius_1Gyr_1300K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -5394,7 +5393,7 @@ long double gas_radius_1Gyr_1300K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_1Gyr_1300K_0core_mass(
       total_earth_masses, the_planet, gas_1Gyr_1300K_0core_mass);
   core_mass_radii[10] = gas_radius_1Gyr_1300K_10core_mass(
@@ -5450,7 +5449,7 @@ long double gas_radius_1Gyr_1300K(long double core_earth_masses,
 
 long double gas_radius_1Gyr_875K_0core_mass(long double total_earth_masses,
                                             planet *the_planet,
-                                            map<int, long double> &mass_radii) {
+                                            std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -5592,7 +5591,7 @@ long double gas_radius_1Gyr_875K_0core_mass(long double total_earth_masses,
 
 long double gas_radius_1Gyr_875K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -5750,7 +5749,7 @@ long double gas_radius_1Gyr_875K_10core_mass(
 
 long double gas_radius_1Gyr_875K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -5897,7 +5896,7 @@ long double gas_radius_1Gyr_875K_25core_mass(
 
 long double gas_radius_1Gyr_875K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -6022,7 +6021,7 @@ long double gas_radius_1Gyr_875K_50core_mass(
 
 long double gas_radius_1Gyr_875K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -6140,7 +6139,7 @@ long double gas_radius_1Gyr_875K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_1Gyr_875K_0core_mass(
       total_earth_masses, the_planet, gas_1Gyr_875K_0core_mass);
   core_mass_radii[10] = gas_radius_1Gyr_875K_10core_mass(
@@ -6196,7 +6195,7 @@ long double gas_radius_1Gyr_875K(long double core_earth_masses,
 
 long double gas_radius_1Gyr_260K_0core_mass(long double total_earth_masses,
                                             planet *the_planet,
-                                            map<int, long double> &mass_radii) {
+                                            std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -6338,7 +6337,7 @@ long double gas_radius_1Gyr_260K_0core_mass(long double total_earth_masses,
 
 long double gas_radius_1Gyr_260K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -6496,7 +6495,7 @@ long double gas_radius_1Gyr_260K_10core_mass(
 
 long double gas_radius_1Gyr_260K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -6643,7 +6642,7 @@ long double gas_radius_1Gyr_260K_25core_mass(
 
 long double gas_radius_1Gyr_260K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -6768,7 +6767,7 @@ long double gas_radius_1Gyr_260K_50core_mass(
 
 long double gas_radius_1Gyr_260K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -6886,7 +6885,7 @@ long double gas_radius_1Gyr_260K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_1Gyr_260K_0core_mass(
       total_earth_masses, the_planet, gas_1Gyr_260K_0core_mass);
   core_mass_radii[10] = gas_radius_1Gyr_260K_10core_mass(
@@ -6942,7 +6941,7 @@ long double gas_radius_1Gyr_260K(long double core_earth_masses,
 
 long double gas_radius_1Gyr_78K_0core_mass(long double total_earth_masses,
                                            planet *the_planet,
-                                           map<int, long double> &mass_radii) {
+                                           std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -7084,7 +7083,7 @@ long double gas_radius_1Gyr_78K_0core_mass(long double total_earth_masses,
 
 long double gas_radius_1Gyr_78K_10core_mass(long double total_earth_masses,
                                             planet *the_planet,
-                                            map<int, long double> &mass_radii) {
+                                            std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -7242,7 +7241,7 @@ long double gas_radius_1Gyr_78K_10core_mass(long double total_earth_masses,
 
 long double gas_radius_1Gyr_78K_25core_mass(long double total_earth_masses,
                                             planet *the_planet,
-                                            map<int, long double> &mass_radii) {
+                                            std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -7389,7 +7388,7 @@ long double gas_radius_1Gyr_78K_25core_mass(long double total_earth_masses,
 
 long double gas_radius_1Gyr_78K_50core_mass(long double total_earth_masses,
                                             planet *the_planet,
-                                            map<int, long double> &mass_radii) {
+                                            std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -7514,7 +7513,7 @@ long double gas_radius_1Gyr_78K_50core_mass(long double total_earth_masses,
 
 long double gas_radius_1Gyr_78K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -7632,7 +7631,7 @@ long double gas_radius_1Gyr_78K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_1Gyr_78K_0core_mass(
       total_earth_masses, the_planet, gas_1Gyr_78K_0core_mass);
   core_mass_radii[10] = gas_radius_1Gyr_78K_10core_mass(
@@ -7693,7 +7692,7 @@ long double gas_radius_1Gyr(long double temperature,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> temperature_radii;
+  std::map<int, long double> temperature_radii;
   temperature_radii[1960] =
       gas_radius_1Gyr_1960K(core_earth_masses, total_earth_masses, the_planet);
   temperature_radii[1300] =
@@ -7767,7 +7766,7 @@ long double gas_radius_1Gyr(long double temperature,
 
 long double gas_radius_4point5Gyr_1960K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -7899,7 +7898,7 @@ long double gas_radius_4point5Gyr_1960K_0core_mass(
 
 long double gas_radius_4point5Gyr_1960K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -8057,7 +8056,7 @@ long double gas_radius_4point5Gyr_1960K_10core_mass(
 
 long double gas_radius_4point5Gyr_1960K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -8204,7 +8203,7 @@ long double gas_radius_4point5Gyr_1960K_25core_mass(
 
 long double gas_radius_4point5Gyr_1960K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -8329,7 +8328,7 @@ long double gas_radius_4point5Gyr_1960K_50core_mass(
 
 long double gas_radius_4point5Gyr_1960K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -8447,7 +8446,7 @@ long double gas_radius_4point5Gyr_1960K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_4point5Gyr_1960K_0core_mass(
       total_earth_masses, the_planet, gas_4point5Gyr_1960K_0core_mass);
   core_mass_radii[10] = gas_radius_4point5Gyr_1960K_10core_mass(
@@ -8503,7 +8502,7 @@ long double gas_radius_4point5Gyr_1960K(long double core_earth_masses,
 
 long double gas_radius_4point5Gyr_1300K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -8645,7 +8644,7 @@ long double gas_radius_4point5Gyr_1300K_0core_mass(
 
 long double gas_radius_4point5Gyr_1300K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -8808,7 +8807,7 @@ long double gas_radius_4point5Gyr_1300K_10core_mass(
 
 long double gas_radius_4point5Gyr_1300K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -8956,7 +8955,7 @@ long double gas_radius_4point5Gyr_1300K_25core_mass(
 
 long double gas_radius_4point5Gyr_1300K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -9081,7 +9080,7 @@ long double gas_radius_4point5Gyr_1300K_50core_mass(
 
 long double gas_radius_4point5Gyr_1300K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -9199,7 +9198,7 @@ long double gas_radius_4point5Gyr_1300K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_4point5Gyr_1300K_0core_mass(
       total_earth_masses, the_planet, gas_4point5Gyr_1300K_0core_mass);
   core_mass_radii[10] = gas_radius_4point5Gyr_1300K_10core_mass(
@@ -9255,7 +9254,7 @@ long double gas_radius_4point5Gyr_1300K(long double core_earth_masses,
 
 long double gas_radius_4point5Gyr_875K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -9397,7 +9396,7 @@ long double gas_radius_4point5Gyr_875K_0core_mass(
 
 long double gas_radius_4point5Gyr_875K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -9555,7 +9554,7 @@ long double gas_radius_4point5Gyr_875K_10core_mass(
 
 long double gas_radius_4point5Gyr_875K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -9702,7 +9701,7 @@ long double gas_radius_4point5Gyr_875K_25core_mass(
 
 long double gas_radius_4point5Gyr_875K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -9827,7 +9826,7 @@ long double gas_radius_4point5Gyr_875K_50core_mass(
 
 long double gas_radius_4point5Gyr_875K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -9945,7 +9944,7 @@ long double gas_radius_4point5Gyr_875K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_4point5Gyr_875K_0core_mass(
       total_earth_masses, the_planet, gas_4point5Gyr_875K_0core_mass);
   core_mass_radii[10] = gas_radius_4point5Gyr_875K_10core_mass(
@@ -10001,7 +10000,7 @@ long double gas_radius_4point5Gyr_875K(long double core_earth_masses,
 
 long double gas_radius_4point5Gyr_260K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -10143,7 +10142,7 @@ long double gas_radius_4point5Gyr_260K_0core_mass(
 
 long double gas_radius_4point5Gyr_260K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -10301,7 +10300,7 @@ long double gas_radius_4point5Gyr_260K_10core_mass(
 
 long double gas_radius_4point5Gyr_260K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -10448,7 +10447,7 @@ long double gas_radius_4point5Gyr_260K_25core_mass(
 
 long double gas_radius_4point5Gyr_260K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -10573,7 +10572,7 @@ long double gas_radius_4point5Gyr_260K_50core_mass(
 
 long double gas_radius_4point5Gyr_260K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -10691,7 +10690,7 @@ long double gas_radius_4point5Gyr_260K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_4point5Gyr_260K_0core_mass(
       total_earth_masses, the_planet, gas_4point5Gyr_260K_0core_mass);
   core_mass_radii[10] = gas_radius_4point5Gyr_260K_10core_mass(
@@ -10747,7 +10746,7 @@ long double gas_radius_4point5Gyr_260K(long double core_earth_masses,
 
 long double gas_radius_4point5Gyr_78K_0core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -10889,7 +10888,7 @@ long double gas_radius_4point5Gyr_78K_0core_mass(
 
 long double gas_radius_4point5Gyr_78K_10core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -11047,7 +11046,7 @@ long double gas_radius_4point5Gyr_78K_10core_mass(
 
 long double gas_radius_4point5Gyr_78K_25core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -11194,7 +11193,7 @@ long double gas_radius_4point5Gyr_78K_25core_mass(
 
 long double gas_radius_4point5Gyr_78K_50core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -11319,7 +11318,7 @@ long double gas_radius_4point5Gyr_78K_50core_mass(
 
 long double gas_radius_4point5Gyr_78K_100core_mass(
     long double total_earth_masses, planet *the_planet,
-    map<int, long double> &mass_radii) {
+    std::map<int, long double> &mass_radii) {
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
@@ -11437,7 +11436,7 @@ long double gas_radius_4point5Gyr_78K(long double core_earth_masses,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> core_mass_radii;
+  std::map<int, long double> core_mass_radii;
   core_mass_radii[0] = gas_radius_4point5Gyr_78K_0core_mass(
       total_earth_masses, the_planet, gas_4point5Gyr_78K_0core_mass);
   core_mass_radii[10] = gas_radius_4point5Gyr_78K_10core_mass(
@@ -11498,7 +11497,7 @@ long double gas_radius_4point5Gyr(long double temperature,
   long double jupiter_radii = 0.0;
   long double jupiter_radii1 = 0.0;
   long double jupiter_radii2 = 0.0;
-  map<int, long double> temperature_radii;
+  std::map<int, long double> temperature_radii;
   temperature_radii[1960] = gas_radius_4point5Gyr_1960K(
       core_earth_masses, total_earth_masses, the_planet);
   temperature_radii[1300] = gas_radius_4point5Gyr_1300K(

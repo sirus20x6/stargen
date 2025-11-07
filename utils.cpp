@@ -6,21 +6,20 @@
 #include <cctype>                   // for toupper, isspace
 #include <cmath>                    // for log, exp, pow, NAN, sqrt, fmod, abs
 #include <cstdlib>                  // for rand, abs, RAND_MAX
-#include <string>                   // for string, basic_string, operator<<
+#include <string>                   // for std::string, basic_string, operator<<
 #include "const.h"                  // for pow2, pow1_4, pow3, pow4
 #include "enviro.h"                 // for eff_temp_to_spec_type, getStarType
 #include <immintrin.h>
 #include <cpuid.h>
 #include "utils.h"
 
-using namespace std;
 
 long seed = 0;
 long jseed = 0;
 long ifrst = 0;
 long nextn = 0;
 
-auto compare_string_char(string &a_string, int place, const char *a_character,
+auto compare_string_char(std::string &a_string, int place, const char *a_character,
                          int length) -> bool {
   if (a_string.compare(place, length, a_character) == 0) {
     return true;
@@ -207,7 +206,7 @@ auto lim(long double x) -> long double { return x / pow1_4(1 + x * x * x * x); }
 /// @brief 
 /// @param str 
 /// @return 
-auto remove_spaces(string str) -> string {
+auto remove_spaces(std::string str) -> std::string {
   str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
   return str;
 }
@@ -269,11 +268,11 @@ auto linear_trend(long double m, long double b, long double x) -> long double {
 /// @brief 
 /// @param the_string 
 /// @return 
-auto my_strtoupper(const string &the_string) -> string {
+auto my_strtoupper(const std::string &the_string) -> std::string {
   const char *temp = the_string.c_str();
   char temp2 = 0;
-  stringstream ss;
-  string output;
+  std::stringstream ss;
+  std::string output;
 
   ss.str("");
   for (int i = 0; i < the_string.length(); i++) {
@@ -290,10 +289,10 @@ auto my_strtoupper(const string &the_string) -> string {
 /// @param luminosity 
 /// @param run 
 /// @return 
-auto star_type_to_num(const string &spec_type, long double luminosity, int run)
+auto star_type_to_num(const std::string &spec_type, long double luminosity, int run)
     -> int {
-  stringstream ss;
-  string arr[] = {
+  std::stringstream ss;
+  std::string arr[] = {
       "blada", "O0", "O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8", "O9", "B0",
       "B1",    "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "A0", "A1", "A2",
       "A3",    "A4", "A5", "A6", "A7", "A8", "A9", "F0", "F1", "F2", "F3", "F4",
@@ -303,15 +302,15 @@ auto star_type_to_num(const string &spec_type, long double luminosity, int run)
       "L1",    "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "T0", "T1", "T2",
       "T3",    "T4", "T5", "T6", "T7", "T8", "T9", "Y0", "Y1", "Y2", "Y3", "Y4",
       "Y5",    "Y6", "Y7", "Y8", "Y9"};
-  int arrSize = sizeof(arr) / sizeof(string);
-  vector<string> star_types(arr, arr + arrSize);
+  int arrSize = sizeof(arr) / sizeof(std::string);
+  std::vector<std::string> star_types(arr, arr + arrSize);
   int num = 0;
   bool found = false;
-  string new_spec_type;
+  std::string new_spec_type;
   long double temperature = NAN;
 
   for (int i = 0; i < star_types.size(); i++) {
-    if (spec_type.find(star_types[i]) != string::npos) {
+    if (spec_type.find(star_types[i]) != std::string::npos) {
       found = true;
       num = i;
       break;

@@ -2,14 +2,13 @@
 #include <cmath>        // for pow, NAN
 #include <cstdlib>      // for NULL, exit, EXIT_FAILURE
 #include <iomanip>      // for operator<<, setw, setprecision
-#include <iostream>     // for operator<<, basic_ostream, ostream, basic_ost...
+#include <iostream>     // for operator<<, basic_ostream, std::ostream, basic_ost...
 #include <utility>      // for move
 #include "c_structs.h"  // for star2
 #include "const.h"      // for pow2, KM_PER_AU, ACCURACY_FOR_PEAK, CM_PER_KM
 #include "enviro.h"     // for eff_temp_to_spec_type, luminosity_to_mass
 #include "utils.h"      // for quicksort, fix_inclination, my_strtoupper
 
-using namespace std;
 
 /**
  * @brief Construct a new star::star object
@@ -28,9 +27,9 @@ using namespace std;
  * @param cel 
  * @param n 
  */
-star::star(long double lum, long double m, long double et, string t,
+star::star(long double lum, long double m, long double et, std::string t,
            long double m2, long double e, long double d, long double i,
-           long double a, planet* kp, string des, bool cel, string n) {
+           long double a, planet* kp, std::string des, bool cel, std::string n) {
   luminosity = lum;
   mass = m;
   eff_temp = et;
@@ -237,8 +236,8 @@ auto star::operator=(const star& right) -> star {
 /// @param strm 
 /// @param obj 
 /// @return 
-auto operator<<(ostream& strm, star& obj) -> ostream& {
-  string is_in_celestia = "";
+auto operator<<(std::ostream& strm, star& obj) -> std::ostream& {
+  std::string is_in_celestia = "";
 
   if (obj.in_celestia) {
     is_in_celestia = "+P";
@@ -254,7 +253,7 @@ auto operator<<(ostream& strm, star& obj) -> ostream& {
 
 /// @brief 
 /// @return 
-auto star::getName() -> string { return name; }
+auto star::getName() -> std::string { return name; }
 
 /// @brief 
 /// @param e 
@@ -294,11 +293,11 @@ auto star::getMass() -> long double { return mass; }
 
 /// @brief 
 /// @return 
-auto star::getSpecType() -> string { return spec_type; }
+auto star::getSpecType() -> std::string { return spec_type; }
 
 /// @brief 
 /// @return 
-auto star::getDesig() -> string { return desig; }
+auto star::getDesig() -> std::string { return desig; }
 
 /// @brief 
 /// @return 
@@ -326,7 +325,7 @@ auto star::getLuminosity2() -> long double { return luminosity2; }
 
 /// @brief 
 /// @return 
-auto star::getSpecType2() -> string { return spec_type2; }
+auto star::getSpecType2() -> std::string { return spec_type2; }
 
 /// @brief 
 /// @param d 
@@ -354,7 +353,7 @@ void star::setMass2(long double m) { mass2 = m; }
 
 /// @brief 
 /// @param s 
-void star::setSpecType2(string s) { spec_type2 = std::move(s); }
+void star::setSpecType2(std::string s) { spec_type2 = std::move(s); }
 
 /// @brief 
 /// @param right 
@@ -387,7 +386,7 @@ catalog::catalog() : extra_spaces(0) { }
 
 /// @brief 
 /// @param a 
-catalog::catalog(string a) : arg(a), extra_spaces(0) {
+catalog::catalog(std::string a) : arg(a), extra_spaces(0) {
   
 }
 
@@ -398,7 +397,7 @@ auto catalog::count() -> unsigned long { return stars.size(); }
 /// @brief 
 /// @param the_star 
 void catalog::addStar(star& the_star) {
-  string star_name = the_star.getName();;
+  std::string star_name = the_star.getName();;
   unsigned long name_length = star_name.length();
   int diff = 0;
 
@@ -417,7 +416,7 @@ void catalog::addStar(star& the_star) {
 /// @return 
 auto catalog::operator[](const int& sub) -> star& {
   if (sub < 0 || sub > (stars.size() - 1)) {
-    cerr << "Non existant star!\n";
+    std::cerr << "Non existant star!\n";
     exit(EXIT_FAILURE);
   }
   return stars[sub];
@@ -447,7 +446,7 @@ catalog::~catalog() {
 /// @param strm 
 /// @param obj 
 /// @return 
-auto operator<<(ostream& strm, catalog& obj) -> ostream& {
+auto operator<<(std::ostream& strm, catalog& obj) -> std::ostream& {
   int total_stars = obj.count();
   strm << setw(14) << "Name" << setw(37 + obj.extra_spaces) << "Mass"
        << setw(12) << "Luminosity" << setw(13) << "Temperature" << setw(11)
@@ -456,7 +455,7 @@ auto operator<<(ostream& strm, catalog& obj) -> ostream& {
 
   for (int i = 0; i < total_stars; i++) {
     obj[i].setExtraSpaces(obj.extra_spaces);
-    strm << setw(8) << right << i << ". " << obj[i] << endl;
+    strm << setw(8) << right << i << ". " << obj[i] << std::endl;
   }
 
   return strm;
@@ -477,11 +476,11 @@ auto catalog::operator=(catalog& right) -> catalog& {
 
 /// @brief 
 /// @param a 
-void catalog::setArg(string a) { arg = std::move(a); }
+void catalog::setArg(std::string a) { arg = std::move(a); }
 
 /// @brief 
 /// @return 
-auto catalog::getArg() -> string { return arg; }
+auto catalog::getArg() -> std::string { return arg; }
 
 /// @brief 
 void catalog::sort() {
@@ -533,7 +532,7 @@ Chemical::Chemical() : num(0), symbol(""), htmlSymbol(""), name(""), weight(0), 
 /// @param r 
 /// @param ma 
 /// @param mi 
-Chemical::Chemical(int nu, string s, string h, string na, long double w,
+Chemical::Chemical(int nu, std::string s, std::string h, std::string na, long double w,
                    long double m, long double b, long double d, long double p,
                    long double c2, long double n2, long double ae,
                    long double as, long double r, long double ma,
@@ -760,7 +759,7 @@ auto Chemical::operator<(Chemical& right) -> bool {
   long double xx = abunds * abunde;
   long double yy = right.abunds * right.abunde;
 
-  // cout << xx << " < " << yy << endl;
+  // std::cout << xx << " < " << yy << std::endl;
 
   if (xx > yy) {
     return true;
@@ -791,7 +790,7 @@ auto Chemical::operator==(Chemical& right) -> bool {
   return false;
 }
 
-auto operator<<(ostream& strm, Chemical& obj) -> ostream& {
+auto operator<<(std::ostream& strm, Chemical& obj) -> std::ostream& {
   strm << left << obj.getNum() << ".\t" << right << obj.getSymbol();
   for (int i = 0; i < obj.getSymbolSpaces(); i++) {
     strm << " ";
@@ -815,19 +814,19 @@ auto ChemTable::count() -> const unsigned long { return chemicles.size(); }
 
 auto ChemTable::operator[](const int& index) -> Chemical& {
   if (index < 0 || index >= chemicles.size()) {
-    cerr << "ERROR: Subscript out of range.\n";
+    std::cerr << "ERROR: Subscript out of range.\n";
     exit(EXIT_FAILURE);
   }
   return chemicles[index];
 }
 
-auto operator<<(ostream& strm, ChemTable& obj) -> ostream& {
-  cout << "Num\t" << setw(6) << "Symbol" << setw(13) << "Name" << setw(24)
+auto operator<<(std::ostream& strm, ChemTable& obj) -> std::ostream& {
+  std::cout << "Num\t" << setw(6) << "Symbol" << setw(13) << "Name" << setw(24)
        << "Weight" << setw(22) << "Min breathable IPP" << setw(20)
        << "Max Breathable IPP" << setw(15) << "Abund\n";
   strm << fixed;
   for (int i = 0; i < obj.count(); i++) {
-    strm << setprecision(0) << obj[i] << endl;
+    strm << setprecision(0) << obj[i] << std::endl;
   }
   return strm;
 }
@@ -847,8 +846,8 @@ sun::sun() {
   combinedEffTemp = 0;
 }
 
-sun::sun(long double l, long double m, long double t, string s, long double a,
-         string n) {
+sun::sun(long double l, long double m, long double t, std::string s, long double a,
+         std::string n) {
   luminosity = l;
   mass = m;
   effTemp = t;
@@ -955,13 +954,13 @@ auto sun::getLuminosity() -> long double { return luminosity; }
 
 auto sun::getMass() -> long double { return mass; }
 
-auto sun::getName() -> string { return name; }
+auto sun::getName() -> std::string { return name; }
 
 auto sun::getREcosphere(long double mass) -> long double {
   return habitable_zone_distance(*this, EARTH_LIKE, mass);
 }
 
-auto sun::getSpecType() -> string {
+auto sun::getSpecType() -> std::string {
   if (specType.empty()) {
     specType = eff_temp_to_spec_type(effTemp, luminosity);
   }
@@ -981,9 +980,9 @@ void sun::setLuminosity(long double l) { luminosity = l; }
 
 void sun::setMass(long double m) { mass = m; }
 
-void sun::setName(string n) { name = std::move(n); }
+void sun::setName(std::string n) { name = std::move(n); }
 
-void sun::setSpecType(string s) {
+void sun::setSpecType(std::string s) {
   specType = std::move(s);
   specType = my_strtoupper(specType);
   if (effTemp == 0) {
@@ -999,7 +998,7 @@ auto sun::getSecondaryLuminosity() -> long double { return secondaryLuminosity; 
 
 auto sun::getSecondaryMass() -> long double { return secondaryMass; }
 
-auto sun::getSecondarySpecType() -> string { return secondarySpecType; }
+auto sun::getSecondarySpecType() -> std::string { return secondarySpecType; }
 
 void sun::setIsCircumbinary(bool cb) {
   isCircumbinary = cb;
@@ -1030,7 +1029,7 @@ void sun::setSecondaryMass(long double m) {
   }
 }
 
-void sun::setSecondarySpecType(string t) {
+void sun::setSecondarySpecType(std::string t) {
   secondarySpecType = std::move(t);
   if (secondaryEffTemp == 0) {
     secondaryEffTemp = spec_type_to_eff_temp(secondarySpecType);
@@ -1085,15 +1084,15 @@ auto sun::getCombinedEffTemp() -> long double {
       f1 = calcFlux(effTemp, i);
       f2 = calcFlux(secondaryEffTemp, i);
       curr = f1 + f2;
-      // cout << i << ": " << f1 << " " << f2 << " " << curr << endl;
+      // std::cout << i << ": " << f1 << " " << f2 << " " << curr << std::endl;
       if (prev > curr) {
         peak = i - ACCURACY_FOR_PEAK;
         break;
       }
     }
-    // cout << "Primary Temp: " << toString(effTemp) << endl;
-    // cout << "Secondary Temp: " << toString(secondaryEffTemp) << endl;
-    // cout << "Peak: " << toString(peak) << endl;;
+    // std::cout << "Primary Temp: " << toString(effTemp) << std::endl;
+    // std::cout << "Secondary Temp: " << toString(secondaryEffTemp) << std::endl;
+    // std::cout << "Peak: " << toString(peak) << std::endl;;
     a = 0.0;
     m = 1000000000.0;
     b = 1.0;
@@ -1103,7 +1102,7 @@ auto sun::getCombinedEffTemp() -> long double {
     m = 1.0;
     b = 1.0;
     temperature = (pow(temperature, b) * m) + a;
-    // cout << "Combined temp: " << toString(temperature) << endl;
+    // std::cout << "Combined temp: " << toString(temperature) << std::endl;
     // exit(EXIT_FAILURE);
     combinedEffTemp = temperature;
     return temperature;
@@ -1214,7 +1213,7 @@ void planet::clearGases() {
 /*void planet::deleteMoon(int i)
 {
   planet *the_moon = temp_moon[i];
-  vector<planet *>::iterator it;
+  std::vector<planet *>::iterator it;
   if (temp_moon[i] != NULL)
   {
     if (temp_moon[i]->next_planet == NULL)
@@ -1364,7 +1363,7 @@ auto planet::getOblateness() -> long double {
     equatorial_radius_in_cm = radius * CM_PER_KM;
     k2 = calculate_moment_of_inertia_coeffient(the_planet);
     while (day == 0) {
-      cerr << "Error! The day is 0 hours long!\n";
+      std::cerr << "Error! The day is 0 hours long!\n";
       exit(EXIT_FAILURE);
     }
     ang_velocity = RADIANS_PER_ROTATION / (SECONDS_PER_HOUR * day);
@@ -1572,7 +1571,7 @@ void planet::sortMoons() {
   planet* next = nullptr;
   planet* node = nullptr;
   // planet *temp = NULL;
-  vector<planet*> temp_vector;
+  std::vector<planet*> temp_vector;
   long double roche_limit = 0;
   long double hill_sphere = 0;
   for (node = first_moon; node != nullptr; node = next) {
@@ -1719,7 +1718,7 @@ auto gas::operator==(gas& right) -> bool {
   return false;
 }
 
-auto operator<<(ostream& strm, gas& obj) -> ostream& {
-  strm << obj.getNum() << " - " << obj.getSurfPressure() << endl;
+auto operator<<(std::ostream& strm, gas& obj) -> std::ostream& {
+  strm << obj.getNum() << " - " << obj.getSurfPressure() << std::endl;
   return strm;
 }

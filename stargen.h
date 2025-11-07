@@ -1,12 +1,9 @@
 #ifndef STARGEN_H
 #define STARGEN_H
 #include <iosfwd>     // for std
-#include <string>     // for string
+#include <string>     // for std::string
 #include "structs.h"  // for sun
 class accrete;
-
-
-using namespace std;
 
 #ifdef macintosh
 #define SUBDIR "html"
@@ -75,12 +72,12 @@ extern long double compainion_eccentricity_arg;
 extern long double compainion_distant_arg;
 extern long double compainion_lum_arg;
 extern long double compainion_eff_arg;
-extern string companion_spec_arg;
+extern std::string companion_spec_arg;
 extern long double min_age;
 extern long double max_age;
 extern long double max_age_backup;
 extern long double temp_arg;
-extern string type_arg;
+extern std::string type_arg;
 extern int decimals_arg;
 extern long double max_distance_arg;
 
@@ -126,39 +123,39 @@ extern long double max_potential_p;
 extern long double min_potential_mass;
 extern long double max_potential_mass;
 
-extern string stargen_revision;
+extern std::string stargen_revision;
 
 extern long flag_seed;
 
 void init();
 void generate_planet(planet* /*the_planet*/, int /*planet_no*/,
                      sun& /*the_sun*/, bool /*random_tilt*/,
-                     const string& /*planet_id*/, bool /*do_gases*/,
+                     const std::string& /*planet_id*/, bool /*do_gases*/,
                      bool /*do_moons*/, bool /*is_moon*/,
                      long double /*parent_mass*/);
 void generate_planets(sun& /*the_sun*/, bool /*random_tilt*/,
-                      const string& /*flag_char*/, int /*sys_no*/,
-                      const string& /*system_name*/, bool /*do_gases*/,
+                      const std::string& /*flag_char*/, int /*sys_no*/,
+                      const std::string& /*system_name*/, bool /*do_gases*/,
                       bool /*do_moons*/);
 void generate_stellar_system(sun &the_sun, bool use_seed_system,
-                             planet *seed_system, const string& flag_char, int sys_no,
-                             const string& system_name, long double inner_dust_limit,
+                             planet *seed_system, const std::string& flag_char, int sys_no,
+                             const std::string& system_name, long double inner_dust_limit,
                              long double outer_planet_limit,
                              long double ecc_coef,
                              long double inner_planet_factor, bool do_gases,
                              bool do_moons, accrete &myAccreteObject);
-auto stargen(actions /*action*/, const string& /*flag_char*/, string /*path*/,
-             const string& /*url_path_arg*/, const string& /*filename_arg*/,
-             const string& /*sys_name_arg*/, string /*prognam*/,
+auto stargen(actions /*action*/, const std::string& /*flag_char*/, std::string /*path*/,
+             const std::string& /*url_path_arg*/, const std::string& /*filename_arg*/,
+             const std::string& /*sys_name_arg*/, std::string /*prognam*/,
              long double /*mass_arg*/, long double /*luminosity_arg*/,
              long /*seed_arg*/, int /*count_arg*/, int /*incr_arg*/,
              catalog& /*cat_arg*/, int /*sys_no_arg*/,
              long double /*ratio_arg*/, long double /*ecc_coef_arg*/,
              long double /*inner_planet_factor_arg*/, int /*flags_arg*/,
              int /*out_format*/, int /*graphic_format*/) -> int;
-void check_planet(planet* /*the_planet*/, const string& /*planet_id*/,
+void check_planet(planet* /*the_planet*/, const std::string& /*planet_id*/,
                   bool /*is_moon*/);
 void assign_type(sun& /*the_sun*/, planet* /*the_planet*/,
-                 const string& /*planet_id*/, bool /*is_moon*/,
+                 const std::string& /*planet_id*/, bool /*is_moon*/,
                  bool /*do_gases*/, bool /*second_time*/);
 #endif

@@ -1,0 +1,3 @@
+/home/user/stargen/_deps/json-subbuild/CMakeFiles/json-populate.dir
+/home/user/stargen/_deps/json-subbuild/CMakeFiles/edit_cache.dir
+/home/user/stargen/_deps/json-subbuild/CMakeFiles/rebuild_cache.dir

@@ -268,8 +268,8 @@ void accrete::update_dust_lanes(long double min, long double max, long double ma
 auto accrete::collect_dust(long double last_mass, long double &new_dust,
                   long double &new_gas, long double a, long double e,
                   long double crit_mass, dust *dust_band) -> long double {
-    // cout << EM(last_mass) << " " << EM(new_dust) << " " << EM(new_gas) << " "
-  // << a << " " << e << " " << EM(crit_mass) << endl;
+    // std::cout << EM(last_mass) << " " << EM(new_dust) << " " << EM(new_gas) << " "
+  // << a << " " << e << " " << EM(crit_mass) << std::endl;
   long double mass_density = NAN;
   long double temp1 = NAN;
   long double temp2 = NAN;
@@ -312,8 +312,8 @@ auto accrete::collect_dust(long double last_mass, long double &new_dust,
       gas_density = mass_density - temp_density;
     }
 
-    // cout << dust_band->getOuterEdge() << " " << dust_band->getInnerEdge() <<
-    // endl;
+    // std::cout << dust_band->getOuterEdge() << " " << dust_band->getInnerEdge() <<
+    // std::endl;
 
     // if the outer edge exceeds the accretion inner limit or the inner edge is 
     // outside the outer limit, just collect the dust from the next band
@@ -467,7 +467,7 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
   // First we try to find an existing planet with an over-lapping orbit.
   for (the_planet = planet_head, count = 1; the_planet != nullptr;
        the_planet = the_planet->next_planet, count++) {
-    // cout << "test2" << count << endl;
+    // std::cout << "test2" << count << std::endl;
     diff = the_planet->getA() - a;
 
     if ((diff > 0.0)) {
@@ -540,7 +540,7 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
             finished = true;
 
             if (flag_verbose & 0x0100) {
-              cerr << "Moon Captured... " << toString(the_planet->getA())
+              std::cerr << "Moon Captured... " << toString(the_planet->getA())
                    << " AU ("
                    << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
                    << " EM) <- " << toString(mass * SUN_MASS_IN_EARTH_MASSES)
@@ -548,14 +548,14 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
             }
           } else {
             if (flag_verbose & 0x0100) {
-              string big_moons_message;
+              std::string big_moons_message;
               if (existing_mass < (the_planet->getMass() * 0.05)) {
                 big_moons_message = "";
               } else {
                 big_moons_message = " (big moons)";
               }
 
-              string moon_size_message;
+              std::string moon_size_message;
               if ((mass * SUN_MASS_IN_EARTH_MASSES) >= 2.5) {
                 moon_size_message = ", too big";
               } else if ((mass * SUN_MASS_IN_EARTH_MASSES) <= .0001) {
@@ -563,12 +563,12 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
               } else {
                 moon_size_message = "";
               }
-              cerr << "Moon Escapes... " << toString(the_planet->getA())
+              std::cerr << "Moon Escapes... " << toString(the_planet->getA())
                    << " AU ("
                    << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
                    << " EM)" << big_moons_message << " "
                    << toString(mass * SUN_MASS_IN_EARTH_MASSES) << " EM"
-                   << moon_size_message << endl;
+                   << moon_size_message << std::endl;
             }
           }
         }
@@ -576,7 +576,7 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
 
       if (!finished && !is_predefined_planet(the_planet)) {
         if (flag_verbose & 0x0100) {
-          cerr << "Collision between two planetesimals! "
+          std::cerr << "Collision between two planetesimals! "
                << toString(the_planet->getA()) << " AU ("
                << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
                << " EM) + " << toString(a) << " AU ("
@@ -585,7 +585,7 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
                << " EMd + " << toString(gas_mass * SUN_MASS_IN_EARTH_MASSES)
                << " EMg [" << toString(crit_mass * SUN_MASS_IN_EARTH_MASSES)
                << " EM])-> " << toString(new_a) << " AU (" << toString(e) << ")"
-               << endl;
+               << std::endl;
         }
 
         temp = the_planet->getMass() + mass;
@@ -744,7 +744,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
     planet_outer_bound = farthest_planet(stell_mass_ratio);
   }
 
-  // cout << planet_inner_bound << " " << planet_outer_bound << endl;
+  // std::cout << planet_inner_bound << " " << planet_outer_bound << std::endl;
 
   // while there's still dust left...
   while (dust_left) {
@@ -767,7 +767,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
           // temp_moons->setMoonA(moon->getMoonA());
           // temp_moons->setMoonE(moon->getMoonE());
           if (flag_verbose & 0x0100) {
-            cerr << "Injecting Moon... " << toString(a) << " AU ("
+            std::cerr << "Injecting Moon... " << toString(a) << " AU ("
                  << toString(total_mass * SUN_MASS_IN_EARTH_MASSES)
                  << " EM) <- "
                  << toString(temp_moons->getMass() * SUN_MASS_IN_EARTH_MASSES)
@@ -801,26 +801,26 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
     }
 
     if (flag_verbose & 0x0200) {
-      cerr << "Checking " << toString(a) << " AU.\n";
+      std::cerr << "Checking " << toString(a) << " AU.\n";
     }
     // if we have dust inside the limits...
     if (dust_available(inner_effect_limit(a, e, total_mass),
                        outer_effect_limit(a, e, total_mass))) {
       if (flag_verbose & 0x0100) {
-        cerr << "Injecting protoplanet at " << toString(a) << " AU.\n";
+        std::cerr << "Injecting protoplanet at " << toString(a) << " AU.\n";
       }
 
       dust_density = dust_density_coeff * sqrt(stell_mass_ratio) *
                      exp(-ALPHA * std::pow(a, 1.0 / NDENSITY));
       crit_mass = critical_limit(a, e, stell_luminosity_ratio);
       if (total_mass == PROTOPLANET_MASS && is_seed == false) {
-        // cout << "test1\n";
-        // cout << total_mass << " " << dust_mass << " " << gas_mass << " " << a
+        // std::cout << "test1\n";
+        // std::cout << total_mass << " " << dust_mass << " " << gas_mass << " " << a
         // << " " << e << " " << crit_mass << " " << planet_inner_bound << " "
-        // << planet_outer_bound << endl;
+        // << planet_outer_bound << std::endl;
         accrete_dust(total_mass, dust_mass, gas_mass, a, e, crit_mass,
                      planet_inner_bound, planet_outer_bound);
-        // cout << "test2\n";
+        // std::cout << "test2\n";
         dust_mass += PROTOPLANET_MASS;
       }
 
@@ -876,20 +876,20 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
           a = new_a;
           e = new_e;
           if (flag_verbose & 0x0200) {
-            cerr << "Planet migrated to " << toString(a)
-                 << " AU with eccentricity of " << toString(e) << endl;
+            std::cerr << "Planet migrated to " << toString(a)
+                 << " AU with eccentricity of " << toString(e) << std::endl;
           }
         }
-        // cout << "test 1\n";
+        // std::cout << "test 1\n";
         coalesce_planetesimals(a, e, total_mass, crit_mass, dust_mass, gas_mass,
                                stell_luminosity_ratio, planet_inner_bound,
                                planet_outer_bound, do_moons);
-        // cout << "test 2\n";
+        // std::cout << "test 2\n";
       } else if (flag_verbose & 0x0100) {
-        cerr << ".. failed due to large neighbor.\n";
+        std::cerr << ".. failed due to large neighbor.\n";
       }
     } else if (flag_verbose & 0x0200) {
-      cerr << ".. failed.\n";
+      std::cerr << ".. failed.\n";
     }
 
     if (is_seed) {
@@ -906,7 +906,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
       update_dust_lanes(r_inner, r_outer, total_mass, crit_mass,
                         planet_inner_bound, planet_outer_bound);
     }
-    // cout << "test 3\n";
+    // std::cout << "test 3\n";
   }
   ZoneScoped;
   return planet_head;
@@ -925,7 +925,7 @@ void accrete::free_dust(dust *head) {
   for (node = head; node != nullptr; node = next) {
     next = node->next_band;
     delete node;
-    // cout << "Deleted Dust\n";
+    // std::cout << "Deleted Dust\n";
   }
   ZoneScoped;
 }
@@ -943,7 +943,7 @@ void accrete::free_planet(planet *head) {
   for (node = head; node != nullptr; node = next) {
     next = node->next_planet;
     delete node;
-    // cout << "Deleted World\n";
+    // std::cout << "Deleted World\n";
   }
   ZoneScoped;
 }
@@ -969,7 +969,7 @@ void accrete::free_generations() {
     }
 
     delete node;
-    // cout << "Deleted Generation\n";
+    // std::cout << "Deleted Generation\n";
   }
   ZoneScoped;
 }

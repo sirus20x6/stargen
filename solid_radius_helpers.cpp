@@ -9,7 +9,6 @@
 #include "structs.h"
 #include "utils.h"
 
-using namespace std;
 
 /**
  * @brief water radius
@@ -20,7 +19,7 @@ using namespace std;
  * @return long double 
  */
 long double water_radius(long double mass, planet *the_planet,
-                         map<long double, long double> &mass_radii) {
+                         std::map<long double, long double> &mass_radii) {
     long double radius;
   bool adjust_for_carbon;
   long double radius1;
@@ -410,7 +409,7 @@ long double water_radius(long double mass, planet *the_planet,
  */
 long double one_quater_rock_three_fourths_water_radius(
     long double mass, long double cmf, planet *the_planet,
-    map<long double, long double> &mass_radii) {
+    std::map<long double, long double> &mass_radii) {
     long double radius;
   long double radius1;
   long double radius2;
@@ -816,7 +815,7 @@ long double one_quater_rock_three_fourths_water_radius(
  */
 long double half_rock_half_water_radius(
     long double mass, long double cmf, planet *the_planet,
-    map<long double, long double> &mass_radii) {
+    std::map<long double, long double> &mass_radii) {
     long double radius;
   long double radius1;
   long double radius2;
@@ -1224,7 +1223,7 @@ long double half_rock_half_water_radius(
  * @return long double 
  */
 long double rock_radius(long double mass, long double cmf, planet *the_planet,
-                        map<long double, long double> &mass_radii) {
+                        std::map<long double, long double> &mass_radii) {
     long double radius;
   long double radius1;
   long double radius2;
@@ -1634,7 +1633,7 @@ long double rock_radius(long double mass, long double cmf, planet *the_planet,
  */
 long double half_rock_half_iron_radius(
     long double mass, long double cmf, planet *the_planet,
-    map<long double, long double> &mass_radii) {
+    std::map<long double, long double> &mass_radii) {
     long double radius;
   long double radius1;
   long double radius2;
@@ -2053,7 +2052,7 @@ long double half_rock_half_iron_radius(
  * @return long double 
  */
 long double iron_radius(long double mass, planet *the_planet,
-                        map<long double, long double> &mass_radii) {
+                        std::map<long double, long double> &mass_radii) {
     long double radius;
   long double radius1;
   long double radius2;
@@ -2463,7 +2462,7 @@ long double iron_radius(long double mass, planet *the_planet,
  */
 long double solid_0point953_iron_0point047_water_radius(
     long double mass, planet *the_planet,
-    map<long double, long double> &mass_radii) {
+    std::map<long double, long double> &mass_radii) {
     long double radius, radius1, radius2;
   if (mass <= 0.1) {
     radius1 = fraction_radius(mass, 0, 0, 0);
@@ -2742,7 +2741,7 @@ long double solid_0point953_iron_0point047_water_radius(
  */
 long double solid_0point51_iron_0point49_water_radius(
     long double mass, planet *the_planet,
-    map<long double, long double> &mass_radii) {
+    std::map<long double, long double> &mass_radii) {
     long double radius, radius1, radius2;
   if (mass <= 0.1) {
     radius1 = fraction_radius(mass, 0, 0, 0);
@@ -3020,7 +3019,7 @@ long double solid_0point51_iron_0point49_water_radius(
  */
 long double solid_0point264_iron_0point736_water_radius(
     long double mass, planet *the_planet,
-    map<long double, long double> &mass_radii) {
+    std::map<long double, long double> &mass_radii) {
     long double radius, radius1, radius2;
   if (mass <= 0.1) {
     radius1 = fraction_radius(mass, 0, 0, 0);

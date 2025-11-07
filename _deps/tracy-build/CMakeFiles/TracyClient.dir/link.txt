@@ -1,0 +1,2 @@
+/usr/bin/ar qc libTracyClient.a CMakeFiles/TracyClient.dir/public/TracyClient.cpp.o
+/usr/bin/ranlib libTracyClient.a

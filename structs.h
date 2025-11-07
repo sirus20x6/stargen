@@ -3,16 +3,14 @@
 #pragma once
 
 #include <iosfwd>  // for ostream, std
-#include <string>  // for string, basic_string
-#include <vector>  // for vector
+#include <string>  // for std::string, basic_string
+#include <vector>  // for std::vector
 class ChemTable;  // lines 496-496
 class Chemical;  // lines 427-427
 class catalog;  // lines 395-395
 class gas;  // lines 30-30
 class star;  // lines 326-326
 struct star2;
-
-using namespace std;
 
 using planet_type = enum planet_type {
   tUnknown,
@@ -34,7 +32,7 @@ using planet_type = enum planet_type {
 };
 
 class gas;
-auto operator<<(ostream &, gas &) -> ostream &;
+auto operator<<(std::ostream &, gas &) -> std::ostream &;
 
 class gas {
  private:
@@ -49,7 +47,7 @@ class gas {
   auto getSurfPressure() -> long double;
   auto operator<(gas &) -> bool;
   auto operator==(gas &) -> bool;
-  friend auto operator<<(ostream &, gas &) -> ostream &;
+  friend auto operator<<(std::ostream &, gas &) -> std::ostream &;
 };
 
 class sun {
@@ -57,21 +55,21 @@ class sun {
   long double luminosity{0};
   long double mass{0};
   long double effTemp{0};
-  string specType{""};
+  std::string specType{""};
   long double age{0};
-  string name{""};
+  std::string name{""};
   bool isCircumbinary{false};
   long double secondaryMass{0};
   long double secondaryLuminosity{0};
   long double secondaryEffTemp{0};
   long double combinedEffTemp{0};
-  string secondarySpecType{""};
+  std::string secondarySpecType{""};
   long double seperation{};
   long double eccentricity{};
 
  public:
   sun();
-  sun(long double, long double, long double, string, long double, string);
+  sun(long double, long double, long double, std::string, long double, std::string);
   sun(sun &);
   sun(const sun &);
   void setLuminosity(long double);
@@ -80,13 +78,13 @@ class sun {
   auto getMass() -> long double;
   void setEffTemp(long double);
   auto getEffTemp() -> long double;
-  void setSpecType(string);
-  auto getSpecType() -> string;
+  void setSpecType(std::string);
+  auto getSpecType() -> std::string;
   auto getLife() -> long double;
   void setAge(long double);
   auto getAge() -> long double;
-  void setName(string);
-  auto getName() -> string;
+  void setName(std::string);
+  auto getName() -> std::string;
   auto getREcosphere(long double) -> long double;
   void setIsCircumbinary(bool);
   auto getIsCircumbinary() -> bool;
@@ -96,8 +94,8 @@ class sun {
   auto getSecondaryLuminosity() -> long double;
   void setSecondaryEffTemp(long double);
   auto getSecondaryEffTemp() -> long double;
-  void setSecondarySpecType(string);
-  auto getSecondarySpecType() -> string;
+  void setSecondarySpecType(std::string);
+  auto getSecondarySpecType() -> std::string;
   auto getCombinedLuminosity() -> long double;
   auto getCombinedMass() -> long double;
   void setSeperation(long double);
@@ -154,7 +152,7 @@ class planet {
   long double cloudCover{0};        /* fraction of surface covered		 */
   long double iceCover{0};          /* fraction of surface covered		 */
   sun theSun;
-  vector<gas> atmosphere;
+  std::vector<gas> atmosphere;
   planet_type type{tUnknown}; /* Type code */
   int minorMoons{};
   long double inclination{0};
@@ -170,7 +168,7 @@ class planet {
   bool deleteable{true};
   long double knownRadius{};
   void estimateMass();
-  // vector<planet *> temp_moon;
+  // std::vector<planet *> temp_moon;
  public:
   planet();
   planet(int, long double, long double, long double, bool, long double,
@@ -331,42 +329,42 @@ class dust {
 
 class star;
 
-auto operator<<(ostream &, star &) -> ostream &;
+auto operator<<(std::ostream &, star &) -> std::ostream &;
 
 class star {
  private:
   long double luminosity{};
   long double mass{};
   long double eff_temp{};
-  string spec_type;
+  std::string spec_type;
   long double mass2{};
   long double eccentricity{};
   long double distance{};
   long double inc{};
   long double an{};
   planet *known_planets{};
-  string desig;
+  std::string desig;
   bool in_celestia{};
-  string name;
+  std::string name;
   int extra_spaces{};
   void calcLuminosity();
   void calcMass();
   void calcEffTemp();
   bool isCircumbinary{};
   long double eff_temp2{};
-  string spec_type2;
+  std::string spec_type2;
   long double luminosity2{};
 
  public:
   star() = default;
-  star(long double, long double, long double, string, long double, long double,
-       long double, long double, long double, planet *, string, bool, string);
+  star(long double, long double, long double, std::string, long double, long double,
+       long double, long double, long double, planet *, std::string, bool, std::string);
   star(star &);
   star(const star &);
   star(star2 &);
   ~star();
   void setExtraSpaces(int);
-  auto getName() -> string;
+  auto getName() -> std::string;
   auto getExtraSpaces() -> int;
   auto getInc() -> long double;
   auto getAn() -> long double;
@@ -375,8 +373,8 @@ class star {
   auto getMass() -> long double;
   auto getLuminosity() -> long double;
   auto getEffTemp() -> long double;
-  auto getSpecType() -> string;
-  auto getDesig() -> string;
+  auto getSpecType() -> std::string;
+  auto getDesig() -> std::string;
   void setDistance(long double);
   auto getDistance() -> long double;
   void setEccentricity(long double);
@@ -387,37 +385,37 @@ class star {
   auto getLuminosity2() -> long double;
   void setEffTemp2(long double);
   auto getEffTemp2() -> long double;
-  void setSpecType2(string);
-  auto getSpecType2() -> string;
+  void setSpecType2(std::string);
+  auto getSpecType2() -> std::string;
   void setIsCircumbinary(bool);
   auto getIsCircumbinary() -> bool;
   auto operator=(const star &) -> star;
   // star operator=(const star);
   auto operator<(star &) -> bool;
   auto operator==(const star &) -> bool;
-  friend auto operator<<(ostream &, star &) -> ostream &;
+  friend auto operator<<(std::ostream &, star &) -> std::ostream &;
 };
 
 class catalog;
-auto operator<<(ostream &, catalog &) -> ostream &;
+auto operator<<(std::ostream &, catalog &) -> std::ostream &;
 
 class catalog {
  private:
   int extra_spaces{0};
-  string arg;
-  vector<star> stars;
+  std::string arg;
+  std::vector<star> stars;
 
  public:
   catalog();
-  catalog(string);
+  catalog(std::string);
   ~catalog();
-  void setArg(string);
+  void setArg(std::string);
   void addStar(star &);
-  auto getArg() -> string;
+  auto getArg() -> std::string;
   auto count() -> unsigned long;
   auto operator[](const int &) -> star &;
   auto operator=(catalog &) -> catalog&;
-  friend auto operator<<(ostream &, catalog &) -> ostream &;
+  friend auto operator<<(std::ostream &, catalog &) -> std::ostream &;
   void sort();
 };
 
@@ -431,14 +429,14 @@ class gen {
 };
 
 class Chemical;
-auto operator<<(ostream &, Chemical &) -> ostream &;
+auto operator<<(std::ostream &, Chemical &) -> std::ostream &;
 
 class Chemical {
  private:
   int num{0};
-  string symbol{""};
-  string htmlSymbol{""};
-  string name{""};
+  std::string symbol{""};
+  std::string htmlSymbol{""};
+  std::string name{""};
   long double weight{0};
   long double melt{0};
   long double boil{0};
@@ -463,7 +461,7 @@ class Chemical {
 
  public:
   Chemical();
-  Chemical(int, string, string, string, long double, long double, long double,
+  Chemical(int, std::string, std::string, std::string, long double, long double, long double,
            long double, long double, long double, long double, long double,
            long double, long double, long double, long double);
   Chemical(Chemical &);
@@ -486,32 +484,32 @@ class Chemical {
   auto getBoil() -> long double { return boil; }
   auto getC() -> long double { return c; }
   auto getDensity() -> long double { return density; }
-  auto getHtmlSymbol() -> string { return htmlSymbol; }
+  auto getHtmlSymbol() -> std::string { return htmlSymbol; }
   auto getMaxIpp() -> long double { return maxIpp; }
   auto getMelt() -> long double { return melt; }
   auto getMinIpp() -> long double { return minIpp; }
   auto getN() -> long double { return n; }
-  auto getName() -> string { return name; }
+  auto getName() -> std::string { return name; }
   auto getPzero() -> long double { return pzero; }
   auto getReactivity() -> long double { return reactivity; }
-  auto getSymbol() -> string { return symbol; }
+  auto getSymbol() -> std::string { return symbol; }
   auto getWeight() -> long double { return weight; }
-  friend auto operator<<(ostream &, Chemical &) -> ostream &;
+  friend auto operator<<(std::ostream &, Chemical &) -> std::ostream &;
 };
 
 class ChemTable;
-auto operator<<(ostream &, ChemTable &) -> ostream &;
+auto operator<<(std::ostream &, ChemTable &) -> std::ostream &;
 
 class ChemTable {
  private:
-  vector<Chemical> chemicles;
+  std::vector<Chemical> chemicles;
 
  public:
   ChemTable() = default;
   void addChemicle(const Chemical&);
   auto count() -> const unsigned long;
   auto operator[](const int &) -> Chemical &;
-  friend auto operator<<(ostream &, ChemTable &) -> ostream &;
+  friend auto operator<<(std::ostream &, ChemTable &) -> std::ostream &;
 };
 
 #endif

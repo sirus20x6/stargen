@@ -3,7 +3,6 @@
 #include "structs.h"
 #include "c_structs.h"
 
-using namespace std;
 
 extern catalog ring_universe;
 

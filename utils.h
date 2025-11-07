@@ -4,24 +4,22 @@
 #include <algorithm>  // for replace
 #include <cmath>      // for isnan
 #include <iomanip>    // for operator<<, setprecision
-#include <iostream>   // for stringstream, cout, basic_ostream<>::__ostream_...
-#include <map>        // for map
-#include <string>     // for string, to_string
-#include <vector>     // for vector
+#include <iostream>   // for std::stringstream, cout, basic_ostream<>::__ostream_...
+#include <map>        // for std::map
+#include <string>     // for std::string, to_string
+#include <vector>     // for std::vector
 #include "stargen.h"  // for decimals_arg
 #include "tracy/Tracy.hpp"
-
-using namespace std;
 
 extern long seed;
 extern long jseed;
 extern long ifrst;
 extern long nextn;
 
-auto compare_string_char(string& a_string, int place, const char* a_character,
+auto compare_string_char(std::string& a_string, int place, const char* a_character,
                          int length = 1) -> bool;
-// string replaceStrChar(string, const char *, const char *);
-auto float_to_string(long double) -> string;
+// std::string replaceStrChar(std::string, const char *, const char *);
+auto float_to_string(long double) -> std::string;
 auto random_number(long double, long double) -> long double;
 auto about(long double, long double) -> long double;
 auto random_eccentricity(long double) -> long double;
@@ -37,13 +35,13 @@ auto logistal_trend(long double, long double, long double, long double)
 void polyRegression(const std::vector<double>& x, const std::vector<double>& y, double *store);
 auto soft(long double, long double, long double) -> long double;
 auto lim(long double) -> long double;
-auto remove_spaces(string) -> string;
+auto remove_spaces(std::string) -> std::string;
 auto randf() -> double;
 void srandf(long);
 auto fix_inclination(long double) -> long double;
 auto linear_trend(long double, long double, long double) -> long double;
-auto my_strtoupper(const string&) -> string;
-auto star_type_to_num(const string& spec_type, long double luminosity,
+auto my_strtoupper(const std::string&) -> std::string;
+auto star_type_to_num(const std::string& spec_type, long double luminosity,
                       int run = 1) -> int;
 void logfix(long double, long double, long double, long double, long double&,
             long double&);
@@ -58,32 +56,32 @@ auto quintic_trend(long double, long double, long double, long double,
                    long double, long double, long double) -> long double;
 
 template <typename T>
-auto toString(T val, int decimals = 0) -> string;
+auto toString(T val, int decimals = 0) -> std::string;
 
 template <typename T>
 auto getNumDecimals(T /*val*/) -> size_t;
 
 template <typename T>
-auto replaceStrChar(string /*str*/, T /*old*/, T /*the_new*/) -> string;
+auto replaceStrChar(std::string /*str*/, T /*old*/, T /*the_new*/) -> std::string;
 
 template <typename T>
-void quicksort(vector<T>& /*v*/, int /*first*/, int /*last*/);
+void quicksort(std::vector<T>& /*v*/, int /*first*/, int /*last*/);
 
 template <typename T>
 auto is_close(T a, T b, long double percent = 1) -> bool;
 
 template <typename T>
-void writeVector(vector<T>& v, const string& separator = "  ");
+void writeVector(std::vector<T>& v, const std::string& separator = "  ");
 
-// display the key-value pairs in the map. follow the output of
+// display the key-value pairs in the std::map. follow the output of
 // each pair by separator. default value of separator = "  "
 template <typename Key, typename T>
-void writeMap(const map<Key, T>& m, const string& separator = "\n");
+void writeMap(const std::map<Key, T>& m, const std::string& separator = "\n");
 
 template <typename T>
-auto toString(T val, int decimals) -> string {
-  stringstream ss;
-  string output;
+auto toString(T val, int decimals) -> std::string {
+  std::stringstream ss;
+  std::string output;
 
   if (decimals_arg != 0) {
     decimals = decimals_arg;
@@ -91,14 +89,14 @@ auto toString(T val, int decimals) -> string {
 
   ss.str("");
 
-  if (isnan(val)) {
+  if (std::isnan(val)) {
     ss << val;
   } else {
     if (decimals == 0) {
-      // ss << showpoint << fixed << setprecision(getNumDecimals(val));
+      // ss << std::showpoint << std::fixed << std::setprecision(getNumDecimals(val));
       output = std::to_string(val);
     } else {
-      ss << showpoint << fixed << setprecision(decimals);
+      ss << std::showpoint << std::fixed << std::setprecision(decimals);
       ss << val;
       output = ss.str();
     }
@@ -109,7 +107,7 @@ auto toString(T val, int decimals) -> string {
 
 template <typename T>
 auto getNumDecimals(T val) -> size_t {
-  if (isnan(val)) {
+  if (std::isnan(val)) {
     return 0;
   }
 
@@ -142,7 +140,7 @@ auto getNumDecimals(T val) -> size_t {
 // these here because due to a bug in gcc/g++, they can't be in a .c or .cpp
 // file... *grumble*
 template <typename T>
-auto pivotIndex(vector<T>& v, int first, int last) -> int {
+auto pivotIndex(std::vector<T>& v, int first, int last) -> int {
   // index for the midpoint of [first,last) and the
   // indices that scan the index range in tandem
   int mid = 0;
@@ -185,7 +183,7 @@ auto pivotIndex(vector<T>& v, int first, int last) -> int {
       // an element <= pivot; we guarantee we stop at arr[first]
       while (pivot < v[scanDown]) {
         // cout << "scanning down using " << pivot << " as pivot point." <<
-        // endl;
+        // std::endl;
         scanDown--;
       }
 
@@ -214,7 +212,7 @@ auto pivotIndex(vector<T>& v, int first, int last) -> int {
 }
 
 template <typename T>
-void quicksort(vector<T>& v, int first, int last) {
+void quicksort(std::vector<T>& v, int first, int last) {
   // index of the pivot
   int pivotLoc = 0;
   // temp used for an exchange when [first,last) has
@@ -261,8 +259,8 @@ void quicksort(vector<T>& v, int first, int last) {
 }
 
 template <typename T>
-auto replaceStrChar(string str, T old, T the_new) -> string {
-  replace(str.begin(), str.end(), old, the_new);
+auto replaceStrChar(std::string str, T old, T the_new) -> std::string {
+  std::replace(str.begin(), str.end(), old, the_new);
   return str;
 }
 
@@ -275,23 +273,23 @@ auto is_close(T a, T b, long double percent) -> bool {
 }
 
 template <typename T>
-void writeVector(vector<T>& v, const string& separator) {
-  // capture the size of the vector in n
+void writeVector(std::vector<T>& v, const std::string& separator) {
+  // capture the size of the std::vector in n
   int i = 0;
   int n = v.size();
 
   for (i = 0; i < n; i++) {
-    cout << v[i] << separator;
+    std::cout << v[i] << separator;
   }
-  cout << endl;
+  std::cout << std::endl;
 }
 
 template <typename Key, typename T>
-void writeMap(const map<Key, T>& m, const string& separator) {
-  typename map<Key, T>::const_iterator iter = m.begin();
+void writeMap(const std::map<Key, T>& m, const std::string& separator) {
+  typename std::map<Key, T>::const_iterator iter = m.begin();
 
   while (iter != m.end()) {
-    cout << (*iter).first << ": " << (*iter).second << separator;
+    std::cout << (*iter).first << ": " << (*iter).second << separator;
     iter++;
   }
 }

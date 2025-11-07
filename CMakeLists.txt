@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.50...4.99)
+cmake_minimum_required(VERSION 3.5...4.99)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 project(stargen VERSION 3.0.0.0 DESCRIPTION "A program for generating solar systems")
 

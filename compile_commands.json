@@ -1,0 +1,368 @@
+[
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/accrete.cpp.o -c /home/user/stargen/accrete.cpp",
+  "file": "/home/user/stargen/accrete.cpp",
+  "output": "CMakeFiles/stargen.dir/accrete.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/andromeda.cpp.o -c /home/user/stargen/andromeda.cpp",
+  "file": "/home/user/stargen/andromeda.cpp",
+  "output": "CMakeFiles/stargen.dir/andromeda.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/andromeda2.cpp.o -c /home/user/stargen/andromeda2.cpp",
+  "file": "/home/user/stargen/andromeda2.cpp",
+  "output": "CMakeFiles/stargen.dir/andromeda2.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/display.cpp.o -c /home/user/stargen/display.cpp",
+  "file": "/home/user/stargen/display.cpp",
+  "output": "CMakeFiles/stargen.dir/display.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/dole.cpp.o -c /home/user/stargen/dole.cpp",
+  "file": "/home/user/stargen/dole.cpp",
+  "output": "CMakeFiles/stargen.dir/dole.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/elements.cpp.o -c /home/user/stargen/elements.cpp",
+  "file": "/home/user/stargen/elements.cpp",
+  "output": "CMakeFiles/stargen.dir/elements.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/enviro.cpp.o -c /home/user/stargen/enviro.cpp",
+  "file": "/home/user/stargen/enviro.cpp",
+  "output": "CMakeFiles/stargen.dir/enviro.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/gas_radius_helpers.cpp.o -c /home/user/stargen/gas_radius_helpers.cpp",
+  "file": "/home/user/stargen/gas_radius_helpers.cpp",
+  "output": "CMakeFiles/stargen.dir/gas_radius_helpers.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/ic3094.cpp.o -c /home/user/stargen/ic3094.cpp",
+  "file": "/home/user/stargen/ic3094.cpp",
+  "output": "CMakeFiles/stargen.dir/ic3094.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/ic3094_2.cpp.o -c /home/user/stargen/ic3094_2.cpp",
+  "file": "/home/user/stargen/ic3094_2.cpp",
+  "output": "CMakeFiles/stargen.dir/ic3094_2.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/jimb.cpp.o -c /home/user/stargen/jimb.cpp",
+  "file": "/home/user/stargen/jimb.cpp",
+  "output": "CMakeFiles/stargen.dir/jimb.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/main.cpp.o -c /home/user/stargen/main.cpp",
+  "file": "/home/user/stargen/main.cpp",
+  "output": "CMakeFiles/stargen.dir/main.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/omega_galaxy.cpp.o -c /home/user/stargen/omega_galaxy.cpp",
+  "file": "/home/user/stargen/omega_galaxy.cpp",
+  "output": "CMakeFiles/stargen.dir/omega_galaxy.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/omega_galaxy2.cpp.o -c /home/user/stargen/omega_galaxy2.cpp",
+  "file": "/home/user/stargen/omega_galaxy2.cpp",
+  "output": "CMakeFiles/stargen.dir/omega_galaxy2.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/Planetary_Habitability_Laboratory.cpp.o -c /home/user/stargen/Planetary_Habitability_Laboratory.cpp",
+  "file": "/home/user/stargen/Planetary_Habitability_Laboratory.cpp",
+  "output": "CMakeFiles/stargen.dir/Planetary_Habitability_Laboratory.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/planets.cpp.o -c /home/user/stargen/planets.cpp",
+  "file": "/home/user/stargen/planets.cpp",
+  "output": "CMakeFiles/stargen.dir/planets.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/radius_tables.cpp.o -c /home/user/stargen/radius_tables.cpp",
+  "file": "/home/user/stargen/radius_tables.cpp",
+  "output": "CMakeFiles/stargen.dir/radius_tables.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/ring_universe.cpp.o -c /home/user/stargen/ring_universe.cpp",
+  "file": "/home/user/stargen/ring_universe.cpp",
+  "output": "CMakeFiles/stargen.dir/ring_universe.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/solid_radius_helpers.cpp.o -c /home/user/stargen/solid_radius_helpers.cpp",
+  "file": "/home/user/stargen/solid_radius_helpers.cpp",
+  "output": "CMakeFiles/stargen.dir/solid_radius_helpers.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/solstation.cpp.o -c /home/user/stargen/solstation.cpp",
+  "file": "/home/user/stargen/solstation.cpp",
+  "output": "CMakeFiles/stargen.dir/solstation.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/stargen.cpp.o -c /home/user/stargen/stargen.cpp",
+  "file": "/home/user/stargen/stargen.cpp",
+  "output": "CMakeFiles/stargen.dir/stargen.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/star_temps.cpp.o -c /home/user/stargen/star_temps.cpp",
+  "file": "/home/user/stargen/star_temps.cpp",
+  "output": "CMakeFiles/stargen.dir/star_temps.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/star_trek.cpp.o -c /home/user/stargen/star_trek.cpp",
+  "file": "/home/user/stargen/star_trek.cpp",
+  "output": "CMakeFiles/stargen.dir/star_trek.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/structs.cpp.o -c /home/user/stargen/structs.cpp",
+  "file": "/home/user/stargen/structs.cpp",
+  "output": "CMakeFiles/stargen.dir/structs.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/utils.cpp.o -c /home/user/stargen/utils.cpp",
+  "file": "/home/user/stargen/utils.cpp",
+  "output": "CMakeFiles/stargen.dir/utils.cpp.o"
+},
+{
+  "directory": "/home/user/stargen",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -I/home/user/stargen/tracy -I/home/user/stargen/_deps/json-src/include -I/home/user/stargen/_deps/yaml-cpp-src/include -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/stargen.dir/PerformanceMonitor.cpp.o -c /home/user/stargen/PerformanceMonitor.cpp",
+  "file": "/home/user/stargen/PerformanceMonitor.cpp",
+  "output": "CMakeFiles/stargen.dir/PerformanceMonitor.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/tracy-build",
+  "command": "/usr/bin/c++ -DTRACY_ENABLE -isystem /home/user/stargen/_deps/tracy-src/public -std=gnu++23 -o CMakeFiles/TracyClient.dir/public/TracyClient.cpp.o -c /home/user/stargen/_deps/tracy-src/public/TracyClient.cpp",
+  "file": "/home/user/stargen/_deps/tracy-src/public/TracyClient.cpp",
+  "output": "_deps/tracy-build/CMakeFiles/TracyClient.dir/public/TracyClient.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilder.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/contrib/graphbuilder.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/contrib/graphbuilder.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilder.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilderadapter.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/contrib/graphbuilderadapter.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/contrib/graphbuilderadapter.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilderadapter.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/binary.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/binary.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/binary.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/binary.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/convert.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/convert.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/convert.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/convert.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/depthguard.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/depthguard.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/depthguard.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/depthguard.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/directives.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/directives.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/directives.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/directives.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/emit.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/emit.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/emit.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emit.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/emitfromevents.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/emitfromevents.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/emitfromevents.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitfromevents.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/emitter.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/emitter.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/emitter.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitter.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/emitterstate.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/emitterstate.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/emitterstate.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitterstate.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/emitterutils.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/emitterutils.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/emitterutils.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitterutils.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/exceptions.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/exceptions.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/exceptions.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/exceptions.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/exp.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/exp.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/exp.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/exp.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/memory.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/memory.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/memory.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/memory.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/node.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/node.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/node.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/node.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/node_data.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/node_data.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/node_data.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/node_data.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/nodebuilder.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/nodebuilder.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/nodebuilder.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/nodebuilder.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/nodeevents.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/nodeevents.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/nodeevents.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/nodeevents.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/null.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/null.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/null.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/null.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/ostream_wrapper.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/ostream_wrapper.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/ostream_wrapper.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/ostream_wrapper.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/parse.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/parse.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/parse.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/parse.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/parser.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/parser.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/parser.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/parser.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/regex_yaml.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/regex_yaml.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/regex_yaml.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/regex_yaml.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/scanner.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/scanner.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/scanner.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scanner.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/scanscalar.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/scanscalar.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/scanscalar.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scanscalar.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/scantag.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/scantag.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/scantag.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scantag.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/scantoken.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/scantoken.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/scantoken.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/scantoken.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/simplekey.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/simplekey.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/simplekey.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/simplekey.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/singledocparser.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/singledocparser.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/singledocparser.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/singledocparser.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/stream.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/stream.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/stream.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/stream.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -I/home/user/stargen/_deps/yaml-cpp-src/src -std=gnu++23 -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -o CMakeFiles/yaml-cpp.dir/src/tag.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/src/tag.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/src/tag.cpp",
+  "output": "_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/tag.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build/util",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -std=gnu++23 -o CMakeFiles/yaml-cpp-sandbox.dir/sandbox.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/util/sandbox.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/util/sandbox.cpp",
+  "output": "_deps/yaml-cpp-build/util/CMakeFiles/yaml-cpp-sandbox.dir/sandbox.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build/util",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -std=gnu++23 -o CMakeFiles/yaml-cpp-parse.dir/parse.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/util/parse.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/util/parse.cpp",
+  "output": "_deps/yaml-cpp-build/util/CMakeFiles/yaml-cpp-parse.dir/parse.cpp.o"
+},
+{
+  "directory": "/home/user/stargen/_deps/yaml-cpp-build/util",
+  "command": "/usr/bin/c++  -I/home/user/stargen/_deps/yaml-cpp-src/include -std=gnu++23 -o CMakeFiles/yaml-cpp-read.dir/read.cpp.o -c /home/user/stargen/_deps/yaml-cpp-src/util/read.cpp",
+  "file": "/home/user/stargen/_deps/yaml-cpp-src/util/read.cpp",
+  "output": "_deps/yaml-cpp-build/util/CMakeFiles/yaml-cpp-read.dir/read.cpp.o"
+}
+]

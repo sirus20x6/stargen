@@ -21,21 +21,20 @@
 #include "structs.h"
 #include "utils.h"
 
-using namespace std;
 
 void initData();
-void usage(string);
+void usage(std::string);
 
 void printAknowledgement() {
-  cout << "Web systems (-W) taken from\n"
+  std::cout << "Web systems (-W) taken from\n"
        << "\thttp://www.solstation.com/stars.htm, Wikipedia, and various research papers\n"
        << "AU systems (-F) taken from stories by C.J. Cherry\n"
        << "Manticore systems (-B) taken from stories by David Weber\n"
-       << "StarGen: " << stargen_revision << endl;
+       << "StarGen: " << stargen_revision << std::endl;
 }
 
 void printExamples() {
-  cout << "Examples:\n"
+  std::cout << "Examples:\n"
           "10000 systems with 1 as the seed for the first system around a\n"
           "custom star with moons and migrated planets and only save ones with "
           "an earthlike planet:\n\n"
@@ -55,15 +54,15 @@ void printExamples() {
 
 int main(int argc, char **argv) {
   actions action            = aGenerate;
-  string  flag_char         = "?";
-  string  path              = SUBDIR;
-  string  url_path_arg      = "";
-  string  filename_arg      = "";
-  string  arg_name          = "";
+  std::string  flag_char         = "?";
+  std::string  path              = SUBDIR;
+  std::string  url_path_arg      = "";
+  std::string  filename_arg      = "";
+  std::string  arg_name          = "";
   char    arg_name_temp[80] = "";
 
   bool        use_stdout = false;
-  string      prognam;
+  std::string      prognam;
   long double mass_arg       = 0.0;
   long double luminosity_arg = 0.0;
   long        seed_arg       = 0;
@@ -84,7 +83,7 @@ int main(int argc, char **argv) {
   bool        skip  = false;
   int         index = 0;
 
-  string temp_string;
+  std::string temp_string;
 
 #ifdef macintosh
   _ftype    = 'TEXT';
@@ -269,21 +268,21 @@ int main(int argc, char **argv) {
       } else if (compare_string_char(temp_string, 1, "A")) {
         ratio_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (ratio_arg <= 0.0) {
-          cout << "Accrete dust density coefficient -A (" << ratio_arg << ") must be > 0.0\n";
+          std::cout << "Accrete dust density coefficient -A (" << ratio_arg << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
       } else if (compare_string_char(temp_string, 1, "Q")) {
         ecc_coef_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (ecc_coef_arg <= 0.0) {
-          cout << "Accrete eccentricity coeffecient -Q (" << ecc_coef_arg << ") must be > 0.0\n";
+          std::cout << "Accrete eccentricity coeffecient -Q (" << ecc_coef_arg << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
       } else if (compare_string_char(temp_string, 1, "q")) {
         inner_planet_factor_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (inner_planet_factor_arg <= 0.0) {
-          cout << "Accrete inner dust boundary -q (" << inner_planet_factor_arg
+          std::cout << "Accrete inner dust boundary -q (" << inner_planet_factor_arg
                << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
@@ -291,14 +290,14 @@ int main(int argc, char **argv) {
       } else if (compare_string_char(temp_string, 1, "w")) {
         compainion_mass_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (compainion_mass_arg <= 0.0) {
-          cout << "Mass of compainion object -w (" << compainion_mass_arg << ") must be > 0.0\n";
+          std::cout << "Mass of compainion object -w (" << compainion_mass_arg << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
       } else if (compare_string_char(temp_string, 1, "f")) {
         compainion_eccentricity_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (compainion_eccentricity_arg <= 0.0) {
-          cout << "Eccentritiy of compainion object's orbit (" << compainion_eccentricity_arg
+          std::cout << "Eccentritiy of compainion object's orbit (" << compainion_eccentricity_arg
                << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
@@ -306,7 +305,7 @@ int main(int argc, char **argv) {
       } else if (compare_string_char(temp_string, 1, "d")) {
         compainion_distant_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (compainion_distant_arg <= 0.0) {
-          cout << "Distance of compainion object -d (" << compainion_distant_arg
+          std::cout << "Distance of compainion object -d (" << compainion_distant_arg
                << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
@@ -314,7 +313,7 @@ int main(int argc, char **argv) {
       } else if (compare_string_char(temp_string, 1, "b")) {
         temp_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (temp_arg <= 0.0) {
-          cout << "Temperature of star -b (" << temp_arg << ") must be > 0.0" << endl;
+          std::cout << "Temperature of star -b (" << temp_arg << ") must be > 0.0" << std::endl;
           return EXIT_FAILURE;
         }
         // skip = true;
@@ -324,14 +323,14 @@ int main(int argc, char **argv) {
       } else if (compare_string_char(temp_string, 1, "j")) {
         compainion_lum_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (compainion_lum_arg <= 0.0) {
-          cout << "Luminosity of companion star j (" << compainion_lum_arg << ") must be > 0.0\n";
+          std::cout << "Luminosity of companion star j (" << compainion_lum_arg << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
       } else if (compare_string_char(temp_string, 1, "X")) {
         compainion_eff_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
         if (compainion_eff_arg <= 0.0) {
-          cout << "Temperature of companion star X (" << compainion_lum_arg << ") must be > 0.0\n";
+          std::cout << "Temperature of companion star X (" << compainion_lum_arg << ") must be > 0.0\n";
           return EXIT_FAILURE;
         }
         // skip = true;
@@ -362,7 +361,7 @@ int main(int argc, char **argv) {
     }
   }
 
-  // cout << arg_name << " blada\n";
+  // std::cout << arg_name << " blada\n";
 
   /*for (index = 0; index < argc; index++)
   {
@@ -389,16 +388,16 @@ int main(int argc, char **argv) {
     if (flags_arg &
         (fOnlyHabitable | fOnlyMultiHabitable | fOnlyJovianHabitable | fOnlyEarthlike)) {
       if (count_arg > 50000) {
-        cout << "Sorry, you cannot set the Repeat count > 50,000 even if you "
+        std::cout << "Sorry, you cannot set the Repeat count > 50,000 even if you "
                 "use a filter, due to system resource issues."
-             << endl;
+             << std::endl;
         return EXIT_FAILURE;
       }
     } else {
       if (count_arg > 1000) {
-        cout << "Sorry, you cannot set the Repeat count > 1,000 unless you use "
+        std::cout << "Sorry, you cannot set the Repeat count > 1,000 unless you use "
                 "a filter, due to system resource issues."
-             << endl;
+             << std::endl;
         return EXIT_FAILURE;
       }
     }
@@ -431,8 +430,8 @@ void initData() {
   initPlanetaryHabitabilityLaboratory();
 }
 
-void usage(string program) {
-  cout << "Usage: " << program
+void usage(std::string program) {
+  std::cout << "Usage: " << program
        << " [options] [system name]\n"
           "  Options:\n"
           "Seed values:\n"
@@ -529,7 +528,7 @@ void usage(string program) {
           "    -g   Include atmospheric gases\n"
           "    -v   List verbosities [hex values] and exit\n"
           "    -v#  Set output verbosity [hex value]\n"
-          "    -V   Use vector graphics [SVG] images [default: GIF]\n"
+          "    -V   Use std::vector graphics [SVG] images [default: GIF]\n"
           "    -z   Do numeric size check and exit\n"
           "    -Z   Dump tables used for gases and exit\n"
           "File specs:\n"
