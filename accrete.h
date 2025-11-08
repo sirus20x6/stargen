@@ -9,6 +9,9 @@ class sun;
 class accrete {
 
     public:
+        accrete() = default;
+        ~accrete(); // Destructor to clean up allocated memory
+
         void free_generations();
         auto stellar_dust_limit(long double) -> long double;
         auto dist_planetary_masses(sun &, long double, long double, long double,

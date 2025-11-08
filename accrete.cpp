@@ -11,6 +11,35 @@
 
 
 /**
+ * @brief Destructor for accrete class - ensures all allocated memory is freed
+ */
+accrete::~accrete() {
+  // Clean up generation history (includes dust and planets)
+  if (hist_head != nullptr) {
+    free_generations();
+    hist_head = nullptr;
+  }
+
+  // Clean up any remaining dust (in case it wasn't in hist_head)
+  if (dust_head != nullptr) {
+    free_dust(dust_head);
+    dust_head = nullptr;
+  }
+
+  // Clean up any remaining planets (in case they weren't in hist_head)
+  if (planet_head != nullptr) {
+    free_planet(planet_head);
+    planet_head = nullptr;
+  }
+
+  // Clean up seed moons if they exist
+  if (seed_moons != nullptr) {
+    free_planet(seed_moons);
+    seed_moons = nullptr;
+  }
+}
+
+/**
  * @brief Set Initial Conditions
  *
  * @param inner_limit_of_dust
