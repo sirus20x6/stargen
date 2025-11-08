@@ -2,6 +2,11 @@
 
 #include "const.h"
 
+// Forward declarations for helper functions
+static void init_solar_system_moons();
+static void init_solar_system_planets();
+static void init_exoplanets();
+
 planet *luna = nullptr;
 planet *callisto = nullptr;
 planet *ganymede = nullptr;
@@ -190,7 +195,10 @@ planet *bajorXII = nullptr;
 planet *bajorXIII = nullptr;
 planet *bajorXIV = nullptr;
 
-void initPlanets() {
+/**
+ * @brief Initialize solar system moons (Galilean moons, Saturn's moons, etc.)
+ */
+static void init_solar_system_moons() {
   // moons in our solar system
   luna = new planet();
   luna->setPlanetNo(1);
@@ -317,7 +325,12 @@ void initPlanets() {
   charon->setDustMass(EM(2.54e-4));
   charon->setDeletable(false);
   charon->reconnect_to = nullptr;
+}
 
+/**
+ * @brief Initialize solar system planets and dwarf planets
+ */
+static void init_solar_system_planets() {
   // planets and dwarf planets in our solar system
   eris = new planet();
   eris->setPlanetNo(11);
@@ -428,7 +441,12 @@ void initPlanets() {
   mercury->setGasGiant(false);
   mercury->setDustMass(EM(0.055));
   mercury->next_planet = venus;
+}
 
+/**
+ * @brief Initialize known exoplanets from various star systems
+ */
+static void init_exoplanets() {
   // exosolar planets
   eriEpsI = new planet();
   eriEpsI->setPlanetNo(1);
@@ -1501,4 +1519,21 @@ void initPlanets() {
   kapteynb->setE(0.21);
   kapteynb->setDustMass(EM(4.7));
   kapteynb->next_planet = kapteync;
+}
+
+/**
+ * @brief Initialize all known planets, moons, and exoplanets
+ *
+ * This function initializes the global planet pointers for:
+ * - Solar system moons (13 major moons)
+ * - Solar system planets and dwarf planets (11 bodies)
+ * - Known exoplanets from various star systems (100+ planets)
+ *
+ * The initialization was split into three helper functions for better
+ * maintainability and to reduce the size of this monolithic function.
+ */
+void initPlanets() {
+  init_solar_system_moons();
+  init_solar_system_planets();
+  init_exoplanets();
 }
