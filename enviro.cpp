@@ -2225,6 +2225,126 @@ static auto calculate_gas_amount(Chemical& the_gas, planet* the_planet,
   return factors.abundance * pvrms * factors.reactivity * fract;
 }
 
+/**
+ * @brief Adjust gas amount to meet IPP (Inspired Partial Pressure) constraints
+ *
+ * Iteratively adjusts gas amount to ensure it falls within min/max IPP range.
+ * - If IPP too high: reduces amount by 1% per iteration
+ * - If IPP too low: increases amount by 1% per iteration
+ *
+ * @param the_gas The gas being adjusted
+ * @param the_planet The planet whose atmosphere is being adjusted
+ * @param gas_amount Reference to the gas amount (will be modified)
+ * @param total_amount Reference to total gas amount (will be modified)
+ */
+static void adjust_gas_ipp_to_range(Chemical& the_gas, planet* the_planet,
+                                    long double& gas_amount, long double& total_amount) {
+  long double pressure = the_planet->getSurfPressure() * (gas_amount / total_amount);
+  long double ipp = inspired_partial_pressure(the_planet->getSurfPressure(), pressure);
+
+  if (ipp > the_gas.getMaxIpp()) {
+    // Gas level too high - reduce iteratively
+    while (ipp > the_gas.getMaxIpp()) {
+      long double old_amount = gas_amount;
+      gas_amount *= 0.99;  // Reduce by 1%
+      total_amount -= old_amount;
+      total_amount += gas_amount;
+      ipp = inspired_partial_pressure(the_planet->getSurfPressure(),
+                                      the_planet->getSurfPressure() * (gas_amount / total_amount));
+    }
+  } else if (ipp < the_gas.getMinIpp()) {
+    // Gas level too low - increase iteratively
+    while (ipp < the_gas.getMinIpp()) {
+      long double old_amount = gas_amount;
+      if (gas_amount <= 0.0) {
+        gas_amount = 1.0E-9;  // Start with tiny amount if zero
+      } else {
+        gas_amount *= 1.01;  // Increase by 1%
+        total_amount -= old_amount;
+      }
+      total_amount += gas_amount;
+      ipp = inspired_partial_pressure(the_planet->getSurfPressure(),
+                                      the_planet->getSurfPressure() * (gas_amount / total_amount));
+    }
+  }
+}
+
+/**
+ * @brief Adjust all gases for potentially habitable planets to meet IPP constraints
+ *
+ * For potentially habitable planets with suitable pressure, iteratively adjusts
+ * gas amounts to ensure breathable atmosphere within safe IPP ranges.
+ *
+ * This implements a constraint satisfaction algorithm:
+ * 1. For each gas, adjust amount to meet min/max IPP constraints
+ * 2. Validate all gases meet constraints
+ * 3. Repeat until all constraints satisfied or max iterations reached
+ *
+ * @param the_planet The planet being evaluated
+ * @param amounts Array of gas amounts (will be modified)
+ * @param total_amount Reference to total gas amount (will be modified)
+ * @param planet_id Planet identifier for debugging
+ */
+static void adjust_gases_for_habitability(planet* the_planet, long double* amounts,
+                                          long double& total_amount,
+                                          const std::string& planet_id) {
+  if (!is_potentialy_habitable(the_planet)) {
+    return;  // Skip non-habitable planets
+  }
+
+  if (the_planet->getSurfPressure() < (1.2 * MIN_O2_IPP) ||
+      the_planet->getSurfPressure() > MAX_HABITABLE_PRESSURE) {
+    return;  // Pressure outside habitable range
+  }
+
+  std::map<int, long double> new_values;
+  std::map<int, bool> do_overs_more, do_overs_less;
+  bool bad_air = false;
+  int counter = 0;
+  const int MAX_ITERATIONS = 1000;
+
+  do {
+    // First pass: adjust each gas to meet IPP constraints
+    for (int i = 0; i < gases.count(); i++) {
+      new_values[i] = 0;
+      adjust_gas_ipp_to_range(gases[i], the_planet, amounts[i], total_amount);
+    }
+
+    // Second pass: validate all gases meet constraints
+    bad_air = false;
+    for (int i = 0; i < gases.count(); i++) {
+      if (new_values[i] > 0.0) {
+        amounts[i] = new_values[i] * total_amount;
+      }
+
+      long double ipp = inspired_partial_pressure(
+          the_planet->getSurfPressure(),
+          the_planet->getSurfPressure() * amounts[i] / total_amount);
+
+      if (ipp > gases[i].getMaxIpp()) {
+        bad_air = true;
+        do_overs_less[i] = true;
+        do_overs_more[i] = false;
+        break;
+      } else if (ipp < gases[i].getMinIpp() && gases[i].getNum() == AN_O) {
+        // Oxygen is critical - must meet minimum
+        bad_air = true;
+        do_overs_less[i] = false;
+        do_overs_more[i] = true;
+        break;
+      } else {
+        do_overs_less[i] = false;
+        do_overs_more[i] = false;
+      }
+    }
+
+    counter++;
+    if (counter > MAX_ITERATIONS) {
+      break;  // Prevent infinite loops
+    }
+  } while (bad_air);
+}
+
 void calculate_gases(sun &the_sun, planet *the_planet, std::string planet_id) {
   the_sun = the_planet->getTheSun();
   if ((the_planet->getSurfPressure() > 0 || the_planet->getGasGiant()) &&
@@ -2319,131 +2439,28 @@ void calculate_gases(sun &the_sun, planet *the_planet, std::string planet_id) {
       }
     }
 
-    long double original_total = NAN;
-    long double increase_factor = 1.0;
-    // long double pressure = 0.0;
-    std::map<int, long double> new_values;
-    std::map<int, bool> do_overs_more, do_overs_less;
-    long double the_amount = 0.0;
-    long double ipp = 0.0;
-    bool bad_air = false;
-    int counter = 0;
-
+    // Adjust gas amounts for potentially habitable planets to meet IPP constraints
     if (n > 0) {
-      do {
-        for (int i = 0; i < gases.count(); i++) {
-          new_values[i] = 0;
-          if (is_potentialy_habitable(the_planet)) {
-            if (planet_id == "") {
-              std::stringstream ss;
-              ss.str("");
-              ss << toString(the_planet->getA()) << " "
-                 << toString(the_planet->getMoonA());
-              planet_id = ss.str();
-              ss.str("");
-            }
-            if (the_planet->getSurfPressure() >= (1.2 * MIN_O2_IPP) &&
-                the_planet->getSurfPressure() <= MAX_HABITABLE_PRESSURE) {
-              // the_amount = the_planet->getSurfPressure() * amount[i] /
-              // original_total;
-              pressure =
-                  the_planet->getSurfPressure() * (amount[i] / totalamount);
-              ipp = inspired_partial_pressure(the_planet->getSurfPressure(),
-                                              pressure);
-              if (ipp > gases[i].getMaxIpp()) {
-                // std::cout << "test1 too high " << gases[i].getSymbol() << " " <<
-                // planet_id << std::endl; std::cout << toString(amount[i]) << std::endl;
-                while (ipp > gases[i].getMaxIpp()) {
-                  the_amount = amount[i];
-                  amount[i] *= 0.99;
-                  totalamount -= the_amount;
-                  totalamount += amount[i];
-                  ipp =
-                      inspired_partial_pressure(the_planet->getSurfPressure(),
-                                                the_planet->getSurfPressure() *
-                                                    (amount[i] / totalamount));
-                }
-              } else if (ipp < gases[i].getMinIpp()) {
-                // std::cout << "test1 too low " << gases[i].getSymbol() << " " <<
-                // planet_id << std::endl; if (planet_id == "1.05853286955409876162
-                // 0.00153819919909735927041")
-                {
-                  //for (int i = 0; i < gases.count(); i++) {
-                    // std::cout << gases[i].getName() << ": " << toString(amount[i])
-                    // << std::endl;
-                  //}
-                  // exit(EXIT_FAILURE);
-                }
-                // std::cout << toString(amount[i]) << " " << toString(ipp) << " " <<
-                // toString(the_planet->getSurfPressure()) << std::endl;
-                while (ipp < gases[i].getMinIpp()) {
-                  the_amount = amount[i];
-                  if (amount[i] <= 0.0) {
-                    amount[i] = 1.0E-9;
-                  } else {
-                    amount[i] *= 1.01;
-                    totalamount -= the_amount;
-                  }
-                  totalamount += amount[i];
-                  ipp =
-                      inspired_partial_pressure(the_planet->getSurfPressure(),
-                                                the_planet->getSurfPressure() *
-                                                    (amount[i] / totalamount));
-                }
-              }
-            }
-          }
-        }
+      // Generate planet ID for debugging if not provided
+      if (planet_id == "" && is_potentialy_habitable(the_planet)) {
+        std::stringstream ss;
+        ss << toString(the_planet->getA()) << " " << toString(the_planet->getMoonA());
+        planet_id = ss.str();
+      }
 
-        long double old_amount = 0.0;
-        for (int i = 0, n = 0; i < gases.count(); i++) {
-          if (is_potentialy_habitable(the_planet)) {
-            if (the_planet->getSurfPressure() >= (1.2 * MIN_O2_IPP) &&
-                the_planet->getSurfPressure() <= MAX_HABITABLE_PRESSURE) {
-              if (new_values[i] > 0.0) {
-                amount[i] = new_values[i] * totalamount;
-              }
-              ipp = inspired_partial_pressure(
-                  the_planet->getSurfPressure(),
-                  the_planet->getSurfPressure() * amount[i] / totalamount);
-              if (ipp > gases[i].getMaxIpp()) {
-                bad_air = true;
-                do_overs_less[i] = true;
-                do_overs_more[i] = false;
-                break;
-              } else if (ipp < gases[i].getMinIpp() &&
-                         gases[i].getNum() == AN_O) {
-                bad_air = true;
-                do_overs_less[i] = false;
-                do_overs_more[i] = true;
-                break;
-              } else {
-                do_overs_less[i] = false;
-                do_overs_more[i] = false;
-                bad_air = false;
-              }
-            }
-          }
-        }
-        counter++;
-        if (counter > 1000) {
-          break;
-        }
-      } while (bad_air);
+      // Adjust gases to meet habitability constraints
+      adjust_gases_for_habitability(the_planet, amount, totalamount, planet_id);
 
+      // Assign final gas amounts to planet atmosphere
       for (int i = 0, n = 0; i < gases.count(); i++) {
         if (amount[i] > 0.0) {
           gas substance;
           substance.setNum(gases[i].getNum());
-          if (new_values[i] > 0.0) {
-            substance.setSurfPressure(the_planet->getSurfPressure() *
-                                      new_values[i]);
-          } else {
-            substance.setSurfPressure(the_planet->getSurfPressure() *
-                                      amount[i] / totalamount);
-          }
+          substance.setSurfPressure(the_planet->getSurfPressure() *
+                                    amount[i] / totalamount);
           the_planet->addGas(substance);
 
+          // Check for oxygen poisoning in verbose mode
           if (flag_verbose & 0x2000) {
             if ((the_planet->getGas(n).getNum() == AN_O) &&
                 inspired_partial_pressure(
@@ -2453,24 +2470,16 @@ void calculate_gases(sun &the_sun, planet *the_planet, std::string planet_id) {
               std::cerr << planet_id << "\t Poisoned by O2\n";
             }
           }
+          n++;
         }
-        n++;
       }
     }
     delete[] amount;
-    /*if (the_planet->getNumGases() == 0 && temp_vector.size() > 0)
-    {
-      for (int i = 0; i < temp_vector.size(); i++)
-      {
-        the_planet->addGas(temp_vector[i]);
-      }
-      temp_vector.clear();
-    }*/
 
+    // Validate atmosphere
     if (the_planet->getNumGases() && (the_planet->getSurfPressure() /
                                       EARTH_SURF_PRES_IN_MILLIBARS) > 0.001) {
-      // std::cerr << "We have a serious air! The atmosphere of " << planet_id << "
-      // contains no gases!\n";
+      // Atmosphere successfully generated
     }
   }
 }
