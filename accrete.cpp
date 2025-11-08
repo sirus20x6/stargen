@@ -1,4 +1,5 @@
 #include "accrete.h"
+#include <cassert>    // for assert
 #include <cmath>      // for pow, sqrt, NAN, fabs, exp, M_PI
 #include <iostream>   // for operator<<, basic_ostream, char_traits, cerr
 #include <string>     // for operator<<, string
@@ -120,6 +121,7 @@ auto accrete::farthest_planet(long double stell_mass_ratio) -> long double {
  */
 auto accrete::inner_effect_limit(long double a, long double e, long double mass)
     -> long double {
+  assert(cloud_eccentricity > -1.0 && "cloud_eccentricity must be > -1.0 to avoid division by zero");
   return a * (1.0 - e) * (1.0 - mass) / (1.0 + cloud_eccentricity);
 }
 
@@ -133,6 +135,7 @@ auto accrete::inner_effect_limit(long double a, long double e, long double mass)
  */
 auto accrete::outer_effect_limit(long double a, long double e, long double mass)
     -> long double {
+  assert(cloud_eccentricity < 1.0 && "cloud_eccentricity must be < 1.0 to avoid division by zero");
   return a * (1.0 + e) * (1.0 + mass) / (1.0 - cloud_eccentricity);
 }
 
