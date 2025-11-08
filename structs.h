@@ -2,6 +2,7 @@
 #define STRUCTS_H
 #pragma once
 
+#include <algorithm>  // for std::sort
 #include <iosfwd>  // for ostream, std
 #include <string>  // for std::string, basic_string
 #include <vector>  // for std::vector
@@ -317,7 +318,43 @@ class planet {
     return moons.size();
   }
 
-  std::vector<planet*> moons;  // Vector of moons (replacing linked list)
+  void addMoon(planet* moon) {
+    moons.push_back(moon);
+  }
+
+  void backupMoons() {
+    moons_backup.clear();
+    moons_backup = moons;  // Copy the vector
+  }
+
+  void restoreMoons() {
+    // Delete generated (deletable) moons
+    for (planet* moon : moons) {
+      if (moon->getDeletable()) {
+        delete moon;
+      }
+    }
+    moons.clear();
+    moons = moons_backup;  // Restore from backup
+  }
+
+  void deleteMoon(size_t index) {
+    if (index < moons.size()) {
+      delete moons[index];
+      moons.erase(moons.begin() + index);
+    }
+  }
+
+  void sortMoonsByOrbit() {
+    std::sort(moons.begin(), moons.end(), [](planet* a, planet* b) {
+      return a->getMoonA() < b->getMoonA();
+    });
+  }
+
+  std::vector<planet*> moons;  // Vector of moons (PRIMARY - use this)
+  std::vector<planet*> moons_backup;  // Backup for predefined moons
+
+  // DEPRECATED: Legacy linked list pointers - to be removed
   planet *first_moon;  // DEPRECATED: Use moons vector instead
   planet *next_planet;
   planet *reconnect_to;

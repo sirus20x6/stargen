@@ -1169,9 +1169,18 @@ planet::~planet() {
   ascendingNode = 0;
   longitudeOfPericenter = 0;
   meanLongitude = 0;
-  while (!atmosphere.empty()) {
-    atmosphere.pop_back();
+  atmosphere.clear();
+
+  // Clean up moons vector (delete generated moons, preserve predefined ones)
+  for (planet* moon : moons) {
+    if (moon->getDeletable()) {
+      delete moon;
+    }
   }
+  moons.clear();
+  moons_backup.clear();
+
+  // Legacy cleanup for old linked list approach (during transition)
   if (first_moon != nullptr) {
     for (node = first_moon; node != nullptr; node = next) {
       next = node->next_planet;
@@ -1570,55 +1579,50 @@ void planet::setVolatileGasInventory(long double v) {
 }
 
 void planet::sortMoons() {
-  planet* prev = nullptr;
-  planet* next = nullptr;
-  planet* node = nullptr;
-  // planet *temp = NULL;
-  std::vector<planet*> temp_vector;
+  // Build moon vector from linked list if needed (during transition)
+  if (moons.empty() && first_moon != nullptr) {
+    buildMoonVector();
+  }
+
   long double roche_limit = 0;
   long double hill_sphere = 0;
-  for (node = first_moon; node != nullptr; node = next) {
-    next = node->next_planet;
-    node->next_planet = nullptr;
-    temp_vector.push_back(node);
-  }
-  first_moon = nullptr;
-  for (auto & i : temp_vector) {
-    // we shouldn't have to do this here but some moons that shouldn't
-    // be possible somehow slip throw the cracks...
-    hill_sphere =
-        a * KM_PER_AU * std::pow(getMass() / (3.0 * theSun.getMass()), 1.0 / 3.0);
-    roche_limit =
-        2.44 * radius * std::pow(density / i->getDensity(), 1.0 / 3.0);
+  std::vector<planet*> valid_moons;
+
+  // Filter out invalid moons and delete them
+  for (planet* moon : moons) {
+    // Calculate stability limits
+    hill_sphere = a * KM_PER_AU * std::pow(getMass() / (3.0 * theSun.getMass()), 1.0 / 3.0);
+    roche_limit = 2.44 * radius * std::pow(density / moon->getDensity(), 1.0 / 3.0);
+
+    // Check if moon is within stable orbital range
     if ((roche_limit * 1.5) >= (hill_sphere / 3.0)) {
-      delete i;
-    } else if ((i->getMoonA() * KM_PER_AU) < (roche_limit * 1.5)) {
-      delete i;
-    } else if ((i->getMoonA() * KM_PER_AU) > (hill_sphere / 3.0)) {
-      delete i;
+      delete moon;  // System can't hold moons
+    } else if ((moon->getMoonA() * KM_PER_AU) < (roche_limit * 1.5)) {
+      delete moon;  // Too close - would be torn apart
+    } else if ((moon->getMoonA() * KM_PER_AU) > (hill_sphere / 3.0)) {
+      delete moon;  // Too far - would escape
+    } else {
+      valid_moons.push_back(moon);  // Moon is stable
     }
-    // if it passed all those tests, we can place the moon.
-    else {
-      if (first_moon == nullptr) {
-        first_moon = i;
-      } else if (i->getMoonA() < first_moon->getMoonA()) {
-        i->next_planet = first_moon;
-        first_moon = i;
-      } else if (first_moon->next_planet == nullptr) {
-        first_moon->next_planet = i;
-        i->next_planet = nullptr;
-      } else {
-        next = first_moon;
-        while (next != nullptr && next->getMoonA() < i->getMoonA()) {
-          prev = next;
-          next = next->next_planet;
-        }
-        i->next_planet = next;
-        if (prev != nullptr) {
-          prev->next_planet = i;
-        }
-      }
+  }
+
+  // Replace moons with only valid ones
+  moons = valid_moons;
+
+  // Sort moons by semi-major axis
+  sortMoonsByOrbit();
+
+  // Update legacy linked list for backward compatibility (during transition)
+  first_moon = nullptr;
+  planet* prev = nullptr;
+  for (planet* moon : moons) {
+    moon->next_planet = nullptr;
+    if (first_moon == nullptr) {
+      first_moon = moon;
+    } else {
+      prev->next_planet = moon;
     }
+    prev = moon;
   }
 }
 

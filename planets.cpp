@@ -346,9 +346,11 @@ static void init_solar_system_planets() {
   pluto->setAxialTilt(122.5);
   pluto->setGasGiant(false);
   pluto->setDustMass(EM(0.002));
-  pluto->first_moon = charon;
+  pluto->addMoon(charon);
+  pluto->backupMoons();
+  pluto->first_moon = charon;  // Legacy compatibility
   pluto->next_planet = eris;
-  pluto->first_moon_backup = charon;
+  pluto->first_moon_backup = charon;  // Legacy compatibility
 
   neptune = new planet();
   neptune->setPlanetNo(9);
@@ -358,9 +360,11 @@ static void init_solar_system_planets() {
   neptune->setGasGiant(true);
   neptune->setDustMass(EM(1.2));
   neptune->setGasMass(EM(17.14 - 1.2));
-  neptune->first_moon = triton;
+  neptune->addMoon(triton);
+  neptune->backupMoons();
+  neptune->first_moon = triton;  // Legacy compatibility
   neptune->next_planet = pluto;
-  neptune->first_moon_backup = triton;
+  neptune->first_moon_backup = triton;  // Legacy compatibility
 
   uranus = new planet();
   uranus->setPlanetNo(8);
@@ -380,9 +384,11 @@ static void init_solar_system_planets() {
   saturn->setGasGiant(true);
   saturn->setDustMass(EM(9));
   saturn->setGasMass(EM(95.18 - 9));
-  saturn->first_moon = tethys;
+  saturn->addMoon(tethys);
+  saturn->backupMoons();
+  saturn->first_moon = tethys;  // Legacy compatibility
   saturn->next_planet = uranus;
-  saturn->first_moon_backup = tethys;
+  saturn->first_moon_backup = tethys;  // Legacy compatibility
 
   jupiter = new planet();
   jupiter->setPlanetNo(6);
@@ -392,9 +398,11 @@ static void init_solar_system_planets() {
   jupiter->setGasGiant(true);
   jupiter->setDustMass(EM(10));
   jupiter->setGasMass(EM(317.9 - 10));
-  jupiter->first_moon = io;
+  jupiter->addMoon(io);
+  jupiter->backupMoons();
+  jupiter->first_moon = io;  // Legacy compatibility
   jupiter->next_planet = saturn;
-  jupiter->first_moon_backup = io;
+  jupiter->first_moon_backup = io;  // Legacy compatibility
 
   ceres = new planet();
   ceres->setPlanetNo(5);
@@ -420,9 +428,11 @@ static void init_solar_system_planets() {
   earth->setAxialTilt(23.5);
   earth->setGasGiant(false);
   earth->setDustMass(EM(1.0));
-  earth->first_moon = luna;
+  earth->addMoon(luna);
+  earth->backupMoons();
+  earth->first_moon = luna;  // Legacy compatibility
   earth->next_planet = mars;
-  earth->first_moon_backup = luna;
+  earth->first_moon_backup = luna;  // Legacy compatibility
 
   venus = new planet();
   venus->setPlanetNo(2);
@@ -1073,9 +1083,12 @@ static void init_exoplanets() {
   bajorVIII->setA(1.2928937846493);
   bajorVIII->setE(0.010224984980454);
   bajorVIII->setDustMass(EM(1.3080413057739237));
-  bajorVIII->first_moon = bajorVIII1;
+  bajorVIII->addMoon(bajorVIII1);
+  bajorVIII->addMoon(bajorVIII2);
+  bajorVIII->backupMoons();
+  bajorVIII->first_moon = bajorVIII1;  // Legacy compatibility
   bajorVIII->next_planet = bajorIX;
-  bajorVIII->first_moon_backup = bajorVIII1;
+  bajorVIII->first_moon_backup = bajorVIII1;  // Legacy compatibility
 
   bajorVII3 = new planet();
   bajorVII3->setDustMass(EM(0.000000290721478925789234789234789));
@@ -1110,9 +1123,15 @@ static void init_exoplanets() {
   bajorVII->setA(1.0617776415431);
   bajorVII->setE(0.010056496949484);
   bajorVII->setDustMass(EM(1.20067295628399508476));
-  bajorVII->first_moon = jeraddo;
+  bajorVII->addMoon(jeraddo);
+  bajorVII->addMoon(derna);
+  bajorVII->addMoon(bajorVII1);
+  bajorVII->addMoon(bajorVII2);
+  bajorVII->addMoon(bajorVII3);
+  bajorVII->backupMoons();
+  bajorVII->first_moon = jeraddo;  // Legacy compatibility
   bajorVII->next_planet = bajorVIII;
-  bajorVII->first_moon_backup = jeraddo;
+  bajorVII->first_moon_backup = jeraddo;  // Legacy compatibility
 
   bajorVI = new planet();
   bajorVI->setA(0.80688692980298);
