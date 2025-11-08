@@ -1,2 +1,16 @@
 build/
 .cache
+
+# CMake build artifacts
+CMakeCache.txt
+CMakeFiles/
+Makefile
+_deps/
+cmake_install.cmake
+compile_commands.json
+
+# Compiled executables
+stargen
+
+# Backup files
+*.backup
