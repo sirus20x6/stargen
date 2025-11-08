@@ -242,9 +242,9 @@ void csv_describe_system(std::fstream& the_file, planet* innermost_planet, bool 
     id = ss.str();
     ss.str("");
     csv_row(the_file, the_planet, do_gases, false, id, ss);
-    if (do_moons) {
+    if (do_moons && !the_planet->moons.empty()) {
       moons = 1;
-      for (moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet) {
+      for (planet* moon : the_planet->moons) {
         ss << the_sun.getName() << " " << counter << "." << moons;
         id = ss.str();
         ss.str("");
@@ -322,9 +322,9 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool d
     id = ss.str();
     ss.str("");
     jsonRow(the_file, the_planet, do_gases, false, id, ss);
-    if (do_moons) {
+    if (do_moons && !the_planet->moons.empty()) {
       moons = 1;
-      for (moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet) {
+      for (planet* moon : the_planet->moons) {
         ss << the_sun.getName() << " " << counter << "." << moons;
         id = ss.str();
         ss.str("");
@@ -1374,10 +1374,8 @@ static auto count_system_objects(planet* innermost_planet, bool do_moons) -> Sys
     }
     counts.object_count++;
 
-    if (do_moons) {
-      for (planet* moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet) {
-        counts.moon_count++;
-      }
+    if (do_moons && !the_planet->moons.empty()) {
+      counts.moon_count += the_planet->moons.size();
     }
   }
 
@@ -1504,7 +1502,7 @@ static auto html_write_moon_thumbnails(std::fstream& the_file, planet* the_plane
   std::string planet_id;
   int moons = 1;
 
-  for (planet* moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet, moons++) {
+  for (planet* moon : the_planet->moons) {
     ss.str("");
     std::string mtype = type_string(moon);
     int mpixels = ((int)(sqrt(convert_km_to_eu(moon->getRadius())) * 100.)) + 1;
@@ -1547,6 +1545,7 @@ static auto html_write_moon_thumbnails(std::fstream& the_file, planet* the_plane
     if (is_potentialy_habitable(moon)) {
       flags.has_potentialy_habitables = true;
     }
+    moons++;
   }
 
   return flags;
@@ -1574,9 +1573,9 @@ static void html_write_terrestrials_table(std::fstream& the_file, planet* innerm
       the_file << "</td></tr>";
     }
 
-    if (do_moons) {
+    if (do_moons && !the_planet->moons.empty()) {
       int moons = 1;
-      for (planet* moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet) {
+      for (planet* moon : the_planet->moons) {
         if (is_habitable_jovian(moon) || is_terrestrial(moon) || is_potentialy_habitable(moon)) {
           the_file << "\n\t<tr><td align=std::right width='5%'>";
           the_file << "<a href='" << (int_link ? "" : system_url) << "#" << counter << "."
@@ -2301,9 +2300,9 @@ void html_describe_system(planet* innermost_planet, bool do_gases, bool do_moons
     }
     the_file << "</td></tr>\n";
 
-    if (do_moons) {
+    if (do_moons && !the_planet->moons.empty()) {
       moons = 1;
-      for (moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet) {
+      for (planet* moon : the_planet->moons) {
         typeString = type_string(moon);
 
         the_file << "<tr align=std::right>\n";
@@ -2333,9 +2332,9 @@ void html_describe_system(planet* innermost_planet, bool do_gases, bool do_moons
   counter = 1;
   for (planet* the_planet : g_sim_context.planets) {
     html_describe_planet(the_planet, counter, 0, do_gases, url_path, the_file);
-    if (do_moons) {
+    if (do_moons && !the_planet->moons.empty()) {
       moons = 1;
-      for (moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet) {
+      for (planet* moon : the_planet->moons) {
         html_describe_planet(moon, counter, moons, do_gases, url_path, the_file);
         moons++;
       }
@@ -2379,9 +2378,9 @@ void celestia_describe_system(planet* innermost_planet, std::string designation,
   for (planet* the_planet : g_sim_context.planets) {
     celestia_describe_world(the_planet, designation, system_name, seed, inc, an, counter, the_sun,
                             false, counter);
-    if (do_moons) {
+    if (do_moons && !the_planet->moons.empty()) {
       moons = 1;
-      for (moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet) {
+      for (planet* moon : the_planet->moons) {
         celestia_describe_world(moon, designation, system_name, seed, inc, an, moons, the_sun, true,
                                 counter);
         moons++;
@@ -2759,7 +2758,7 @@ designation << " (" << system_name << ")\n"; std::cout << "#\n";
   for (planet* the_planet : g_sim_context.planets) {
     mass = the_planet->getMass();
     total_moon_mass = 0;
-    for (moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet) {
+    for (planet* moon : the_planet->moons) {
       total_moon_mass += moon->getMass();
     }
 

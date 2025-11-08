@@ -1613,10 +1613,12 @@ static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
       // reorder the moons
       the_planet->sortMoons();
 
+      // Build moon vector for efficient iteration
+      the_planet->buildMoonVector();
+
       // make some modifications to the moons
-      int moon_number = 0;
-      for (tmp = the_planet->first_moon, moon_number = 1; tmp != nullptr;
-           tmp = tmp->next_planet, moon_number++) {
+      int moon_number = 1;
+      for (planet* tmp : the_planet->moons) {
         tmp->setPlanetNo(moon_number);
         ss.str("");
         ss << planet_id << "-" << tmp->getPlanetNo();
@@ -1651,6 +1653,7 @@ static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
         tmp->setHza(calcHza(tmp));
         tmp->setEsi(calcEsi(tmp));
         tmp->setSph(calcSph(tmp));
+        moon_number++;
       }
     }
   }

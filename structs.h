@@ -168,7 +168,6 @@ class planet {
   bool deleteable{true};
   long double knownRadius{};
   void estimateMass();
-  // std::vector<planet *> temp_moon;
  public:
   planet();
   planet(int, long double, long double, long double, bool, long double,
@@ -300,7 +299,26 @@ class planet {
   void sortMoons();
   auto operator<(planet &) -> bool;
   auto operator==(planet &) -> bool;
-  planet *first_moon;
+
+  // Moon vector management
+  void buildMoonVector() {
+    moons.clear();
+    for (planet* m = first_moon; m != nullptr; m = m->next_planet) {
+      moons.push_back(m);
+    }
+  }
+
+  void clearMoons() {
+    moons.clear();
+    first_moon = nullptr;
+  }
+
+  size_t getMoonCount() const {
+    return moons.size();
+  }
+
+  std::vector<planet*> moons;  // Vector of moons (replacing linked list)
+  planet *first_moon;  // DEPRECATED: Use moons vector instead
   planet *next_planet;
   planet *reconnect_to;
   planet *first_moon_backup;
