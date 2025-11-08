@@ -576,19 +576,173 @@ std::string cloud_type_string(planet* the_planet) {
  * @param prognam
  * @param do_moons
  */
+/**
+ * @brief SVG scaling parameters
+ */
+struct SVGScaleParams {
+  long double max_x;
+  long double max_y;
+  long double margin;
+  long double min_log;
+  long double max_log;
+  long double mult;
+  long double offset;
+  long double em_scale;
+  int floor;
+  int ceiling;
+};
+
+/**
+ * @brief Calculate SVG scaling parameters for logarithmic distance display
+ */
+static auto calculate_svg_scale(planet* innermost_planet, planet* outermost_planet) -> SVGScaleParams {
+  SVGScaleParams params;
+  params.max_x = 760.0;
+  params.max_y = 120.0;
+  params.margin = 20.0;
+  params.em_scale = 5.0;
+
+  long double inner_edge = innermost_planet->getA() * (1.0 - innermost_planet->getE());
+  long double outer_edge = outermost_planet->getA() * (1.0 + outermost_planet->getE());
+
+  params.floor = (int)(log10(inner_edge) - 1.0);
+  params.min_log = params.floor;
+  params.ceiling = (int)(log10(outer_edge) + 1.0);
+  params.max_log = 0.0;
+
+  // Find precise min and max log values
+  for (int x = params.floor; x <= params.ceiling; x++) {
+    for (float n = 1.0; n < 9.9; n++) {
+      if (inner_edge > std::pow(10.0, x + log10(n))) {
+        params.min_log = x + log10(n);
+      }
+      if (params.max_log == 0.0 && outer_edge < std::pow(10.0, x + log10(n))) {
+        params.max_log = x + log10(n);
+      }
+    }
+  }
+
+  params.mult = params.max_x / (params.max_log - params.min_log);
+  params.offset = -params.mult * (1.0 + params.min_log);
+
+  return params;
+}
+
+/**
+ * @brief Write SVG header and document setup
+ */
+static void svg_write_header(std::fstream& output, planet* innermost_planet,
+                             const std::string& prognam, const SVGScaleParams& params) {
+  output << "<?xml version='1.0' standalone='no'?>\n";
+  output << "<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' \n";
+  output << "  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>\n";
+  output << "\n";
+  output << "<svg width='100%' height='100%' version='1.1'\n";
+  output << "     xmlns='http://www.w3.org/2000/svg'\n";
+  output << "     viewBox='-" << params.margin << " -" << params.margin << " "
+         << (params.max_x + (params.margin * 2.0)) << " "
+         << (params.max_y + (params.margin * 2.0)) << "' >\n";
+  output << "\n";
+  output << "<title>" << innermost_planet->getTheSun().getName() << "</title>\n";
+  output << "<desc>Created by: " << prognam << " - " << stargen_revision << "</desc>\n";
+  output << "\n";
+}
+
+/**
+ * @brief Draw axis and tick marks
+ */
+static void svg_draw_axis(std::fstream& output, const SVGScaleParams& params) {
+  output << "<g stroke='black' stroke-width='1'>\n";
+  output << "    <line x1='" << ((params.offset + params.mult) + (params.min_log * params.mult))
+         << "' y1='" << (params.max_y - params.margin) << "' x2='"
+         << ((params.offset + params.mult) + (params.max_log * params.mult)) << "' y2='"
+         << (params.max_y - params.margin) << "' />\n";
+
+  for (int x = params.floor; x <= params.ceiling; x++) {
+    for (float n = 1.0; n < 9.9; n++) {
+      if (params.min_log <= (x + log10(n)) && params.max_log >= (x + log10(n))) {
+        float value = (n == 1) ? 10 : 5;
+        output << "    <line x1='" << ((params.offset + params.mult) + ((x + log10(n)) * params.mult))
+               << "' y1='" << (params.max_y - params.margin - value) << "' x2='"
+               << ((params.offset + params.mult) + ((x + log10(n)) * params.mult)) << "' y2='"
+               << (params.max_y - params.margin + value) << "' />\n";
+      }
+    }
+  }
+
+  output << "</g>\n\n";
+}
+
+/**
+ * @brief Draw habitable zone indicators
+ */
+static void svg_draw_habitable_zone(std::fstream& output, sun& the_sun, const SVGScaleParams& params) {
+  long double min_r_ecosphere = habitable_zone_distance(the_sun, RECENT_VENUS, 1.0);
+  long double max_r_ecosphere = habitable_zone_distance(the_sun, EARLY_MARS, 1.0);
+
+  // Center line of habitable zone
+  output << "<line x1='" << ((params.offset + params.mult) + (log10(the_sun.getREcosphere(1.0)) * params.mult))
+         << "' y1='" << ((params.max_y - params.margin) - 5) << "' x2='"
+         << ((params.offset + params.mult) + (log10(the_sun.getREcosphere(1.0)) * params.mult))
+         << "' y2='" << ((params.max_y - params.margin) + 5)
+         << "' stroke='blue' stroke-width='1' />\n";
+
+  // Habitable zone range
+  output << "<line x1='" << ((params.offset + params.mult) + (log10(min_r_ecosphere) * params.mult))
+         << "' y1='" << (params.max_y - params.margin) << "' x2='"
+         << ((params.offset + params.mult) + (log10(max_r_ecosphere) * params.mult)) << "' y2='"
+         << (params.max_y - params.margin)
+         << "' stroke='#66c' stroke-width='10' stroke-opacity='0.5' />\n";
+}
+
+/**
+ * @brief Draw axis labels (AU distances)
+ */
+static void svg_draw_axis_labels(std::fstream& output, const SVGScaleParams& params) {
+  output << "<g font-family='Arial' font-size='10' \n";
+  output << "   font-style='normal' font-weight='normal'\n";
+  output << "   fill='black' text-anchor='middle'>\n";
+
+  for (int x = params.floor; x <= params.ceiling; x++) {
+    if (params.min_log <= x && params.max_log >= x) {
+      output << "    <text x='" << ((params.offset + params.mult) + (x * params.mult))
+             << "' y='120'> " << std::pow(10.0, x) << " AU </text>\n";
+    }
+  }
+
+  output << "\n";
+}
+
+/**
+ * @brief Draw all planets in the system
+ */
+static void svg_draw_planets(std::fstream& output, planet* innermost_planet, const SVGScaleParams& params) {
+  for (planet* a_planet = innermost_planet; a_planet != nullptr; a_planet = a_planet->next_planet) {
+    long double x = (params.offset + params.mult) + (log10(a_planet->getA()) * params.mult);
+    long double r = std::pow((a_planet->getMass() * SUN_MASS_IN_EARTH_MASSES), 1.0 / 3.0) * params.em_scale;
+    long double x1 = (params.offset + params.mult) + (log10(a_planet->getA() * (1.0 - a_planet->getE())) * params.mult);
+    long double x2 = (params.offset + params.mult) + (log10(a_planet->getA() * (1.0 + a_planet->getE())) * params.mult);
+
+    output << "    <circle cx='" << x << "' cy='30' r='" << r
+           << "' fill='none' stroke='black' stroke-width='1' />\n";
+    output << "    <line x1='" << x1 << "' y1='" << ((params.max_y - params.margin) - 15.0)
+           << "' x2='" << x2 << "' y2='" << ((params.max_y - params.margin) - 15.0)
+           << "' stroke='black' stroke-width='8' stroke-opacity='0.3'/>\n";
+    output << "    <text x='" << x << "' y='" << (params.max_y - (params.margin * 2.0)) << "'>";
+    output << (a_planet->getMass() * SUN_MASS_IN_EARTH_MASSES);
+    output << "</text>\n\n";
+  }
+}
+
 void create_svg_file(planet* innermost_planet, std::string path, std::string file_name, std::string svg_ext,
                      std::string prognam, bool do_moons) {
   performanceMonitor.recordFileOperation("svg_output");
-  planet*      outermost_planet;
-  planet*      a_planet;
-  std::fstream      output;
-  std::string       the_file_spec;
+
   std::stringstream ss;
-
-  ss.str("");
   ss << path << file_name << svg_ext;
-  the_file_spec = ss.str();
+  std::string the_file_spec = ss.str();
 
+  std::fstream output;
 #ifdef macintosh
   _fcreator = 'MSIE';
   _ftype    = 'TEXT';
@@ -599,127 +753,27 @@ void create_svg_file(planet* innermost_planet, std::string path, std::string fil
   _ftype    = 'TEXT';
 #endif
 
-  for (outermost_planet = innermost_planet; outermost_planet != nullptr;
-       outermost_planet = outermost_planet->next_planet) {
-    long double max_x      = 760.0;
-    long double max_y      = 120.0;
-    long double margin     = 20.0;
-    long double inner_edge = innermost_planet->getA() * (1.0 - innermost_planet->getE());
-    long double outer_edge = outermost_planet->getA() * (1.0 + outermost_planet->getE());
-    int floor              = (int)(log10(inner_edge) - 1.0);
-    long double min_log    = floor;
-    int ceiling            = (int)(log10(outer_edge) + 1.0);
-    long double max_log    = 0.0;
-    long double mult;
-    long double offset;
-    long double em_scale = 5;
-
-    for (int x = floor; x <= ceiling; x++) {
-      float n;
-
-      for (n = 1.0; n < 9.9; n++) {
-        if (inner_edge > std::pow(10.0, x + log10(n))) {
-          min_log = x + log10(n);
-        }
-
-        if (max_log == 0.0 && outer_edge < std::pow(10.0, x + log10(n))) {
-          max_log = x + log10(n);
-        }
-      }
-    }
-
-    mult     = max_x / (max_log - min_log);
-    offset   = -mult * (1.0 + min_log);
-    em_scale = 5;
-
-    output << "<?xml version='1.0' standalone='no'?>\n";
-    output << "<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' \n";
-    output << "  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>\n";
-    output << "\n";
-    output << "<svg width='100%' height='100%' version='1.1'\n";
-    output << "     xmlns='http://www.w3.org/2000/svg'\n";
-    output << "     viewBox='-" << margin << " -" << margin << " " << (max_x + (margin * 2.0))
-           << " " << (max_y + (margin * 2.0)) << "' >\n";
-    output << "\n";
-    output << "<title>" << innermost_planet->getTheSun().getName() << "</title>\n";
-    output << "<desc>Created by: " << prognam << " - " << stargen_revision << "</desc>\n";
-    output << "\n";
-    output << "<g stroke='black' stroke-width='1'>\n";
-    output << "    <line x1='" << ((offset + mult) + (min_log * mult)) << "' y1='"
-           << (max_y - margin) << "' x2='" << ((offset + mult) + (max_log * mult)) << "' y2='"
-           << (max_y - margin) << "' />\n";
-
-    for (int x = floor; x <= ceiling; x++) {
-      float n;
-
-      for (n = 1.0; n < 9.9; n++) {
-        if (min_log <= (x + log10(n)) && max_log >= (x + log10(n))) {
-          float value;
-          if (n == 1) {
-            value = 10;
-          } else {
-            value = 5;
-          }
-          output << "    <line x1='" << ((offset + mult) + ((x + log10(n)) * mult)) << "' y1='"
-                 << (max_y - margin - value) << "' x2='"
-                 << ((offset + mult) + ((x + log10(n)) * mult)) << "' y2='"
-                 << (max_y - margin + value) << "' />\n";
-        }
-      }
-    }
-
-    output << "</g>\n\n";
-
-    sun         the_sun         = innermost_planet->getTheSun();
-    long double min_r_ecosphere = habitable_zone_distance(the_sun, RECENT_VENUS, 1.0);
-    long double max_r_ecosphere = habitable_zone_distance(the_sun, EARLY_MARS, 1.0);
-
-    output << "<line x1='"
-           << ((offset + mult) + (log10(innermost_planet->getTheSun().getREcosphere(1.0)) * mult))
-           << "' y1='" << ((max_y - margin) - 5) << "' x2='"
-           << ((offset + mult) + (log10(innermost_planet->getTheSun().getREcosphere(1.0)) * mult))
-           << "' y2='" << ((max_y - margin) + 5) << "' stroke='blue' stroke-width='1' />\n";
-
-    output << "<line x1='" << ((offset + mult) + (log10(min_r_ecosphere) * mult)) << "' y1='"
-           << (max_y - margin) << "' x2='" << ((offset + mult) + (log10(max_r_ecosphere) * mult))
-           << "' y2='" << (max_y - margin)
-           << "' stroke='#66c' stroke-width='10' stroke-opacity='0.5' />\n";
-
-    output << "<g font-family='Arial' font-size='10' \n";
-    output << "   font-style='normal' font-weight='normal'\n";
-    output << "   fill='black' text-anchor='middle'>\n";
-
-    for (int x = floor; x <= ceiling; x++) {
-      if (min_log <= x && max_log >= x) {
-        output << "    <text x='" << ((offset + mult) + (x * mult)) << "' y='120'> "
-               << std::pow(10.0, x) << " AU </text>\n";
-      }
-    }
-
-    output << "\n";
-
-    for (a_planet = innermost_planet; a_planet != nullptr; a_planet = a_planet->next_planet) {
-      long double x = (offset + mult) + (log10(a_planet->getA()) * mult);
-      long double r =
-          std::pow((a_planet->getMass() * SUN_MASS_IN_EARTH_MASSES), 1.0 / 3.0) * em_scale;
-      long double x1 =
-          (offset + mult) + (log10(a_planet->getA() * (1.0 - a_planet->getE())) * mult);
-      long double x2 =
-          (offset + mult) + (log10(a_planet->getA() * (1.0 + a_planet->getE())) * mult);
-
-      output << "    <circle cx='" << x << "' cy='30' r='" << r
-             << "' fill='none' stroke='black' stroke-width='1' />\n";
-      output << "    <line x1='" << x1 << "' y1='" << ((max_y - margin) - 15.0) << "' x2='" << x2
-             << "' y2='" << ((max_y - margin) - 15.0)
-             << "' stroke='black' stroke-width='8' stroke-opacity='0.3'/>\n";
-      output << "    <text x='" << x << "' y='" << (max_y - (margin * 2.0)) << "'>";
-      output << (a_planet->getMass() * SUN_MASS_IN_EARTH_MASSES);
-      output << "</text>\n\n";
-    }
-
-    output << "</g>\n";
-    output << "</svg>\n";
+  // Find outermost planet
+  planet* outermost_planet = innermost_planet;
+  for (; outermost_planet->next_planet != nullptr; outermost_planet = outermost_planet->next_planet) {
+    // Just iterate to find the last planet
   }
+
+  // Calculate scaling parameters
+  SVGScaleParams params = calculate_svg_scale(innermost_planet, outermost_planet);
+
+  // Generate SVG document
+  svg_write_header(output, innermost_planet, prognam, params);
+  svg_draw_axis(output, params);
+
+  sun the_sun = innermost_planet->getTheSun();
+  svg_draw_habitable_zone(output, the_sun, params);
+  svg_draw_axis_labels(output, params);
+  svg_draw_planets(output, innermost_planet, params);
+
+  output << "</g>\n";
+  output << "</svg>\n";
+
   ZoneScoped;
   output.close();
 }
