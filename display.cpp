@@ -39,86 +39,137 @@ int random_numberInt(int min, int max) {
  * @param seed
  * @param do_moons
  */
+/**
+ * @brief Get planet classification symbol for text output
+ */
+static auto get_planet_symbol(planet* the_planet) -> char {
+  if (the_planet->getGreenhouseEffect() && the_planet->getSurfPressure() > 0.0) {
+    return '+';  // Greenhouse effect
+  }
+  if ((the_planet->getHydrosphere() > 0.05) && (the_planet->getHydrosphere() < 0.8)) {
+    return '*';  // Water world
+  }
+  if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 0.1) {
+    return 'o';  // Significant mass
+  }
+  return '.';  // Small body
+}
+
+/**
+ * @brief Print system characteristics header
+ */
+static void text_print_system_header(sun& the_sun, long int seed) {
+  std::cout << std::format("Stargen - V{}; seed={}\n", stargen_revision, seed)
+            << "                          SYSTEM  CHARACTERISTICS\n";
+
+  if (!the_sun.getIsCircumbinary()) {
+    std::cout << std::format("Stellar mass: {} solar masses\n", the_sun.getMass())
+              << std::format("Stellar luminosity: {}\n", the_sun.getLuminosity());
+  } else {
+    std::cout << std::format("Mass of Primary: {} solar masses\n", the_sun.getMass())
+              << std::format("Luminosity of Primary: {}\n", the_sun.getLuminosity())
+              << std::format("Mass of Secondary: {} solar masses\n", the_sun.getSecondaryMass())
+              << std::format("Luminosity of Secondary: {}\n", the_sun.getSecondaryLuminosity());
+  }
+
+  std::cout << std::format("Age: {} billion years\t({} billion std::left on main sequence)\n",
+                           the_sun.getAge() / 1.0E9,
+                           (the_sun.getLife() - the_sun.getAge()) / 1.0E9)
+            << std::format("Habitable ecosphere radius: {} AU\n\n",
+                           AVE(habitable_zone_distance(the_sun, RECENT_VENUS, 1.0),
+                               habitable_zone_distance(the_sun, EARLY_MARS, 1.0)));
+}
+
+/**
+ * @brief Print compact planet list
+ */
+static void text_print_planet_list(planet* innermost_planet) {
+  std::cout << "Planets present at:\n";
+  int counter = 1;
+  for (planet* the_planet = innermost_planet; the_planet != nullptr;
+       the_planet = the_planet->next_planet, counter++) {
+    std::cout << std::format(
+        "{}\t{} AU\t{} EM\t{}\n",
+        counter,
+        the_planet->getA(),
+        the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES,
+        get_planet_symbol(the_planet));
+  }
+  std::cout << "\n\n\n";
+}
+
+/**
+ * @brief Print detailed planet properties
+ */
+static void text_print_planet_details(planet* the_planet, int counter) {
+  std::cout << std::format("Planet {}", counter);
+  if (is_gas_planet(the_planet)) {
+    std::cout << "\t*gas giant*";
+  }
+  std::cout << '\n';
+
+  // Tidal locking status
+  if ((int)the_planet->getDay() == (int)(the_planet->getOrbPeriod() * 24.0)) {
+    std::cout << "Planet is tidally locked with one face to star.\n";
+  } else if (the_planet->getResonantPeriod()) {
+    std::cout << "Planet's rotation is in a resonant spin lock with the star.\n";
+  }
+
+  // Orbital properties
+  std::cout << std::format("   Distance from primary star:\t{} AU\n", the_planet->getA())
+            << std::format("   Eccentricity of orbit:\t{}\n", the_planet->getE())
+            << std::format("   Length of year:\t\t{} days\n", the_planet->getOrbPeriod())
+            << std::format("   Length of day:\t\t{} hours\n", the_planet->getDay())
+            << std::format("   Mass:\t\t\t{} Earth masses\n",
+                           the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES);
+
+  // Surface properties (rocky planets only)
+  if (!is_gas_planet(the_planet)) {
+    std::cout << std::format("   Surface gravity:\t\t{} Earth gees\n", the_planet->getSurfGrav())
+              << std::format("   Surface pressure:\t\t{} Earth atmospheres",
+                             the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS);
+    if (the_planet->getGreenhouseEffect() && the_planet->getSurfPressure() > 0.0) {
+      std::cout << " GREENHOUSE EFFECT";
+    }
+    std::cout << '\n'
+              << std::format("   Surface temperature:\t\t{} degrees Celcius\n",
+                             the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER)
+              << std::format("   Boiling point of water:\t{} degrees Celcius\n",
+                             the_planet->getBoilPoint() - FREEZING_POINT_OF_WATER)
+              << std::format("   Hydrosphere percentage:\t{}%\n", the_planet->getHydrosphere() * 100.0)
+              << std::format("   Cloud cover percentage:\t{}%\n", the_planet->getCloudCover() * 100.0)
+              << std::format("   Ice cover percentage:\t{}%\n", the_planet->getIceCover() * 100.0);
+  }
+
+  // Physical properties (all planets)
+  std::cout << std::format("   Equatorial radius:\t\t{} Km\n", the_planet->getRadius())
+            << std::format("   Density:\t\t\t{} grams/cc\n", the_planet->getDensity())
+            << std::format("   Escape Velocity:\t\t{} Km/sec\n",
+                           the_planet->getEscVelocity() / CM_PER_KM)
+            << std::format("   Molecular weight retained:\t{} and above\n",
+                           the_planet->getMolecWeight())
+            << std::format("   Surface acceleration:\t{} cm/sec2\n", the_planet->getSurfAccel())
+            << std::format("   Axial tilt:\t\t\t{} degrees\n", the_planet->getAxialTilt())
+            << std::format("   Planetary albedo:\t\t{}\n", the_planet->getAlbedo()) << "\n\n";
+}
+
 void text_describe_system(planet* innermost_planet, bool do_gases, long int seed, bool do_moons) {
   performanceMonitor.recordFileOperation("text_output");
   do_gases = (flags_arg_clone & fDoGases) != 0;
-  planet* the_planet;
-  sun     the_sun = innermost_planet->getTheSun();
-  int     counter;
 
-  std::cout << std::format("Stargen - V{}; seed={}\n", stargen_revision, seed)
-            << "                          SYSTEM  CHARACTERISTICS\n";
-  if (!the_sun.getIsCircumbinary()) {
-    std::cout << std::format("Stellar mass: {} solar masses\n", the_sun.getMass());
-    std::cout << std::format("Stellar luminosity: {}\n", the_sun.getLuminosity());
-  } else {
-    std::cout << std::format("Mass of Primary: {} solar masses\n", the_sun.getMass());
-    std::cout << std::format("Luminosity of Primary: {}\n", the_sun.getLuminosity());
-    std::cout << std::format("Mass of Secondary: {} solar masses\n", the_sun.getSecondaryMass());
-    std::cout << std::format("Luminosity of Secondary: {}\n", the_sun.getSecondaryLuminosity());
-  }
-  std::cout << std::format("Age: {} billion years\t({} billion std::left on main sequence)\n",
-                           the_sun.getAge() / 1.0E9,
-                           (the_sun.getAge() - the_sun.getLife()) / 1.0E9);
-  std::cout << std::format("Habitable ecosphere radius: {} AU\n\n",
-                           AVE(habitable_zone_distance(the_sun, RECENT_VENUS, 1.0),
-                               habitable_zone_distance(the_sun, EARLY_MARS, 1.0)));
-  std::cout << "Planets present at:\n";
-  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
+  sun the_sun = innermost_planet->getTheSun();
+
+  // Print system header
+  text_print_system_header(the_sun, seed);
+
+  // Print compact planet list
+  text_print_planet_list(innermost_planet);
+
+  // Print detailed planet information
+  int counter = 1;
+  for (planet* the_planet = innermost_planet; the_planet != nullptr;
        the_planet = the_planet->next_planet, counter++) {
-    std::cout << std::format(
-        "{}\t{} AU\t{} EM\t{}\n", counter, the_planet->getA(),
-        the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES,
-        ((the_planet->getGreenhouseEffect() && the_planet->getSurfPressure() > 0.0)       ? '+'
-         : ((the_planet->getHydrosphere() > .05) && (the_planet->getHydrosphere() < 0.8)) ? '*'
-         : ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > .1)                      ? 'o'
-                                                                                          : '.'));
-  }
-  std::cout << "\n\n\n";
-  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
-       the_planet = the_planet->next_planet, counter++) {
-    std::cout << std::format("Planet {}", counter);
-    if (is_gas_planet(the_planet)) {
-      std::cout << "\t*gas giant*";
-    }
-    std::cout << '\n';
-    if ((int)the_planet->getDay() == (int)(the_planet->getOrbPeriod() * 24.0)) {
-      std::cout << "Planet is tidally locked with one face to star.\n";
-    } else if (the_planet->getResonantPeriod()) {
-      std::cout << "Planet's rotation is in a resonant spin lock with the star.\n";
-    }
-    std::cout << std::format("   Distance from primary star:\t{} AU\n", the_planet->getA())
-              << std::format("   Eccentricity of orbit:\t{}\n", the_planet->getE())
-              << std::format("   Length of year:\t\t{} days\n", the_planet->getOrbPeriod())
-              << std::format("   Length of day:\t\t{} hours\n", the_planet->getDay())
-              << std::format("   Mass:\t\t\t{} Earth masses\n",
-                             the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES);
-    if (!is_gas_planet(the_planet)) {
-      std::cout << std::format("   Surface gravity:\t\t{} Earth gees\n", the_planet->getSurfGrav())
-                << std::format("   Surface pressure:\t\t{} Earth atmospheres",
-                               the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS);
-      if (the_planet->getGreenhouseEffect() && the_planet->getSurfPressure() > 0.0) {
-        std::cout << " GREENHOUSE EFFECT";
-      }
-      std::cout
-          << '\n'
-          << std::format("   Surface temperature:\t\t{} degrees Celcius\n",
-                         the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER)
-          << std::format("   Boiling point of water:\t{} degrees Celcius\n",
-                         the_planet->getBoilPoint() - FREEZING_POINT_OF_WATER)
-          << std::format("   Hydrosphere percentage:\t{}%\n", the_planet->getHydrosphere() * 100.0)
-          << std::format("   Cloud cover percentage:\t{}%\n", the_planet->getCloudCover() * 100.0)
-          << std::format("   Ice cover percentage:\t{}%\n", the_planet->getIceCover() * 100.0);
-    }
-    std::cout << std::format("   Equatorial radius:\t\t{} Km\n", the_planet->getRadius())
-              << std::format("   Density:\t\t\t{} grams/cc\n", the_planet->getDensity())
-              << std::format("   Escape Velocity:\t\t{} Km/sec\n",
-                             the_planet->getEscVelocity() / CM_PER_KM)
-              << std::format("   Molecular weight retained:\t{} and above\n",
-                             the_planet->getMolecWeight())
-              << std::format("   Surface acceleration:\t{} cm/sec2\n", the_planet->getSurfAccel())
-              << std::format("   Axial tilt:\t\t\t{} degrees\n", the_planet->getAxialTilt())
-              << std::format("   Planetary albedo:\t\t{}\n", the_planet->getAlbedo()) << "\n\n";
+    text_print_planet_details(the_planet, counter);
   }
 }
 
