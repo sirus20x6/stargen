@@ -1648,44 +1648,11 @@ void html_thumbnail_totals(std::fstream& the_file) {
  * @param url_path
  * @param the_file
  */
-void html_describe_planet(planet* the_planet, int counter, int moons, bool do_gases,
-                          const std::string& url_path, std::fstream& the_file) {
-  std::string planet_id =
-      moons > 0 ? std::format("{}.{}", counter, moons) : std::to_string(counter);
-  std::string typeString = type_string(the_planet);
-
-  do_gases = (flags_arg_clone & fDoGases) != 0;
-
-  the_file << std::format(R"(
-<p>
-<a name='{0}'></a>
-<table border=3 cellspacing=2 cellpadding=2 align=center bgcolor='{1}' width='{2}%'>
-<colgroup span=1 align=std::left valign=middle>
-<colgroup span=2 align=std::left valign=middle>
-<tr><th colspan=3 bgcolor='{3}' align=center>
-<font size='+2' color='{4}'>{5} #{0} Statistics</font></th></tr>
-)",
-                          planet_id, BGTABLE, (moons == 0) ? 95 : 90, BGHEADER, TXHEADER,
-                          (moons == 0) ? "Planet" : "Moon");
-
-  the_file << std::format(R"(
-<tr><th>Planet type</th>
-<td colspan=2><img alt='{0}' src='{1}ref/{2}Planet.webp' align=middle width=150 height=150>{0}
-)",
-                          typeString, url_path, image_type_string(the_planet));
-
-  if ((int)the_planet->getDay() == (int)(the_planet->getOrbPeriod() * 24.0)) {
-    the_file << "<br>Tidally Locked 1 Face\n";
-  } else if (the_planet->getResonantPeriod()) {
-    the_file << std::format("<br>Resonant Spin Locked ({} Resonance)\n",
-                            moons == 0 ? printSpinResonanceFactor(the_planet->getE())
-                                       : printSpinResonanceFactor(the_planet->getMoonE()));
-  }
-
-  print_description(the_file, "<br>", the_planet, "");
-
-  the_file << "</td></tr>\n";
-
+/**
+ * @brief Write orbital properties to HTML table
+ */
+static void html_write_orbital_properties(planet* the_planet, int moons,
+                                          std::fstream& the_file) {
   if (moons == 0) {
     the_file << std::format(R"(
 <tr><th>Distance from primary star</th><td>{:.2f} KM</td>
@@ -1712,7 +1679,13 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
                           the_planet->getInclination(), the_planet->getAscendingNode(),
                           the_planet->getLongitudeOfPericenter(), the_planet->getMeanLongitude(),
                           the_planet->getHzd());
+}
 
+/**
+ * @brief Write mass and composition data to HTML table
+ */
+static void html_write_mass_composition(planet* the_planet, const std::string& url_path,
+                                        std::fstream& the_file) {
   the_file << std::format(
       R"(
 <tr><th>Mass</th><td>{:.2f} Kg</td>
@@ -1780,7 +1753,12 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
 <tr><th>Habitable Zone Composition (HZC)</th><td>{:.2f}</td><td></td></tr>
 )",
                           the_planet->getHzc());
+}
 
+/**
+ * @brief Write physical properties (surface conditions, radius, density) to HTML table
+ */
+static void html_write_physical_properties(planet* the_planet, std::fstream& the_file) {
   if (!is_gas_planet(the_planet)) {
     long double celsius = the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER;
 
@@ -1851,6 +1829,7 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
                             the_planet->getEstimatedTemp(),
                             the_planet->getEstimatedTemp() - EARTH_AVERAGE_KELVIN);
   }
+
   the_file << std::format(R"(
 <tr><th>Average radius</th>
 <td>{:.2f} Km</td>
@@ -1905,7 +1884,13 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
                           the_planet->getEscVelocity() / CM_PER_KM, the_planet->getMolecWeight());
 
   list_molecules(the_file, the_planet->getMolecWeight());
+}
 
+/**
+ * @brief Write atmospheric gas composition to HTML table
+ */
+static void html_write_atmospheric_gases(planet* the_planet, bool do_gases,
+                                         std::fstream& the_file) {
   if (do_gases && the_planet->getNumGases() > 0) {
     the_file << R"(
 <table border=0 cellspacing=0 cellpadding=0>
@@ -1946,7 +1931,12 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
     the_file << "</table>\n";
   }
   the_file << "</td></tr>\n";
+}
 
+/**
+ * @brief Write additional properties (orbital period, hydrosphere, ESI) to HTML table
+ */
+static void html_write_additional_properties(planet* the_planet, std::fstream& the_file) {
   the_file << std::format(
       R"(
 <tr><th>Habitable Zone Atmosphere (HZA)</th>
@@ -2019,10 +2009,58 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
 <td><!--esir: {:.4f}<br />esid: {:.4f}<br />esiv: {:.4f}<br />esit: {:.4f}--></td></tr>
 )",
                           the_planet->getEsi(), esir, esid, esiv, esit);
-
-  the_file << "</table>\n\n</p>\n<br>\n\n";
 }
 
+void html_describe_planet(planet* the_planet, int counter, int moons, bool do_gases,
+                          const std::string& url_path, std::fstream& the_file) {
+  std::string planet_id =
+      moons > 0 ? std::format("{}.{}", counter, moons) : std::to_string(counter);
+  std::string typeString = type_string(the_planet);
+
+  do_gases = (flags_arg_clone & fDoGases) != 0;
+
+  // Write table header
+  the_file << std::format(R"(
+<p>
+<a name='{0}'></a>
+<table border=3 cellspacing=2 cellpadding=2 align=center bgcolor='{1}' width='{2}%'>
+<colgroup span=1 align=std::left valign=middle>
+<colgroup span=2 align=std::left valign=middle>
+<tr><th colspan=3 bgcolor='{3}' align=center>
+<font size='+2' color='{4}'>{5} #{0} Statistics</font></th></tr>
+)",
+                          planet_id, BGTABLE, (moons == 0) ? 95 : 90, BGHEADER, TXHEADER,
+                          (moons == 0) ? "Planet" : "Moon");
+
+  // Write planet type and image
+  the_file << std::format(R"(
+<tr><th>Planet type</th>
+<td colspan=2><img alt='{0}' src='{1}ref/{2}Planet.webp' align=middle width=150 height=150>{0}
+)",
+                          typeString, url_path, image_type_string(the_planet));
+
+  if ((int)the_planet->getDay() == (int)(the_planet->getOrbPeriod() * 24.0)) {
+    the_file << "<br>Tidally Locked 1 Face\n";
+  } else if (the_planet->getResonantPeriod()) {
+    the_file << std::format("<br>Resonant Spin Locked ({} Resonance)\n",
+                            moons == 0 ? printSpinResonanceFactor(the_planet->getE())
+                                       : printSpinResonanceFactor(the_planet->getMoonE()));
+  }
+
+  print_description(the_file, "<br>", the_planet, "");
+
+  the_file << "</td></tr>\n";
+
+  // Write all planet properties using helper functions
+  html_write_orbital_properties(the_planet, moons, the_file);
+  html_write_mass_composition(the_planet, url_path, the_file);
+  html_write_physical_properties(the_planet, the_file);
+  html_write_atmospheric_gases(the_planet, do_gases, the_file);
+  html_write_additional_properties(the_planet, the_file);
+
+  // Close table
+  the_file << "</table>\n\n</p>\n<br>\n\n";
+}
 /**
  * @brief HTML describe system
  *
