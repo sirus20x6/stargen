@@ -30,15 +30,12 @@ auto compare_string_char(std::string &a_string, int place, const char *a_charact
   return false;
 }
 
-/// @brief 
-/// @param inner 
-/// @param outer 
-/// @return 
+/// @brief Generate a random number between inner and outer
+/// @param inner Lower bound
+/// @param outer Upper bound
+/// @return Random number in range [inner, outer)
 auto random_number(long double inner, long double outer) -> long double {
-  long double range = NAN;
-
-  range = outer - inner;
-  return (((long double)rand()) / (long double)(RAND_MAX)) * range + inner;
+  return g_random_context.randDouble(inner, outer);
 }
 
 /*-----------------------------------------------------------------*/

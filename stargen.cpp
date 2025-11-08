@@ -838,13 +838,12 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
  * 
  */
 void init() {
-    if (flag_seed == 0) {
+  if (flag_seed == 0) {
     time_t temp_time = 0;
     auto seed = (unsigned)(time(&temp_time));
-    srand(seed);
-    flag_seed = rand();
+    flag_seed = seed;
   }
-  srand(flag_seed);
+  g_random_context.setSeed(flag_seed);
   system_seed = flag_seed;
   ZoneScoped;
 }

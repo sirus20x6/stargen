@@ -1,6 +1,5 @@
 #include "accrete.h"
 #include <cmath>      // for pow, sqrt, NAN, fabs, exp, M_PI
-#include <cstdlib>    // for rand
 #include <iostream>   // for operator<<, basic_ostream, char_traits, cerr
 #include <string>     // for operator<<, string
 #include "const.h"    // for SUN_MASS_IN_EARTH_MASSES, PROTOPLANET_MASS, K
@@ -8,6 +7,9 @@
 #include "stargen.h"  // for flag_verbose, max_distance_arg, fDoMoons, flags...
 #include "structs.h"  // for planet, dust, gen, sun
 #include "utils.h"    // for toString, random_eccentricity, random_number
+#include "RandomContext.h"  // for RandomContext
+
+extern RandomContext g_random_context;
 
 
 /**
@@ -890,7 +892,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
             new_e = random_eccentricity(ecc_coef);
           }
           if (total_mass >= ((0.7 * JUPITER_MASS) / SUN_MASS_IN_EARTH_MASSES)) {
-            if (((1 + rand()) % 14) == 0 && min_distance < 0.2) {
+            if (g_random_context.randInt(14) == 0 && min_distance < 0.2) {
               new_a = random_number(min_distance, 0.2);
               new_e = random_eccentricity(ecc_coef);
               for (int i = 0;(calcPerihelion(new_a, new_e) < min_distance) && (i < 1000); i++) {
@@ -898,7 +900,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
                 new_e = random_eccentricity(ecc_coef);
               }
             }
-            if (((1 + rand()) % 10) == 0 &&
+            if (g_random_context.randInt(10) == 0 &&
                 calcPerihelion(new_a, 0.1) > min_distance) {
               while (new_e < 0.1) {
                 new_e = random_eccentricity(0.25);
@@ -912,7 +914,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
                      total_mass <= (10.0 / SUN_MASS_IN_EARTH_MASSES) &&
                      a >= (4.0 * sqrt(stell_luminosity_ratio)) &&
                      (dust_mass / total_mass) >= 0.75) {
-            if (((1 + rand()) % 4) == 0) {
+            if (g_random_context.randInt(4) == 0) {
               new_a = random_number(min_distance, a / 2.0);
               new_e = random_eccentricity(ecc_coef);
               for (int i = 0;calcPerihelion(new_a, new_e) < planet_inner_bound && i < 1000;i++) {
