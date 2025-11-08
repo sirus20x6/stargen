@@ -24,6 +24,7 @@ void initConfig() {
     g_config.dust_density_ratio = DUST_DENSITY_COEFF;
     g_config.max_age = 10.0E9;
     g_config.max_age_backup = 10.0E9;
+    g_sim_context.dust_density_coeff = DUST_DENSITY_COEFF;
 }
 
 // Legacy global references - these now point to Config members for compatibility
@@ -47,11 +48,12 @@ std::string& type_arg = g_config.stellar_type;
 long double& max_distance_arg = g_config.max_distance;
 bool& allow_planet_migration = g_config.do_migration;
 
-/*  These are the global variables used during accretion:  */
-planet *innermost_planet;
-long double dust_density_coeff = DUST_DENSITY_COEFF;
+/*  Legacy global references - now point to SimulationContext members  */
+planet*& innermost_planet = g_sim_context.innermost_planet;
+long double& dust_density_coeff = g_sim_context.dust_density_coeff;
+long& system_seed = g_sim_context.current_system_seed;
 
-// Statistics globals - now point to SimulationContext members
+// Global statistics - now point to SimulationContext members
 int& total_earthlike = g_sim_context.total_earthlike;
 int& total_habitable = g_sim_context.total_habitable;
 int& total_worlds = g_sim_context.total_worlds;
@@ -62,6 +64,17 @@ int& total_potentially_habitable = g_sim_context.total_potentially_habitable;
 int& total_potentially_habitable_earthlike = g_sim_context.total_potentially_habitable_earthlike;
 int& total_potentially_habitable_conservative = g_sim_context.total_potentially_habitable_conservative;
 int& total_potentially_habitable_optimistic = g_sim_context.total_potentially_habitable_optimistic;
+
+// Per-system statistics - now point to SimulationContext members
+int& earthlike = g_sim_context.system_earthlike;
+int& habitable = g_sim_context.system_habitable;
+int& habitable_jovians = g_sim_context.system_habitable_jovians;
+int& habitable_superterrans = g_sim_context.system_habitable_superterrans;
+int& potential_habitable = g_sim_context.system_potentially_habitable;
+long double& max_moon_mass = g_sim_context.system_max_moon_mass;
+int (&type_counts)[16] = g_sim_context.type_counts;
+int& type_count = g_sim_context.type_count;
+int& max_type_count = g_sim_context.max_type_count;
 
 long double& min_breathable_terrestrial_g = g_sim_context.min_breathable_terrestrial_g;
 long double& min_breathable_g = g_sim_context.min_breathable_g;
@@ -93,20 +106,7 @@ long double& max_potential_l = g_sim_context.max_potential_l;
 long double& min_potential_mass = g_sim_context.min_potential_mass;
 long double& max_potential_mass = g_sim_context.max_potential_mass;
 
-// Per-system statistics (kept as true globals, reset each system)
-int earthlike = 0;
-int habitable = 0;
-int habitable_jovians = 0;
-int habitable_superterrans = 0;
-int potential_habitable = 0;
-long double max_moon_mass = 0.0;
-
-int type_counts[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // seb
-int type_count = 0;
-int max_type_count = 0;
-
-long system_seed = 0;
-
+// Version identifier
 std::string stargen_revision = "$Revision: 3.0 $";
 
 /**

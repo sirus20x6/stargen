@@ -15,7 +15,12 @@ public:
     // Clone of the current sun (for context sharing)
     sun current_sun;
 
-    // Statistics counters
+    // Planet generation state
+    planet* innermost_planet = nullptr;  // Head of planet linked list (to be replaced with vector)
+    long double dust_density_coeff = 0.0;  // Dust density coefficient for accretion
+    long current_system_seed = 0;  // Seed for current system being generated
+
+    // Global/cross-system statistics counters
     int total_earthlike = 0;
     int total_habitable = 0;
     int total_habitable_earthlike = 0;
@@ -26,6 +31,19 @@ public:
     int total_potentially_habitable_conservative = 0;
     int total_potentially_habitable_optimistic = 0;
     int total_worlds = 0;
+
+    // Per-system statistics (reset for each system)
+    int system_earthlike = 0;
+    int system_habitable = 0;
+    int system_habitable_jovians = 0;
+    int system_habitable_superterrans = 0;
+    int system_potentially_habitable = 0;
+    long double system_max_moon_mass = 0.0;
+
+    // Type diversity tracking (for experimental features)
+    int type_counts[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int type_count = 0;
+    int max_type_count = 0;
 
     // Breathable planet statistics (min/max values)
     // Min values initialized high so first real value will be less
@@ -64,11 +82,21 @@ public:
     SimulationContext() = default;
 
     // Helper methods for statistics
-    void recordEarthlike() { total_earthlike++; }
-    void recordHabitable() { total_habitable++; }
-    void recordWorld() { total_worlds++; }
+    void recordEarthlike() {
+        total_earthlike++;
+        system_earthlike++;
+    }
 
-    void resetStatistics() {
+    void recordHabitable() {
+        total_habitable++;
+        system_habitable++;
+    }
+
+    void recordWorld() {
+        total_worlds++;
+    }
+
+    void resetGlobalStatistics() {
         total_earthlike = 0;
         total_habitable = 0;
         total_habitable_earthlike = 0;
@@ -79,6 +107,27 @@ public:
         total_potentially_habitable_conservative = 0;
         total_potentially_habitable_optimistic = 0;
         total_worlds = 0;
+    }
+
+    void resetSystemStatistics() {
+        system_earthlike = 0;
+        system_habitable = 0;
+        system_habitable_jovians = 0;
+        system_habitable_superterrans = 0;
+        system_potentially_habitable = 0;
+        system_max_moon_mass = 0.0;
+
+        // Reset type diversity tracking
+        for (int i = 0; i < 16; i++) {
+            type_counts[i] = 0;
+        }
+        type_count = 0;
+        max_type_count = 0;
+    }
+
+    // Backward compatibility alias
+    void resetStatistics() {
+        resetGlobalStatistics();
     }
 
     void updateBreathableStats(long double g, long double l, long double temp,
