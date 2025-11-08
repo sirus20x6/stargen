@@ -1125,6 +1125,65 @@ static void finalize_gas_giant_properties(planet *the_planet, sun &the_sun,
  * @param do_moons Whether to generate moons
  * @param is_moon Whether this planet is itself a moon
  */
+/**
+ * @brief Calculate the Hill sphere radius for a planet or moon
+ * @param semi_major_axis Semi-major axis in AU
+ * @param body_mass Mass of the body in solar masses
+ * @param primary_mass Mass of the primary body in solar masses
+ * @return Hill sphere radius in km
+ */
+static long double calculate_hill_sphere(long double semi_major_axis,
+                                         long double body_mass,
+                                         long double primary_mass) {
+  return semi_major_axis * KM_PER_AU *
+         std::pow(body_mass / (3.0 * primary_mass), 1.0 / 3.0);
+}
+
+/**
+ * @brief Calculate the Roche limit for a moon around a planet
+ * @param planet_radius Radius of the planet in km
+ * @param planet_density Density of the planet in g/cc
+ * @param moon_density Density of the moon in g/cc
+ * @return Roche limit in km
+ */
+static long double calculate_roche_limit(long double planet_radius,
+                                         long double planet_density,
+                                         long double moon_density) {
+  return 2.44 * planet_radius *
+         std::pow(planet_density / moon_density, 1.0 / 3.0);
+}
+
+/**
+ * @brief Check if a proposed moon orbit collides with existing moons
+ * @param the_planet The planet hosting the moons
+ * @param distance Proposed orbital distance in km
+ * @param moon_mass Mass of the proposed moon in solar masses
+ * @param planet_mass Mass of the planet in solar masses
+ * @return true if collision detected, false if orbit is clear
+ */
+static bool check_moon_collision(planet *the_planet, long double distance,
+                                long double moon_mass, long double planet_mass) {
+  planet *the_moon = nullptr;
+  long double hill_sphere2 = 0;
+  long double temp_hill_sphere = 0;
+
+  temp_hill_sphere = distance * std::pow(moon_mass / (3.0 * planet_mass), 1.0 / 3.0);
+
+  for (the_moon = the_planet->first_moon; the_moon != nullptr;
+       the_moon = the_moon->next_planet) {
+    hill_sphere2 = the_moon->getMoonA() * KM_PER_AU *
+                   std::pow(the_moon->getMass() / (3.0 * planet_mass), 1.0 / 3.0);
+
+    if (((the_moon->getMoonA() * KM_PER_AU) >= (distance - temp_hill_sphere) &&
+         (the_moon->getMoonA() * KM_PER_AU) <= (distance + temp_hill_sphere)) ||
+        (distance >= ((the_moon->getMoonA() * KM_PER_AU) - hill_sphere2) &&
+         distance <= ((the_moon->getMoonA() * KM_PER_AU) + hill_sphere2))) {
+      return true;  // Collision detected
+    }
+  }
+  return false;  // No collision
+}
+
 static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
                           bool random_tilt, const std::string &planet_id,
                           bool do_gases, bool do_moons, bool is_moon) {
@@ -1153,11 +1212,8 @@ static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
       ptr->setMoonE(0);
     }*/
 
-    long double hill_sphere = 0.0;
-
-    hill_sphere =
-        the_planet->getA() * KM_PER_AU *
-        std::pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
+    long double hill_sphere = calculate_hill_sphere(
+        the_planet->getA(), the_planet->getMass(), the_sun.getMass());
 
     for (n = 0, ptr = the_planet->first_moon; ptr != nullptr; ptr = next_moon)
     // for (n = 0; n < the_planet->getMoonCount(); n++)
@@ -1187,9 +1243,9 @@ static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
                                      ptr->getOrbitZone(), ptr));
       ptr->setDensity(volume_density(ptr->getMass(), ptr->getRadius()));
 
-      roche_limit =
-          2.44 * the_planet->getRadius() *
-          std::pow(the_planet->getDensity() / ptr->getDensity(), 1.0 / 3.0);
+      roche_limit = calculate_roche_limit(the_planet->getRadius(),
+                                          the_planet->getDensity(),
+                                          ptr->getDensity());
 
       if ((roche_limit * 1.5) < (hill_sphere / 3.0) &&
           (hill_sphere / 3.0) > (the_planet->getRadius() * 2.5)) {
@@ -1217,27 +1273,9 @@ static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
           eccentricity = random_number(
               0, 0.01);  // I know I should use random_eccentricity here but I
                          // want to prevent orbits from crossing each other
-          for (the_moon = the_planet->first_moon; the_moon != nullptr;
-               the_moon = the_moon->next_planet) {
-            hill_sphere2 =
-                the_moon->getMoonA() * KM_PER_AU *
-                std::pow(the_moon->getMass() / (3.0 * the_planet->getMass()),
-                    1.0 / 3.0);
-            temp_hill_sphere =
-                distance * std::pow(ptr->getMass() / (3.0 * the_planet->getMass()),
-                               1.0 / 3.0);
-            if (((the_moon->getMoonA() * KM_PER_AU) >=
-                     (distance - temp_hill_sphere) &&
-                 (the_moon->getMoonA() * KM_PER_AU) <=
-                     (distance + temp_hill_sphere)) ||
-                (distance >=
-                     ((the_moon->getMoonA() * KM_PER_AU) - hill_sphere2) &&
-                 distance <=
-                     ((the_moon->getMoonA() * KM_PER_AU) + hill_sphere2))) {
-              bad_place = true;
-              break;
-            }
-          }
+
+          bad_place = check_moon_collision(the_planet, distance, ptr->getMass(),
+                                           the_planet->getMass());
           if (!bad_place) {
             done = true;
           }
@@ -1363,14 +1401,11 @@ static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
     bool done2 = false;
     bool too_many_tries = false;
     bool bad_place2 = false;
-    long double hill_sphere3 = 0;
+    long double hill_sphere3 = calculate_hill_sphere(
+        the_planet->getA(), the_planet->getMass(), the_sun.getMass());
     long double hill_sphere4 = 0;
     long double roche_limit2 = 0;
     int tries2 = 0;
-
-    hill_sphere3 =
-        the_planet->getA() * KM_PER_AU *
-        std::pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
     if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 1000.0) {
       max_total_moon_mass =
           the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.05;
@@ -1460,9 +1495,9 @@ static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
       long double distance2 = NAN;
       long double eccentricity2 = NAN;
 
-      roche_limit2 =
-          2.44 * the_planet->getRadius() *
-          std::pow(the_planet->getDensity() / new_moon->getDensity(), 1.0 / 3.0);
+      roche_limit2 = calculate_roche_limit(the_planet->getRadius(),
+                                           the_planet->getDensity(),
+                                           new_moon->getDensity());
       if ((roche_limit2 * 1.5) >= (hill_sphere3 / 3.0)) {
         if ((flag_verbose & 0x1000) != 0) {
           std::cerr << "  " << planet_id << ": Can't add anymore moons!\n";
