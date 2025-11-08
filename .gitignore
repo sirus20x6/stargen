@@ -18,3 +18,6 @@ stargen
 
 # Backup files
 *.backup
+
+# Generated HTML output
+html/
