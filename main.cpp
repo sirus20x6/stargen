@@ -21,10 +21,40 @@
 #include "structs.h"
 #include "utils.h"
 
+/**
+ * @brief Struct to hold all command line arguments
+ */
+struct CommandLineArgs {
+  actions action = aGenerate;
+  std::string flag_char = "?";
+  std::string path = SUBDIR;
+  std::string url_path_arg = "";
+  std::string filename_arg = "";
+  std::string arg_name = "";
+
+  bool use_stdout = false;
+  long double mass_arg = 0.0;
+  long double luminosity_arg = 0.0;
+  long int seed_arg = 0;
+  int count_arg = 1;
+  int increment_arg = 1;
+  catalog star_catalog{};
+  int sys_no_arg = 0;
+
+  long double ratio_arg = 0.0;
+  long double ecc_coef_arg = 0.077;  // seb: dole value
+  long double inner_planet_factor_arg = 0.3;  // seb: dole value
+
+  int flags_arg = 0;
+  int out_format = ffHTML;
+  int graphic_format = gfGIF;
+};
 
 void initData();
 void initConfig();  // Initialize configuration defaults
 void usage(std::string);
+bool parseCommandLine(int argc, char** argv, const std::string& prognam, CommandLineArgs& args);
+bool validateArguments(const CommandLineArgs& args);
 
 void printAknowledgement() {
   std::cout << "Web systems (-W) taken from\n"
@@ -53,39 +83,389 @@ void printExamples() {
           "stargen -m1.09 -y1.12609 -BG0V -b6215 -w0.75 -d1114.6 -f0.011 -M -r -s1 -n10000 -E\n\n";
 }
 
+/**
+ * @brief Parse command line arguments
+ * @return false if parsing failed or help was requested
+ */
+bool parseCommandLine(int argc, char** argv, const std::string& prognam, CommandLineArgs& args) {
+  bool first_part_of_name = true;
+
+  for (int i = 0; i < argc; i++) {
+    bool skip = false;
+    std::string temp_string = argv[i];
+
+    if (!compare_string_char(temp_string, 0, "-")) {
+      // Not a flag - it's part of the system name
+      if (temp_string != prognam) {
+        if (first_part_of_name) {
+          first_part_of_name = false;
+          args.arg_name = temp_string;
+        } else {
+          args.arg_name.append(" ");
+          args.arg_name.append(temp_string);
+        }
+      }
+      continue;
+    }
+
+    // Handle stdout flag
+    if (compare_string_char(temp_string, 1, "-")) {
+      args.use_stdout = true;
+      continue;
+    }
+
+    // Handle PHL catalog
+    if (compare_string_char(temp_string, 1, "PHL", 3)) {
+      args.star_catalog = phl;
+      args.sys_no_arg = temp_string.length() > 2 ?
+        atoi(temp_string.substr(4, temp_string.length() - 4).c_str()) : 0;
+      args.flag_char = args.star_catalog.getArg();
+      continue;
+    }
+
+    // Handle significant numbers
+    if (compare_string_char(temp_string, 1, "sn", 2)) {
+      decimals_arg = atoi(temp_string.substr(3, temp_string.length() - 3).c_str());
+      continue;
+    }
+
+    // Handle circumbinary flag
+    if (compare_string_char(temp_string, 1, "CB", 2)) {
+      args.flags_arg |= fIsCircubinaryStar;
+      continue;
+    }
+
+    // Handle max age
+    if (compare_string_char(temp_string, 1, "MY", 2)) {
+      max_age_backup = max_age = atof(temp_string.substr(3, temp_string.length() - 3).c_str());
+      continue;
+    }
+
+    // Handle max distance
+    if (compare_string_char(temp_string, 1, "md", 2)) {
+      max_distance_arg = atof(temp_string.substr(3, temp_string.length() - 3).c_str());
+      continue;
+    }
+
+    // Handle single character flags
+    const char flag = temp_string.length() > 1 ? temp_string[1] : '\0';
+
+    switch (flag) {
+      case 's':  // Seed
+        args.seed_arg = atol(temp_string.substr(2, temp_string.length() - 2).c_str());
+        break;
+
+      case 'm':  // Mass
+        args.mass_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        break;
+
+      case 'y':  // Luminosity
+        args.luminosity_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        break;
+
+      case 'Y':  // Min age
+        min_age = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        break;
+
+      case 'n':  // Count
+        args.count_arg = atoi(temp_string.substr(2, temp_string.length() - 2).c_str());
+        break;
+
+      case 'i':  // Increment
+        args.increment_arg = atoi(temp_string.substr(2, temp_string.length() - 2).c_str());
+        break;
+
+      case 'x':  // Use solar system
+        args.flag_char = temp_string.substr(1, 1).c_str();
+        args.flags_arg |= fUseSolarsystem;
+        if (args.mass_arg == 0.0) args.mass_arg = 1.0;
+        break;
+
+      case 'a':  // Reuse solar system
+        if (!compare_string_char(temp_string, 2, "k")) {
+          args.flag_char = temp_string.substr(1, 1).c_str();
+          args.flags_arg |= fReuseSolarsystem;
+          return true;  // Break out of argument parsing
+        }
+        break;
+
+      case 'D':  // Dole catalog
+      case 'W':  // Sol station catalog
+      case 'F':  // Jimb catalog
+      case 'O':  // Omega galaxy catalog
+      case 'R':  // Ring universe catalog
+      case 'I':  // IC3094 catalog
+      case 'U':  // Andromeda catalog
+      case 'G':  // Star Trek catalog
+        if (flag == 'D') args.star_catalog = dole;
+        else if (flag == 'W') args.star_catalog = solstation;
+        else if (flag == 'F') args.star_catalog = jimb;
+        else if (flag == 'O') args.star_catalog = omega_galaxy;
+        else if (flag == 'R') args.star_catalog = ring_universe;
+        else if (flag == 'I') args.star_catalog = ic3094;
+        else if (flag == 'U') args.star_catalog = andromeda;
+        else if (flag == 'G') args.star_catalog = star_trek;
+
+        args.sys_no_arg = temp_string.length() > 2 ?
+          atoi(temp_string.substr(2, temp_string.length() - 2).c_str()) : 0;
+        args.flag_char = args.star_catalog.getArg();
+        break;
+
+      case 'o':  // Output filename
+        if (i + 1 < argc) {
+          args.filename_arg = argv[i + 1];
+          skip = true;
+        }
+        break;
+
+      case 't':  // Text output
+        args.out_format = ffTEXT;
+        break;
+
+      case 'e':  // CSV output
+        if (!compare_string_char(temp_string, 2, "x")) {
+          args.out_format = ffCSV;
+        } else if (compare_string_char(temp_string, 1, "ex", 2)) {
+          printExamples();
+          return false;
+        }
+        break;
+
+      case 'C':  // CSV download
+        args.out_format = ffCSVdl;
+        break;
+
+      case 'c':  // Celestia
+        args.out_format = ffCELESTIA;
+        break;
+
+      case 'J':  // JSON or Jovian
+        if (compare_string_char(temp_string, 2, "S")) {
+          args.out_format = ffJSON;
+        } else {
+          args.flags_arg |= fDoGases | fOnlyJovianHabitable;
+        }
+        break;
+
+      case 'V':  // SVG graphics
+        args.graphic_format = gfSVG;
+        break;
+
+      case 'S':  // SVG output
+        args.graphic_format = gfSVG;
+        args.out_format = ffSVG;
+        break;
+
+      case 'k':  // Use known planets
+        args.flags_arg |= fUseKnownPlanets;
+        break;
+
+      case 'K':  // Use known planets only
+        args.flags_arg |= fUseKnownPlanets | fNoGenerate;
+        break;
+
+      case 'p':  // Path or performance
+        if (compare_string_char(temp_string, 1, "path")) {
+          if (i + 1 < argc) {
+            args.path = argv[i + 1];
+            skip = true;
+          }
+        } else if (!compare_string_char(temp_string, 2, "ath")) {
+          performanceMonitor.setEnabled(true);
+        }
+        break;
+
+      case 'u':  // URL path
+        if (i + 1 < argc) {
+          args.url_path_arg = argv[i + 1];
+          skip = true;
+        }
+        break;
+
+      case 'g':  // Do gases
+        args.flags_arg |= fDoGases;
+        break;
+
+      case 'v':  // Verbose
+        if (temp_string.length() > 2) {
+          sscanf(temp_string.substr(2, temp_string.length() - 2).c_str(), "%x", &flag_verbose);
+          if (flag_verbose & 0x0001) {
+            args.flags_arg |= fDoGases;
+          }
+        } else {
+          args.action = aListVerbosity;
+        }
+        break;
+
+      case 'l':  // List catalog
+        args.action = aListCatalog;
+        break;
+
+      case 'L':  // List catalog as HTML
+        args.action = aListCatalogAsHTML;
+        break;
+
+      case 'z':  // Size check
+        args.action = aSizeCheck;
+        break;
+
+      case 'Z':  // List gases
+        args.action = aListGases;
+        break;
+
+      case 'M':  // Do moons
+        args.flags_arg |= fDoMoons;
+        break;
+
+      case 'r':  // Do migration
+        args.flags_arg |= fDoMigration;
+        break;
+
+      case 'H':  // Only habitable
+        args.flags_arg |= fDoGases | fOnlyHabitable;
+        break;
+
+      case '2':  // Only multi-habitable
+        args.flags_arg |= fDoGases | fOnlyMultiHabitable;
+        break;
+
+      case '3':  // Only three habitable
+        args.flags_arg |= fDoGases | fOnlyThreeHabitable;
+        break;
+
+      case 'E':  // Only earthlike
+        args.flags_arg |= fDoGases | fOnlyEarthlike;
+        break;
+
+      case 'P':  // Only potentially habitable
+        args.flags_arg |= fDoGases | fOnlyPotentialHabitable;
+        break;
+
+      case 'A':  // Accrete dust density ratio
+        args.ratio_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        if (args.ratio_arg <= 0.0) {
+          std::cout << "Accrete dust density coefficient -A (" << args.ratio_arg << ") must be > 0.0\n";
+          return false;
+        }
+        break;
+
+      case 'Q':  // Eccentricity coefficient
+        args.ecc_coef_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        if (args.ecc_coef_arg <= 0.0) {
+          std::cout << "Accrete eccentricity coeffecient -Q (" << args.ecc_coef_arg << ") must be > 0.0\n";
+          return false;
+        }
+        break;
+
+      case 'q':  // Inner planet factor
+        args.inner_planet_factor_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        if (args.inner_planet_factor_arg <= 0.0) {
+          std::cout << "Accrete inner dust boundary -q (" << args.inner_planet_factor_arg << ") must be > 0.0\n";
+          return false;
+        }
+        break;
+
+      case 'w':  // Companion mass
+        compainion_mass_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        if (compainion_mass_arg <= 0.0) {
+          std::cout << "Mass of compainion object -w (" << compainion_mass_arg << ") must be > 0.0\n";
+          return false;
+        }
+        break;
+
+      case 'f':  // Companion eccentricity
+        compainion_eccentricity_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        if (compainion_eccentricity_arg <= 0.0) {
+          std::cout << "Eccentritiy of compainion object's orbit (" << compainion_eccentricity_arg << ") must be > 0.0\n";
+          return false;
+        }
+        break;
+
+      case 'd':  // Companion distance
+        compainion_distant_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        if (compainion_distant_arg <= 0.0) {
+          std::cout << "Distance of compainion object -d (" << compainion_distant_arg << ") must be > 0.0\n";
+          return false;
+        }
+        break;
+
+      case 'b':  // Star temperature
+        temp_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        if (temp_arg <= 0.0) {
+          std::cout << "Temperature of star -b (" << temp_arg << ") must be > 0.0" << std::endl;
+          return false;
+        }
+        break;
+
+      case 'B':  // Spectral type
+        type_arg = temp_string.substr(2, temp_string.length() - 2).c_str();
+        break;
+
+      case 'j':  // Companion luminosity
+        compainion_lum_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        if (compainion_lum_arg <= 0.0) {
+          std::cout << "Luminosity of companion star j (" << compainion_lum_arg << ") must be > 0.0\n";
+          return false;
+        }
+        break;
+
+      case 'X':  // Companion temperature
+        compainion_eff_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
+        if (compainion_eff_arg <= 0.0) {
+          std::cout << "Temperature of companion star X (" << compainion_eff_arg << ") must be > 0.0\n";
+          return false;
+        }
+        break;
+
+      case 'N':  // Companion spectral type
+        companion_spec_arg = temp_string.substr(2, temp_string.length() - 2).c_str();
+        break;
+
+      case 'h':  // Help
+        usage(prognam);
+        return false;
+
+      default:
+        // Check for special cases handled earlier
+        if (compare_string_char(temp_string, 1, "ak", 2)) {
+          printAknowledgement();
+          return false;
+        }
+        usage(prognam);
+        return false;
+    }
+
+    if (skip) {
+      i++;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * @brief Validate command line arguments
+ */
+bool validateArguments(const CommandLineArgs& args) {
+  if (args.use_stdout) {
+    if (args.flags_arg & (fOnlyHabitable | fOnlyMultiHabitable | fOnlyJovianHabitable | fOnlyEarthlike)) {
+      if (args.count_arg > 50000) {
+        std::cout << "Sorry, you cannot set the Repeat count > 50,000 even if you "
+                "use a filter, due to system resource issues." << std::endl;
+        return false;
+      }
+    } else {
+      if (args.count_arg > 1000) {
+        std::cout << "Sorry, you cannot set the Repeat count > 1,000 unless you use "
+                "a filter, due to system resource issues." << std::endl;
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 int main(int argc, char **argv) {
-  actions action            = aGenerate;
-  std::string  flag_char         = "?";
-  std::string  path              = SUBDIR;
-  std::string  url_path_arg      = "";
-  std::string  filename_arg      = "";
-  std::string  arg_name          = "";
-  char    arg_name_temp[80] = "";
-
-  bool        use_stdout = false;
-  std::string      prognam;
-  long double mass_arg       = 0.0;
-  long double luminosity_arg = 0.0;
-  long        seed_arg       = 0;
-  int         count_arg      = 1;
-  int         increment_arg  = 1;
-  catalog     star_catalog;
-  int         sys_no_arg = 0;
-
-  long double ratio_arg               = 0.0;
-  long double ecc_coef_arg            = 0.077;  // seb: dole value
-  long double inner_planet_factor_arg = 0.3;    // seb: dole value
-
-  int flags_arg      = 0;
-  int out_format     = ffHTML;
-  int graphic_format = gfGIF;
-
-  const char *c;
-  bool        skip  = false;
-  int         index = 0;
-
-  std::string temp_string;
-
 #ifdef macintosh
   _ftype    = 'TEXT';
   _fcreator = 'R*ch';
@@ -94,322 +474,56 @@ int main(int argc, char **argv) {
 
   initData();
 
-  prognam = argv[0];
-  if ((c = strrchr(prognam.c_str(), DIRSEP[0])) != nullptr) {
+  // Extract program name
+  std::string prognam = argv[0];
+  if (const char* c = strrchr(prognam.c_str(), DIRSEP[0]); c != nullptr) {
     prognam = c + 1;
   }
 
+  // Check for help
   if (argc <= 1) {
     usage(prognam);
     return EXIT_FAILURE;
   }
 
-  // need to somehow parse arguments
-  bool first_part_of_name = true;
-  for (int i = 0; i < argc; i++) {
-    skip        = false;
-    temp_string = argv[i];
-    if (compare_string_char(temp_string, 0, "-")) {
-      if (compare_string_char(temp_string, 1, "-")) {
-        use_stdout = true;
-      } else if (compare_string_char(temp_string, 1, "PHL", 3)) {
-        star_catalog = phl;
-        if (temp_string.length() > 2) {
-          sys_no_arg = atoi(temp_string.substr(4, temp_string.length() - 4).c_str());
-        } else {
-          sys_no_arg = 0;
-        }
-
-        flag_char = star_catalog.getArg();
-      } else if (compare_string_char(temp_string, 1, "sn", 2)) {
-        decimals_arg = atoi(temp_string.substr(3, temp_string.length() - 3).c_str());
-      } else if (compare_string_char(temp_string, 1, "CB", 2)) {
-        flags_arg |= fIsCircubinaryStar;
-      } else if (compare_string_char(temp_string, 1, "MY", 2)) {
-        max_age_backup = max_age = atof(temp_string.substr(3, temp_string.length() - 3).c_str());
-      } else if (compare_string_char(temp_string, 1, "md", 2)) {
-        max_distance_arg = atof(temp_string.substr(3, temp_string.length() - 3).c_str());
-      } else if (compare_string_char(temp_string, 1, "s")) {
-        seed_arg = atol(temp_string.substr(2, temp_string.length() - 2).c_str());
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "m")) {
-        mass_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "y")) {
-        luminosity_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "Y")) {
-        min_age = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "n")) {
-        count_arg = atoi(temp_string.substr(2, temp_string.length() - 2).c_str());
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "i")) {
-        increment_arg = atoi(temp_string.substr(2, temp_string.length() - 2).c_str());
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "x")) {
-        flag_char = temp_string.substr(1, 1).c_str();
-        flags_arg |= fUseSolarsystem;
-        if (mass_arg == 0.0) mass_arg = 1.0;
-      } else if (compare_string_char(temp_string, 1, "a") &&
-                 !compare_string_char(temp_string, 2, "k")) {
-        flag_char = temp_string.substr(1, 1).c_str();
-        flags_arg |= fReuseSolarsystem;
-        break;
-      } else if (compare_string_char(temp_string, 1, "D") ||
-                 compare_string_char(temp_string, 1, "W") ||
-                 compare_string_char(temp_string, 1, "F") ||
-                 compare_string_char(temp_string, 1, "O") ||
-                 compare_string_char(temp_string, 1, "R") ||
-                 compare_string_char(temp_string, 1, "I") ||
-                 compare_string_char(temp_string, 1, "U") ||
-                 compare_string_char(temp_string, 1, "G")) {
-        if (compare_string_char(temp_string, 1, "D")) {
-          star_catalog = dole;
-        } else if (compare_string_char(temp_string, 1, "W")) {
-          star_catalog = solstation;
-        } else if (compare_string_char(temp_string, 1, "F")) {
-          star_catalog = jimb;
-        } else if (compare_string_char(temp_string, 1, "O")) {
-          star_catalog = omega_galaxy;
-        } else if (compare_string_char(temp_string, 1, "R")) {
-          star_catalog = ring_universe;
-        } else if (compare_string_char(temp_string, 1, "I")) {
-          star_catalog = ic3094;
-        } else if (compare_string_char(temp_string, 1, "U")) {
-          star_catalog = andromeda;
-        } else if (compare_string_char(temp_string, 1, "G")) {
-          star_catalog = star_trek;
-        }
-        if (temp_string.length() > 2) {
-          sys_no_arg = atoi(temp_string.substr(2, temp_string.length() - 2).c_str());
-        } else {
-          sys_no_arg = 0;
-        }
-
-        flag_char = star_catalog.getArg();
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "o")) {
-        filename_arg = argv[i + 1];
-        skip         = true;
-      } else if (compare_string_char(temp_string, 1, "t")) {
-        out_format = ffTEXT;
-      } else if (compare_string_char(temp_string, 1, "ex", 2)) {
-        printExamples();
-        return 0;
-      } else if (compare_string_char(temp_string, 1, "e") &&
-                 !compare_string_char(temp_string, 2, "x")) {
-        out_format = ffCSV;
-      } else if (compare_string_char(temp_string, 1, "C")) {
-        out_format = ffCSVdl;
-      } else if (compare_string_char(temp_string, 1, "c")) {
-        out_format = ffCELESTIA;
-      } else if (compare_string_char(temp_string, 1, "J") &&
-                 compare_string_char(temp_string, 2, "S")) {
-        out_format = ffJSON;
-      }
-      /*else if (compare_string_char(temp_string, 1, "P"))
-      {
-        out_format = ffMOONGEN;
-      }*/
-      else if (compare_string_char(temp_string, 1, "V")) {
-        graphic_format = gfSVG;
-      } else if (compare_string_char(temp_string, 1, "S")) {
-        graphic_format = gfSVG;
-        out_format     = ffSVG;
-      } else if (compare_string_char(temp_string, 1, "k")) {
-        flags_arg |= fUseKnownPlanets;
-      } else if (compare_string_char(temp_string, 1, "K")) {
-        flags_arg |= fUseKnownPlanets | fNoGenerate;
-      } else if (compare_string_char(temp_string, 1, "path")) {
-        path = argv[i + 1];
-        skip = true;
-      } else if (compare_string_char(temp_string, 1, "u")) {
-        url_path_arg = argv[i + 1];
-        skip         = true;
-      } else if (compare_string_char(temp_string, 1, "g")) {
-        flags_arg |= fDoGases;
-      } else if (compare_string_char(temp_string, 1, "v")) {
-        if (temp_string.length() > 2) {
-          sscanf(temp_string.substr(2, temp_string.length() - 2).c_str(), "%x", &flag_verbose);
-          if (flag_verbose & 0x0001) {
-            flags_arg |= fDoGases;
-          }
-          // skip = true;
-        } else {
-          action = aListVerbosity;
-        }
-      } else if (compare_string_char(temp_string, 1, "l")) {
-        action = aListCatalog;
-      } else if (compare_string_char(temp_string, 1, "L")) {
-        action = aListCatalogAsHTML;
-      } else if (compare_string_char(temp_string, 1, "z")) {
-        action = aSizeCheck;
-      } else if (compare_string_char(temp_string, 1, "Z")) {
-        action = aListGases;
-      } else if (compare_string_char(temp_string, 1, "M")) {
-        flags_arg |= fDoMoons;
-      } else if (compare_string_char(temp_string, 1, "r")) {
-        flags_arg |= fDoMigration;
-      } else if (compare_string_char(temp_string, 1, "ak", 2)) {
-        printAknowledgement();
-        return 0;
-      } else if (compare_string_char(temp_string, 1, "H")) {
-        flags_arg |= fDoGases | fOnlyHabitable;
-      } else if (compare_string_char(temp_string, 1, "2")) {
-        flags_arg |= fDoGases | fOnlyMultiHabitable;
-      } else if (compare_string_char(temp_string, 1, "3")) {
-        flags_arg |= fDoGases | fOnlyThreeHabitable;
-      } else if (compare_string_char(temp_string, 1, "J")) {
-        flags_arg |= fDoGases | fOnlyJovianHabitable;
-      } else if (compare_string_char(temp_string, 1, "E")) {
-        flags_arg |= fDoGases | fOnlyEarthlike;
-      } else if (compare_string_char(temp_string, 1, "P")) {
-        flags_arg |= fDoGases | fOnlyPotentialHabitable;
-      } else if (compare_string_char(temp_string, 1, "A")) {
-        ratio_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        if (ratio_arg <= 0.0) {
-          std::cout << "Accrete dust density coefficient -A (" << ratio_arg << ") must be > 0.0\n";
-          return EXIT_FAILURE;
-        }
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "Q")) {
-        ecc_coef_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        if (ecc_coef_arg <= 0.0) {
-          std::cout << "Accrete eccentricity coeffecient -Q (" << ecc_coef_arg << ") must be > 0.0\n";
-          return EXIT_FAILURE;
-        }
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "q")) {
-        inner_planet_factor_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        if (inner_planet_factor_arg <= 0.0) {
-          std::cout << "Accrete inner dust boundary -q (" << inner_planet_factor_arg
-               << ") must be > 0.0\n";
-          return EXIT_FAILURE;
-        }
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "w")) {
-        compainion_mass_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        if (compainion_mass_arg <= 0.0) {
-          std::cout << "Mass of compainion object -w (" << compainion_mass_arg << ") must be > 0.0\n";
-          return EXIT_FAILURE;
-        }
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "f")) {
-        compainion_eccentricity_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        if (compainion_eccentricity_arg <= 0.0) {
-          std::cout << "Eccentritiy of compainion object's orbit (" << compainion_eccentricity_arg
-               << ") must be > 0.0\n";
-          return EXIT_FAILURE;
-        }
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "d")) {
-        compainion_distant_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        if (compainion_distant_arg <= 0.0) {
-          std::cout << "Distance of compainion object -d (" << compainion_distant_arg
-               << ") must be > 0.0\n";
-          return EXIT_FAILURE;
-        }
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "b")) {
-        temp_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        if (temp_arg <= 0.0) {
-          std::cout << "Temperature of star -b (" << temp_arg << ") must be > 0.0" << std::endl;
-          return EXIT_FAILURE;
-        }
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "B")) {
-        type_arg = temp_string.substr(2, temp_string.length() - 2).c_str();
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "j")) {
-        compainion_lum_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        if (compainion_lum_arg <= 0.0) {
-          std::cout << "Luminosity of companion star j (" << compainion_lum_arg << ") must be > 0.0\n";
-          return EXIT_FAILURE;
-        }
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "X")) {
-        compainion_eff_arg = atof(temp_string.substr(2, temp_string.length() - 2).c_str());
-        if (compainion_eff_arg <= 0.0) {
-          std::cout << "Temperature of companion star X (" << compainion_lum_arg << ") must be > 0.0\n";
-          return EXIT_FAILURE;
-        }
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "N")) {
-        companion_spec_arg = temp_string.substr(2, temp_string.length() - 2).c_str();
-        // skip = true;
-      } else if (compare_string_char(temp_string, 1, "h")) {
-        usage(prognam);
-        return EXIT_FAILURE;
-      } else if (compare_string_char(temp_string, 1, "p") &&
-                 !compare_string_char(temp_string, 2, "ath")) {
-        performanceMonitor.setEnabled(true);
-      } else {
-        usage(prognam);
-        return EXIT_FAILURE;
-      }
-    } else if (temp_string != prognam) {
-      if (first_part_of_name) {
-        first_part_of_name = false;
-        arg_name           = temp_string;
-      } else {
-        arg_name.append(" ");
-        arg_name.append(temp_string);
-      }
-    }
-    if (skip) {
-      i++;
-    }
+  // Parse command line arguments
+  CommandLineArgs args;
+  if (!parseCommandLine(argc, argv, prognam, args)) {
+    return EXIT_FAILURE;
   }
 
-  // std::cout << arg_name << " blada\n";
-
-  /*for (index = 0; index < argc; index++)
-  {
-    if ((strlen(argv[index]) + arg_name.length()) < arg_name.size())
-    {
-      if (arg_name.length())
-        arg_name = " ";
-
-      arg_name = argv[index];
-    }
-    if ((strlen(argv[index]) + strlen(arg_name_temp)) < sizeof(arg_name_temp))
-    {
-      if (strlen(arg_name_temp))
-      {
-        strcpy(arg_name_temp + strlen(arg_name_temp), " ");
-      }
-      strcpy(arg_name_temp + strlen(arg_name_temp), argv[index]);
-    }
+  // Validate arguments
+  if (!validateArguments(args)) {
+    return EXIT_FAILURE;
   }
 
-  arg_name = arg_name_temp;*/
+  // Set global flag for backward compatibility
+  flags_arg_clone = args.flags_arg;
 
-  if (use_stdout) {
-    if (flags_arg &
-        (fOnlyHabitable | fOnlyMultiHabitable | fOnlyJovianHabitable | fOnlyEarthlike)) {
-      if (count_arg > 50000) {
-        std::cout << "Sorry, you cannot set the Repeat count > 50,000 even if you "
-                "use a filter, due to system resource issues."
-             << std::endl;
-        return EXIT_FAILURE;
-      }
-    } else {
-      if (count_arg > 1000) {
-        std::cout << "Sorry, you cannot set the Repeat count > 1,000 unless you use "
-                "a filter, due to system resource issues."
-             << std::endl;
-        return EXIT_FAILURE;
-      }
-    }
-  }
-
-  flags_arg_clone = flags_arg;
+  // Run the star generation
   ZoneScoped;
-  return stargen(action, flag_char, path, url_path_arg, filename_arg, arg_name, prognam, mass_arg,
-                 luminosity_arg, seed_arg, count_arg, increment_arg, star_catalog, sys_no_arg,
-                 ratio_arg, ecc_coef_arg, inner_planet_factor_arg, flags_arg, out_format,
-                 graphic_format);
+  return stargen(
+    args.action,
+    args.flag_char,
+    args.path,
+    args.url_path_arg,
+    args.filename_arg,
+    args.arg_name,
+    prognam,
+    args.mass_arg,
+    args.luminosity_arg,
+    args.seed_arg,
+    args.count_arg,
+    args.increment_arg,
+    args.star_catalog,
+    args.sys_no_arg,
+    args.ratio_arg,
+    args.ecc_coef_arg,
+    args.inner_planet_factor_arg,
+    args.flags_arg,
+    args.out_format,
+    args.graphic_format
+  );
 }
 
 /**
