@@ -606,15 +606,14 @@ void create_svg_file(planet* innermost_planet, std::string path, std::string fil
     long double margin     = 20.0;
     long double inner_edge = innermost_planet->getA() * (1.0 - innermost_planet->getE());
     long double outer_edge = outermost_planet->getA() * (1.0 + outermost_planet->getE());
-    long double floor      = (int)(log10(inner_edge) - 1.0);
+    int floor              = (int)(log10(inner_edge) - 1.0);
     long double min_log    = floor;
-    long double ceiling    = (int)(log10(outer_edge) + 1.0);
+    int ceiling            = (int)(log10(outer_edge) + 1.0);
     long double max_log    = 0.0;
     long double mult;
     long double offset;
     long double em_scale = 5;
 
-    // todo: fix loop counter
     for (int x = floor; x <= ceiling; x++) {
       float n;
 
@@ -650,7 +649,6 @@ void create_svg_file(planet* innermost_planet, std::string path, std::string fil
            << (max_y - margin) << "' x2='" << ((offset + mult) + (max_log * mult)) << "' y2='"
            << (max_y - margin) << "' />\n";
 
-    // todo: fix loop counter
     for (int x = floor; x <= ceiling; x++) {
       float n;
 
@@ -691,7 +689,6 @@ void create_svg_file(planet* innermost_planet, std::string path, std::string fil
     output << "   font-style='normal' font-weight='normal'\n";
     output << "   fill='black' text-anchor='middle'>\n";
 
-    // todo: fix loop counter
     for (int x = floor; x <= ceiling; x++) {
       if (min_log <= x && max_log >= x) {
         output << "    <text x='" << ((offset + mult) + (x * mult)) << "' y='120'> "
