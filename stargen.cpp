@@ -792,10 +792,9 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     if (!use_seed_system) {
       myAccreteObject.free_generations();
     } else {
-      planet *ptr = nullptr;
       planet *node = nullptr;
       planet *next = nullptr;
-      for (ptr = innermost_planet; ptr != nullptr; ptr = ptr->next_planet) {
+      for (planet* ptr : g_sim_context.planets) {
         ptr->setImf(0);
         ptr->setRmf(0);
         ptr->setCmf(0);
@@ -942,6 +941,10 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
   // std::cout << "test" << system_counter << "\n";
   generate_planets(the_sun, !use_seed_system, flag_char, sys_no,
                    system_name, do_gases, do_moons);
+
+  // Build planet vector for efficient iteration (replacing linked list traversal)
+  g_sim_context.buildPlanetVector();
+
   ZoneScoped;
 }
 
@@ -962,12 +965,11 @@ void generate_planets(sun &the_sun, bool random_tilt, const std::string &flag_ch
     do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   planet *the_planet = nullptr;
-  int planet_no = 0;
+  int planet_no = 1;
   planet *moon = nullptr;
   int moons = 0;
 
-  for (the_planet = innermost_planet, planet_no = 1; the_planet != nullptr;
-       the_planet = the_planet->next_planet, planet_no++) {
+  for (planet* the_planet : g_sim_context.planets) {
     std::string planet_id;
     std::stringstream ss;
 
@@ -993,8 +995,8 @@ void generate_planets(sun &the_sun, bool random_tilt, const std::string &flag_ch
     check_planet(the_planet, planet_id, false);
 
     if (do_moons) {
-      for (moon = the_planet->first_moon, moons = 1; moon != nullptr;
-           moon = moon->next_planet, moons++) {
+      moons = 1;
+      for (moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet) {
         std::string moon_id;
 
         ss.str("");
@@ -1002,8 +1004,10 @@ void generate_planets(sun &the_sun, bool random_tilt, const std::string &flag_ch
         moon_id = ss.str();
 
         check_planet(moon, moon_id, true);
+        moons++;
       }
     }
+    planet_no++;
   }
   ZoneScoped;
 }

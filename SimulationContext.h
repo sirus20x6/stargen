@@ -16,7 +16,9 @@ public:
     sun current_sun;
 
     // Planet generation state
-    planet* innermost_planet = nullptr;  // Head of planet linked list (to be replaced with vector)
+    planet* innermost_planet = nullptr;  // DEPRECATED: Use planets vector instead
+    std::vector<planet*> planets;  // Vector of planets (replacing linked list)
+    std::vector<planet*> moons_cache; // Temporary cache for moon processing
     long double dust_density_coeff = 0.0;  // Dust density coefficient for accretion
     long current_system_seed = 0;  // Seed for current system being generated
 
@@ -128,6 +130,24 @@ public:
     // Backward compatibility alias
     void resetStatistics() {
         resetGlobalStatistics();
+    }
+
+    // Planet vector management
+    void buildPlanetVector() {
+        planets.clear();
+        for (planet* p = innermost_planet; p != nullptr; p = p->next_planet) {
+            planets.push_back(p);
+        }
+    }
+
+    void clearPlanets() {
+        planets.clear();
+        innermost_planet = nullptr;
+    }
+
+    // Get planet count
+    size_t getPlanetCount() const {
+        return planets.size();
     }
 
     void updateBreathableStats(long double g, long double l, long double temp,
