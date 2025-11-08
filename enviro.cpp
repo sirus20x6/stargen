@@ -2091,6 +2091,216 @@ auto getGasGiantAlbedo(const string& sudusky_class, const string& star_type,
   }
 }
 
+/**
+ * @brief Structure to hold gas retention calculation parameters
+ */
+struct GasRetentionFactors {
+  long double abundance;
+  long double reactivity;
+  long double pressure_factor;
+  long double retention_fraction;
+};
+
+/**
+ * @brief Calculate gas retention factors for Argon
+ */
+static auto calculate_argon_retention(Chemical& the_gas, sun& the_sun,
+                                     long double base_abundance) -> GasRetentionFactors {
+  GasRetentionFactors factors;
+  factors.abundance = base_abundance;
+  factors.reactivity = 0.15 * the_sun.getAge() / 4e9;
+  factors.pressure_factor = 1.0;
+  factors.retention_fraction = 1.0;
+  return factors;
+}
+
+/**
+ * @brief Calculate gas retention factors for Helium
+ */
+static auto calculate_helium_retention(Chemical& the_gas, sun& the_sun,
+                                      planet* the_planet, long double base_abundance,
+                                      long double pressure) -> GasRetentionFactors {
+  GasRetentionFactors factors;
+  factors.abundance = base_abundance *
+                     (0.001 + (the_planet->getGasMass() / the_planet->getMass()));
+  factors.pressure_factor = (0.75 + pressure);
+  factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                               the_sun.getAge() / 2e9 * factors.pressure_factor);
+  factors.retention_fraction = 1.0;
+  return factors;
+}
+
+/**
+ * @brief Calculate gas retention factors for Oxygen/O2
+ */
+static auto calculate_oxygen_retention(Chemical& the_gas, sun& the_sun,
+                                      planet* the_planet, long double base_abundance,
+                                      long double pressure) -> GasRetentionFactors {
+  GasRetentionFactors factors;
+  factors.abundance = base_abundance;
+
+  if (the_sun.getAge() > 2e9 &&
+      (the_planet->getGasGiant() ||
+       (the_planet->getSurfTemp() > 270 && the_planet->getSurfTemp() < 400))) {
+    factors.pressure_factor = (0.89 + pressure / 4);
+    factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                                 std::pow(the_sun.getAge() / 2e9, 0.25) * factors.pressure_factor);
+  } else {
+    factors.pressure_factor = (0.75 + pressure);
+    factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                                 the_sun.getAge() / 2e9 * factors.pressure_factor);
+  }
+  factors.retention_fraction = 1.0;
+  return factors;
+}
+
+/**
+ * @brief Calculate gas retention factors for CO2
+ */
+static auto calculate_co2_retention(Chemical& the_gas, sun& the_sun,
+                                   planet* the_planet, long double base_abundance,
+                                   long double pressure) -> GasRetentionFactors {
+  GasRetentionFactors factors;
+  factors.abundance = base_abundance;
+
+  if (the_sun.getAge() > 2e9 &&
+      (the_planet->getGasGiant() ||
+       (the_planet->getSurfTemp() > 270 && the_planet->getSurfTemp() < 400))) {
+    factors.pressure_factor = (0.75 + pressure);
+    factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                                 std::pow(the_sun.getAge() / 2e9, 0.5) * factors.pressure_factor);
+    factors.reactivity *= 1.5;
+  } else {
+    factors.pressure_factor = (0.75 + pressure);
+    factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                                 the_sun.getAge() / 2e9 * factors.pressure_factor);
+  }
+  factors.retention_fraction = 1.0;
+  return factors;
+}
+
+/**
+ * @brief Calculate generic gas retention factors
+ */
+static auto calculate_generic_retention(Chemical& the_gas, sun& the_sun,
+                                       long double base_abundance,
+                                       long double pressure) -> GasRetentionFactors {
+  GasRetentionFactors factors;
+  factors.abundance = base_abundance;
+  factors.pressure_factor = (0.75 + pressure);
+  factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                               the_sun.getAge() / 2e9 * factors.pressure_factor);
+  factors.retention_fraction = 1.0;
+  return factors;
+}
+
+/**
+ * @brief Calculate final gas amount based on retention factors
+ */
+static auto calculate_gas_amount(Chemical& the_gas, planet* the_planet,
+                                sun& the_sun, const GasRetentionFactors& factors,
+                                long double molecular_weight_retention) -> long double {
+  long double vrms = rms_vel(the_gas.getWeight(), the_planet->getExosphericTemp());
+  long double pvrms = std::pow(1.0 / (1.0 + vrms / the_planet->getEscVelocity()),
+                               the_sun.getAge() / 1e9);
+  long double fract = 1.0 - (the_planet->getMolecWeight() / the_gas.getWeight());
+
+  return factors.abundance * pvrms * factors.reactivity * fract;
+}
+
+/**
+ * @brief Adjust gas amount to meet IPP constraints
+ */
+static void adjust_gas_ipp_to_range(Chemical& the_gas, planet* the_planet,
+                                    long double& gas_amount, long double& total_amount) {
+  long double pressure = the_planet->getSurfPressure() * (gas_amount / total_amount);
+  long double ipp = inspired_partial_pressure(the_planet->getSurfPressure(), pressure);
+
+  if (ipp > the_gas.getMaxIpp()) {
+    while (ipp > the_gas.getMaxIpp()) {
+      long double old_amount = gas_amount;
+      gas_amount *= 0.99;
+      total_amount -= old_amount;
+      total_amount += gas_amount;
+      ipp = inspired_partial_pressure(the_planet->getSurfPressure(),
+                                      the_planet->getSurfPressure() * (gas_amount / total_amount));
+    }
+  } else if (ipp < the_gas.getMinIpp()) {
+    while (ipp < the_gas.getMinIpp()) {
+      long double old_amount = gas_amount;
+      if (gas_amount <= 0.0) {
+        gas_amount = 1.0E-9;
+      } else {
+        gas_amount *= 1.01;
+        total_amount -= old_amount;
+      }
+      total_amount += gas_amount;
+      ipp = inspired_partial_pressure(the_planet->getSurfPressure(),
+                                      the_planet->getSurfPressure() * (gas_amount / total_amount));
+    }
+  }
+}
+
+/**
+ * @brief Adjust all gases for potentially habitable planets
+ */
+static void adjust_gases_for_habitability(planet* the_planet, long double* amounts,
+                                          long double& total_amount,
+                                          const string& planet_id) {
+  if (!is_potentialy_habitable(the_planet)) {
+    return;
+  }
+
+  if (the_planet->getSurfPressure() < (1.2 * MIN_O2_IPP) ||
+      the_planet->getSurfPressure() > MAX_HABITABLE_PRESSURE) {
+    return;
+  }
+
+  std::map<int, long double> new_values;
+  std::map<int, bool> do_overs_more, do_overs_less;
+  bool bad_air = false;
+  int counter = 0;
+  const int MAX_ITERATIONS = 1000;
+
+  do {
+    for (int i = 0; i < gases.count(); i++) {
+      new_values[i] = 0;
+      adjust_gas_ipp_to_range(gases[i], the_planet, amounts[i], total_amount);
+    }
+
+    bad_air = false;
+    for (int i = 0; i < gases.count(); i++) {
+      if (new_values[i] > 0.0) {
+        amounts[i] = new_values[i] * total_amount;
+      }
+
+      long double ipp = inspired_partial_pressure(
+          the_planet->getSurfPressure(),
+          the_planet->getSurfPressure() * amounts[i] / total_amount);
+
+      if (ipp > gases[i].getMaxIpp()) {
+        bad_air = true;
+        do_overs_less[i] = true;
+        do_overs_more[i] = false;
+        break;
+      } else if (ipp < gases[i].getMinIpp() && gases[i].getNum() == AN_O) {
+        bad_air = true;
+        do_overs_less[i] = false;
+        do_overs_more[i] = true;
+        break;
+      } else {
+        do_overs_less[i] = false;
+        do_overs_more[i] = false;
+      }
+    }
+
+    counter++;
+    if (counter > MAX_ITERATIONS) {
+      break;
+    }
+  } while (bad_air);
+}
+
 void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
   the_sun = the_planet->getTheSun();
   if ((the_planet->getSurfPressure() > 0 || the_planet->getGasGiant()) &&
@@ -2124,50 +2334,27 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
       if (((yp >= 0 && yp < the_planet->getLowTemp()) ||
            is_gas_planet(the_planet)) &&
           (gases[i].getWeight() >= the_planet->getMolecWeight())) {
-        long double vrms =
-            rms_vel(gases[i].getWeight(), the_planet->getExosphericTemp());
-        long double pvrms =
-            std::pow(1.0 / (1.0 + vrms / the_planet->getEscVelocity()),
-                the_sun.getAge() / 1e9);
-        long double abund = gases[i].getAbunds();
-        long double react = 1.0;
-        long double fract = 1.0;
-        long double pres2 = 1.0;
+        // Use helper functions to calculate gas-specific retention factors
+        GasRetentionFactors factors;
+        long double base_abundance = gases[i].getAbunds();
 
         if (gases[i].getSymbol() == "Ar") {
-          react = 0.15 * the_sun.getAge() / 4e9;
+          factors = calculate_argon_retention(gases[i], the_sun, base_abundance);
         } else if (gases[i].getSymbol() == "He") {
-          abund = abund *
-                  (0.001 + (the_planet->getGasMass() / the_planet->getMass()));
-          pres2 = (0.75 + pressure);
-          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
-                      the_sun.getAge() / 2e9 * pres2);
-        } else if ((gases[i].getSymbol() == "O" ||
-                    gases[i].getSymbol() == "O2") &&
-                   the_sun.getAge() > 2e9 &&
-                   (the_planet->getGasGiant() ||
-                    (the_planet->getSurfTemp() > 270 &&
-                     the_planet->getSurfTemp() < 400))) {
-          pres2 = (0.89 + pressure / 4);
-          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
-                      std::pow(the_sun.getAge() / 2e9, 0.25) * pres2);
-        } else if (gases[i].getSymbol() == "CO2" && the_sun.getAge() > 2e9 &&
-                   (the_planet->getGasGiant() ||
-                    (the_planet->getSurfTemp() > 270 &&
-                     the_planet->getSurfTemp() < 400))) {
-          pres2 = (0.75 + pressure);
-          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
-                      std::pow(the_sun.getAge() / 2e9, 0.5) * pres2);
-          react *= 1.5;
+          factors = calculate_helium_retention(gases[i], the_sun, the_planet,
+                                              base_abundance, pressure);
+        } else if (gases[i].getSymbol() == "O" || gases[i].getSymbol() == "O2") {
+          factors = calculate_oxygen_retention(gases[i], the_sun, the_planet,
+                                              base_abundance, pressure);
+        } else if (gases[i].getSymbol() == "CO2") {
+          factors = calculate_co2_retention(gases[i], the_sun, the_planet,
+                                           base_abundance, pressure);
         } else {
-          pres2 = (0.75 + pressure);
-          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
-                      the_sun.getAge() / 2e9 * pres2);
+          factors = calculate_generic_retention(gases[i], the_sun,
+                                               base_abundance, pressure);
         }
 
-        fract = 1.0 - (the_planet->getMolecWeight() / gases[i].getWeight());
-
-        amount[i] = abund * pvrms * react * fract;
+        amount[i] = calculate_gas_amount(gases[i], the_planet, the_sun, factors, 1.0);
 
         // cout << toString(amount[i]) <<  " " << toString(vrms) << " " <<
         // toString(pvrms) << " " << toString(abund) << " " << toString(react)
@@ -2179,9 +2366,10 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
              gases[i].getSymbol() == "CO2")) {
           cerr << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
                << " " << gases[i].getSymbol() << ", " << toString(amount[i])
-               << " = a " << toString(abund) << " * p " << toString(pvrms)
-               << " * r " << toString(react) << " * p2 " << toString(pres2)
-               << " * f " << toString(fract) << "\t("
+               << " = a " << toString(factors.abundance)
+               << " * r " << toString(factors.reactivity)
+               << " * p2 " << toString(factors.pressure_factor)
+               << " * f " << toString(factors.retention_fraction) << "\t("
                << toString(100.0 *
                            (the_planet->getGasMass() / the_planet->getMass()))
                << "%)\n";
@@ -2203,129 +2391,23 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
       }
     }
 
-    long double original_total = NAN;
-    long double increase_factor = 1.0;
-    // long double pressure = 0.0;
-    map<int, long double> new_values;
-    map<int, bool> do_overs_more, do_overs_less;
-    long double the_amount = 0.0;
-    long double ipp = 0.0;
-    bool bad_air = false;
-    int counter = 0;
-
+    // Apply habitability constraints and assign final gas amounts
     if (n > 0) {
-      do {
-        for (int i = 0; i < gases.count(); i++) {
-          new_values[i] = 0;
-          if (is_potentialy_habitable(the_planet)) {
-            if (planet_id == "") {
-              stringstream ss;
-              ss.str("");
-              ss << toString(the_planet->getA()) << " "
-                 << toString(the_planet->getMoonA());
-              planet_id = ss.str();
-              ss.str("");
-            }
-            if (the_planet->getSurfPressure() >= (1.2 * MIN_O2_IPP) &&
-                the_planet->getSurfPressure() <= MAX_HABITABLE_PRESSURE) {
-              // the_amount = the_planet->getSurfPressure() * amount[i] /
-              // original_total;
-              pressure =
-                  the_planet->getSurfPressure() * (amount[i] / totalamount);
-              ipp = inspired_partial_pressure(the_planet->getSurfPressure(),
-                                              pressure);
-              if (ipp > gases[i].getMaxIpp()) {
-                // cout << "test1 too high " << gases[i].getSymbol() << " " <<
-                // planet_id << endl; cout << toString(amount[i]) << endl;
-                while (ipp > gases[i].getMaxIpp()) {
-                  the_amount = amount[i];
-                  amount[i] *= 0.99;
-                  totalamount -= the_amount;
-                  totalamount += amount[i];
-                  ipp =
-                      inspired_partial_pressure(the_planet->getSurfPressure(),
-                                                the_planet->getSurfPressure() *
-                                                    (amount[i] / totalamount));
-                }
-              } else if (ipp < gases[i].getMinIpp()) {
-                // cout << "test1 too low " << gases[i].getSymbol() << " " <<
-                // planet_id << endl; if (planet_id == "1.05853286955409876162
-                // 0.00153819919909735927041")
-                {
-                  //for (int i = 0; i < gases.count(); i++) {
-                    // cout << gases[i].getName() << ": " << toString(amount[i])
-                    // << endl;
-                  //}
-                  // exit(EXIT_FAILURE);
-                }
-                // cout << toString(amount[i]) << " " << toString(ipp) << " " <<
-                // toString(the_planet->getSurfPressure()) << endl;
-                while (ipp < gases[i].getMinIpp()) {
-                  the_amount = amount[i];
-                  if (amount[i] <= 0.0) {
-                    amount[i] = 1.0E-9;
-                  } else {
-                    amount[i] *= 1.01;
-                    totalamount -= the_amount;
-                  }
-                  totalamount += amount[i];
-                  ipp =
-                      inspired_partial_pressure(the_planet->getSurfPressure(),
-                                                the_planet->getSurfPressure() *
-                                                    (amount[i] / totalamount));
-                }
-              }
-            }
-          }
-        }
+      if (planet_id == "" && is_potentialy_habitable(the_planet)) {
+        std::stringstream ss;
+        ss << toString(the_planet->getA()) << " " << toString(the_planet->getMoonA());
+        planet_id = ss.str();
+      }
 
-        long double old_amount = 0.0;
-        for (int i = 0, n = 0; i < gases.count(); i++) {
-          if (is_potentialy_habitable(the_planet)) {
-            if (the_planet->getSurfPressure() >= (1.2 * MIN_O2_IPP) &&
-                the_planet->getSurfPressure() <= MAX_HABITABLE_PRESSURE) {
-              if (new_values[i] > 0.0) {
-                amount[i] = new_values[i] * totalamount;
-              }
-              ipp = inspired_partial_pressure(
-                  the_planet->getSurfPressure(),
-                  the_planet->getSurfPressure() * amount[i] / totalamount);
-              if (ipp > gases[i].getMaxIpp()) {
-                bad_air = true;
-                do_overs_less[i] = true;
-                do_overs_more[i] = false;
-                break;
-              } else if (ipp < gases[i].getMinIpp() &&
-                         gases[i].getNum() == AN_O) {
-                bad_air = true;
-                do_overs_less[i] = false;
-                do_overs_more[i] = true;
-                break;
-              } else {
-                do_overs_less[i] = false;
-                do_overs_more[i] = false;
-                bad_air = false;
-              }
-            }
-          }
-        }
-        counter++;
-        if (counter > 1000) {
-          break;
-        }
-      } while (bad_air);
+      adjust_gases_for_habitability(the_planet, amount, totalamount, planet_id);
 
+      // Assign final gas amounts to planet atmosphere
       for (int i = 0, n = 0; i < gases.count(); i++) {
         if (amount[i] > 0.0) {
           gas substance;
           substance.setNum(gases[i].getNum());
-          if (new_values[i] > 0.0) {
-            substance.setSurfPressure(the_planet->getSurfPressure() *
-                                      new_values[i]);
-          } else {
-            substance.setSurfPressure(the_planet->getSurfPressure() *
-                                      amount[i] / totalamount);
-          }
+          substance.setSurfPressure(the_planet->getSurfPressure() *
+                                    amount[i] / totalamount);
           the_planet->addGas(substance);
 
           if (flag_verbose & 0x2000) {
