@@ -372,14 +372,14 @@ class dust {
   dust();
   ~dust();
   void setInnerEdge(long double);
-  auto getInnerEdge() -> long double;
+  auto getInnerEdge() const -> long double;
   void setOuterEdge(long double);
-  auto getOuterEdge() -> long double;
+  auto getOuterEdge() const -> long double;
   void setDustPresent(bool);
-  auto getDustPresent() -> bool;
+  auto getDustPresent() const -> bool;
   void setGasPresent(bool);
-  auto getGasPresent() -> bool;
-  dust *next_band;
+  auto getGasPresent() const -> bool;
+  // REMOVED: dust *next_band; - Now using std::vector instead of linked list
 };
 
 class star;
@@ -478,7 +478,7 @@ class gen {
  public:
   gen();
   ~gen();
-  dust *dusts;
+  std::vector<dust> dusts;  // Changed from dust* to std::vector<dust>
   planet *planets;
   gen *next;
 };

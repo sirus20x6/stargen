@@ -1,6 +1,8 @@
 #ifndef ACCRETE_H
 #define ACCRETE_H
 
+#include <vector>
+
 class dust;
 class gen;
 class planet;
@@ -27,7 +29,7 @@ class accrete {
     long double reduced_mass;
     long double dust_density;
     long double cloud_eccentricity;
-    dust *dust_head = nullptr;
+    std::vector<dust> dust_bands;  // Changed from dust *dust_head to vector
     planet *planet_head = nullptr;
     gen *hist_head = nullptr;
     planet *seed_moons = nullptr;
@@ -39,14 +41,14 @@ class accrete {
     auto outer_effect_limit(long double, long double, long double) -> long double;
     auto dust_available(long double, long double) -> bool;
     void update_dust_lanes(long double, long double, long double, long double, long double, long double);
-    auto collect_dust(long double, long double &, long double &, long double, long double, long double, dust *) -> long double;
+    auto collect_dust(long double, long double &, long double &, long double, long double, long double, size_t) -> long double;
     auto critical_limit(long double, long double, long double) -> long double;
     void accrete_dust(long double &, long double &, long double &, long double, long double, long double, long double, long double);
     void coalesce_planetesimals(long double, long double, long double, long double,
                                 long double, long double, long double, long double,
                                 long double, bool);
 
-    void free_dust(dust *);
+    // REMOVED: void free_dust(dust *); - No longer needed with std::vector
     void free_planet(planet *);
     
     auto is_predefined_planet_helper(planet *the_planet, planet *predined_planet) -> bool;

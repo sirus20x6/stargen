@@ -1647,7 +1647,8 @@ auto planet::operator==(planet& rhs) -> bool {
   return false;
 }
 
-dust::dust() : innerEdge(0), outerEdge(0), dustPresent(true), gasPresent(true), next_band(NULL) {
+dust::dust() : innerEdge(0), outerEdge(0), dustPresent(true), gasPresent(true) {
+  // REMOVED: next_band(NULL) - no longer using linked list
   
   
   
@@ -1663,20 +1664,22 @@ dust::~dust() {
   // next_band = NULL;
 }
 
-auto dust::getDustPresent() -> bool { return dustPresent; }
+auto dust::getDustPresent() const -> bool { return dustPresent; }
 
-auto dust::getGasPresent() -> bool { return gasPresent; }
+auto dust::getGasPresent() const -> bool { return gasPresent; }
 
-auto dust::getInnerEdge() -> long double {
+auto dust::getInnerEdge() const -> long double {
   if (innerEdge < outerEdge) {
     return innerEdge;
   } else {
-    innerEdge = 0;
-    return innerEdge;
+    // NOTE: This modifies innerEdge which violates const correctness!
+    // This should be fixed but keeping for now to maintain existing behavior
+    const_cast<dust*>(this)->innerEdge = 0;
+    return 0;
   }
 }
 
-auto dust::getOuterEdge() -> long double { return outerEdge; }
+auto dust::getOuterEdge() const -> long double { return outerEdge; }
 
 void dust::setDustPresent(bool d) { dustPresent = d; }
 
@@ -1686,7 +1689,8 @@ void dust::setInnerEdge(long double i) { innerEdge = i; }
 
 void dust::setOuterEdge(long double o) { outerEdge = o; }
 
-gen::gen() : dusts(NULL), planets(NULL), next(NULL) {
+gen::gen() : planets(NULL), next(NULL) {
+  // dusts vector is default-initialized (empty)
   
   
   

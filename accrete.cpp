@@ -20,11 +20,7 @@ accrete::~accrete() {
     hist_head = nullptr;
   }
 
-  // Clean up any remaining dust (in case it wasn't in hist_head)
-  if (dust_head != nullptr) {
-    free_dust(dust_head);
-    dust_head = nullptr;
-  }
+  // dust_bands vector automatically cleaned up (RAII)
 
   // Clean up any remaining planets (in case they weren't in hist_head)
   if (planet_head != nullptr) {
@@ -48,10 +44,7 @@ accrete::~accrete() {
 void accrete::set_initial_conditions(long double inner_limit_of_dust,
                             long double outer_limit_of_dust) {
   // Clean up previous allocations to prevent memory leaks
-  if (dust_head != nullptr) {
-    free_dust(dust_head);
-    dust_head = nullptr;
-  }
+  dust_bands.clear();  // Vector automatically cleans up
 
   if (hist_head != nullptr) {
     free_generations();
@@ -61,13 +54,13 @@ void accrete::set_initial_conditions(long double inner_limit_of_dust,
   // Reset planet_head (planets are cleaned up via hist_head)
   planet_head = nullptr;
 
-  // Allocate new dust chain
-  dust_head = new dust();
-  dust_head->next_band = nullptr;
-  dust_head->setOuterEdge(outer_limit_of_dust);
-  dust_head->setInnerEdge(inner_limit_of_dust);
-  dust_head->setDustPresent(true);
-  dust_head->setGasPresent(true);
+  // Create initial dust band
+  dust initial_dust;
+  initial_dust.setOuterEdge(outer_limit_of_dust);
+  initial_dust.setInnerEdge(inner_limit_of_dust);
+  initial_dust.setDustPresent(true);
+  initial_dust.setGasPresent(true);
+  dust_bands.push_back(initial_dust);
   dust_left = true;
 
   cloud_eccentricity = 0.2;
@@ -76,7 +69,7 @@ void accrete::set_initial_conditions(long double inner_limit_of_dust,
   // Create new history node
   gen *hist = nullptr;
   hist = new gen();
-  hist->dusts = dust_head;
+  hist->dusts = dust_bands;  // Copy dust vector to history
   hist->planets = planet_head;
   hist->next = hist_head;
   hist_head = hist;
@@ -152,31 +145,31 @@ auto accrete::outer_effect_limit(long double a, long double e, long double mass)
  */
 auto accrete::dust_available(long double inside_range, long double outside_range)
     -> bool {
-    dust *current_dust_band = nullptr;
   bool dust_here = false;
 
-  // this loop finds the dust band whose outer edge is within our inside range.
-  current_dust_band = dust_head;
-  while (current_dust_band != nullptr &&
-         current_dust_band->getOuterEdge() < inside_range) {
-    current_dust_band = current_dust_band->next_band;
-  }
-  // if we have no dust band, there's no dust here; otherwise, it depends on the
-  // dust record
-  if (current_dust_band == nullptr) {
-    dust_here = false;
-  } else {
-    dust_here = current_dust_band->getDustPresent();
-  }
-  // this loop ORs together all of the dust bands between the first one we found
-  // and the dust band whose inner edge is outside our outside range.
-  while (current_dust_band != nullptr &&
-         current_dust_band->getInnerEdge() < outside_range) {
-    dust_here = dust_here || current_dust_band->getDustPresent();
-    current_dust_band = current_dust_band->next_band;
+  // Find the first dust band whose outer edge is within our inside range
+  size_t index = 0;
+  while (index < dust_bands.size() &&
+         dust_bands[index].getOuterEdge() < inside_range) {
+    index++;
   }
 
-  // return whether or not we found a dust band in our range that still had dust
+  // If we have no dust band, there's no dust here; otherwise, it depends on the dust record
+  if (index >= dust_bands.size()) {
+    dust_here = false;
+  } else {
+    dust_here = dust_bands[index].getDustPresent();
+  }
+
+  // This loop ORs together all of the dust bands between the first one we found
+  // and the dust band whose inner edge is outside our outside range
+  while (index < dust_bands.size() &&
+         dust_bands[index].getInnerEdge() < outside_range) {
+    dust_here = dust_here || dust_bands[index].getDustPresent();
+    index++;
+  }
+
+  // Return whether or not we found a dust band in our range that still had dust
   ZoneScoped;
   return dust_here;
 }
@@ -194,104 +187,107 @@ auto accrete::dust_available(long double inside_range, long double outside_range
 void accrete::update_dust_lanes(long double min, long double max, long double mass,
                        long double crit_mass, long double body_inner_bound,
                        long double body_outer_bound) {
-    bool gas = false;
-  dust *node1 = nullptr;
-  dust *node2 = nullptr;
-  dust *node3 = nullptr;
-
+  bool gas = (mass <= crit_mass);
   dust_left = false;
-  if (mass > crit_mass) {
-    gas = false;
-  } else {
-    gas = true;
-  }
-  node1 = dust_head;
-  while (node1 != nullptr) {
-    if (node1->getInnerEdge() < min && node1->getOuterEdge() > max) {
-      node2 = new dust();
-      node2->setInnerEdge(min);
-      node2->setOuterEdge(max);
-      if (node1->getGasPresent()) {
-        node2->setGasPresent(gas);
-      } else {
-        node2->setGasPresent(false);
+
+  // Process each dust band - iterate carefully to handle insertions
+  size_t i = 0;
+  while (i < dust_bands.size()) {
+    dust& band = dust_bands[i];
+
+    if (band.getInnerEdge() < min && band.getOuterEdge() > max) {
+      // Case 1: Band spans entire range - split into 3 bands
+      // [inner...min] [min...max] [max...outer]
+      dust middle_band;
+      middle_band.setInnerEdge(min);
+      middle_band.setOuterEdge(max);
+      middle_band.setGasPresent(band.getGasPresent() ? gas : false);
+      middle_band.setDustPresent(false);
+
+      dust right_band;
+      right_band.setInnerEdge(max);
+      right_band.setOuterEdge(band.getOuterEdge());
+      right_band.setGasPresent(band.getGasPresent());
+      right_band.setDustPresent(band.getDustPresent());
+
+      // Modify current band to be left part
+      band.setOuterEdge(min);
+
+      // Insert middle and right bands after current
+      dust_bands.insert(dust_bands.begin() + i + 1, right_band);
+      dust_bands.insert(dust_bands.begin() + i + 1, middle_band);
+
+      // Skip past the newly inserted bands
+      i += 3;
+    } else if (band.getInnerEdge() < max && band.getOuterEdge() > max) {
+      // Case 2: Band overlaps max boundary - split into 2
+      // [inner...max] [max...outer]
+      dust right_band;
+      right_band.setInnerEdge(max);
+      right_band.setOuterEdge(band.getOuterEdge());
+      right_band.setDustPresent(band.getDustPresent());
+      right_band.setGasPresent(band.getGasPresent());
+
+      // Modify current band
+      band.setOuterEdge(max);
+      band.setGasPresent(band.getGasPresent() ? gas : false);
+      band.setDustPresent(false);
+
+      // Insert right band after current
+      dust_bands.insert(dust_bands.begin() + i + 1, right_band);
+      i += 2;
+    } else if (band.getInnerEdge() < min && band.getOuterEdge() > min) {
+      // Case 3: Band overlaps min boundary - split into 2
+      // [inner...min] [min...outer]
+      dust right_band;
+      right_band.setInnerEdge(min);
+      right_band.setOuterEdge(band.getOuterEdge());
+      right_band.setDustPresent(false);
+      right_band.setGasPresent(band.getGasPresent() ? gas : false);
+
+      // Modify current band
+      band.setOuterEdge(min);
+
+      // Insert right band after current
+      dust_bands.insert(dust_bands.begin() + i + 1, right_band);
+      i += 2;
+    } else if (band.getInnerEdge() >= min && band.getOuterEdge() <= max) {
+      // Case 4: Band completely within range - modify in place
+      if (band.getGasPresent()) {
+        band.setGasPresent(gas);
       }
-      node2->setDustPresent(false);
-      node3 = new dust();
-      node3->setInnerEdge(max);
-      node3->setOuterEdge(node1->getOuterEdge());
-      node3->setGasPresent(node1->getGasPresent());
-      node3->setDustPresent(node1->getDustPresent());
-      node3->next_band = node1->next_band;
-      node1->next_band = node2;
-      node2->next_band = node3;
-      node1->setOuterEdge(min);
-      node1 = node3->next_band;
+      band.setDustPresent(false);
+      i++;
     } else {
-      if (node1->getInnerEdge() < max && node1->getOuterEdge() > max) {
-        node2 = new dust();
-        node2->next_band = node1->next_band;
-        node2->setDustPresent(node1->getDustPresent());
-        node2->setGasPresent(node1->getGasPresent());
-        node2->setOuterEdge(node1->getOuterEdge());
-        node2->setInnerEdge(max);
-        node1->next_band = node2;
-        node1->setOuterEdge(max);
-        if (node1->getGasPresent()) {
-          node1->setGasPresent(gas);
-        } else {
-          node1->setGasPresent(false);
-        }
-        node1->setDustPresent(false);
-        node1 = node2->next_band;
-      } else {
-        if (node1->getInnerEdge() < min && node1->getOuterEdge() > min) {
-          node2 = new dust();
-          node2->next_band = node1->next_band;
-          node2->setDustPresent(false);
-          if (node1->getGasPresent()) {
-            node2->setGasPresent(gas);
-          } else {
-            node2->setGasPresent(false);
-          }
-          node2->setOuterEdge(node1->getOuterEdge());
-          node2->setInnerEdge(min);
-          node1->next_band = node2;
-          node1->setOuterEdge(min);
-          node1 = node2->next_band;
-        } else {
-          if (node1->getInnerEdge() >= min && node1->getOuterEdge() <= max) {
-            if (node1->getGasPresent()) {
-              node1->setGasPresent(gas);
-            }
-            node1->setDustPresent(false);
-            node1 = node1->next_band;
-          } else {
-            if (node1->getOuterEdge() < min || node1->getInnerEdge() > max) {
-              node1 = node1->next_band;
-            }
-          }
-        }
-      }
+      // Case 5: Band outside range - skip
+      i++;
     }
   }
-  node1 = dust_head;
-  while (node1 != nullptr) {
-    if (node1->getDustPresent() && node1->getOuterEdge() >= body_inner_bound &&
-        node1->getInnerEdge() <= body_outer_bound) {
+
+  // Check if there's dust left in the affected region
+  for (const auto& band : dust_bands) {
+    if (band.getDustPresent() &&
+        band.getOuterEdge() >= body_inner_bound &&
+        band.getInnerEdge() <= body_outer_bound) {
       dust_left = true;
+      break;
     }
-    node2 = node1->next_band;
-    if (node2 != nullptr) {
-      if (node1->getDustPresent() == node2->getDustPresent() &&
-          node1->getGasPresent() == node2->getGasPresent()) {
-        node1->setOuterEdge(node2->getOuterEdge());
-        node1->next_band = node2->next_band;
-        delete node2;
-      }
-    }
-    node1 = node1->next_band;
   }
+
+  // Merge adjacent bands with identical properties
+  size_t j = 0;
+  while (j < dust_bands.size() - 1) {
+    if (dust_bands[j].getDustPresent() == dust_bands[j + 1].getDustPresent() &&
+        dust_bands[j].getGasPresent() == dust_bands[j + 1].getGasPresent()) {
+      // Merge j+1 into j
+      dust_bands[j].setOuterEdge(dust_bands[j + 1].getOuterEdge());
+      dust_bands.erase(dust_bands.begin() + j + 1);
+      // Don't increment j - check if we can merge with the next band too
+    } else {
+      j++;
+    }
+  }
+
   ZoneScoped;
 }
 
@@ -309,8 +305,8 @@ void accrete::update_dust_lanes(long double min, long double max, long double ma
  */
 auto accrete::collect_dust(long double last_mass, long double &new_dust,
                   long double &new_gas, long double a, long double e,
-                  long double crit_mass, dust *dust_band) -> long double {
-    // std::cout << EM(last_mass) << " " << EM(new_dust) << " " << EM(new_gas) << " "
+                  long double crit_mass, size_t band_index) -> long double {
+  // std::cout << EM(last_mass) << " " << EM(new_dust) << " " << EM(new_gas) << " "
   // << a << " " << e << " " << EM(crit_mass) << std::endl;
   long double mass_density = NAN;
   long double temp1 = NAN;
@@ -334,70 +330,73 @@ auto accrete::collect_dust(long double last_mass, long double &new_dust,
   if (r_inner < 0.0) {
     r_inner = 0.0;
   }
-// base case: if this is the last dust band, return 0
-  if (dust_band == nullptr) {
+
+  // Base case: if we've gone past the last dust band, return 0
+  if (band_index >= dust_bands.size()) {
     return 0;
-  } else {
-  // if we have dust, use the dust density, otherwise zero
-  if (dust_band->getDustPresent()) {
+  }
+
+  const dust& dust_band = dust_bands[band_index];
+
+  // If we have dust, use the dust density, otherwise zero
+  if (dust_band.getDustPresent()) {
     temp_density = dust_density;
   }
 
-    // if the last mass is below the critical mass, or there's no dust in this 
-    // dust band, the density is the overall accretion density;
-    // otherwise, the mass density is this horrifying formula
-    if (last_mass < crit_mass || !dust_band->getGasPresent()) {
-      mass_density = temp_density;
-    } else {
-      mass_density =
-          K * temp_density / (1.0 + sqrt(crit_mass / last_mass) * (K - 1.0));
-      gas_density = mass_density - temp_density;
+  // If the last mass is below the critical mass, or there's no dust in this
+  // dust band, the density is the overall accretion density;
+  // otherwise, the mass density is this horrifying formula
+  if (last_mass < crit_mass || !dust_band.getGasPresent()) {
+    mass_density = temp_density;
+  } else {
+    mass_density =
+        K * temp_density / (1.0 + sqrt(crit_mass / last_mass) * (K - 1.0));
+    gas_density = mass_density - temp_density;
+  }
+
+  // std::cout << dust_band.getOuterEdge() << " " << dust_band.getInnerEdge() <<
+  // std::endl;
+
+  // If the outer edge exceeds the accretion inner limit or the inner edge is
+  // outside the outer limit, just collect the dust from the next band
+  if (dust_band.getOuterEdge() <= r_inner ||
+      dust_band.getInnerEdge() >= r_outer) {
+    return collect_dust(last_mass, new_dust, new_gas, a, e, crit_mass,
+                        band_index + 1);
+  } else {
+    bandwidth = r_outer - r_inner;
+
+    temp1 = r_outer - dust_band.getOuterEdge();
+    if (temp1 < 0.0) {
+      temp1 = 0.0;
     }
+    width = bandwidth - temp1;
 
-    // std::cout << dust_band->getOuterEdge() << " " << dust_band->getInnerEdge() <<
-    // std::endl;
-
-    // if the outer edge exceeds the accretion inner limit or the inner edge is 
-    // outside the outer limit, just collect the dust from the next band
-    if (dust_band->getOuterEdge() <= r_inner ||
-        dust_band->getInnerEdge() >= r_outer) {
-      return collect_dust(last_mass, new_dust, new_gas, a, e, crit_mass,
-                          dust_band->next_band);
-    } else {
-      bandwidth = r_outer - r_inner;
-
-      temp1 = r_outer - dust_band->getOuterEdge();
-      if (temp1 < 0.0) {
-        temp1 = 0.0;
-      }
-      width = bandwidth - temp1;
-
-      // account for the gap between the inner edge and the start of 
-      // the accretion radius
-      temp2 = dust_band->getInnerEdge() - r_inner;
-      if (temp2 < 0.0) {
-        temp2 = 0.0;
-      }
-      width = width - temp2;
-
-      // calculate the area of a cross-section, and the volume
-      temp = 4.0 * PI * std::pow(a, 2.0) * reduced_mass *
-             (1.0 - e * (temp1 - temp2) / bandwidth);
-      volume = temp * width;
-
-      // calculate the total mass of this lane plus the mass of the next lane
-      new_mass = volume * mass_density;
-      new_gas = volume * gas_density;
-      new_dust = new_mass - new_gas;
-
-      next_mass = collect_dust(last_mass, next_dust, next_gas, a, e, crit_mass,
-                               dust_band->next_band);
-
-      new_gas = new_gas + next_gas;
-      new_dust = new_dust + next_dust;
-
-      return new_mass + next_mass;
+    // Account for the gap between the inner edge and the start of
+    // the accretion radius
+    temp2 = dust_band.getInnerEdge() - r_inner;
+    if (temp2 < 0.0) {
+      temp2 = 0.0;
     }
+    width = width - temp2;
+
+    // Calculate the area of a cross-section, and the volume
+    temp = 4.0 * PI * std::pow(a, 2.0) * reduced_mass *
+           (1.0 - e * (temp1 - temp2) / bandwidth);
+    volume = temp * width;
+
+    // Calculate the total mass of this lane plus the mass of the next lane
+    new_mass = volume * mass_density;
+    new_gas = volume * gas_density;
+    new_dust = new_mass - new_gas;
+
+    next_mass = collect_dust(last_mass, next_dust, next_gas, a, e, crit_mass,
+                             band_index + 1);
+
+    new_gas = new_gas + next_gas;
+    new_dust = new_dust + next_dust;
+
+    return new_mass + next_mass;
   }
   ZoneScoped;
 }
@@ -450,10 +449,10 @@ void accrete::accrete_dust(long double &seed_mass, long double &new_dust,
 
   do {
     temp_mass = new_mass;
-    // std::fixed point algorithm: accumulate more mass until the difference is less 
+    // std::fixed point algorithm: accumulate more mass until the difference is less
     // than .01% of the old mass
     new_mass =
-        collect_dust(new_mass, new_dust, new_gas, a, e, crit_mass, dust_head);
+        collect_dust(new_mass, new_dust, new_gas, a, e, crit_mass, 0);
     if (new_mass < temp_mass) {
       new_mass = temp_mass;
       break;
@@ -967,17 +966,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
  * @param head 
  */
 
-void accrete::free_dust(dust *head) {
-    dust *node = nullptr;
-  dust *next = nullptr;
-
-  for (node = head; node != nullptr; node = next) {
-    next = node->next_band;
-    delete node;
-    // std::cout << "Deleted Dust\n";
-  }
-  ZoneScoped;
-}
+// REMOVED: free_dust - No longer needed with std::vector
 
 /**
  * @brief free planet
@@ -1003,15 +992,13 @@ void accrete::free_planet(planet *head) {
  */
 
 void accrete::free_generations() {
-    gen *node = nullptr;
+  gen *node = nullptr;
   gen *next = nullptr;
 
   for (node = hist_head; node != nullptr; node = next) {
     next = node->next;
 
-    if (node->dusts != nullptr) {
-      free_dust(node->dusts);
-    }
+    // node->dusts is now a std::vector - automatically cleaned up
 
     if (node->planets != nullptr) {
       free_planet(node->planets);
