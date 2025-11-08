@@ -1244,63 +1244,46 @@ void html_star_details_helper(std::fstream& the_file, const std::string& header,
 }
 
 /**
- * @brief HTML thumbnails
- *
- * @param innermost_planet
- * @param the_file
- * @param system_name
- * @param url_path
- * @param system_url
- * @param svg_url
- * @param file_name
- * @param details
- * @param terrestrials
- * @param int_link
- * @param do_moons
- * @param graphic_format
- * @param do_gases
+ * @brief Count system objects (planets, dwarf planets, asteroids, moons)
  */
-void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std::string& system_name,
-                     const std::string& url_path, const std::string& system_url, const std::string& svg_url,
-                     const std::string& file_name, bool details, bool terrestrials, bool int_link,
-                     bool do_moons, int graphic_format, bool do_gases) {
-  planet*      the_planet;
-  sun          the_sun = innermost_planet->getTheSun();
-  int          counter;
-  int          planet_count               = 0;
-  bool         terrestrials_seen          = false;
-  bool         habitable_jovians_seen     = false;
-  bool         potentialy_habitables_seen = false;
-  planet*      moon;
-  int          moons;
-  int          dwarf_planet_count  = 0;
-  int          asteroid_belt_count = 0;
-  int          moon_count          = 0;
-  int          object_count        = 0;
-  std::stringstream ss;
-  std::string       planet_id;
+struct SystemObjectCounts {
+  int planet_count;
+  int dwarf_planet_count;
+  int asteroid_belt_count;
+  int moon_count;
+  int object_count;
+};
 
-  if (!the_file) {
-    std::cout << "We have a serious error!\n";
-    exit(EXIT_FAILURE);
-  }
+static auto count_system_objects(planet* innermost_planet, bool do_moons) -> SystemObjectCounts {
+  SystemObjectCounts counts = {0, 0, 0, 0, 0};
 
-  for (the_planet = innermost_planet; the_planet != nullptr; the_planet = the_planet->next_planet) {
+  for (planet* the_planet = innermost_planet; the_planet != nullptr; the_planet = the_planet->next_planet) {
     if (the_planet->getType() == tAsteroids) {
-      asteroid_belt_count++;
+      counts.asteroid_belt_count++;
     } else if (calcLambda(the_planet->getA(), the_planet->getMass()) < 1.0) {
-      dwarf_planet_count++;
+      counts.dwarf_planet_count++;
     } else {
-      planet_count++;
+      counts.planet_count++;
     }
-    object_count++;
+    counts.object_count++;
+
     if (do_moons) {
-      for (moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet) {
-        moon_count++;
+      for (planet* moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet) {
+        counts.moon_count++;
       }
     }
   }
 
+  return counts;
+}
+
+/**
+ * @brief Write HTML thumbnail table header
+ */
+static void html_write_thumbnail_header(std::fstream& the_file, const std::string& system_name,
+                                        const std::string& url_path, const std::string& system_url,
+                                        const std::string& file_name, const std::string& svg_url,
+                                        int graphic_format, const SystemObjectCounts& counts) {
   the_file << "<p>\n\n";
   the_file << "<table border=3 cellspacing=2 cellpadding=2 align=center ";
   the_file << "bgcolor='" << BGTABLE << "' width='90%'>\n";
@@ -1325,11 +1308,11 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
   the_file << "<table border=0 cellspacing=0 cellpadding=3 bgcolor='" << BGSPACE
            << "' width='100%'>\n";
 
-  the_file << "<tr><td colspan=" << (object_count + 2) << " bgcolor='" << BGHEADER
+  the_file << "<tr><td colspan=" << (counts.object_count + 2) << " bgcolor='" << BGHEADER
            << "' align=center>\n";
-  the_file << "\t<font size='+1'  color='" << TXHEADER << "'><b>" << planet_count
-           << " Planets,</b> <b>" << dwarf_planet_count << " Dwarf Planets,</b> <b>"
-           << asteroid_belt_count << " Asteroid Belts</b>, <b>" << moon_count
+  the_file << "\t<font size='+1'  color='" << TXHEADER << "'><b>" << counts.planet_count
+           << " Planets,</b> <b>" << counts.dwarf_planet_count << " Dwarf Planets,</b> <b>"
+           << counts.asteroid_belt_count << " Asteroid Belts</b>, <b>" << counts.moon_count
            << " Moons</b></font>\n";
   the_file << "\t(<font size='-1' color='" << TXHEADER
            << "'>size proportional to Sqrt(Radius)</font>)\n";
@@ -1337,13 +1320,87 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
   the_file << "<tr valign=middle bgcolor='" << BGSPACE << "'>\n";
   the_file << "<td bgcolor='" << BGSPACE << "'><img alt='Sun' src='" << url_path << "ref/Sun.gif' ";
   the_file << "width=15 height=63 border=0></td>\n";
+}
 
-  for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
-       the_planet = the_planet->next_planet, counter++) {
+/**
+ * @brief Write a planet thumbnail image and link
+ */
+static auto html_write_planet_thumbnail(std::fstream& the_file, planet* the_planet, sun& the_sun,
+                                        int counter, bool do_gases, const std::string& url_path,
+                                        const std::string& system_url, bool int_link) -> bool {
+  std::stringstream ss;
+  std::string planet_id;
+
+  int ppixels = ((int)(sqrt(convert_km_to_eu(the_planet->getRadius())) * 50.0)) + 1;
+  std::string ptype = type_string(the_planet);
+  std::string info;
+
+  if ((the_planet->getSurfPressure() > 0 || the_planet->getGasGiant()) &&
+      the_planet->getNumGases() == 0 && do_gases) {
     ss.str("");
-    int    ppixels = ((int)(sqrt(convert_km_to_eu(the_planet->getRadius())) * 50.0)) + 1;
-    std::string ptype   = type_string(the_planet);
-    std::string info;
+    ss << counter;
+    planet_id = ss.str();
+    calculate_gases(the_sun, the_planet, planet_id);
+  }
+
+  if (the_planet->getType() == tAsteroids) {
+    ppixels = (int)(25.0 + (8.0 * log((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) /
+                                      ASTEROID_MASS_LIMIT)));
+  }
+
+  if (ppixels < 10) {
+    ppixels = 10;
+  }
+
+  ss.str("");
+  ss << ptype << ": " << (the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) << " EM";
+  if (is_gas_planet(the_planet)) {
+    ss << " (c. " << the_planet->getEstimatedTemp() << "&deg;)";
+  } else if (the_planet->getType() == tUnknown) {
+    ss << ", " << (the_planet->getGasMass() * SUN_MASS_IN_EARTH_MASSES) << " EM from gas ("
+       << (100.0 * (the_planet->getGasMass() / the_planet->getMass())) << "%)";
+  } else {
+    ss << " " << the_planet->getSurfGrav() << " g, "
+       << (the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER) << "&deg;";
+  }
+  ss << " Zone = " << the_planet->getOrbitZone();
+  info = ss.str();
+
+  the_file << "\t<td bgcolor='" << BGSPACE << "' align=center><a href='"
+           << (int_link ? "" : system_url) << "#" << counter << "' title='#" << counter << " - "
+           << info << "'>";
+  the_file << "<img alt='" << ptype << "' src='" << url_path << "ref/"
+           << image_type_string(the_planet) << "Planet.webp' width=" << ppixels
+           << " height=" << ppixels << " border=0>";
+  the_file << "</a>";
+
+  return is_terrestrial(the_planet) || is_habitable_jovian(the_planet) || is_potentialy_habitable(the_planet);
+}
+
+/**
+ * @brief Result of checking moon interest categories
+ */
+struct MoonInterestFlags {
+  bool has_terrestrials;
+  bool has_habitable_jovians;
+  bool has_potentialy_habitables;
+};
+
+/**
+ * @brief Write moon thumbnails for a planet
+ */
+static auto html_write_moon_thumbnails(std::fstream& the_file, planet* the_planet, sun& the_sun,
+                                       int counter, bool do_gases, const std::string& url_path,
+                                       const std::string& system_url, bool int_link) -> MoonInterestFlags {
+  MoonInterestFlags flags = {false, false, false};
+  std::stringstream ss;
+  std::string planet_id;
+  int moons = 1;
+
+  for (planet* moon = the_planet->first_moon; moon != nullptr; moon = moon->next_planet, moons++) {
+    ss.str("");
+    std::string mtype = type_string(moon);
+    int mpixels = ((int)(sqrt(convert_km_to_eu(moon->getRadius())) * 100.)) + 1;
 
     if ((the_planet->getSurfPressure() > 0 || the_planet->getGasGiant()) &&
         the_planet->getNumGases() == 0 && do_gases) {
@@ -1353,100 +1410,226 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
       calculate_gases(the_sun, the_planet, planet_id);
     }
 
-    if (the_planet->getType() == tAsteroids) {
-      ppixels = (int)(25.0 + (8.0 * log((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) /
-                                        ASTEROID_MASS_LIMIT)));
-    }
-
-    if (ppixels < 10) {
-      ppixels = 10;
-    }
-
     ss.str("");
-    ss << ptype << ": " << (the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) << " EM";
-    if (is_gas_planet(the_planet)) {
-      ss << " (c. " << the_planet->getEstimatedTemp() << "&deg;)";
-    } else if (the_planet->getType() == tUnknown) {
-      ss << ", " << (the_planet->getGasMass() * SUN_MASS_IN_EARTH_MASSES) << " EM from gas ("
-         << (100.0 * (the_planet->getGasMass() / the_planet->getMass())) << "%)";
+    ss << mtype << ": " << (moon->getMass() * SUN_MASS_IN_EARTH_MASSES) << " EM";
+    if (is_gas_planet(moon)) {
+      ss << " (c. " << moon->getEstimatedTemp() << "&deg;)";
+    } else if (moon->getType() == tUnknown) {
+      ss << ", " << (moon->getGasMass() * SUN_MASS_IN_EARTH_MASSES) << " EM from gas ("
+         << (100.0 * (moon->getGasMass() / moon->getMass())) << "%)";
     } else {
-      ss << " " << the_planet->getSurfGrav() << " g, "
-         << (the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER) << "&deg;";
+      ss << " " << moon->getSurfGrav() << " g, "
+         << (moon->getSurfTemp() - FREEZING_POINT_OF_WATER) << "&deg;";
     }
-    ss << " Zone = " << the_planet->getOrbitZone();
-    info = ss.str();
+    ss << " Zone = " << moon->getOrbitZone();
+    std::string info = ss.str();
 
-    the_file << "\t<td bgcolor='" << BGSPACE << "' align=center><a href='"
-             << (int_link ? "" : system_url) << "#" << counter << "' title='#" << counter << " - "
-             << info << "'>";
-    the_file << "<img alt='" << ptype << "' src='" << url_path << "ref/"
-             << image_type_string(the_planet) << "Planet.webp' width=" << ppixels
-             << " height=" << ppixels << " border=0>";
+    the_file << "\n\t\t<br><a href='" << (int_link ? "" : system_url) << "#" << counter << "."
+             << moons << "' title='#" << counter << "." << moons << " - " << info << "'>";
+    the_file << "<img alt='" << mtype << "' src='" << url_path << "ref/"
+             << image_type_string(moon) << "Planet.webp' width=" << mpixels
+             << " height=" << mpixels << " border=0>";
     the_file << "</a>";
 
-    if (is_terrestrial(the_planet)) {
-      terrestrials_seen = true;
+    if (is_terrestrial(moon)) {
+      flags.has_terrestrials = true;
     }
-
-    if (is_habitable_jovian(the_planet)) {
-      habitable_jovians_seen = true;
+    if (is_habitable_jovian(moon)) {
+      flags.has_habitable_jovians = true;
     }
+    if (is_potentialy_habitable(moon)) {
+      flags.has_potentialy_habitables = true;
+    }
+  }
 
-    if (is_potentialy_habitable(the_planet)) {
-      potentialy_habitables_seen = true;
+  return flags;
+}
+
+/**
+ * @brief Write terrestrial/habitable planets description table
+ */
+static void html_write_terrestrials_table(std::fstream& the_file, planet* innermost_planet,
+                                          const std::string& system_url, bool int_link,
+                                          bool do_moons) {
+  the_file << "<tr><td colspan=2><table width='100%'>";
+
+  int counter = 1;
+  for (planet* the_planet = innermost_planet; the_planet != nullptr;
+       the_planet = the_planet->next_planet, counter++) {
+    if (is_habitable_jovian(the_planet) || is_terrestrial(the_planet) ||
+        is_potentialy_habitable(the_planet)) {
+      the_file << "\n\t<tr><td align=std::right width='5%'>";
+      the_file << "<a href='" << (int_link ? "" : system_url) << "#" << counter << "'><small>#"
+               << counter << "</small></a>";
+      the_file << "</td>\n\t\t<td><small>" << type_string(the_planet) << ": </small>";
+
+      print_description(the_file, "", the_planet, "");
+
+      the_file << "</td></tr>";
     }
 
     if (do_moons) {
-      for (moon = the_planet->first_moon, moons = 1; do_moons && moon != nullptr;
+      int moons = 1;
+      for (planet* moon = the_planet->first_moon; moon != nullptr;
            moon = moon->next_planet, moons++) {
-        ss.str("");
-        std::string mtype   = type_string(moon);
-        int    mpixels = ((int)(sqrt(convert_km_to_eu(moon->getRadius())) * 100.)) + 1;
+        if (is_habitable_jovian(moon) || is_terrestrial(moon) || is_potentialy_habitable(moon)) {
+          the_file << "\n\t<tr><td align=std::right width='5%'>";
+          the_file << "<a href='" << (int_link ? "" : system_url) << "#" << counter << "."
+                   << moons << "'><small>#" << counter << "." << moons << "</small></a>";
+          the_file << "</td>\n\t\t<td><small>" << type_string(moon) << ": </small>";
 
-        if ((the_planet->getSurfPressure() > 0 || the_planet->getGasGiant()) &&
-            the_planet->getNumGases() == 0 && do_gases) {
-          ss.str("");
-          ss << counter;
-          planet_id = ss.str();
-          calculate_gases(the_sun, the_planet, planet_id);
-        }
+          print_description(the_file, "", moon, "");
 
-        ss.str("");
-        ss << mtype << ": " << (moon->getMass() * SUN_MASS_IN_EARTH_MASSES) << " EM";
-        if (is_gas_planet(moon)) {
-          ss << " (c. " << moon->getEstimatedTemp() << "&deg;)";
-        } else if (moon->getType() == tUnknown) {
-          ss << ", " << (moon->getGasMass() * SUN_MASS_IN_EARTH_MASSES) << " EM from gas ("
-             << (100.0 * (moon->getGasMass() / moon->getMass())) << "%)";
-        } else {
-          ss << " " << moon->getSurfGrav() << " g, "
-             << (moon->getSurfTemp() - FREEZING_POINT_OF_WATER) << "&deg;";
-        }
-        ss << " Zone = " << moon->getOrbitZone();
-        info = ss.str();
-
-        the_file << "\n\t\t<br><a href='" << (int_link ? "" : system_url) << "#" << counter << "."
-                 << moons << "' title='#" << counter << "." << moons << " - " << info << "'>";
-        the_file << "<img alt='" << mtype << "' src='" << url_path << "ref/"
-                 << image_type_string(moon) << "Planet.webp' width=" << mpixels
-                 << " height=" << mpixels << " border=0>";
-        the_file << "</a>";
-
-        if (is_terrestrial(moon)) {
-          terrestrials_seen = true;
-        }
-
-        if (is_habitable_jovian(moon)) {
-          habitable_jovians_seen = true;
-        }
-
-        if (is_potentialy_habitable(moon)) {
-          potentialy_habitables_seen = true;
+          the_file << "</td></tr>";
         }
       }
     }
+  }
+
+  the_file << "</table></td></tr>\n";
+}
+
+/**
+ * @brief Write star system details section
+ */
+static void html_write_system_details(std::fstream& the_file, sun& the_sun) {
+  long double min_r_ecosphere = habitable_zone_distance(the_sun, RECENT_VENUS, 1.0);
+  long double max_r_ecosphere = habitable_zone_distance(the_sun, EARLY_MARS, 1.0);
+
+  if (!the_sun.getIsCircumbinary()) {
+    html_star_details_helper(the_file, "Stellar Characteristics", the_sun.getMass(),
+                             the_sun.getLuminosity(), the_sun.getEffTemp(), the_sun.getAge(),
+                             the_sun.getLife(), the_sun.getSpecType());
+  } else {
+    html_star_details_helper(the_file, "Stellar Characteristics of Primary", the_sun.getMass(),
+                             the_sun.getLuminosity(), the_sun.getEffTemp(), the_sun.getAge(),
+                             the_sun.getLife(), the_sun.getSpecType());
+    html_star_details_helper(the_file, "Stellar Characteristics of Secondary",
+                             the_sun.getSecondaryMass(), the_sun.getSecondaryLuminosity(),
+                             the_sun.getSecondaryEffTemp(), the_sun.getAge(),
+                             the_sun.getSecondaryLife(), the_sun.getSecondarySpecType());
+    the_file << "<tr><td colspan=2 bgcolor='" << BGHEADER << "' align=center>";
+    the_file << "<font size='+1' color='" << TXHEADER << "'><b>Orbit Characteristics</b></font>";
+    the_file << "</td></tr>\n";
+    the_file << "<tr><td>Seperation</td>\n";
+    the_file << "\t<td>" << toString(the_sun.getSeperation()) << " AU</td></tr>";
+    the_file << "<tr><td>Eccentricity</td>\n";
+    the_file << "\t<td>" << toString(the_sun.getEccentricity()) << " AU</td></tr>";
+  }
+
+  the_file << "<tr><td colspan=2 bgcolor='" << BGHEADER << "' align=center>";
+  the_file << "<font size='+1' color='" << TXHEADER
+           << "'><b>Habitable Zone Characteristics</b></font>";
+  the_file << "</td></tr>\n";
+
+  if (the_sun.getIsCircumbinary()) {
+    the_file << "<tr><td>Minimum Stable Orbit</td>\n";
+    the_file << "\t<td>" << toString(the_sun.getMinStableDistance()) << " AU</td></tr>\n";
+  }
+
+  the_file << "<tr><td>Range</td>\n";
+  the_file << "\t<td>" << toString(min_r_ecosphere) << " AU to " << toString(max_r_ecosphere)
+           << " AU</td></tr>\n";
+  the_file << "<tr><td>Radius</td>\n";
+  the_file << "\t<td>" << toString(AVE(min_r_ecosphere, max_r_ecosphere)) << " AU</td></tr>\n";
+  the_file << "<tr><td>Recent Venus Distance</td>\n";
+  the_file << "\t<td>" << toString(min_r_ecosphere) << " AU</td></tr>\n";
+  the_file << "<tr><td>Runaway Greenhouse Distance</td>\n";
+  the_file << "\t<td>" << toString(habitable_zone_distance(the_sun, RUNAWAY_GREENHOUSE, 1.0))
+           << " AU</td></tr>\n";
+  the_file << "<tr><td>Moist Greenhouse Distance</td>\n";
+  the_file << "\t<td>" << toString(habitable_zone_distance(the_sun, MOIST_GREENHOUSE, 1.0))
+           << " AU</td></tr>\n";
+  the_file << "<tr><td>Earth-like Distance</td>\n";
+  the_file << "\t<td>" << toString(habitable_zone_distance(the_sun, EARTH_LIKE, 1.0))
+           << " AU</td></tr>\n";
+  the_file << "<tr><td>First CO2 Condensation Limit</td>\n";
+  the_file << "\t<td>"
+           << toString(habitable_zone_distance(the_sun, FIRST_CO2_CONDENSATION_LIMIT, 1.0))
+           << " AU</td></tr>\n";
+  the_file << "<tr><td>Maximum Greenhouse Distance</td>\n";
+  the_file << "\t<td>" << toString(habitable_zone_distance(the_sun, MAXIMUM_GREENHOUSE, 1.0))
+           << " AU</td></tr>\n";
+  the_file << "<tr><td>Early Mars Distance</td>\n";
+  the_file << "\t<td>" << toString(max_r_ecosphere) << " AU</td></tr>\n";
+  the_file << "<tr><td>Two AU Cloud Limit</td>\n";
+  the_file << "\t<td>" << toString(habitable_zone_distance(the_sun, TWO_AU_CLOUD_LIMIT, 1.0))
+           << " AU</td></tr>\n";
+}
+
+/**
+ * @brief HTML thumbnails
+ *
+ * @param innermost_planet
+ * @param the_file
+ * @param system_name
+ * @param url_path
+ * @param system_url
+ * @param svg_url
+ * @param file_name
+ * @param details
+ * @param terrestrials
+ * @param int_link
+ * @param do_moons
+ * @param graphic_format
+ * @param do_gases
+ */
+void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std::string& system_name,
+                     const std::string& url_path, const std::string& system_url, const std::string& svg_url,
+                     const std::string& file_name, bool details, bool terrestrials, bool int_link,
+                     bool do_moons, int graphic_format, bool do_gases) {
+  if (!the_file) {
+    std::cout << "We have a serious error!\n";
+    exit(EXIT_FAILURE);
+  }
+
+  sun the_sun = innermost_planet->getTheSun();
+  bool terrestrials_seen = false;
+  bool habitable_jovians_seen = false;
+  bool potentialy_habitables_seen = false;
+
+  // Count all system objects
+  SystemObjectCounts counts = count_system_objects(innermost_planet, do_moons);
+
+  // Write table header with system name and counts
+  html_write_thumbnail_header(the_file, system_name, url_path, system_url, file_name, svg_url, graphic_format, counts);
+
+  // Write planet and moon thumbnails
+  int counter = 1;
+  for (planet* the_planet = innermost_planet; the_planet != nullptr;
+       the_planet = the_planet->next_planet, counter++) {
+    bool planet_interesting = html_write_planet_thumbnail(the_file, the_planet, the_sun, counter,
+                                                          do_gases, url_path, system_url, int_link);
+
+    if (planet_interesting) {
+      if (is_terrestrial(the_planet)) {
+        terrestrials_seen = true;
+      }
+      if (is_habitable_jovian(the_planet)) {
+        habitable_jovians_seen = true;
+      }
+      if (is_potentialy_habitable(the_planet)) {
+        potentialy_habitables_seen = true;
+      }
+    }
+
+    if (do_moons) {
+      MoonInterestFlags moon_flags = html_write_moon_thumbnails(the_file, the_planet, the_sun, counter,
+                                                                do_gases, url_path, system_url, int_link);
+      if (moon_flags.has_terrestrials) {
+        terrestrials_seen = true;
+      }
+      if (moon_flags.has_habitable_jovians) {
+        habitable_jovians_seen = true;
+      }
+      if (moon_flags.has_potentialy_habitables) {
+        potentialy_habitables_seen = true;
+      }
+    }
+
     the_file << "</td>\n";
   }
+
   the_file << "<td bgcolor='" << BGSPACE << "' align=std::right valign=bottom>";
   the_file << "<a href='" << url_path << "ref/Key.html'><font size='-3' color='" << TXSPACE
            << "'>See<br>Key</font></a></td>\n";
@@ -1458,105 +1641,14 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
 
   the_file << "</td></tr>\n";
 
-  // Table of data on the star system
-
+  // Write terrestrial/habitable planets table
   if (terrestrials && (terrestrials_seen || habitable_jovians_seen || potentialy_habitables_seen)) {
-    the_file << "<tr><td colspan=2><table width='100%'>";
-
-    for (the_planet = innermost_planet, counter = 1; the_planet != nullptr;
-         the_planet = the_planet->next_planet, counter++) {
-      if (is_habitable_jovian(the_planet) || is_terrestrial(the_planet) ||
-          is_potentialy_habitable(the_planet)) {
-        the_file << "\n\t<tr><td align=std::right width='5%'>";
-        the_file << "<a href='" << (int_link ? "" : system_url) << "#" << counter << "'><small>#"
-                 << counter << "</small></a>";
-        the_file << "</td>\n\t\t<td><small>" << type_string(the_planet) << ": </small>";
-
-        print_description(the_file, "", the_planet, "");
-
-        the_file << "</td></tr>";
-      }
-
-      if (do_moons) {
-        for (moon = the_planet->first_moon, moons = 1; moon != nullptr;
-             moon = moon->next_planet, moons++) {
-          if (is_habitable_jovian(moon) || is_terrestrial(moon) || is_potentialy_habitable(moon)) {
-            the_file << "\n\t<tr><td align=std::right width='5%'>";
-            the_file << "<a href='" << (int_link ? "" : system_url) << "#" << counter << "."
-                     << moons << "'><small>#" << counter << "." << moons << "</small></a>";
-            the_file << "</td>\n\t\t<td><small>" << type_string(moon) << ": </small>";
-
-            print_description(the_file, "", moon, "");
-
-            the_file << "</td></tr>";
-          }
-        }
-      }
-    }
-
-    the_file << "</table></td></tr>\n";
+    html_write_terrestrials_table(the_file, innermost_planet, system_url, int_link, do_moons);
   }
 
+  // Write star system details
   if (details) {
-    long double min_r_ecosphere = habitable_zone_distance(the_sun, RECENT_VENUS, 1.0);
-    long double max_r_ecosphere = habitable_zone_distance(the_sun, EARLY_MARS, 1.0);
-
-    if (!the_sun.getIsCircumbinary()) {
-      html_star_details_helper(the_file, "Stellar Characteristics", the_sun.getMass(),
-                               the_sun.getLuminosity(), the_sun.getEffTemp(), the_sun.getAge(),
-                               the_sun.getLife(), the_sun.getSpecType());
-    } else {
-      html_star_details_helper(the_file, "Stellar Characteristics of Primary", the_sun.getMass(),
-                               the_sun.getLuminosity(), the_sun.getEffTemp(), the_sun.getAge(),
-                               the_sun.getLife(), the_sun.getSpecType());
-      html_star_details_helper(the_file, "Stellar Characteristics of Secondary",
-                               the_sun.getSecondaryMass(), the_sun.getSecondaryLuminosity(),
-                               the_sun.getSecondaryEffTemp(), the_sun.getAge(),
-                               the_sun.getSecondaryLife(), the_sun.getSecondarySpecType());
-      the_file << "<tr><td colspan=2 bgcolor='" << BGHEADER << "' align=center>";
-      the_file << "<font size='+1' color='" << TXHEADER << "'><b>Orbit Characteristics</b></font>";
-      the_file << "</td></tr>\n";
-      the_file << "<tr><td>Seperation</td>\n";
-      the_file << "\t<td>" << toString(the_sun.getSeperation()) << " AU</td></tr>";
-      the_file << "<tr><td>Eccentricity</td>\n";
-      the_file << "\t<td>" << toString(the_sun.getEccentricity()) << " AU</td></tr>";
-    }
-    the_file << "<tr><td colspan=2 bgcolor='" << BGHEADER << "' align=center>";
-    the_file << "<font size='+1' color='" << TXHEADER
-             << "'><b>Habitable Zone Characteristics</b></font>";
-    the_file << "</td></tr>\n";
-    if (the_sun.getIsCircumbinary()) {
-      the_file << "<tr><td>Minimum Stable Orbit</td>\n";
-      the_file << "\t<td>" << toString(the_sun.getMinStableDistance()) << " AU</td></tr>\n";
-    }
-    the_file << "<tr><td>Range</td>\n";
-    the_file << "\t<td>" << toString(min_r_ecosphere) << " AU to " << toString(max_r_ecosphere)
-             << " AU</td></tr>\n";
-    the_file << "<tr><td>Radius</td>\n";
-    the_file << "\t<td>" << toString(AVE(min_r_ecosphere, max_r_ecosphere)) << " AU</td></tr>\n";
-    the_file << "<tr><td>Recent Venus Distance</td>\n";
-    the_file << "\t<td>" << toString(min_r_ecosphere) << " AU</td></tr>\n";
-    the_file << "<tr><td>Runaway Greenhouse Distance</td>\n";
-    the_file << "\t<td>" << toString(habitable_zone_distance(the_sun, RUNAWAY_GREENHOUSE, 1.0))
-             << " AU</td></tr>\n";
-    the_file << "<tr><td>Moist Greenhouse Distance</td>\n";
-    the_file << "\t<td>" << toString(habitable_zone_distance(the_sun, MOIST_GREENHOUSE, 1.0))
-             << " AU</td></tr>\n";
-    the_file << "<tr><td>Earth-like Distance</td>\n";
-    the_file << "\t<td>" << toString(habitable_zone_distance(the_sun, EARTH_LIKE, 1.0))
-             << " AU</td></tr>\n";
-    the_file << "<tr><td>First CO2 Condensation Limit</td>\n";
-    the_file << "\t<td>"
-             << toString(habitable_zone_distance(the_sun, FIRST_CO2_CONDENSATION_LIMIT, 1.0))
-             << " AU</td></tr>\n";
-    the_file << "<tr><td>Maximum Greenhouse Distance</td>\n";
-    the_file << "\t<td>" << toString(habitable_zone_distance(the_sun, MAXIMUM_GREENHOUSE, 1.0))
-             << " AU</td></tr>\n";
-    the_file << "<tr><td>Early Mars Distance</td>\n";
-    the_file << "\t<td>" << toString(max_r_ecosphere) << " AU</td></tr>\n";
-    the_file << "<tr><td>Two AU Cloud Limit</td>\n";
-    the_file << "\t<td>" << toString(habitable_zone_distance(the_sun, TWO_AU_CLOUD_LIMIT, 1.0))
-             << " AU</td></tr>\n";
+    html_write_system_details(the_file, the_sun);
   }
 
   the_file << "</table>\n<br clear='all'>\n";
