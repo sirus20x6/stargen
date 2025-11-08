@@ -2090,6 +2090,141 @@ auto getGasGiantAlbedo(const std::string& sudusky_class, const std::string& star
   }
 }
 
+/**
+ * @brief Structure to hold gas retention calculation parameters
+ */
+struct GasRetentionFactors {
+  long double abundance;
+  long double reactivity;
+  long double pressure_factor;
+  long double retention_fraction;
+};
+
+/**
+ * @brief Calculate gas retention factors for Argon
+ *
+ * Argon accumulates slowly through radioactive decay over stellar age
+ */
+static auto calculate_argon_retention(Chemical& the_gas, sun& the_sun,
+                                     long double base_abundance) -> GasRetentionFactors {
+  GasRetentionFactors factors;
+  factors.abundance = base_abundance;
+  factors.reactivity = 0.15 * the_sun.getAge() / 4e9;  // Accumulation factor
+  factors.pressure_factor = 1.0;
+  factors.retention_fraction = 1.0;
+  return factors;
+}
+
+/**
+ * @brief Calculate gas retention factors for Helium
+ *
+ * Helium abundance is affected by gas giant mass fraction
+ * Helium escapes more easily from low-mass planets
+ */
+static auto calculate_helium_retention(Chemical& the_gas, sun& the_sun,
+                                      planet* the_planet, long double base_abundance,
+                                      long double pressure) -> GasRetentionFactors {
+  GasRetentionFactors factors;
+  // Helium enhanced in gas giants due to primordial retention
+  factors.abundance = base_abundance *
+                     (0.001 + (the_planet->getGasMass() / the_planet->getMass()));
+  factors.pressure_factor = (0.75 + pressure);
+  factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                               the_sun.getAge() / 2e9 * factors.pressure_factor);
+  factors.retention_fraction = 1.0;
+  return factors;
+}
+
+/**
+ * @brief Calculate gas retention factors for Oxygen/O2
+ *
+ * Oxygen production requires stellar age > 2Gyr and specific temperature range
+ * Free oxygen indicates photosynthesis or photochemical processes
+ */
+static auto calculate_oxygen_retention(Chemical& the_gas, sun& the_sun,
+                                      planet* the_planet, long double base_abundance,
+                                      long double pressure) -> GasRetentionFactors {
+  GasRetentionFactors factors;
+  factors.abundance = base_abundance;
+
+  // Oxygen only accumulates on mature systems with suitable temperatures
+  if (the_sun.getAge() > 2e9 &&
+      (the_planet->getGasGiant() ||
+       (the_planet->getSurfTemp() > 270 && the_planet->getSurfTemp() < 400))) {
+    factors.pressure_factor = (0.89 + pressure / 4);
+    factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                                 std::pow(the_sun.getAge() / 2e9, 0.25) * factors.pressure_factor);
+  } else {
+    // Default retention for young systems or unsuitable temperatures
+    factors.pressure_factor = (0.75 + pressure);
+    factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                                 the_sun.getAge() / 2e9 * factors.pressure_factor);
+  }
+  factors.retention_fraction = 1.0;
+  return factors;
+}
+
+/**
+ * @brief Calculate gas retention factors for CO2
+ *
+ * CO2 accumulates through volcanic outgassing and weathering cycles
+ */
+static auto calculate_co2_retention(Chemical& the_gas, sun& the_sun,
+                                   planet* the_planet, long double base_abundance,
+                                   long double pressure) -> GasRetentionFactors {
+  GasRetentionFactors factors;
+  factors.abundance = base_abundance;
+
+  // CO2 accumulation enhanced on mature, warm planets
+  if (the_sun.getAge() > 2e9 &&
+      (the_planet->getGasGiant() ||
+       (the_planet->getSurfTemp() > 270 && the_planet->getSurfTemp() < 400))) {
+    factors.pressure_factor = (0.75 + pressure);
+    factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                                 std::pow(the_sun.getAge() / 2e9, 0.5) * factors.pressure_factor);
+    factors.reactivity *= 1.5;  // Enhanced CO2 retention
+  } else {
+    factors.pressure_factor = (0.75 + pressure);
+    factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                                 the_sun.getAge() / 2e9 * factors.pressure_factor);
+  }
+  factors.retention_fraction = 1.0;
+  return factors;
+}
+
+/**
+ * @brief Calculate generic gas retention factors
+ *
+ * Used for gases without specific chemical behavior models
+ */
+static auto calculate_generic_retention(Chemical& the_gas, sun& the_sun,
+                                       long double base_abundance,
+                                       long double pressure) -> GasRetentionFactors {
+  GasRetentionFactors factors;
+  factors.abundance = base_abundance;
+  factors.pressure_factor = (0.75 + pressure);
+  factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
+                               the_sun.getAge() / 2e9 * factors.pressure_factor);
+  factors.retention_fraction = 1.0;
+  return factors;
+}
+
+/**
+ * @brief Calculate final gas amount based on retention factors
+ *
+ * Combines abundance, velocity retention, reactivity, and molecular weight fraction
+ */
+static auto calculate_gas_amount(Chemical& the_gas, planet* the_planet,
+                                sun& the_sun, const GasRetentionFactors& factors,
+                                long double molecular_weight_retention) -> long double {
+  long double vrms = rms_vel(the_gas.getWeight(), the_planet->getExosphericTemp());
+  long double pvrms = std::pow(1.0 / (1.0 + vrms / the_planet->getEscVelocity()),
+                               the_sun.getAge() / 1e9);
+  long double fract = 1.0 - (the_planet->getMolecWeight() / the_gas.getWeight());
+
+  return factors.abundance * pvrms * factors.reactivity * fract;
+}
+
 void calculate_gases(sun &the_sun, planet *the_planet, std::string planet_id) {
   the_sun = the_planet->getTheSun();
   if ((the_planet->getSurfPressure() > 0 || the_planet->getGasGiant()) &&
@@ -2123,63 +2258,45 @@ void calculate_gases(sun &the_sun, planet *the_planet, std::string planet_id) {
       if (((yp >= 0 && yp < the_planet->getLowTemp()) ||
            is_gas_planet(the_planet)) &&
           (gases[i].getWeight() >= the_planet->getMolecWeight())) {
-        long double vrms =
-            rms_vel(gases[i].getWeight(), the_planet->getExosphericTemp());
-        long double pvrms =
-            std::pow(1.0 / (1.0 + vrms / the_planet->getEscVelocity()),
-                the_sun.getAge() / 1e9);
-        long double abund = gases[i].getAbunds();
-        long double react = 1.0;
-        long double fract = 1.0;
-        long double pres2 = 1.0;
+
+        // Calculate gas-specific retention factors
+        GasRetentionFactors factors;
+        long double base_abundance = gases[i].getAbunds();
 
         if (gases[i].getSymbol() == "Ar") {
-          react = 0.15 * the_sun.getAge() / 4e9;
+          factors = calculate_argon_retention(gases[i], the_sun, base_abundance);
         } else if (gases[i].getSymbol() == "He") {
-          abund = abund *
-                  (0.001 + (the_planet->getGasMass() / the_planet->getMass()));
-          pres2 = (0.75 + pressure);
-          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
-                      the_sun.getAge() / 2e9 * pres2);
-        } else if ((gases[i].getSymbol() == "O" ||
-                    gases[i].getSymbol() == "O2") &&
-                   the_sun.getAge() > 2e9 &&
-                   (the_planet->getGasGiant() ||
-                    (the_planet->getSurfTemp() > 270 &&
-                     the_planet->getSurfTemp() < 400))) {
-          pres2 = (0.89 + pressure / 4);
-          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
-                      std::pow(the_sun.getAge() / 2e9, 0.25) * pres2);
-        } else if (gases[i].getSymbol() == "CO2" && the_sun.getAge() > 2e9 &&
-                   (the_planet->getGasGiant() ||
-                    (the_planet->getSurfTemp() > 270 &&
-                     the_planet->getSurfTemp() < 400))) {
-          pres2 = (0.75 + pressure);
-          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
-                      std::pow(the_sun.getAge() / 2e9, 0.5) * pres2);
-          react *= 1.5;
+          factors = calculate_helium_retention(gases[i], the_sun, the_planet,
+                                              base_abundance, pressure);
+        } else if (gases[i].getSymbol() == "O" || gases[i].getSymbol() == "O2") {
+          factors = calculate_oxygen_retention(gases[i], the_sun, the_planet,
+                                              base_abundance, pressure);
+        } else if (gases[i].getSymbol() == "CO2") {
+          factors = calculate_co2_retention(gases[i], the_sun, the_planet,
+                                           base_abundance, pressure);
         } else {
-          pres2 = (0.75 + pressure);
-          react = std::pow(1.0 / (1.0 + gases[i].getReactivity()),
-                      the_sun.getAge() / 2e9 * pres2);
+          factors = calculate_generic_retention(gases[i], the_sun,
+                                               base_abundance, pressure);
         }
 
-        fract = 1.0 - (the_planet->getMolecWeight() / gases[i].getWeight());
+        // Calculate final gas amount using retention factors
+        amount[i] = calculate_gas_amount(gases[i], the_planet, the_sun, factors, 1.0);
 
-        amount[i] = abund * pvrms * react * fract;
-
-        // std::cout << toString(amount[i]) <<  " " << toString(vrms) << " " <<
-        // toString(pvrms) << " " << toString(abund) << " " << toString(react)
-        // << " " << toString(fract) << " " << toString(pres2) << std::endl;
-
+        // Debug output for verbose mode
         if (flag_verbose & 0x4000 &&
             (gases[i].getSymbol() == "O" || gases[i].getSymbol() == "N" ||
              gases[i].getSymbol() == "Ar" || gases[i].getSymbol() == "He" ||
              gases[i].getSymbol() == "CO2")) {
+          long double vrms = rms_vel(gases[i].getWeight(), the_planet->getExosphericTemp());
+          long double pvrms = std::pow(1.0 / (1.0 + vrms / the_planet->getEscVelocity()),
+                                       the_sun.getAge() / 1e9);
+          long double fract = 1.0 - (the_planet->getMolecWeight() / gases[i].getWeight());
+
           std::cerr << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
                << " " << gases[i].getSymbol() << ", " << toString(amount[i])
-               << " = a " << toString(abund) << " * p " << toString(pvrms)
-               << " * r " << toString(react) << " * p2 " << toString(pres2)
+               << " = a " << toString(factors.abundance) << " * p " << toString(pvrms)
+               << " * r " << toString(factors.reactivity) << " * p2 "
+               << toString(factors.pressure_factor)
                << " * f " << toString(fract) << "\t("
                << toString(100.0 *
                            (the_planet->getGasMass() / the_planet->getMass()))
