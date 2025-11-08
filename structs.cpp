@@ -1077,16 +1077,19 @@ auto sun::getCombinedEffTemp() -> long double {
     // effTemp = 5800;
     // secondaryEffTemp = 4400;
     curr = peak = 0;
-    // todo this is bad. figure out what accuracy for peak is
-    // then change the loop counter to not be a long double.
-    for (long double i = 0; i < 1500.0; i += ACCURACY_FOR_PEAK) {
+    // Find peak wavelength of combined stellar flux
+    // Using integer counter to avoid floating-point accumulation errors
+    constexpr long double max_wavelength_nm = 1500.0;
+    const int num_steps = static_cast<int>(max_wavelength_nm / ACCURACY_FOR_PEAK);
+    for (int step = 0; step < num_steps; step++) {
+      long double wavelength = step * ACCURACY_FOR_PEAK;
       prev = curr;
-      f1 = calcFlux(effTemp, i);
-      f2 = calcFlux(secondaryEffTemp, i);
+      f1 = calcFlux(effTemp, wavelength);
+      f2 = calcFlux(secondaryEffTemp, wavelength);
       curr = f1 + f2;
-      // std::cout << i << ": " << f1 << " " << f2 << " " << curr << std::endl;
+      // std::cout << wavelength << ": " << f1 << " " << f2 << " " << curr << std::endl;
       if (prev > curr) {
-        peak = i - ACCURACY_FOR_PEAK;
+        peak = wavelength - ACCURACY_FOR_PEAK;
         break;
       }
     }
