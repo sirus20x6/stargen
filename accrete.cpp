@@ -12,15 +12,27 @@
 
 /**
  * @brief Set Initial Conditions
- * 
- * @param inner_limit_of_dust 
- * @param outer_limit_of_dust 
+ *
+ * @param inner_limit_of_dust
+ * @param outer_limit_of_dust
  */
 void accrete::set_initial_conditions(long double inner_limit_of_dust,
                             long double outer_limit_of_dust) {
-  planet_head = nullptr;
-  hist_head = nullptr;
+  // Clean up previous allocations to prevent memory leaks
+  if (dust_head != nullptr) {
+    free_dust(dust_head);
+    dust_head = nullptr;
+  }
 
+  if (hist_head != nullptr) {
+    free_generations();
+    hist_head = nullptr;
+  }
+
+  // Reset planet_head (planets are cleaned up via hist_head)
+  planet_head = nullptr;
+
+  // Allocate new dust chain
   dust_head = new dust();
   dust_head->next_band = nullptr;
   dust_head->setOuterEdge(outer_limit_of_dust);
@@ -32,6 +44,7 @@ void accrete::set_initial_conditions(long double inner_limit_of_dust,
   cloud_eccentricity = 0.2;
   //	cloud_eccentricity = 0.6;
 
+  // Create new history node
   gen *hist = nullptr;
   hist = new gen();
   hist->dusts = dust_head;
