@@ -2,7 +2,7 @@
 #include <cmath>       // for pow, NAN, exp, log
 #include <cstdlib>     // for EXIT_SUCCESS, srand, rand
 #include <ctime>       // for time, time_t
-#include <iostream>    // for operator<<, basic_ostream, ostream, "\n", stri...
+#include <iostream>    // for operator<<, basic_ostream, std::ostream, "\n", stri...
 #include "accrete.h"   // for accrete
 #include "const.h"     // for SUN_MASS_IN_EARTH_MASSES, KM_PER_AU, EARTH_AVE...
 #include "display.h"   // for type_string, close_html_file, create_svg_file
@@ -10,94 +10,309 @@
 #include "enviro.h"    // for makeHabitable, est_temp, gravity, acceleration
 #include "planets.h"   // for earth, mercury
 #include "utils.h"     // for toString, random_number, replaceStrChar, about
+#include "Config.h"    // for Config
+#include "SimulationContext.h"  // for SimulationContext
+#include "RandomContext.h"  // for RandomContext
 
-using namespace std;
+// Global instances for configuration, simulation state, and RNG
+Config g_config;
+SimulationContext g_sim_context;
+RandomContext g_random_context;
 
-int flags_arg_clone = 0;
+// Initialize Config defaults
+void initConfig() {
+    g_config.dust_density_ratio = DUST_DENSITY_COEFF;
+    g_config.max_age = 10.0E9;
+    g_config.max_age_backup = 10.0E9;
+}
 
-sun the_sun_clone;
+// Legacy global references - these now point to Config members for compatibility
+int& flags_arg_clone = g_config.flags;
+sun& the_sun_clone = g_sim_context.current_sun;
+int& flag_verbose = g_config.verbose_level;
+long& flag_seed = g_config.random_seed;
+long double& min_age = g_config.min_age;
+long double& max_age = g_config.max_age;
+long double& max_age_backup = g_config.max_age_backup;
+bool& is_circumbinary = g_config.is_circumbinary;
+long double& compainion_mass_arg = g_config.companion_mass;
+long double& compainion_eccentricity_arg = g_config.companion_eccentricity;
+long double& compainion_distant_arg = g_config.companion_distance;
+long double& compainion_lum_arg = g_config.companion_luminosity;
+long double& compainion_eff_arg = g_config.companion_temperature;
+std::string& companion_spec_arg = g_config.companion_spectral_type;
+int& decimals_arg = g_config.decimals;
+long double& temp_arg = g_config.stellar_temperature;
+std::string& type_arg = g_config.stellar_type;
+long double& max_distance_arg = g_config.max_distance;
+bool& allow_planet_migration = g_config.do_migration;
 
-int flag_verbose = 0;
 /*  These are the global variables used during accretion:  */
 planet *innermost_planet;
 long double dust_density_coeff = DUST_DENSITY_COEFF;
 
-long flag_seed = 0;
+// Statistics globals - now point to SimulationContext members
+int& total_earthlike = g_sim_context.total_earthlike;
+int& total_habitable = g_sim_context.total_habitable;
+int& total_worlds = g_sim_context.total_worlds;
+int& total_habitable_earthlike = g_sim_context.total_habitable_earthlike;
+int& total_habitable_conservative = g_sim_context.total_habitable_conservative;
+int& total_habitable_optimistic = g_sim_context.total_habitable_optimistic;
+int& total_potentially_habitable = g_sim_context.total_potentially_habitable;
+int& total_potentially_habitable_earthlike = g_sim_context.total_potentially_habitable_earthlike;
+int& total_potentially_habitable_conservative = g_sim_context.total_potentially_habitable_conservative;
+int& total_potentially_habitable_optimistic = g_sim_context.total_potentially_habitable_optimistic;
 
-long double min_age = 0;
-long double max_age = 10.0E9;
-long double max_age_backup = 10.0E9;
+long double& min_breathable_terrestrial_g = g_sim_context.min_breathable_terrestrial_g;
+long double& min_breathable_g = g_sim_context.min_breathable_g;
+long double& max_breathable_terrestrial_g = g_sim_context.max_breathable_terrestrial_g;
+long double& max_breathable_g = g_sim_context.max_breathable_g;
+long double& min_breathable_temp = g_sim_context.min_breathable_temp;
+long double& max_breathable_temp = g_sim_context.max_breathable_temp;
+long double& min_breathable_p = g_sim_context.min_breathable_p;
+long double& max_breathable_p = g_sim_context.max_breathable_p;
+long double& min_breathable_terrestrial_l = g_sim_context.min_breathable_terrestrial_l;
+long double& min_breathable_l = g_sim_context.min_breathable_l;
+long double& max_breathable_terrestrial_l = g_sim_context.max_breathable_terrestrial_l;
+long double& max_breathable_l = g_sim_context.max_breathable_l;
+long double& min_breathable_mass = g_sim_context.min_breathable_mass;
+long double& max_breathable_mass = g_sim_context.max_breathable_mass;
 
-bool is_circumbinary = false;
-long double compainion_mass_arg = 0;
-long double compainion_eccentricity_arg = 0;
-long double compainion_distant_arg = 0;
-long double compainion_lum_arg = 0;
-long double compainion_eff_arg = 0;
-string companion_spec_arg;
-int decimals_arg = 0;
+long double& min_potential_terrestrial_g = g_sim_context.min_potential_terrestrial_g;
+long double& min_potential_g = g_sim_context.min_potential_g;
+long double& max_potential_terrestrial_g = g_sim_context.max_potential_terrestrial_g;
+long double& max_potential_g = g_sim_context.max_potential_g;
+long double& min_potential_temp = g_sim_context.min_potential_temp;
+long double& max_potential_temp = g_sim_context.max_potential_temp;
+long double& min_potential_p = g_sim_context.min_potential_p;
+long double& max_potential_p = g_sim_context.max_potential_p;
+long double& min_potential_terrestrial_l = g_sim_context.min_potential_terrestrial_l;
+long double& min_potential_l = g_sim_context.min_potential_l;
+long double& max_potential_terrestrial_l = g_sim_context.max_potential_terrestrial_l;
+long double& max_potential_l = g_sim_context.max_potential_l;
+long double& min_potential_mass = g_sim_context.min_potential_mass;
+long double& max_potential_mass = g_sim_context.max_potential_mass;
 
-long double temp_arg = 0;
-string type_arg;
-
-long double max_distance_arg = 0;
-
+// Per-system statistics (kept as true globals, reset each system)
 int earthlike = 0;
-int total_earthlike = 0;
 int habitable = 0;
 int habitable_jovians = 0;
 int habitable_superterrans = 0;
-int total_habitable = 0;
 int potential_habitable = 0;
-int total_worlds = 0;
-int total_habitable_earthlike = 0;
-int total_habitable_conservative = 0;
-int total_habitable_optimistic = 0;
-int total_potentially_habitable = 0;
-int total_potentially_habitable_earthlike = 0;
-int total_potentially_habitable_conservative = 0;
-int total_potentially_habitable_optimistic = 0;
-
-long double min_breathable_terrestrial_g = 1000.0;
-long double min_breathable_g = 1000.0;
-long double max_breathable_terrestrial_g = 0.0;
-long double max_breathable_g = 0.0;
-long double min_breathable_temp = 1000.0;
-long double max_breathable_temp = 0.0;
-long double min_breathable_p = 100000.0;
-long double max_breathable_p = 0.0;
-long double min_breathable_terrestrial_l = 1000.0;
-long double min_breathable_l = 1000.0;
-long double max_breathable_terrestrial_l = 0.0;
-long double max_breathable_l = 0.0;
 long double max_moon_mass = 0.0;
-long double min_breathable_mass = 0;
-long double max_breathable_mass = 0;
-
-long double min_potential_terrestrial_g = 1000.0;
-long double min_potential_g = 1000.0;
-long double max_potential_terrestrial_g = 0.0;
-long double max_potential_g = 0.0;
-long double min_potential_temp = 1000.0;
-long double max_potential_temp = 0.0;
-long double min_potential_p = 100000.0;
-long double max_potential_p = 0.0;
-long double min_potential_terrestrial_l = 1000.0;
-long double min_potential_l = 1000.0;
-long double max_potential_terrestrial_l = 0.0;
-long double max_potential_l = 0.0;
-long double min_potential_mass = 0;
-long double max_potential_mass = 0;
 
 int type_counts[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // seb
 int type_count = 0;
 int max_type_count = 0;
 
-bool allow_planet_migration = false;
-
 long system_seed = 0;
 
-string stargen_revision = "$Revision: 3.0 $";
+std::string stargen_revision = "$Revision: 3.0 $";
+
+/**
+ * @brief Handle aListGases action - list all gases with their properties
+ */
+static auto handle_list_gases_action() -> int {
+  long double total = 0.0;
+  int count = gases.count();
+  for (int i = 0; i < count; i++) {
+    if (gases[i].getWeight() >= AN_N &&
+        gases[i].getMaxIpp() < INCREDIBLY_LARGE_NUMBER) {
+      total += gases[i].getMaxIpp();
+    }
+  }
+  std::cout << gases;
+  std::cout << "Total Max ipp: " << toString(total) << "\n";
+  std::cout << "Max pressure: " << toString(MAX_HABITABLE_PRESSURE) << " atm\n";
+  return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Handle aListCatalog action - list star catalog
+ */
+static auto handle_list_catalog_action(catalog& cat_arg) -> int {
+  std::cout << cat_arg;
+  return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Handle aListCatalogAsHTML action - list catalog as HTML options
+ */
+static auto handle_list_catalog_html_action(catalog& cat_arg) -> int {
+  int count = cat_arg.count();
+  for (int i = 0; i < count; i++) {
+    std::cout << "\t<option value=" << i << ">" << cat_arg[i].getName()
+         << "</option>\n";
+  }
+  return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Handle aSizeCheck action - display type sizes and planet temperatures
+ */
+static auto handle_size_check_action() -> int {
+  long double tempE = est_temp(1.0, 1.0, EARTH_ALBEDO);
+  long double tempJ = est_temp(1.0, 5.2034, GAS_GIANT_ALBEDO);
+  long double tempS = est_temp(1.0, 9.5371, GAS_GIANT_ALBEDO);
+  long double tempU = est_temp(1.0, 19.1913, GAS_GIANT_ALBEDO);
+  long double tempN = est_temp(1.0, 30.0690, GAS_GIANT_ALBEDO);
+
+  std::cout << "Size of float: " << sizeof(float) << "\n";
+  std::cout << "Size of doubles: " << sizeof(double) << "\n";
+  std::cout << "Size of long doubles: " << sizeof(long double) << "\n";
+  std::cout << "Earth Eff Temp: " << toString(tempE) << " K, "
+       << toString(tempE - FREEZING_POINT_OF_WATER)
+       << " C, Earth rel: " << toString(tempE - EARTH_AVERAGE_KELVIN)
+       << " C\n";
+  std::cout << "Jupiter Eff Temp: " << toString(tempJ) << " K\n";
+  std::cout << "Saturn Eff Temp: " << toString(tempS) << " K\n";
+  std::cout << "Uranus Eff Temp: " << toString(tempU) << " K\n";
+  std::cout << "Neptune Eff Temp: " << toString(tempN) << " K\n";
+  return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Handle aListVerbosity action - show verbosity flag documentation
+ */
+static auto handle_list_verbosity_action() -> int {
+  std::cout << "Stargen " << stargen_revision << "\n"
+  << "Verbosity flags are hexidecimal numbers:\n"
+  << "\t0001\tEarthlike count\n"
+  << "\t0002\tTrace Min/Max\n"
+  << "\t0004\tList Habitable\n"
+  << "\t0008\tList Earthlike & Sphinxlike\n\n"
+  << "\t0010\tList Gases\n"
+  << "\t0020\tTrace temp iterations\n"
+  << "\t0040\tGas lifetimes\n"
+  << "\t0080\tList loss of accreted gas mass\n\n"
+  << "\t0100\tInjecting, collision\n"
+  << "\t0200\tChecking..., Failed...\n"
+  << "\t0400\tList binary info\n"
+  << "\t0800\tList accreted atmospheres\n\n"
+  << "\t1000\tMoons (experimental)\n"
+  << "\t2000\tOxygen poisoned (experimental)\n"
+  << "\t4000\tTrace gas percentages\n"
+  << "\t8000\tList Jovians in the ecosphere\n\n"
+  << "\t10000\tList type diversity\n"
+  << "\t20000\tTrace Surface temp interations\n"
+  << "\t40000\tDisplay Roche Limits and Hill Sphere distances\n"
+  << "\t80000\tDisplay mass-radius maps\n";
+  return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Normalize filter flags - handle mutually exclusive filters
+ */
+static void normalize_filter_flags(bool& only_habitable, bool& only_multi_habitable,
+                                   bool& only_earthlike, bool& only_three_habitable,
+                                   bool& only_superterrans) {
+  if (only_habitable && only_multi_habitable) {
+    only_habitable = false;
+  }
+  if (only_habitable && only_earthlike) {
+    only_habitable = false;
+  }
+  if (only_three_habitable) {
+    only_habitable = false;
+    only_earthlike = false;
+    only_multi_habitable = false;
+  }
+  if (only_superterrans) {
+    only_habitable = false;
+    only_earthlike = false;
+    only_multi_habitable = false;
+    only_three_habitable = false;
+  }
+}
+
+/**
+ * @brief Calculate weighted type count from type_counts array
+ * @param type_counts Array of counts for each planet type
+ * @param base_count Base count to add weights to
+ * @return Weighted type count
+ */
+static auto calculate_weighted_type_count(const int type_counts[], int base_count) -> int {
+  int wt_count = base_count;
+  if (type_counts[0] > 0) wt_count += 1;   // Unknown
+  if (type_counts[1] > 0) wt_count += 3;   // Rock
+  if (type_counts[2] > 0) wt_count += 16;  // Venusian
+  if (type_counts[3] > 0) wt_count += 20;  // Terrestrial
+  if (type_counts[4] > 0) wt_count += 12;  // Gas Dwarf
+  if (type_counts[5] > 0) wt_count += 11;  // Neptunian
+  if (type_counts[6] > 0) wt_count += 2;   // Jovian
+  if (type_counts[7] > 0) wt_count += 15;  // Martian
+  if (type_counts[8] > 0) wt_count += 18;  // Water
+  if (type_counts[9] > 0) wt_count += 14;  // Ice
+  if (type_counts[10] > 0) wt_count += 13; // Asteroids
+  if (type_counts[11] > 0) wt_count += 10; // 1-Face
+  return wt_count;
+}
+
+/**
+ * @brief Check if system passes filter criteria and should be output
+ */
+static auto should_output_system(bool only_habitable, bool only_multi_habitable,
+                                bool only_jovian_habitable, bool only_earthlike,
+                                bool only_three_habitable, bool only_superterrans,
+                                bool only_potential_habitable, int habitable,
+                                int habitable_jovians, int earthlike,
+                                int habitable_superterrans, int potential_habitable) -> bool {
+  // No filters active - output everything
+  if (!(only_habitable || only_multi_habitable || only_jovian_habitable ||
+        only_earthlike || only_three_habitable || only_superterrans ||
+        only_potential_habitable)) {
+    return true;
+  }
+
+  // Check each filter condition
+  if (only_habitable && (habitable > 0) && !only_jovian_habitable) return true;
+  if (only_habitable && only_jovian_habitable && habitable > 0 &&
+      habitable_jovians > 0) return true;
+  if (only_multi_habitable && (habitable > 1) && !only_jovian_habitable) return true;
+  if (only_multi_habitable && only_jovian_habitable && habitable > 1 &&
+      habitable_jovians > 0) return true;
+  if (only_earthlike && (earthlike > 0) && !only_jovian_habitable) return true;
+  if (only_earthlike && only_jovian_habitable && earthlike > 0 &&
+      habitable_jovians > 0) return true;
+  if (only_jovian_habitable && (habitable_jovians > 0) &&
+      !(only_earthlike || only_multi_habitable || only_habitable ||
+        only_three_habitable)) return true;
+  if (only_three_habitable && only_jovian_habitable && habitable > 2 &&
+      habitable_jovians > 0) return true;
+  if (only_three_habitable && (habitable > 2)) return true;
+  if (only_superterrans && habitable_superterrans > 0) return true;
+  if (only_potential_habitable && potential_habitable > 0) return true;
+
+  return false;
+}
+
+/**
+ * @brief Print summary statistics at the end of generation
+ */
+static void print_summary_statistics() {
+  if (((flag_verbose & 0x0001) != 0) || ((flag_verbose & 0x0002) != 0)) {
+    std::cerr << "Earthlike planets: " << total_earthlike << "\n";
+    std::cerr << "Breathable atmospheres: " << total_habitable << "\n";
+    std::cerr << "Breathable g range: " << toString(min_breathable_g) << " - "
+         << toString(max_breathable_g) << "\n";
+    std::cerr << "Terrestrial g range: " << toString(min_breathable_terrestrial_g)
+         << " - " << toString(max_breathable_terrestrial_g) << "\n";
+    std::cerr << "Breathable pressure range: " << toString(min_breathable_p) << " - "
+         << toString(max_breathable_p) << "\n";
+    std::cerr << "Breathable temp range: "
+         << toString(min_breathable_temp - EARTH_AVERAGE_KELVIN) << " C - "
+         << toString(max_breathable_temp - EARTH_AVERAGE_KELVIN) << " C"
+         << "\n";
+    std::cerr << "Breathable illumination range: " << toString(min_breathable_l)
+         << " - " << toString(max_breathable_l) << "\n";
+    std::cerr << "Terrestrial illumination range: "
+         << toString(min_breathable_terrestrial_l) << " - "
+         << toString(max_breathable_terrestrial_l) << "\n";
+    std::cerr << "Max moon mass: "
+         << toString(max_moon_mass * SUN_MASS_IN_EARTH_MASSES)
+         << " Earth Masses\n";
+  }
+}
 
 /**
  * @brief stargen
@@ -124,15 +339,15 @@ string stargen_revision = "$Revision: 3.0 $";
  * @param graphic_format 
  * @return int 
  */
-auto stargen(actions action, const string &flag_char, string path,
-             const string &url_path_arg, const string &filename_arg,
-             const string &sys_name_arg, string prognam, long double mass_arg,
+auto stargen(actions action, const std::string &flag_char, std::string path,
+             const std::string &url_path_arg, const std::string &filename_arg,
+             const std::string &sys_name_arg, std::string prognam, long double mass_arg,
              long double luminosity_arg, long seed_arg, int count_arg,
              int incr_arg, catalog &cat_arg, int sys_no_arg,
              long double ratio_arg, long double ecc_coef_arg,
              long double inner_planet_factor_arg, int flags_arg, int out_format,
              int graphic_format) -> int {
-    sun the_sun;
+  sun the_sun;
   long double min_mass = 0.4;
   long double inc_mass = 0.05;
   long double max_mass = 2.35;
@@ -140,16 +355,16 @@ auto stargen(actions action, const string &flag_char, string path,
   long double sys_an = 0.0;   // seb
   int system_count = 1;
   int seed_increment = 1;
-  string default_path = SUBDIR; /* OS specific */
-  string default_url_path = "../";
-  string url_path = default_url_path;
-  string thumbnail_file = "Thumbnails";
-  string file_name = "StarGen";
-  string subdir;
-  string csv_file_name = "StarGen.csv";
-  fstream html_file;
-  fstream thumbnails;
-  fstream csv_file;
+  std::string default_path = SUBDIR; /* OS specific */
+  std::string default_url_path = "../";
+  std::string url_path = default_url_path;
+  std::string thumbnail_file = "Thumbnails";
+  std::string file_name = "StarGen";
+  std::string subdir;
+  std::string csv_file_name = "StarGen.csv";
+  std::fstream html_file;
+  std::fstream thumbnails;
+  std::fstream csv_file;
   int index = 0;
   bool do_catalog = cat_arg.count() > 0 && sys_no_arg == 0;
   int catalog_count = 0;
@@ -168,7 +383,7 @@ auto stargen(actions action, const string &flag_char, string path,
   bool only_potential_habitable = (flags_arg & fOnlyPotentialHabitable) != 0;
   allow_planet_migration = (flags_arg & fDoMigration) != 0;
   is_circumbinary = (flags_arg & fIsCircubinaryStar) != 0;
-  stringstream ss;
+  std::stringstream ss;
 
   accrete myAccreteObject;
 
@@ -176,26 +391,9 @@ auto stargen(actions action, const string &flag_char, string path,
     catalog_count = cat_arg.count();
   }
 
-  if (only_habitable && only_multi_habitable) {
-    only_habitable = false;
-  }
-
-  if (only_habitable && only_earthlike) {
-    only_habitable = false;
-  }
-
-  if (only_three_habitable) {
-    only_habitable = false;
-    only_earthlike = false;
-    only_multi_habitable = false;
-  }
-
-  if (only_superterrans) {
-    only_habitable = false;
-    only_earthlike = false;
-    only_multi_habitable = false;
-    only_three_habitable = false;
-  }
+  // Normalize mutually exclusive filter flags
+  normalize_filter_flags(only_habitable, only_multi_habitable, only_earthlike,
+                        only_three_habitable, only_superterrans);
 
   if (prognam.empty()) {
     prognam = "StarGen";
@@ -223,81 +421,16 @@ auto stargen(actions action, const string &flag_char, string path,
   }
 
   switch (action) {
-    case aListGases: {
-      long double total = 0.0;
-      int count = gases.count();
-      for (int i = 0; i < count; i++) {
-        if (gases[i].getWeight() >= AN_N &&
-            gases[i].getMaxIpp() < INCREDIBLY_LARGE_NUMBER) {
-          total += gases[i].getMaxIpp();
-        }
-        // cout << " " << gases[i].getNum() << ": " << gases[i].getSymbol() << "
-        // - " << gases[i].getName() << " " << toString(gases[i].getMinIpp()) <<
-        // " mb - " << toString(gases[i].getMaxIpp()) << " mb\n";
-      }
-      cout << gases;
-      cout << "Total Max ipp: " << toString(total) << "\n";
-      cout << "Max pressure: " << toString(MAX_HABITABLE_PRESSURE) << " atm"
-           << "\n";
-      return EXIT_SUCCESS;
-    }
-    case aListCatalog: {
-      cout << cat_arg;
-      return EXIT_SUCCESS;
-    }
-    case aListCatalogAsHTML: {
-      int count = cat_arg.count();
-      for (int i = 0; i < count; i++) {
-        cout << "\t<option value=" << i << ">" << cat_arg[i].getName()
-             << "</option>\n";
-      }
-      return EXIT_SUCCESS;
-    }
-    case aSizeCheck: {
-      long double tempE = est_temp(1.0, 1.0, EARTH_ALBEDO);
-      long double tempJ = est_temp(1.0, 5.2034, GAS_GIANT_ALBEDO);
-      long double tempS = est_temp(1.0, 9.5371, GAS_GIANT_ALBEDO);
-      long double tempU = est_temp(1.0, 19.1913, GAS_GIANT_ALBEDO);
-      long double tempN = est_temp(1.0, 30.0690, GAS_GIANT_ALBEDO);
-
-      cout << "Size of float: " << sizeof(float) << "\n";
-      cout << "Size of doubles: " << sizeof(double) << "\n";
-      cout << "Size of long doubles: " << sizeof(long double) << "\n";
-      cout << "Earth Eff Temp: " << toString(tempE) << " K, "
-           << toString(tempE - FREEZING_POINT_OF_WATER)
-           << " C, Earth rel: " << toString(tempE - EARTH_AVERAGE_KELVIN)
-           << " C\n";
-      cout << "Jupiter Eff Temp: " << toString(tempJ) << " K\n";
-      cout << "Saturn Eff Temp: " << toString(tempS) << " K\n";
-      cout << "Uranus Eff Temp: " << toString(tempU) << " K\n";
-      cout << "Neptune Eff Temp: " << toString(tempN) << " K\n";
-      return EXIT_SUCCESS;
-    }
-    case aListVerbosity: {
-      cout << "Stargen " << stargen_revision << "\n"
-      << "Verbosity flags are hexidecimal numbers:\n"
-      << "\t0001\tEarthlike count\n"
-      << "\t0002\tTrace Min/Max\n"
-      << "\t0004\tList Habitable\n"
-      << "\t0008\tList Earthlike & Sphinxlike\n\n"
-      << "\t0010\tList Gases\n"
-      << "\t0020\tTrace temp iterations\n"
-      << "\t0040\tGas lifetimes\n"
-      << "\t0080\tList loss of accreted gas mass\n\n"
-      << "\t0100\tInjecting, collision\n"
-      << "\t0200\tChecking..., Failed...\n"
-      << "\t0400\tList binary info\n"
-      << "\t0800\tList accreted atmospheres\n\n"
-      << "\t1000\tMoons (experimental)\n"
-      << "\t2000\tOxygen poisoned (experimental)\n"
-      << "\t4000\tTrace gas percentages\n"
-      << "\t8000\tList Jovians in the ecosphere\n\n"
-      << "\t10000\tList type diversity\n"
-      << "\t20000\tTrace Surface temp interations\n"
-      << "\t40000\tDisplay Roche Limits and Hill Sphere distances\n"
-      << "\t80000\tDisplay mass-radius maps\n";
-      return EXIT_SUCCESS;
-    }
+    case aListGases:
+      return handle_list_gases_action();
+    case aListCatalog:
+      return handle_list_catalog_action(cat_arg);
+    case aListCatalogAsHTML:
+      return handle_list_catalog_html_action(cat_arg);
+    case aSizeCheck:
+      return handle_size_check_action();
+    case aListVerbosity:
+      return handle_list_verbosity_action();
     case aGenerate:
       break;
   }
@@ -341,8 +474,8 @@ auto stargen(actions action, const string &flag_char, string path,
   }
 
   if (out_format == ffCSV || out_format == ffCSVdl || out_format == ffJSON) {
-    string csv_url;
-    string cleaned_arg = "StarGen";
+    std::string csv_url;
+    std::string cleaned_arg = "StarGen";
 
     if (!filename_arg.empty()) {
       char *ptr = nullptr;
@@ -364,9 +497,9 @@ auto stargen(actions action, const string &flag_char, string path,
   }
 
   for (index = 0; index < system_count; index++) {
-    string system_name;
-    string designation;
-    string cp;
+    std::string system_name;
+    std::string designation;
+    std::string cp;
     long double outer_limit = NAN;
     long double inner_dust_limit = NAN;
     int sys_no = 0;
@@ -405,7 +538,7 @@ auto stargen(actions action, const string &flag_char, string path,
 
       // in_celestia = cat_arg[sys_no].getInCelestia();
 
-      // cout << cat_arg[sys_no].getMass() << " " <<
+      // std::cout << cat_arg[sys_no].getMass() << " " <<
       // cat_arg[sys_no].getLuminosity() << " " << cat_arg[sys_no].getEffTemp()
       // << " " << cat_arg[sys_no].getSpecType() << "\n";
 
@@ -468,7 +601,7 @@ auto stargen(actions action, const string &flag_char, string path,
 
       outer_limit = 0;
     } else {
-      stringstream ss;
+      std::stringstream ss;
       if (!sys_name_arg.empty()) {
         system_name = sys_name_arg;
         designation = sys_name_arg;
@@ -509,7 +642,7 @@ auto stargen(actions action, const string &flag_char, string path,
     the_sun.setName(system_name);
 
     if (((flag_verbose & 0x0400) != 0) && outer_limit > 0.0) {
-      cerr << system_name << ", Outer Limit: " << toString(outer_limit) << "\n";
+      std::cerr << system_name << ", Outer Limit: " << toString(outer_limit) << "\n";
     }
     if (system_count == 1 && !filename_arg.empty()) {
       file_name = filename_arg;
@@ -543,54 +676,22 @@ auto stargen(actions action, const string &flag_char, string path,
       type_count = 0;
     }
     type_count = 0;
-    // cout << index << "\n";
+    // std::cout << index << "\n";
     the_sun_clone = the_sun;
     generate_stellar_system(the_sun, use_seed_system, seed_planets, flag_char,
                             sys_no, system_name, inner_dust_limit, outer_limit,
                             ecc_coef_arg, inner_planet_factor_arg, do_gases,
                             do_moons, myAccreteObject);
 
+    // If planet generation failed (e.g., zero stellar mass), skip this system
+    if (innermost_planet == nullptr) {
+      continue;
+    }
+
     planet *a_planet = nullptr;
     int counter = 0;
-    int wt_type_count = type_count;
+    int wt_type_count = calculate_weighted_type_count(type_counts, type_count);
     int norm_type_count = 0;
-
-    if (type_counts[0] > 0) {
-      wt_type_count += 1;  // Unknown
-    }
-    if (type_counts[1] > 0) {
-      wt_type_count += 3;  // Rock
-    }
-    if (type_counts[2] > 0) {
-      wt_type_count += 16;  // Venusian
-    }
-    if (type_counts[3] > 0) {
-      wt_type_count += 20;  // Terrestrial
-    }
-    if (type_counts[4] > 0) {
-      wt_type_count += 12;  // Gas Dwarf
-    }
-    if (type_counts[5] > 0) {
-      wt_type_count += 11;  // Neptunian
-    }
-    if (type_counts[6] > 0) {
-      wt_type_count += 2;  // Jovian
-    }
-    if (type_counts[7] > 0) {
-      wt_type_count += 15;  // Martian
-    }
-    if (type_counts[8] > 0) {
-      wt_type_count += 18;  // Water
-    }
-    if (type_counts[9] > 0) {
-      wt_type_count += 14;  // Ice
-    }
-    if (type_counts[10] > 0) {
-      wt_type_count += 13;  // Asteroids
-    }
-    if (type_counts[11] > 0) {
-      wt_type_count += 10;  // 1-Face
-    }
 
 // why is there an empty for loop here? will investigate old versions to see
 // what used to be here
@@ -606,7 +707,7 @@ auto stargen(actions action, const string &flag_char, string path,
     }
 
     if ((flag_verbose & 0x10000) != 0) {
-      cerr << "System " << flag_seed << " - " << system_name << " (-s"
+      std::cerr << "System " << flag_seed << " - " << system_name << " (-s"
            << flag_seed << " -" << flag_char << sys_no << ") has " << type_count
            << " types out of " << counter << " planets. [" << norm_type_count
            << "]\n";
@@ -615,28 +716,12 @@ auto stargen(actions action, const string &flag_char, string path,
     total_habitable += habitable;
     total_potentially_habitable += potential_habitable;
     total_earthlike += earthlike;
-    if ((!(only_habitable || only_multi_habitable || only_jovian_habitable ||
-           only_earthlike || only_three_habitable || only_superterrans ||
-           only_potential_habitable)) ||
-        (only_habitable && (habitable > 0) && !only_jovian_habitable) ||
-        (only_habitable && only_jovian_habitable && habitable > 0 &&
-         habitable_jovians > 0) ||
-        (only_multi_habitable && (habitable > 1) && !only_jovian_habitable) ||
-        (only_multi_habitable && only_jovian_habitable && habitable > 1 &&
-         habitable_jovians > 0) ||
-        (only_earthlike && (earthlike > 0) && !only_jovian_habitable) ||
-        (only_earthlike && only_jovian_habitable && earthlike > 0 &&
-         habitable_jovians > 0) ||
-        (only_jovian_habitable && (habitable_jovians > 0) &&
-         !(only_earthlike || only_multi_habitable || only_habitable ||
-           only_three_habitable)) ||
-        (only_three_habitable && only_jovian_habitable && habitable > 2 &&
-         habitable_jovians > 0) ||
-        (only_three_habitable && (habitable > 2)) ||
-        (only_superterrans && habitable_superterrans > 0) ||
-        (only_potential_habitable && potential_habitable > 0)) {
-      string system_url;
-      string svg_url;
+    if (should_output_system(only_habitable, only_multi_habitable, only_jovian_habitable,
+                            only_earthlike, only_three_habitable, only_superterrans,
+                            only_potential_habitable, habitable, habitable_jovians,
+                            earthlike, habitable_superterrans, potential_habitable)) {
+      std::string system_url;
+      std::string svg_url;
 
       ss.str("");
       ss << url_path << subdir << file_name << ".html";
@@ -690,7 +775,7 @@ auto stargen(actions action, const string &flag_char, string path,
             flag_seed); break;*/
       }
       if (habitable > 1 && ((flag_verbose & 0x0001) != 0)) {
-        cerr << "System " << flag_seed << " - " << system_name << " (-s"
+        std::cerr << "System " << flag_seed << " - " << system_name << " (-s"
              << flag_seed << " -" << flag_char << sys_no << ") has "
              << habitable << " planets with breathable atmospheres.\n";
       }
@@ -727,7 +812,7 @@ auto stargen(actions action, const string &flag_char, string path,
               node->setCmf(0);
               node->next_planet = node->reconnect_to;
             }
-            // cout << "Deleted World\n";
+            // std::cout << "Deleted World\n";
           }
           ptr->first_moon = ptr->first_moon_backup;
         }
@@ -735,28 +820,7 @@ auto stargen(actions action, const string &flag_char, string path,
     }
   }
 
-  if (((flag_verbose & 0x0001) != 0) || ((flag_verbose & 0x0002) != 0)) {
-    cerr << "Earthlike planets: " << total_earthlike << "\n";
-    cerr << "Breathable atmospheres: " << total_habitable << "\n";
-    cerr << "Breathable g range: " << toString(min_breathable_g) << " - "
-         << toString(max_breathable_g) << "\n";
-    cerr << "Terrestrial g range: " << toString(min_breathable_terrestrial_g)
-         << " - " << toString(max_breathable_terrestrial_g) << "\n";
-    cerr << "Breathable pressure range: " << toString(min_breathable_p) << " - "
-         << toString(max_breathable_p) << "\n";
-    cerr << "Breathable temp range: "
-         << toString(min_breathable_temp - EARTH_AVERAGE_KELVIN) << " C - "
-         << toString(max_breathable_temp - EARTH_AVERAGE_KELVIN) << " C"
-         << "\n";
-    cerr << "Breathable illumination range: " << toString(min_breathable_l)
-         << " - " << toString(max_breathable_l) << "\n";
-    cerr << "Terrestrial illumination range: "
-         << toString(min_breathable_terrestrial_l) << " - "
-         << toString(max_breathable_terrestrial_l) << "\n";
-    cerr << "Max moon mass: "
-         << toString(max_moon_mass * SUN_MASS_IN_EARTH_MASSES)
-         << " Earth Masses\n";
-  }
+  print_summary_statistics();
 
   if (system_count > 1) {
     if (out_format == ffHTML) {
@@ -806,13 +870,13 @@ int system_counter = 0;
  * @param myAccreteObject 
  */
 void generate_stellar_system(sun &the_sun, bool use_seed_system,
-                             planet *seed_system, const string& flag_char, int sys_no,
-                             const string& system_name, long double inner_dust_limit,
+                             planet *seed_system, const std::string& flag_char, int sys_no,
+                             const std::string& system_name, long double inner_dust_limit,
                              long double outer_planet_limit,
                              long double ecc_coef,
                              long double inner_planet_factor, bool do_gases,
                              bool do_moons, accrete &myAccreteObject) {
-    do_gases = (flags_arg_clone & fDoGases) != 0;
+  do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
   system_counter++;
   long double outer_dust_limit = NAN;
@@ -831,7 +895,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
   }
 
   if (the_sun.getMass() == 0) {
-    // cout << system_name << " " << sys_no << "\n";
+    // std::cout << system_name << " " << sys_no << "\n";
   }
 
   if (the_sun.getEffTemp() == 0) {
@@ -851,7 +915,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
     if (min_age > max_age_of_star) {
       min_age = max_age_of_star;
     }
-    // cout << min_age << " " << max_age << "\n";
+    // std::cout << min_age << " " << max_age << "\n";
     the_sun.setAge(random_number(min_age, max_age));
   } else {
     long double max_age_of_star = the_sun.getLife();
@@ -864,14 +928,18 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
     if (min_age > max_age_of_star) {
       min_age = max_age_of_star;
     }
-    // cout << min_age << " " << max_age << "\n";
+    // std::cout << min_age << " " << max_age << "\n";
     innermost_planet =
         myAccreteObject.dist_planetary_masses(the_sun, inner_dust_limit, outer_dust_limit,
                               outer_planet_limit, dust_density_coeff, ecc_coef,
                               inner_planet_factor, seed_system, do_moons);
+    if (innermost_planet == nullptr) {
+      // Failed to generate planets (e.g., zero stellar mass)
+      return;
+    }
     the_sun.setAge(random_number(min_age, max_age));
   }
-  // cout << "test" << system_counter << "\n";
+  // std::cout << "test" << system_counter << "\n";
   generate_planets(the_sun, !use_seed_system, flag_char, sys_no,
                    system_name, do_gases, do_moons);
   ZoneScoped;
@@ -888,8 +956,8 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
  * @param do_gases 
  * @param do_moons 
  */
-void generate_planets(sun &the_sun, bool random_tilt, const string &flag_char,
-                      int sys_no, const string &system_name, bool do_gases,
+void generate_planets(sun &the_sun, bool random_tilt, const std::string &flag_char,
+                      int sys_no, const std::string &system_name, bool do_gases,
                       bool do_moons) {
     do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
@@ -900,14 +968,14 @@ void generate_planets(sun &the_sun, bool random_tilt, const string &flag_char,
 
   for (the_planet = innermost_planet, planet_no = 1; the_planet != nullptr;
        the_planet = the_planet->next_planet, planet_no++) {
-    string planet_id;
-    stringstream ss;
+    std::string planet_id;
+    std::stringstream ss;
 
     ss.str("");
     ss << system_name << " (-s" << toString(flag_seed) << " -" << flag_char
        << toString(sys_no) << ") " << toString(planet_no);
     planet_id = ss.str();
-    // cout << planet_id << "\n";
+    // std::cout << planet_id << "\n";
     if (!(the_planet->getKnownRadius() > 0)) {
       the_planet->setImf(0);
       the_planet->setRmf(0);
@@ -927,7 +995,7 @@ void generate_planets(sun &the_sun, bool random_tilt, const string &flag_char,
     if (do_moons) {
       for (moon = the_planet->first_moon, moons = 1; moon != nullptr;
            moon = moon->next_planet, moons++) {
-        string moon_id;
+        std::string moon_id;
 
         ss.str("");
         ss << planet_id << "-" << toString(moons);
@@ -941,20 +1009,717 @@ void generate_planets(sun &the_sun, bool random_tilt, const string &flag_char,
 }
 
 /**
+ * @brief Calculate atmospheric gas loss for rocky planets (H2 and He)
+ * @param the_planet Planet to calculate gas loss for
+ * @param the_sun Parent star
+ * @param planet_id Planet identifier for logging
+ */
+static void calculate_gas_loss(planet *the_planet, sun &the_sun, const std::string &planet_id) {
+  if ((the_planet->getGasMass() / the_planet->getMass()) <= 0.000001) {
+    return;  // No significant gas to lose
+  }
+
+  long double h2_mass = the_planet->getGasMass() * 0.85;
+  long double he_mass = (the_planet->getGasMass() - h2_mass) * 0.999;
+
+  long double h2_loss = 0.0;
+  long double he_loss = 0.0;
+
+  long double h2_life = gas_life(MOL_HYDROGEN, the_planet);
+  long double he_life = gas_life(HELIUM, the_planet);
+
+  if (h2_life < the_sun.getAge()) {
+    h2_loss = ((1.0 - (1.0 / exp(the_sun.getAge() / h2_life))) * h2_mass);
+    the_planet->setGasMass(the_planet->getGasMass() - h2_loss);
+    the_planet->setSurfAccel(acceleration(the_planet));
+    the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
+  }
+
+  if (he_life < the_sun.getAge()) {
+    he_loss = ((1.0 - (1.0 / exp(the_sun.getAge() / he_life))) * he_mass);
+    the_planet->setGasMass(the_planet->getGasMass() - he_loss);
+    the_planet->setSurfAccel(acceleration(the_planet));
+    the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
+  }
+
+  if ((h2_loss + he_loss) > .000001 && ((flag_verbose & 0x0080) != 0)) {
+    std::cerr << planet_id << "\tLosing gas: H2: "
+         << toString(h2_loss * SUN_MASS_IN_EARTH_MASSES)
+         << " EM, He: " << toString(he_loss * SUN_MASS_IN_EARTH_MASSES)
+         << " EM\n";
+  }
+}
+
+/**
+ * @brief Finalize gas giant properties (temperature, albedo, atmosphere)
+ * @param the_planet Planet to finalize
+ * @param the_sun Parent star
+ * @param planet_id Planet identifier for logging
+ * @param do_gases Whether to calculate detailed atmospheric gases
+ * @param force_gas_giant Whether this is a forced gas giant classification
+ * @param parent_mass Mass of parent body (for moons)
+ * @param is_moon Whether this is a moon
+ */
+static void finalize_gas_giant_properties(planet *the_planet, sun &the_sun,
+                                         const std::string &planet_id, bool do_gases,
+                                         bool force_gas_giant, long double parent_mass,
+                                         bool is_moon) {
+  the_planet->setGreenhouseEffect(false);
+  the_planet->setVolatileGasInventory(INCREDIBLY_LARGE_NUMBER);
+  the_planet->setSurfPressure(INCREDIBLY_LARGE_NUMBER);
+  the_planet->setBoilPoint(INCREDIBLY_LARGE_NUMBER);
+  the_planet->setGreenhsRise(0);
+  the_planet->setHydrosphere(1);
+  the_planet->setCloudCover(1);
+  the_planet->setIceCover(0);
+  the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
+
+  if (force_gas_giant) {
+    the_planet->setMolecWeight(about(0.5, 0.1));
+  } else {
+    the_planet->setMolecWeight(min_molec_weight(the_planet));
+  }
+
+  gas_giant_temperature_albedo(the_planet, parent_mass, is_moon);
+
+  the_planet->setDensity(
+      volume_density(the_planet->getMass(), the_planet->getRadius()));
+
+  the_planet->setEstimatedTerrTemp(est_temp(
+      the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
+      the_planet->getA(), EARTH_ALBEDO));
+
+  if (do_gases) {
+    the_sun = the_planet->getTheSun();
+    calculate_gases(the_sun, the_planet, planet_id);
+  }
+
+  long double temp = the_planet->getEstimatedTerrTemp();
+
+  if (is_habitable_jovian(the_planet)) {
+    habitable_jovians++;
+
+    if ((flag_verbose & 0x8000) != 0) {
+      std::string planet_type = type_string(the_planet);
+      std::string moon_string = the_planet->first_moon != nullptr ? " WITH MOON" : "";
+
+      std::cerr << planet_id << "\t" << planet_type << " ("
+           << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
+           << " EM " << toString(the_sun.getAge() / 1.0E9) << " By)"
+           << moon_string << " with earth-like temperature ("
+           << toString(temp - FREEZING_POINT_OF_WATER) << " C, "
+           << toString(32.0 + ((temp - FREEZING_POINT_OF_WATER) * 1.8))
+           << " F, " << (temp - EARTH_AVERAGE_KELVIN) << " C Earth).\n";
+    }
+  }
+}
+
+/**
+ * @brief Generate moons for a planet
+ * @param the_planet Planet to generate moons for
+ * @param planet_no Planet number for ID generation
+ * @param the_sun Parent star
+ * @param random_tilt Whether to randomize tilt
+ * @param planet_id Planet identifier for logging
+ * @param do_gases Whether to calculate detailed atmospheric gases
+ * @param do_moons Whether to generate moons
+ * @param is_moon Whether this planet is itself a moon
+ */
+/**
+ * @brief Calculate the Hill sphere radius for a planet or moon
+ * @param semi_major_axis Semi-major axis in AU
+ * @param body_mass Mass of the body in solar masses
+ * @param primary_mass Mass of the primary body in solar masses
+ * @return Hill sphere radius in km
+ */
+static long double calculate_hill_sphere(long double semi_major_axis,
+                                         long double body_mass,
+                                         long double primary_mass) {
+  return semi_major_axis * KM_PER_AU *
+         std::pow(body_mass / (3.0 * primary_mass), 1.0 / 3.0);
+}
+
+/**
+ * @brief Calculate the Roche limit for a moon around a planet
+ * @param planet_radius Radius of the planet in km
+ * @param planet_density Density of the planet in g/cc
+ * @param moon_density Density of the moon in g/cc
+ * @return Roche limit in km
+ */
+static long double calculate_roche_limit(long double planet_radius,
+                                         long double planet_density,
+                                         long double moon_density) {
+  return 2.44 * planet_radius *
+         std::pow(planet_density / moon_density, 1.0 / 3.0);
+}
+
+/**
+ * @brief Check if a proposed moon orbit collides with existing moons
+ * @param the_planet The planet hosting the moons
+ * @param distance Proposed orbital distance in km
+ * @param moon_mass Mass of the proposed moon in solar masses
+ * @param planet_mass Mass of the planet in solar masses
+ * @return true if collision detected, false if orbit is clear
+ */
+static bool check_moon_collision(planet *the_planet, long double distance,
+                                long double moon_mass, long double planet_mass) {
+  planet *the_moon = nullptr;
+  long double hill_sphere2 = 0;
+  long double temp_hill_sphere = 0;
+
+  temp_hill_sphere = distance * std::pow(moon_mass / (3.0 * planet_mass), 1.0 / 3.0);
+
+  for (the_moon = the_planet->first_moon; the_moon != nullptr;
+       the_moon = the_moon->next_planet) {
+    hill_sphere2 = the_moon->getMoonA() * KM_PER_AU *
+                   std::pow(the_moon->getMass() / (3.0 * planet_mass), 1.0 / 3.0);
+
+    if (((the_moon->getMoonA() * KM_PER_AU) >= (distance - temp_hill_sphere) &&
+         (the_moon->getMoonA() * KM_PER_AU) <= (distance + temp_hill_sphere)) ||
+        (distance >= ((the_moon->getMoonA() * KM_PER_AU) - hill_sphere2) &&
+         distance <= ((the_moon->getMoonA() * KM_PER_AU) + hill_sphere2))) {
+      return true;  // Collision detected
+    }
+  }
+  return false;  // No collision
+}
+
+static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
+                          bool random_tilt, const std::string &planet_id,
+                          bool do_gases, bool do_moons, bool is_moon) {
+  if (!do_moons || is_moon) {
+    return;
+  }
+
+  bool skip_minor_moons = false;
+  long double moon_mass = 0.0;
+  int n = 0;
+  std::stringstream ss;
+  std::string moon_id;
+  long double temp_hill_sphere = 0;
+  long double min_rand_distance = 0;
+
+  if (the_planet->first_moon != nullptr) {
+    planet *ptr = nullptr;
+    planet *prev = nullptr;
+    planet *next_moon = nullptr;
+
+    // reset moon distances for predefined moons
+    /*for (n = 0, ptr = the_planet->first_moon; ptr != NULL; ptr = next_moon)
+    {
+      next_moon = ptr->next_planet;
+      ptr->setMoonA(0);
+      ptr->setMoonE(0);
+    }*/
+
+    long double hill_sphere = calculate_hill_sphere(
+        the_planet->getA(), the_planet->getMass(), the_sun.getMass());
+
+    for (n = 0, ptr = the_planet->first_moon; ptr != nullptr; ptr = next_moon)
+    // for (n = 0; n < the_planet->getMoonCount(); n++)
+    {
+      next_moon = ptr->next_planet;
+      moon_mass += ptr->getMass() * SUN_MASS_IN_EARTH_MASSES;
+
+      long double roche_limit = 0.0;
+      long double distance = 0.0;
+      long double eccentricity = 0.0;
+
+      ptr->setA(the_planet->getA());
+      ptr->setE(the_planet->getE());
+      ptr->setOrbitZone(the_planet->getOrbitZone());
+
+      assign_composition(ptr, the_sun, true);
+
+      ss.str("");
+      ss << planet_id << "-" << toString(n + 1);
+      moon_id = ss.str();
+      ss.str("");
+
+      // generate_planet(ptr, n, the_sun, random_tilt, moon_id, do_gases,
+      // do_moons, true, the_planet->getMass());
+      ptr->setRadius(radius_improved(ptr->getMass(), ptr->getImf(),
+                                     ptr->getRmf(), ptr->getCmf(), false,
+                                     ptr->getOrbitZone(), ptr));
+      ptr->setDensity(volume_density(ptr->getMass(), ptr->getRadius()));
+
+      roche_limit = calculate_roche_limit(the_planet->getRadius(),
+                                          the_planet->getDensity(),
+                                          ptr->getDensity());
+
+      if ((roche_limit * 1.5) < (hill_sphere / 3.0) &&
+          (hill_sphere / 3.0) > (the_planet->getRadius() * 2.5)) {
+        bool done = false;
+        bool bad_place = false;
+        bool to_many_tries = false;
+        planet *the_moon = nullptr;
+        long double hill_sphere2 = 0;
+        int tries = 0;
+        while (!done) {
+          tries++;
+          if (tries > 20) {
+            to_many_tries = true;
+            break;
+          }
+          bad_place = false;
+
+          if ((roche_limit * 1.5) > (the_planet->getRadius() * 2.5)) {
+            min_rand_distance = roche_limit * 1.5;
+          } else {
+            min_rand_distance = the_planet->getRadius() * 2.5;
+          }
+
+          distance = random_number(min_rand_distance, hill_sphere / 3.0);
+          eccentricity = random_number(
+              0, 0.01);  // I know I should use random_eccentricity here but I
+                         // want to prevent orbits from crossing each other
+
+          bad_place = check_moon_collision(the_planet, distance, ptr->getMass(),
+                                           the_planet->getMass());
+          if (!bad_place) {
+            done = true;
+          }
+        }
+
+        if (to_many_tries) {
+          bool dont_break = false;
+          if ((flag_verbose & 0x1000) != 0) {
+            std::cerr << "  " << planet_id << ": can't fit anymore moons!\n";
+          }
+          skip_minor_moons = true;
+          planet *node = nullptr;
+          planet *next = nullptr;
+          for (node = ptr; node != nullptr; node = next) {
+            next = node->next_planet;
+            if (node->getDeletable()) {
+              delete node;
+            } else {
+              node->next_planet = node->reconnect_to;
+              n = 0;
+              the_planet->first_moon = the_planet->first_moon_backup;
+              // ptr = the_planet->first_moon;
+              dont_break = true;
+              continue;
+            }
+          }
+          if (prev != nullptr) {
+            prev->next_planet = nullptr;
+          } else {
+            the_planet->first_moon = nullptr;
+          }
+          /*for (int m = n; m < the_planet->getMoonCount(); m++)
+          {
+            the_planet->deleteMoon(m);
+          }*/
+          if (!dont_break) {
+            break;
+          }
+        } else {
+          ptr->setMoonA(distance / KM_PER_AU);
+          ptr->setMoonE(eccentricity);
+
+          ptr->setOrbPeriod(
+              period(ptr->getMoonA(), ptr->getMass(), the_planet->getMass()));
+          ptr->setType(tUnknown);
+          generate_planet(ptr, n, the_sun, random_tilt, moon_id, do_gases,
+                          do_moons, true, the_planet->getMass());
+
+          if ((flag_verbose & 0x40000) != 0) {
+            std::cerr << "   Roche limit: R = "
+                 << toString(the_planet->getRadius())
+                 << ", rM = " << toString(the_planet->getDensity())
+                 << ", rm = " << toString(ptr->getDensity()) << " -> "
+                 << toString(roche_limit) << " km\n";
+            std::cerr << "   Hill Sphere: a = "
+                 << toString(the_planet->getA() * KM_PER_AU) << ", m = "
+                 << toString(the_planet->getMass() * SOLAR_MASS_IN_KILOGRAMS)
+                 << ", M = "
+                 << toString(the_sun.getMass() * SOLAR_MASS_IN_KILOGRAMS)
+                 << " -> " << toString(hill_sphere) << " km\n";
+            std::cerr << moon_id << " Moon orbit: a = "
+                 << toString(ptr->getMoonA() * KM_PER_AU)
+                 << " km, e = " << toString(ptr->getMoonE()) << "\n";
+          }
+
+          if ((flag_verbose & 0x1000) != 0) {
+            std::cerr << "  " << planet_id << ": ("
+                 << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
+                 << " EM) " << n << " "
+                 << toString(ptr->getMass() * SUN_MASS_IN_EARTH_MASSES)
+                 << " EM\n";
+          }
+          prev = ptr;
+        }
+      } else {
+        if ((flag_verbose & 0x1000) != 0) {
+          std::cerr << "  " << planet_id
+               << " lost moons due to gravity of the sun!\n";
+        }
+        skip_minor_moons = true;
+        // delete moons
+        planet *node = nullptr;
+        planet *next = nullptr;
+        for (node = the_planet->first_moon; node != nullptr; node = next) {
+          next = node->next_planet;
+          if (node->getDeletable()) {
+            delete node;
+          } else {
+            node->next_planet = node->reconnect_to;
+            // n = 0;
+            the_planet->first_moon = the_planet->first_moon_backup;
+            // ptr = the_planet->first_moon;
+            continue;
+          }
+        }
+        n = 0;
+        the_planet->first_moon = nullptr;
+        /*for (int m = 0; m < the_planet->getMoonCount(); m++)
+         *	    {
+         *	      the_planet->deleteMoon(m);
+         }*/
+        break;
+      }
+    }
+  }
+
+  if (skip_minor_moons) {
+    the_planet->setMinorMoons(0);
+  } else {
+    the_planet->setMinorMoons(
+        poisson(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES));
+  }
+
+  if (the_planet->getMinorMoons() > 0) {
+    long double max_total_moon_mass = NAN;
+    long double remaining_moon_mass = NAN;
+    long double new_moon_mass = NAN;
+    long double new_moon_gas_mass = NAN;
+    long double min_new_moon_mass = 1.0 / 100000000000.0;
+    planet *tmp = nullptr;
+    planet *ref = nullptr;
+    int attempts = 0;
+    bool done2 = false;
+    bool too_many_tries = false;
+    bool bad_place2 = false;
+    long double hill_sphere3 = calculate_hill_sphere(
+        the_planet->getA(), the_planet->getMass(), the_sun.getMass());
+    long double hill_sphere4 = 0;
+    long double roche_limit2 = 0;
+    int tries2 = 0;
+    if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 1000.0) {
+      max_total_moon_mass =
+          the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.05;
+    } else if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 10.0) {
+      max_total_moon_mass =
+          the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * (1.5 / 10000.0);
+    } else if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 0.5) {
+      if (the_planet->getRadius() > 15000.0) {
+        max_total_moon_mass =
+            the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.01;
+      } else {
+        max_total_moon_mass =
+            the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.05;
+      }
+    } else {
+      max_total_moon_mass =
+          the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * (1.5 / 10000.0);
+    }
+    remaining_moon_mass = max_total_moon_mass - moon_mass;
+
+    // get the pointer to the last moon in the list
+    if (the_planet->first_moon != nullptr) {
+      tmp = the_planet->first_moon;
+      while (true) {
+        if (tmp->next_planet == nullptr) {
+          break;
+        }
+        tmp = tmp->next_planet;
+      }
+    } else {
+      tmp = nullptr;
+    }
+
+    n++;
+    int moon_count = 0;
+    while (true) {
+      done2 = false;
+      ss.str("");
+      ss << planet_id << "-" << toString(n);
+      moon_id = ss.str();
+      ss.str("");
+
+      if (remaining_moon_mass <= 0.0 || attempts > 5 ||
+          moon_count > the_planet->getMinorMoons() ||
+          (hill_sphere3 / 3.0) <= the_planet->getRadius()) {
+        break;
+      }
+      planet *new_moon = nullptr;
+      new_moon = new planet();
+      new_moon->setPlanetNo(n);
+      new_moon->setOrbitZone(the_planet->getOrbitZone());
+      new_moon->setA(the_planet->getA());
+      new_moon->setE(the_planet->getE());
+      new_moon->setHzd(the_planet->getHzd());
+
+      double r1 = randf();
+      double maxln = exp(1.0);
+      double r2 = log(1.0 + (maxln * r1)) / 1.33;
+
+      new_moon_mass = r2 * remaining_moon_mass;
+
+      if (new_moon_mass < min_new_moon_mass) {
+        new_moon_mass = min_new_moon_mass;
+      }
+
+      if (new_moon_mass > 10.0) {
+        new_moon_gas_mass = new_moon_mass * random_number(0.05, 1.0);
+        new_moon->setGasGiant(true);
+      } else {
+        new_moon_gas_mass = 0;
+        new_moon->setGasGiant(false);
+      }
+      new_moon->setDustMass((new_moon_mass - new_moon_gas_mass) /
+                            SUN_MASS_IN_EARTH_MASSES);
+      new_moon->setGasMass(new_moon_gas_mass / SUN_MASS_IN_EARTH_MASSES);
+
+      assign_composition(new_moon, the_sun, true);
+
+      // generate_planet(new_moon, n, the_sun, random_tilt, moon_id, do_gases,
+      // do_moons, true, the_planet->getMass());
+      new_moon->setRadius(radius_improved(
+          new_moon->getMass(), new_moon->getImf(), new_moon->getRmf(),
+          new_moon->getCmf(), false, new_moon->getOrbitZone(), new_moon));
+      new_moon->setDensity(
+          volume_density(new_moon->getMass(), new_moon->getRadius()));
+
+      long double distance2 = NAN;
+      long double eccentricity2 = NAN;
+
+      roche_limit2 = calculate_roche_limit(the_planet->getRadius(),
+                                           the_planet->getDensity(),
+                                           new_moon->getDensity());
+      if ((roche_limit2 * 1.5) >= (hill_sphere3 / 3.0)) {
+        if ((flag_verbose & 0x1000) != 0) {
+          std::cerr << "  " << planet_id << ": Can't add anymore moons!\n";
+        }
+        delete new_moon;
+        break;
+      }
+      tries2 = 0;
+      while (!done2) {
+        tries2++;
+        bad_place2 = false;
+        too_many_tries = false;
+        distance2 = random_number(roche_limit2 * 1.5, hill_sphere3 / 3.0);
+        eccentricity2 = random_number(
+            0, 0.01);  // I know I should use random_eccentricity here but I
+                       // want to prevent orbits from crossing each other
+        if ((flag_verbose & 0x1000) != 0) {
+          std::cerr << "  " << planet_id << ": Attempting to add moon ("
+               << toString(new_moon->getMass() * SUN_MASS_IN_EARTH_MASSES)
+               << " EU) at " << toString(distance2)
+               << " km with eccentricity of " << toString(eccentricity2)
+               << "\n";
+        }
+
+        for (ref = the_planet->first_moon; ref != nullptr;
+             ref = ref->next_planet) {
+          hill_sphere4 =
+              ref->getMoonA() * KM_PER_AU *
+              std::pow(ref->getMass() / (3.0 * the_planet->getMass()), 1.0 / 3.0);
+          temp_hill_sphere =
+              distance2 *
+              std::pow(new_moon->getMass() / (3.0 * the_planet->getMass()),
+                  1.0 / 3.0);
+          // std::cout << toString(distance2) << " " << toString(distance2 -
+          // temp_hill_sphere) << " " << toString(distance2 +
+          // temp_hill_sphere) << "\n";
+          if (((ref->getMoonA() * KM_PER_AU) >=
+                   (distance2 - temp_hill_sphere) &&
+               (ref->getMoonA() * KM_PER_AU) <=
+                   (distance2 + temp_hill_sphere)) ||
+              (distance2 >= ((ref->getMoonA() * KM_PER_AU) - hill_sphere4) &&
+               distance2 <= ((ref->getMoonA() * KM_PER_AU) + hill_sphere4))) {
+            bad_place2 = true;
+            if ((flag_verbose & 0x1000) != 0) {
+              std::cerr << "  Failed due to neighboring moon.\n";
+            }
+            break;
+          }
+        }
+        if (!bad_place2 || tries2 > 20) {
+          done2 = true;
+        }
+        if (tries2 > 20) {
+          too_many_tries = true;
+        }
+      }
+      new_moon->setMoonA(distance2 / KM_PER_AU);
+      new_moon->setMoonE(eccentricity2);
+      if (bad_place2 || too_many_tries) {
+        delete new_moon;
+        attempts++;
+        if ((flag_verbose & 0x1000) != 0) {
+          std::cerr << "  Failed to add moon.\n";
+        }
+      } else {
+        attempts = 0;
+        generate_planet(new_moon, n, the_sun, random_tilt, moon_id, do_gases,
+                        do_moons, true, the_planet->getMass());
+        if (tmp != nullptr) {
+          tmp->next_planet = new_moon;
+          tmp = tmp->next_planet;
+        } else {
+          the_planet->first_moon = new_moon;
+          tmp = the_planet->first_moon;
+        }
+        // the_planet->addMoon(new_moon);
+        remaining_moon_mass -= new_moon_mass;
+        moon_mass += new_moon_mass;
+        n++;
+        moon_count++;
+
+        if ((flag_verbose & 0x40000) != 0) {
+          std::cerr << "   Roche limit: R = " << toString(the_planet->getRadius())
+               << ", rM = " << toString(the_planet->getDensity())
+               << ", rm = " << toString(new_moon->getDensity()) << " -> "
+               << toString(roche_limit2) << " km\n";
+          std::cerr << "   Hill Sphere: a = "
+               << toString(the_planet->getA() * KM_PER_AU) << ", m = "
+               << toString(the_planet->getMass() * SOLAR_MASS_IN_KILOGRAMS)
+               << ", M = "
+               << toString(the_sun.getMass() * SOLAR_MASS_IN_KILOGRAMS)
+               << " -> " << toString(hill_sphere3) << " km\n";
+          std::cerr << moon_id << " Moon orbit: a = "
+               << toString(new_moon->getMoonA() * KM_PER_AU)
+               << " km, e = " << toString(new_moon->getMoonE()) << "\n";
+        }
+
+        if ((flag_verbose & 0x1000) != 0) {
+          std::cerr << "  New Moon for " << planet_id << ": ("
+               << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
+               << " EM) " << n << " "
+               << toString(new_moon->getMass() * SUN_MASS_IN_EARTH_MASSES)
+               << " EM\n";
+        }
+      }
+    }
+
+    if (the_planet->first_moon != nullptr) {
+      // reorder the moons
+      the_planet->sortMoons();
+
+      // make some modifications to the moons
+      int moon_number = 0;
+      for (tmp = the_planet->first_moon, moon_number = 1; tmp != nullptr;
+           tmp = tmp->next_planet, moon_number++) {
+        tmp->setPlanetNo(moon_number);
+        ss.str("");
+        ss << planet_id << "-" << tmp->getPlanetNo();
+        moon_id = ss.str();
+
+        // change inclinations
+        long double fdist =
+            (tmp->getMoonA() * KM_PER_AU) / (hill_sphere3 / 3.0);
+        long double fmass =
+            std::pow(moon_mass / (tmp->getMass() * SUN_MASS_IN_EARTH_MASSES), 0.2);
+        tmp->setInclination(fdist * fmass * tmp->getInclination());
+
+        if (tmp->getGasMass() == 0) {
+          // we don't want moons with too thick an atmosphere
+          if (tmp->getSurfPressure() > 6000) {
+            tmp->setType(tUnknown);
+            tmp->setSurfPressure(calcPhlPressure(tmp) *
+                                 EARTH_SURF_PRES_IN_MILLIBARS);
+            while (tmp->getSurfPressure() > 6000) {
+              tmp->setSurfPressure(tmp->getSurfPressure() - 1.0);
+            }
+            iterate_surface_temp(tmp, do_gases);
+            if (do_gases) {
+              tmp->clearGases();
+              calculate_gases(the_sun, tmp, moon_id);
+            }
+            assign_type(the_sun, tmp, moon_id, true, do_gases, false);
+          }
+        }
+
+        tmp->setHzc(calcHzc(tmp));
+        tmp->setHza(calcHza(tmp));
+        tmp->setEsi(calcEsi(tmp));
+        tmp->setSph(calcSph(tmp));
+      }
+    }
+  }
+}
+
+/**
+ * @brief Finalize rocky planet properties (atmosphere, temperature, type)
+ * @param the_planet Planet to finalize
+ * @param the_sun Parent star
+ * @param planet_id Planet identifier for logging
+ * @param do_gases Whether to calculate detailed atmospheric gases
+ * @param is_moon Whether this is a moon
+ * @param the_fudged_radius Fudged radius for calculations
+ */
+static void finalize_rocky_planet_properties(planet *the_planet, sun &the_sun,
+                                            const std::string &planet_id, bool do_gases,
+                                            bool is_moon, long double the_fudged_radius) {
+  the_planet->setEstimatedTemp(est_temp(
+      the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
+      the_planet->getA(), EARTH_ALBEDO));
+  the_planet->setEstimatedTerrTemp(est_temp(
+      the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
+      the_planet->getA(), EARTH_ALBEDO));
+
+  the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
+  the_planet->setMolecWeight(min_molec_weight(the_planet));
+
+  the_planet->setGreenhouseEffect(grnhouse(
+      the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
+      the_planet->getA()));
+
+  long double fudged_escape_velocity =
+      escape_vel(the_planet->getMass(), the_fudged_radius);
+  the_planet->setVolatileGasInventory(vol_inventory(
+      the_planet->getMass(), fudged_escape_velocity,
+      the_planet->getRmsVelocity(), the_sun.getMass(),
+      the_planet->getOrbitZone(), the_planet->getGreenhouseEffect(),
+      the_planet->getGasMass() > 0.0));
+  the_planet->setSurfPressure(pressure(the_planet->getVolatileGasInventory(),
+                                       the_fudged_radius,
+                                       the_planet->getSurfGrav()));
+
+  if (the_planet->getSurfPressure() == 0.0) {
+    the_planet->setBoilPoint(0.0);
+  } else {
+    the_planet->setBoilPoint(boiling_point(the_planet->getSurfPressure()));
+  }
+
+  iterate_surface_temp(the_planet, do_gases);
+
+  if (do_gases) {
+    the_sun = the_planet->getTheSun();
+    calculate_gases(the_sun, the_planet, planet_id);
+  }
+
+  assign_type(the_sun, the_planet, planet_id, is_moon, do_gases, false);
+}
+
+/**
  * @brief generate planet
- * 
- * @param the_planet 
- * @param planet_no 
- * @param the_sun 
- * @param random_tilt 
- * @param planet_id 
- * @param do_gases 
- * @param do_moons 
- * @param is_moon 
- * @param parent_mass 
+ *
+ * @param the_planet
+ * @param planet_no
+ * @param the_sun
+ * @param random_tilt
+ * @param planet_id
+ * @param do_gases
+ * @param do_moons
+ * @param is_moon
+ * @param parent_mass
  */
 void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
-                     bool random_tilt, const string &planet_id, bool do_gases,
+                     bool random_tilt, const std::string &planet_id, bool do_gases,
                      bool do_moons, bool is_moon, long double parent_mass) {
     do_gases = (flags_arg_clone & fDoGases) != 0;
   do_moons = (flags_arg_clone & fDoMoons) != 0;
@@ -1060,43 +1825,8 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
         acceleration(the_planet));
     the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
 
-    if ((the_planet->getGasMass() / the_planet->getMass()) > 0.000001) {
-      long double h2_mass = the_planet->getGasMass() * 0.85;
-      long double he_mass = (the_planet->getGasMass() - h2_mass) * 0.999;
-
-      long double h2_loss = 0.0;
-      long double he_loss = 0.0;
-
-      long double h2_life = gas_life(MOL_HYDROGEN, the_planet);
-      long double he_life = gas_life(HELIUM, the_planet);
-
-      if (h2_life < the_sun.getAge()) {
-        h2_loss = ((1.0 - (1.0 / exp(the_sun.getAge() / h2_life))) * h2_mass);
-
-        the_planet->setGasMass(the_planet->getGasMass() - h2_loss);
-
-        the_planet->setSurfAccel(
-            acceleration(the_planet));
-        the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
-      }
-
-      if (he_life < the_sun.getAge()) {
-        he_loss = ((1.0 - (1.0 / exp(the_sun.getAge() / he_life))) * he_mass);
-
-        the_planet->setGasMass(the_planet->getGasMass() - he_loss);
-
-        the_planet->setSurfAccel(
-            acceleration(the_planet));
-        the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
-      }
-
-      if ((h2_loss + he_loss) > .000001 && ((flag_verbose & 0x0080) != 0)) {
-        cerr << planet_id << "\tLosing gas: H2: "
-             << toString(h2_loss * SUN_MASS_IN_EARTH_MASSES)
-             << " EM, He: " << toString(he_loss * SUN_MASS_IN_EARTH_MASSES)
-             << " EM\n";
-      }
-    }
+    // Calculate and apply atmospheric gas loss (H2 and He)
+    calculate_gas_loss(the_planet, the_sun, planet_id);
   }
 
   the_planet->setDay(day_length(the_planet, parent_mass, is_moon));
@@ -1105,103 +1835,13 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
   the_planet->setEscVelocity(
       escape_vel(the_planet->getMass(), the_planet->getRadius()));
 
+  // Finalize planet properties based on type
   if (is_gas_planet(the_planet)) {
-    the_planet->setGreenhouseEffect(false);
-    the_planet->setVolatileGasInventory(INCREDIBLY_LARGE_NUMBER);
-    the_planet->setSurfPressure(INCREDIBLY_LARGE_NUMBER);
-
-    the_planet->setBoilPoint(INCREDIBLY_LARGE_NUMBER);
-
-    the_planet->setGreenhsRise(0);
-
-    the_planet->setHydrosphere(1);
-    the_planet->setCloudCover(1);
-    the_planet->setIceCover(0);
-    the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
-    if (force_gas_giant) {
-      the_planet->setMolecWeight(about(0.5, 0.1));
-    } else {
-      the_planet->setMolecWeight(min_molec_weight(the_planet));
-    }
-
-    gas_giant_temperature_albedo(the_planet, parent_mass, is_moon);
-    // the_planet->setDay(day_length(the_planet, parent_mass, is_moon));
-    // the_planet->setOblateness(calcOblateness(the_planet));
-
-    the_planet->setDensity(
-        volume_density(the_planet->getMass(), the_planet->getRadius()));
-
-    the_planet->setEstimatedTerrTemp(est_temp(
-        the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
-        the_planet->getA(), EARTH_ALBEDO));
-
-    if (do_gases) {
-      the_sun = the_planet->getTheSun();
-      calculate_gases(the_sun, the_planet, planet_id);
-    }
-
-    long double temp = the_planet->getEstimatedTerrTemp();
-
-    if (is_habitable_jovian(the_planet)) {
-      habitable_jovians++;
-
-      if ((flag_verbose & 0x8000) != 0) {
-        string planet_type;
-        string moon_string;
-        planet_type = type_string(the_planet);
-        if (the_planet->first_moon != nullptr) {
-          moon_string = " WITH MOON";
-        } else {
-          moon_string = "";
-        }
-        cerr << planet_id << "\t" << planet_type << " ("
-             << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
-             << " EM " << toString(the_sun.getAge() / 1.0E9) << " By)"
-             << moon_string << " with earth-like temperature ("
-             << toString(temp - FREEZING_POINT_OF_WATER) << " C, "
-             << toString(32.0 + ((temp - FREEZING_POINT_OF_WATER) * 1.8))
-             << " F, " << (temp - EARTH_AVERAGE_KELVIN) << " C Earth).\n";
-      }
-    }
+    finalize_gas_giant_properties(the_planet, the_sun, planet_id, do_gases,
+                                  force_gas_giant, parent_mass, is_moon);
   } else {
-    the_planet->setEstimatedTemp(est_temp(
-        the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
-        the_planet->getA(), EARTH_ALBEDO));
-    the_planet->setEstimatedTerrTemp(est_temp(
-        the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
-        the_planet->getA(), EARTH_ALBEDO));
-
-    the_planet->setSurfGrav(gravity(the_planet->getSurfAccel()));
-    the_planet->setMolecWeight(min_molec_weight(the_planet));
-
-    the_planet->setGreenhouseEffect(grnhouse(
-        the_sun.getREcosphere(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
-        the_planet->getA()));
-    long double fudged_escape_velocity =
-        escape_vel(the_planet->getMass(), the_fudged_radius);
-    the_planet->setVolatileGasInventory(vol_inventory(
-        the_planet->getMass(), fudged_escape_velocity,
-        the_planet->getRmsVelocity(), the_sun.getMass(),
-        the_planet->getOrbitZone(), the_planet->getGreenhouseEffect(),
-        the_planet->getGasMass() > 0.0));
-    the_planet->setSurfPressure(pressure(the_planet->getVolatileGasInventory(),
-                                         the_fudged_radius,
-                                         the_planet->getSurfGrav()));
-
-    if (the_planet->getSurfPressure() == 0.0) {
-      the_planet->setBoilPoint(0.0);
-    } else {
-      the_planet->setBoilPoint(boiling_point(the_planet->getSurfPressure()));
-    }
-
-    iterate_surface_temp(the_planet, do_gases);
-
-    if (do_gases) {
-      the_sun = the_planet->getTheSun();
-      calculate_gases(the_sun, the_planet, planet_id);
-    }
-
-    assign_type(the_sun, the_planet, planet_id, is_moon, do_gases, false);
+    finalize_rocky_planet_properties(the_planet, the_sun, planet_id, do_gases,
+                                     is_moon, the_fudged_radius);
   }
 
   the_planet->setHzc(calcHzc(the_planet));
@@ -1209,495 +1849,102 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
   the_planet->setEsi(calcEsi(the_planet));
   the_planet->setSph(calcSph(the_planet));
 
-  if (do_moons && !is_moon) {
-    bool skip_minor_moons = false;
-    long double moon_mass = 0.0;
-    int n = 0;
-    stringstream ss;
-    string moon_id;
-    long double temp_hill_sphere = 0;
-    long double min_rand_distance = 0;
-    if (the_planet->first_moon != nullptr) {
-      planet *ptr = nullptr;
-      planet *prev = nullptr;
-      planet *next_moon = nullptr;
+  // Generate moons for this planet (if not a moon itself)
+  generate_moons(the_planet, planet_no, the_sun, random_tilt, planet_id,
+                 do_gases, do_moons, is_moon);
 
-      // reset moon distances for predefined moons
-      /*for (n = 0, ptr = the_planet->first_moon; ptr != NULL; ptr = next_moon)
-      {
-        next_moon = ptr->next_planet;
-        ptr->setMoonA(0);
-        ptr->setMoonE(0);
-      }*/
-
-      long double hill_sphere = 0.0;
-
-      hill_sphere =
-          the_planet->getA() * KM_PER_AU *
-          std::pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
-
-      for (n = 0, ptr = the_planet->first_moon; ptr != nullptr; ptr = next_moon)
-      // for (n = 0; n < the_planet->getMoonCount(); n++)
-      {
-        next_moon = ptr->next_planet;
-        moon_mass += ptr->getMass() * SUN_MASS_IN_EARTH_MASSES;
-
-        long double roche_limit = 0.0;
-        long double distance = 0.0;
-        long double eccentricity = 0.0;
-
-        ptr->setA(the_planet->getA());
-        ptr->setE(the_planet->getE());
-        ptr->setOrbitZone(the_planet->getOrbitZone());
-
-        assign_composition(ptr, the_sun, true);
-
-        ss.str("");
-        ss << planet_id << "-" << toString(n + 1);
-        moon_id = ss.str();
-        ss.str("");
-
-        // generate_planet(ptr, n, the_sun, random_tilt, moon_id, do_gases,
-        // do_moons, true, the_planet->getMass());
-        ptr->setRadius(radius_improved(ptr->getMass(), ptr->getImf(),
-                                       ptr->getRmf(), ptr->getCmf(), false,
-                                       ptr->getOrbitZone(), ptr));
-        ptr->setDensity(volume_density(ptr->getMass(), ptr->getRadius()));
-
-        roche_limit =
-            2.44 * the_planet->getRadius() *
-            std::pow(the_planet->getDensity() / ptr->getDensity(), 1.0 / 3.0);
-
-        if ((roche_limit * 1.5) < (hill_sphere / 3.0) &&
-            (hill_sphere / 3.0) > (the_planet->getRadius() * 2.5)) {
-          bool done = false;
-          bool bad_place = false;
-          bool to_many_tries = false;
-          planet *the_moon = nullptr;
-          long double hill_sphere2 = 0;
-          int tries = 0;
-          while (!done) {
-            tries++;
-            if (tries > 20) {
-              to_many_tries = true;
-              break;
-            }
-            bad_place = false;
-
-            if ((roche_limit * 1.5) > (the_planet->getRadius() * 2.5)) {
-              min_rand_distance = roche_limit * 1.5;
-            } else {
-              min_rand_distance = the_planet->getRadius() * 2.5;
-            }
-
-            distance = random_number(min_rand_distance, hill_sphere / 3.0);
-            eccentricity = random_number(
-                0, 0.01);  // I know I should use random_eccentricity here but I
-                           // want to prevent orbits from crossing each other
-            for (the_moon = the_planet->first_moon; the_moon != nullptr;
-                 the_moon = the_moon->next_planet) {
-              hill_sphere2 =
-                  the_moon->getMoonA() * KM_PER_AU *
-                  std::pow(the_moon->getMass() / (3.0 * the_planet->getMass()),
-                      1.0 / 3.0);
-              temp_hill_sphere =
-                  distance * std::pow(ptr->getMass() / (3.0 * the_planet->getMass()),
-                                 1.0 / 3.0);
-              if (((the_moon->getMoonA() * KM_PER_AU) >=
-                       (distance - temp_hill_sphere) &&
-                   (the_moon->getMoonA() * KM_PER_AU) <=
-                       (distance + temp_hill_sphere)) ||
-                  (distance >=
-                       ((the_moon->getMoonA() * KM_PER_AU) - hill_sphere2) &&
-                   distance <=
-                       ((the_moon->getMoonA() * KM_PER_AU) + hill_sphere2))) {
-                bad_place = true;
-                break;
-              }
-            }
-            if (!bad_place) {
-              done = true;
-            }
-          }
-
-          if (to_many_tries) {
-            bool dont_break = false;
-            if ((flag_verbose & 0x1000) != 0) {
-              cerr << "  " << planet_id << ": can't fit anymore moons!\n";
-            }
-            skip_minor_moons = true;
-            planet *node = nullptr;
-            planet *next = nullptr;
-            for (node = ptr; node != nullptr; node = next) {
-              next = node->next_planet;
-              if (node->getDeletable()) {
-                delete node;
-              } else {
-                node->next_planet = node->reconnect_to;
-                n = 0;
-                the_planet->first_moon = the_planet->first_moon_backup;
-                // ptr = the_planet->first_moon;
-                dont_break = true;
-                continue;
-              }
-            }
-            if (prev != nullptr) {
-              prev->next_planet = nullptr;
-            } else {
-              the_planet->first_moon = nullptr;
-            }
-            /*for (int m = n; m < the_planet->getMoonCount(); m++)
-            {
-              the_planet->deleteMoon(m);
-            }*/
-            if (!dont_break) {
-              break;
-            }
-          } else {
-            ptr->setMoonA(distance / KM_PER_AU);
-            ptr->setMoonE(eccentricity);
-
-            ptr->setOrbPeriod(
-                period(ptr->getMoonA(), ptr->getMass(), the_planet->getMass()));
-            ptr->setType(tUnknown);
-            generate_planet(ptr, n, the_sun, random_tilt, moon_id, do_gases,
-                            do_moons, true, the_planet->getMass());
-
-            if ((flag_verbose & 0x40000) != 0) {
-              cerr << "   Roche limit: R = "
-                   << toString(the_planet->getRadius())
-                   << ", rM = " << toString(the_planet->getDensity())
-                   << ", rm = " << toString(ptr->getDensity()) << " -> "
-                   << toString(roche_limit) << " km\n";
-              cerr << "   Hill Sphere: a = "
-                   << toString(the_planet->getA() * KM_PER_AU) << ", m = "
-                   << toString(the_planet->getMass() * SOLAR_MASS_IN_KILOGRAMS)
-                   << ", M = "
-                   << toString(the_sun.getMass() * SOLAR_MASS_IN_KILOGRAMS)
-                   << " -> " << toString(hill_sphere) << " km\n";
-              cerr << moon_id << " Moon orbit: a = "
-                   << toString(ptr->getMoonA() * KM_PER_AU)
-                   << " km, e = " << toString(ptr->getMoonE()) << "\n";
-            }
-
-            if ((flag_verbose & 0x1000) != 0) {
-              cerr << "  " << planet_id << ": ("
-                   << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                   << " EM) " << n << " "
-                   << toString(ptr->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                   << " EM\n";
-            }
-            prev = ptr;
-          }
-        } else {
-          if ((flag_verbose & 0x1000) != 0) {
-            cerr << "  " << planet_id
-                 << " lost moons due to gravity of the sun!\n";
-          }
-          skip_minor_moons = true;
-          // delete moons
-          planet *node = nullptr;
-          planet *next = nullptr;
-          for (node = the_planet->first_moon; node != nullptr; node = next) {
-            next = node->next_planet;
-            if (node->getDeletable()) {
-              delete node;
-            } else {
-              node->next_planet = node->reconnect_to;
-              // n = 0;
-              the_planet->first_moon = the_planet->first_moon_backup;
-              // ptr = the_planet->first_moon;
-              continue;
-            }
-          }
-          n = 0;
-          the_planet->first_moon = nullptr;
-          /*for (int m = 0; m < the_planet->getMoonCount(); m++)
-           *	    {
-           *	      the_planet->deleteMoon(m);
-           }*/
-          break;
-        }
-      }
-    }
-
-    if (skip_minor_moons) {
-      the_planet->setMinorMoons(0);
-    } else {
-      the_planet->setMinorMoons(
-          poisson(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES));
-    }
-
-    if (the_planet->getMinorMoons() > 0) {
-      long double max_total_moon_mass = NAN;
-      long double remaining_moon_mass = NAN;
-      long double new_moon_mass = NAN;
-      long double new_moon_gas_mass = NAN;
-      long double min_new_moon_mass = 1.0 / 100000000000.0;
-      planet *tmp = nullptr;
-      planet *ref = nullptr;
-      int attempts = 0;
-      bool done2 = false;
-      bool too_many_tries = false;
-      bool bad_place2 = false;
-      long double hill_sphere3 = 0;
-      long double hill_sphere4 = 0;
-      long double roche_limit2 = 0;
-      int tries2 = 0;
-
-      hill_sphere3 =
-          the_planet->getA() * KM_PER_AU *
-          std::pow(the_planet->getMass() / (3.0 * the_sun.getMass()), 1.0 / 3.0);
-      if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 1000.0) {
-        max_total_moon_mass =
-            the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.05;
-      } else if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 10.0) {
-        max_total_moon_mass =
-            the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * (1.5 / 10000.0);
-      } else if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 0.5) {
-        if (the_planet->getRadius() > 15000.0) {
-          max_total_moon_mass =
-              the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.01;
-        } else {
-          max_total_moon_mass =
-              the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * 0.05;
-        }
-      } else {
-        max_total_moon_mass =
-            the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES * (1.5 / 10000.0);
-      }
-      remaining_moon_mass = max_total_moon_mass - moon_mass;
-
-      // get the pointer to the last moon in the list
-      if (the_planet->first_moon != nullptr) {
-        tmp = the_planet->first_moon;
-        while (true) {
-          if (tmp->next_planet == nullptr) {
-            break;
-          }
-          tmp = tmp->next_planet;
-        }
-      } else {
-        tmp = nullptr;
-      }
-
-      n++;
-      int moon_count = 0;
-      while (true) {
-        done2 = false;
-        ss.str("");
-        ss << planet_id << "-" << toString(n);
-        moon_id = ss.str();
-        ss.str("");
-
-        if (remaining_moon_mass <= 0.0 || attempts > 5 ||
-            moon_count > the_planet->getMinorMoons() ||
-            (hill_sphere3 / 3.0) <= the_planet->getRadius()) {
-          break;
-        }
-        planet *new_moon = nullptr;
-        new_moon = new planet();
-        new_moon->setPlanetNo(n);
-        new_moon->setOrbitZone(the_planet->getOrbitZone());
-        new_moon->setA(the_planet->getA());
-        new_moon->setE(the_planet->getE());
-        new_moon->setHzd(the_planet->getHzd());
-
-        double r1 = randf();
-        double maxln = exp(1.0);
-        double r2 = log(1.0 + (maxln * r1)) / 1.33;
-
-        new_moon_mass = r2 * remaining_moon_mass;
-
-        if (new_moon_mass < min_new_moon_mass) {
-          new_moon_mass = min_new_moon_mass;
-        }
-
-        if (new_moon_mass > 10.0) {
-          new_moon_gas_mass = new_moon_mass * random_number(0.05, 1.0);
-          new_moon->setGasGiant(true);
-        } else {
-          new_moon_gas_mass = 0;
-          new_moon->setGasGiant(false);
-        }
-        new_moon->setDustMass((new_moon_mass - new_moon_gas_mass) /
-                              SUN_MASS_IN_EARTH_MASSES);
-        new_moon->setGasMass(new_moon_gas_mass / SUN_MASS_IN_EARTH_MASSES);
-
-        assign_composition(new_moon, the_sun, true);
-
-        // generate_planet(new_moon, n, the_sun, random_tilt, moon_id, do_gases,
-        // do_moons, true, the_planet->getMass());
-        new_moon->setRadius(radius_improved(
-            new_moon->getMass(), new_moon->getImf(), new_moon->getRmf(),
-            new_moon->getCmf(), false, new_moon->getOrbitZone(), new_moon));
-        new_moon->setDensity(
-            volume_density(new_moon->getMass(), new_moon->getRadius()));
-
-        long double distance2 = NAN;
-        long double eccentricity2 = NAN;
-
-        roche_limit2 =
-            2.44 * the_planet->getRadius() *
-            std::pow(the_planet->getDensity() / new_moon->getDensity(), 1.0 / 3.0);
-        if ((roche_limit2 * 1.5) >= (hill_sphere3 / 3.0)) {
-          if ((flag_verbose & 0x1000) != 0) {
-            cerr << "  " << planet_id << ": Can't add anymore moons!\n";
-          }
-          delete new_moon;
-          break;
-        }
-        tries2 = 0;
-        while (!done2) {
-          tries2++;
-          bad_place2 = false;
-          too_many_tries = false;
-          distance2 = random_number(roche_limit2 * 1.5, hill_sphere3 / 3.0);
-          eccentricity2 = random_number(
-              0, 0.01);  // I know I should use random_eccentricity here but I
-                         // want to prevent orbits from crossing each other
-          if ((flag_verbose & 0x1000) != 0) {
-            cerr << "  " << planet_id << ": Attempting to add moon ("
-                 << toString(new_moon->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                 << " EU) at " << toString(distance2)
-                 << " km with eccentricity of " << toString(eccentricity2)
-                 << "\n";
-          }
-
-          for (ref = the_planet->first_moon; ref != nullptr;
-               ref = ref->next_planet) {
-            hill_sphere4 =
-                ref->getMoonA() * KM_PER_AU *
-                std::pow(ref->getMass() / (3.0 * the_planet->getMass()), 1.0 / 3.0);
-            temp_hill_sphere =
-                distance2 *
-                std::pow(new_moon->getMass() / (3.0 * the_planet->getMass()),
-                    1.0 / 3.0);
-            // cout << toString(distance2) << " " << toString(distance2 -
-            // temp_hill_sphere) << " " << toString(distance2 +
-            // temp_hill_sphere) << "\n";
-            if (((ref->getMoonA() * KM_PER_AU) >=
-                     (distance2 - temp_hill_sphere) &&
-                 (ref->getMoonA() * KM_PER_AU) <=
-                     (distance2 + temp_hill_sphere)) ||
-                (distance2 >= ((ref->getMoonA() * KM_PER_AU) - hill_sphere4) &&
-                 distance2 <= ((ref->getMoonA() * KM_PER_AU) + hill_sphere4))) {
-              bad_place2 = true;
-              if ((flag_verbose & 0x1000) != 0) {
-                cerr << "  Failed due to neighboring moon.\n";
-              }
-              break;
-            }
-          }
-          if (!bad_place2 || tries2 > 20) {
-            done2 = true;
-          }
-          if (tries2 > 20) {
-            too_many_tries = true;
-          }
-        }
-        new_moon->setMoonA(distance2 / KM_PER_AU);
-        new_moon->setMoonE(eccentricity2);
-        if (bad_place2 || too_many_tries) {
-          delete new_moon;
-          attempts++;
-          if ((flag_verbose & 0x1000) != 0) {
-            cerr << "  Failed to add moon.\n";
-          }
-        } else {
-          attempts = 0;
-          generate_planet(new_moon, n, the_sun, random_tilt, moon_id, do_gases,
-                          do_moons, true, the_planet->getMass());
-          if (tmp != nullptr) {
-            tmp->next_planet = new_moon;
-            tmp = tmp->next_planet;
-          } else {
-            the_planet->first_moon = new_moon;
-            tmp = the_planet->first_moon;
-          }
-          // the_planet->addMoon(new_moon);
-          remaining_moon_mass -= new_moon_mass;
-          moon_mass += new_moon_mass;
-          n++;
-          moon_count++;
-
-          if ((flag_verbose & 0x40000) != 0) {
-            cerr << "   Roche limit: R = " << toString(the_planet->getRadius())
-                 << ", rM = " << toString(the_planet->getDensity())
-                 << ", rm = " << toString(new_moon->getDensity()) << " -> "
-                 << toString(roche_limit2) << " km\n";
-            cerr << "   Hill Sphere: a = "
-                 << toString(the_planet->getA() * KM_PER_AU) << ", m = "
-                 << toString(the_planet->getMass() * SOLAR_MASS_IN_KILOGRAMS)
-                 << ", M = "
-                 << toString(the_sun.getMass() * SOLAR_MASS_IN_KILOGRAMS)
-                 << " -> " << toString(hill_sphere3) << " km\n";
-            cerr << moon_id << " Moon orbit: a = "
-                 << toString(new_moon->getMoonA() * KM_PER_AU)
-                 << " km, e = " << toString(new_moon->getMoonE()) << "\n";
-          }
-
-          if ((flag_verbose & 0x1000) != 0) {
-            cerr << "  New Moon for " << planet_id << ": ("
-                 << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                 << " EM) " << n << " "
-                 << toString(new_moon->getMass() * SUN_MASS_IN_EARTH_MASSES)
-                 << " EM\n";
-          }
-        }
-      }
-
-      if (the_planet->first_moon != nullptr) {
-        // reorder the moons
-        the_planet->sortMoons();
-
-        // make some modifications to the moons
-        int moon_number = 0;
-        for (tmp = the_planet->first_moon, moon_number = 1; tmp != nullptr;
-             tmp = tmp->next_planet, moon_number++) {
-          tmp->setPlanetNo(moon_number);
-          ss.str("");
-          ss << planet_id << "-" << tmp->getPlanetNo();
-          moon_id = ss.str();
-
-          // change inclinations
-          long double fdist =
-              (tmp->getMoonA() * KM_PER_AU) / (hill_sphere3 / 3.0);
-          long double fmass =
-              std::pow(moon_mass / (tmp->getMass() * SUN_MASS_IN_EARTH_MASSES), 0.2);
-          tmp->setInclination(fdist * fmass * tmp->getInclination());
-
-          if (tmp->getGasMass() == 0) {
-            // we don't want moons with too thick an atmosphere
-            if (tmp->getSurfPressure() > 6000) {
-              tmp->setType(tUnknown);
-              tmp->setSurfPressure(calcPhlPressure(tmp) *
-                                   EARTH_SURF_PRES_IN_MILLIBARS);
-              while (tmp->getSurfPressure() > 6000) {
-                tmp->setSurfPressure(tmp->getSurfPressure() - 1.0);
-              }
-              iterate_surface_temp(tmp, do_gases);
-              if (do_gases) {
-                tmp->clearGases();
-                calculate_gases(the_sun, tmp, moon_id);
-              }
-              assign_type(the_sun, tmp, moon_id, true, do_gases, false);
-            }
-          }
-
-          tmp->setHzc(calcHzc(tmp));
-          tmp->setHza(calcHza(tmp));
-          tmp->setEsi(calcEsi(tmp));
-          tmp->setSph(calcSph(tmp));
-        }
-      }
-    }
-  }
   ZoneScoped;
 }
 
-void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
-    int tIndex = 0;
+/**
+ * @brief Update min/max statistic for a value
+ * @param value The current value to check
+ * @param min_stat Reference to minimum statistic to update
+ * @param max_stat Reference to maximum statistic to update
+ * @return true if a new min or max was set, false otherwise
+ */
+static auto update_min_max_stat(long double value, long double& min_stat, long double& max_stat) -> bool {
+  bool updated = false;
+  if (min_stat > value || min_stat == 0.0) {
+    min_stat = value;
+    updated = true;
+  }
+  if (max_stat < value) {
+    max_stat = value;
+    updated = true;
+  }
+  return updated;
+}
+
+/**
+ * @brief Update breathable planet statistics
+ * @param the_planet The planet to track statistics for
+ * @param illumination The planet's illumination value
+ * @return true if any new min/max was set (for verbose logging)
+ */
+static auto update_breathable_statistics(planet* the_planet, long double illumination) -> bool {
+  bool stats_updated = false;
+
+  stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), min_breathable_temp, max_breathable_temp);
+  stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_breathable_g, max_breathable_g);
+  stats_updated |= update_min_max_stat(illumination, min_breathable_l, max_breathable_l);
+  stats_updated |= update_min_max_stat(the_planet->getSurfPressure(), min_breathable_p, max_breathable_p);
+  stats_updated |= update_min_max_stat(the_planet->getMass(), min_breathable_mass, max_breathable_mass);
+
+  // Update terrestrial-specific stats if applicable
+  if (the_planet->getType() == tTerrestrial) {
+    stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_breathable_terrestrial_g, max_breathable_terrestrial_g);
+    stats_updated |= update_min_max_stat(illumination, min_breathable_terrestrial_l, max_breathable_terrestrial_l);
+  }
+
+  return stats_updated;
+}
+
+/**
+ * @brief Update potentially habitable planet statistics
+ * @param the_planet The planet to track statistics for
+ * @param illumination The planet's illumination value
+ * @return true if any new min/max was set (for verbose logging)
+ */
+static auto update_potential_statistics(planet* the_planet, long double illumination) -> bool {
+  bool stats_updated = false;
+
+  stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), min_potential_temp, max_potential_temp);
+  stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_potential_g, max_potential_g);
+  stats_updated |= update_min_max_stat(illumination, min_potential_l, max_potential_l);
+  stats_updated |= update_min_max_stat(the_planet->getSurfPressure(), min_potential_p, max_potential_p);
+  stats_updated |= update_min_max_stat(the_planet->getMass(), min_potential_mass, max_potential_mass);
+
+  // Update terrestrial-specific stats if applicable
+  if (the_planet->getType() == tTerrestrial ||
+      (the_planet->getType() == t1Face &&
+       the_planet->getHydrosphere() >= 0.05 &&
+       the_planet->getHydrosphere() <= 0.8)) {
+    stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_potential_terrestrial_g, max_potential_terrestrial_g);
+    stats_updated |= update_min_max_stat(illumination, min_potential_terrestrial_l, max_potential_terrestrial_l);
+  }
+
+  return stats_updated;
+}
+
+/**
+ * @brief Log planet information for verbose output
+ */
+static void log_planet_info(planet* the_planet, const std::string& planet_id, long double illumination) {
+  std::cerr << type_string(the_planet)
+       << "\tp=" << toString(the_planet->getSurfPressure())
+       << "\tm=" << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
+       << "\tg=" << toString(the_planet->getSurfGrav())
+       << "\tt=" << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN)
+       << "\tl=" << toString(illumination)
+       << "\t" << planet_id << "\n";
+}
+
+/**
+ * @brief Check planet and update statistics
+ */
+void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon) {
+  int tIndex = 0;
 
   tIndex = the_planet->getType();
 
@@ -1738,124 +1985,9 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
       habitable_superterrans++;
     }
 
-    if (min_breathable_temp > the_planet->getSurfTemp() ||
-        min_breathable_temp == 0.0) {
-      min_breathable_temp = the_planet->getSurfTemp();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_breathable_temp < the_planet->getSurfTemp()) {
-      max_breathable_temp = the_planet->getSurfTemp();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_breathable_g > the_planet->getSurfGrav() ||
-        min_breathable_g == 0.0) {
-      min_breathable_g = the_planet->getSurfGrav();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_breathable_g < the_planet->getSurfGrav()) {
-      max_breathable_g = the_planet->getSurfGrav();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_breathable_l > illumination || min_breathable_l == 0.0) {
-      min_breathable_l = illumination;
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_breathable_l < illumination) {
-      max_breathable_l = illumination;
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (the_planet->getType() == tTerrestrial) {
-      if (min_breathable_terrestrial_g > the_planet->getSurfGrav() ||
-          min_breathable_terrestrial_g == 0.0) {
-        min_breathable_terrestrial_g = the_planet->getSurfGrav();
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (max_breathable_terrestrial_g < the_planet->getSurfGrav()) {
-        max_breathable_terrestrial_g = the_planet->getSurfGrav();
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (min_breathable_terrestrial_l > illumination ||
-          min_breathable_terrestrial_l == 0.0) {
-        min_breathable_terrestrial_l = illumination;
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (max_breathable_terrestrial_l < illumination) {
-        max_breathable_terrestrial_l = illumination;
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-    }
-
-    if (min_breathable_p > the_planet->getSurfPressure() ||
-        min_breathable_p == 0.0) {
-      min_breathable_p = the_planet->getSurfPressure();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_breathable_p < the_planet->getSurfPressure()) {
-      max_breathable_p = the_planet->getSurfPressure();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_breathable_mass > the_planet->getMass() ||
-        min_breathable_mass == 0.0) {
-      min_breathable_mass = the_planet->getMass();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_breathable_mass < the_planet->getMass()) {
-      max_breathable_mass = the_planet->getMass();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
+    // Update breathable planet statistics
+    if (update_breathable_statistics(the_planet, illumination) && ((flag_verbose & 0x0002) != 0)) {
+      list_it = true;
     }
 
     if ((flag_verbose & 0x0004) != 0) {
@@ -1863,12 +1995,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
     }
 
     if (list_it) {
-      cerr << type_string(the_planet)
-           << "\tp=" << toString(the_planet->getSurfPressure()) << "\tm="
-           << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
-           << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
-           << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN)
-           << "\tl=" << toString(illumination) << "\t" << planet_id << "\n";
+      log_planet_info(the_planet, planet_id, illumination);
     }
   } else if (is_potentialy_habitable(the_planet)) {
     potential_habitable++;
@@ -1886,126 +2013,9 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
       total_potentially_habitable_optimistic++;
     }
 
-    if (min_potential_temp > the_planet->getSurfTemp() ||
-        min_potential_temp == 0.0) {
-      min_potential_temp = the_planet->getSurfTemp();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_potential_temp < the_planet->getSurfTemp()) {
-      max_potential_temp = the_planet->getSurfTemp();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_potential_g > the_planet->getSurfGrav() || min_potential_g == 0.0) {
-      min_potential_g = the_planet->getSurfGrav();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_potential_g < the_planet->getSurfGrav()) {
-      max_potential_g = the_planet->getSurfGrav();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_potential_l > illumination || min_potential_l == 0.0) {
-      min_potential_l = illumination;
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_potential_l < illumination) {
-      max_potential_l = illumination;
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (the_planet->getType() == tTerrestrial ||
-        (the_planet->getType() == t1Face &&
-         the_planet->getHydrosphere() >= 0.05 &&
-         the_planet->getHydrosphere() <= 0.8)) {
-      if (min_breathable_terrestrial_g > the_planet->getSurfGrav() ||
-          min_breathable_terrestrial_g == 0.0) {
-        min_breathable_terrestrial_g = the_planet->getSurfGrav();
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (max_breathable_terrestrial_g < the_planet->getSurfGrav()) {
-        max_breathable_terrestrial_g = the_planet->getSurfGrav();
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (min_breathable_terrestrial_l > illumination ||
-          min_breathable_terrestrial_l == 0.0) {
-        min_breathable_terrestrial_l = illumination;
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-
-      if (max_breathable_terrestrial_l < illumination) {
-        max_breathable_terrestrial_l = illumination;
-
-        if ((flag_verbose & 0x0002) != 0) {
-          list_it = true;
-        }
-      }
-    }
-
-    if (min_potential_p > the_planet->getSurfPressure() ||
-        min_potential_p == 0.0) {
-      min_potential_p = the_planet->getSurfPressure();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_potential_p < the_planet->getSurfPressure()) {
-      max_potential_p = the_planet->getSurfPressure();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (min_potential_mass > the_planet->getMass() ||
-        min_potential_mass == 0.0) {
-      min_potential_mass = the_planet->getMass();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
-    }
-
-    if (max_potential_mass < the_planet->getMass()) {
-      max_potential_mass = the_planet->getMass();
-
-      if ((flag_verbose & 0x0002) != 0) {
-        list_it = true;
-      }
+    // Update potentially habitable planet statistics
+    if (update_potential_statistics(the_planet, illumination) && ((flag_verbose & 0x0002) != 0)) {
+      list_it = true;
     }
 
     if ((flag_verbose & 0x0004) != 0) {
@@ -2013,12 +2023,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
     }
 
     if (list_it) {
-      cerr << type_string(the_planet)
-           << "\tp=" << toString(the_planet->getSurfPressure()) << "\tm="
-           << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
-           << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
-           << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN)
-           << "\tl=" << toString(illumination) << "\t" << planet_id << "\n";
+      log_planet_info(the_planet, planet_id, illumination);
     }
   }
 
@@ -2026,7 +2031,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
     max_moon_mass = the_planet->getMass();
 
     if ((flag_verbose & 0x0002) != 0) {
-      cerr << type_string(the_planet)
+      std::cerr << type_string(the_planet)
            << "\tp=" << toString(the_planet->getSurfPressure()) << "\tm="
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
            << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
@@ -2045,7 +2050,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
         (int)((50.0 * the_planet->getCoreRadius()) / the_planet->getRadius());
 
     if (core_size <= 49) {
-      cerr << type_string(the_planet)
+      std::cerr << type_string(the_planet)
            << "\tp=" << toString(the_planet->getCoreRadius())
            << "\tr=" << toString(the_planet->getRadius()) << "\tm="
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) << "\t"
@@ -2068,7 +2073,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
     earthlike++;
 
     if ((flag_verbose & 0x0008) != 0) {
-      cerr << type_string(the_planet)
+      std::cerr << type_string(the_planet)
            << "\tp=" << toString(the_planet->getSurfPressure()) << "\tm="
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
            << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
@@ -2078,7 +2083,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
   } else if (breathe == BREATHABLE && gravity > 1.3 && rel_temp < -2.0 &&
              ice < 10.0 && habitable > 1) {
     if ((flag_verbose & 0x0008) != 0) {
-      cerr << type_string(the_planet)
+      std::cerr << type_string(the_planet)
            << "\tp=" << toString(the_planet->getSurfPressure()) << "\tm="
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
            << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
@@ -2099,7 +2104,7 @@ void check_planet(planet *the_planet, const string &planet_id, bool is_moon) {
  * @param do_gases 
  * @param second_time 
  */
-void assign_type(sun &the_sun, planet *the_planet, const string &planet_id,
+void assign_type(sun &the_sun, planet *the_planet, const std::string &planet_id,
                  bool is_moon, bool do_gases, bool second_time) {
     if (the_planet->getSurfPressure() < 1.0) {
     if (the_planet->getRadius() < round_threshold(the_planet->getDensity())) {
@@ -2200,7 +2205,7 @@ void assign_type(sun &the_sun, planet *the_planet, const string &planet_id,
       }
 
       if ((flag_verbose & 0x0001) != 0) {
-        string one_face_string;
+        std::string one_face_string;
         if (((int)the_planet->getDay() ==
              (int)(the_planet->getOrbPeriod() * 24.0)) ||
             the_planet->getResonantPeriod()) {
@@ -2208,7 +2213,7 @@ void assign_type(sun &the_sun, planet *the_planet, const string &planet_id,
         } else {
           one_face_string = "";
         }
-        cerr << type_string(the_planet)
+        std::cerr << type_string(the_planet)
              << "\tp=" << toString(the_planet->getSurfPressure()) << "\tm="
              << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
              << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="

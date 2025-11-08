@@ -2,14 +2,13 @@
 #include <cmath>        // for pow, NAN
 #include <cstdlib>      // for NULL, exit, EXIT_FAILURE
 #include <iomanip>      // for operator<<, setw, setprecision
-#include <iostream>     // for operator<<, basic_ostream, ostream, basic_ost...
+#include <iostream>     // for operator<<, basic_ostream, std::ostream, basic_ost...
 #include <utility>      // for move
 #include "c_structs.h"  // for star2
 #include "const.h"      // for pow2, KM_PER_AU, ACCURACY_FOR_PEAK, CM_PER_KM
 #include "enviro.h"     // for eff_temp_to_spec_type, luminosity_to_mass
 #include "utils.h"      // for quicksort, fix_inclination, my_strtoupper
 
-using namespace std;
 
 /**
  * @brief Construct a new star::star object
@@ -28,9 +27,9 @@ using namespace std;
  * @param cel 
  * @param n 
  */
-star::star(long double lum, long double m, long double et, string t,
+star::star(long double lum, long double m, long double et, std::string t,
            long double m2, long double e, long double d, long double i,
-           long double a, planet* kp, string des, bool cel, string n) {
+           long double a, planet* kp, std::string des, bool cel, std::string n) {
   luminosity = lum;
   mass = m;
   eff_temp = et;
@@ -133,24 +132,24 @@ void star::calcMass() { mass = luminosity_to_mass(luminosity); }
  */
 void star::calcEffTemp() { eff_temp = spec_type_to_eff_temp(spec_type); }
 
-star::star(star& right) {
-  luminosity = right.luminosity;
-  mass = right.mass;
-  eff_temp = right.eff_temp;
-  spec_type = right.spec_type;
-  mass2 = right.mass2;
-  eccentricity = right.eccentricity;
-  distance = right.distance;
-  inc = right.inc;
-  an = right.an;
-  known_planets = right.known_planets;
-  desig = right.desig;
-  in_celestia = right.in_celestia;
-  name = right.name;
-  isCircumbinary = right.isCircumbinary;
-  luminosity2 = right.luminosity2;
-  eff_temp2 = right.eff_temp2;
-  spec_type2 = right.spec_type2;
+star::star(star& rhs) {
+  luminosity = rhs.luminosity;
+  mass = rhs.mass;
+  eff_temp = rhs.eff_temp;
+  spec_type = rhs.spec_type;
+  mass2 = rhs.mass2;
+  eccentricity = rhs.eccentricity;
+  distance = rhs.distance;
+  inc = rhs.inc;
+  an = rhs.an;
+  known_planets = rhs.known_planets;
+  desig = rhs.desig;
+  in_celestia = rhs.in_celestia;
+  name = rhs.name;
+  isCircumbinary = rhs.isCircumbinary;
+  luminosity2 = rhs.luminosity2;
+  eff_temp2 = rhs.eff_temp2;
+  spec_type2 = rhs.spec_type2;
   if (luminosity == 0) {
     calcLuminosity();
   }
@@ -165,24 +164,24 @@ star::star(star& right) {
   }
 }
 
-star::star(const star& right) {
-  luminosity = right.luminosity;
-  mass = right.mass;
-  eff_temp = right.eff_temp;
-  spec_type = right.spec_type;
-  mass2 = right.mass2;
-  eccentricity = right.eccentricity;
-  distance = right.distance;
-  inc = right.inc;
-  an = right.an;
-  known_planets = right.known_planets;
-  desig = right.desig;
-  in_celestia = right.in_celestia;
-  name = right.name;
-  isCircumbinary = right.isCircumbinary;
-  luminosity2 = right.luminosity2;
-  eff_temp2 = right.eff_temp2;
-  spec_type2 = right.spec_type2;
+star::star(const star& rhs) {
+  luminosity = rhs.luminosity;
+  mass = rhs.mass;
+  eff_temp = rhs.eff_temp;
+  spec_type = rhs.spec_type;
+  mass2 = rhs.mass2;
+  eccentricity = rhs.eccentricity;
+  distance = rhs.distance;
+  inc = rhs.inc;
+  an = rhs.an;
+  known_planets = rhs.known_planets;
+  desig = rhs.desig;
+  in_celestia = rhs.in_celestia;
+  name = rhs.name;
+  isCircumbinary = rhs.isCircumbinary;
+  luminosity2 = rhs.luminosity2;
+  eff_temp2 = rhs.eff_temp2;
+  spec_type2 = rhs.spec_type2;
   if (luminosity == 0) {
     calcLuminosity();
   }
@@ -198,26 +197,26 @@ star::star(const star& right) {
 }
 
 /// @brief 
-/// @param right 
+/// @param std::right 
 /// @return 
-auto star::operator=(const star& right) -> star {
-  luminosity = right.luminosity;
-  mass = right.mass;
-  eff_temp = right.eff_temp;
-  spec_type = right.spec_type;
-  mass2 = right.mass2;
-  eccentricity = right.eccentricity;
-  distance = right.distance;
-  inc = right.inc;
-  an = right.an;
-  known_planets = right.known_planets;
-  desig = right.desig;
-  in_celestia = right.in_celestia;
-  name = right.name;
-  isCircumbinary = right.isCircumbinary;
-  luminosity2 = right.luminosity2;
-  eff_temp2 = right.eff_temp2;
-  spec_type2 = right.spec_type2;
+auto star::operator=(const star& rhs) -> star {
+  luminosity = rhs.luminosity;
+  mass = rhs.mass;
+  eff_temp = rhs.eff_temp;
+  spec_type = rhs.spec_type;
+  mass2 = rhs.mass2;
+  eccentricity = rhs.eccentricity;
+  distance = rhs.distance;
+  inc = rhs.inc;
+  an = rhs.an;
+  known_planets = rhs.known_planets;
+  desig = rhs.desig;
+  in_celestia = rhs.in_celestia;
+  name = rhs.name;
+  isCircumbinary = rhs.isCircumbinary;
+  luminosity2 = rhs.luminosity2;
+  eff_temp2 = rhs.eff_temp2;
+  spec_type2 = rhs.spec_type2;
   if (luminosity == 0) {
     calcLuminosity();
   }
@@ -237,24 +236,24 @@ auto star::operator=(const star& right) -> star {
 /// @param strm 
 /// @param obj 
 /// @return 
-auto operator<<(ostream& strm, star& obj) -> ostream& {
-  string is_in_celestia = "";
+auto operator<<(std::ostream& strm, star& obj) -> std::ostream& {
+  std::string is_in_celestia = "";
 
   if (obj.in_celestia) {
     is_in_celestia = "+P";
   }
 
-  strm << setprecision(4);
-  strm << left << setw(30 + obj.extra_spaces) << obj.name << fixed << right
-       << setw(3) << is_in_celestia << setw(8) << obj.mass << setw(12)
-       << obj.luminosity << setw(13) << obj.eff_temp << setw(11)
+  strm << std::setprecision(4);
+  strm << std::left << std::setw(30 + obj.extra_spaces) << obj.name << std::fixed << std::right
+       << std::setw(3) << is_in_celestia << std::setw(8) << obj.mass << std::setw(12)
+       << obj.luminosity << std::setw(13) << obj.eff_temp << std::setw(11)
        << obj.spec_type;
   return strm;
 }
 
 /// @brief 
 /// @return 
-auto star::getName() -> string { return name; }
+auto star::getName() -> std::string { return name; }
 
 /// @brief 
 /// @param e 
@@ -294,11 +293,11 @@ auto star::getMass() -> long double { return mass; }
 
 /// @brief 
 /// @return 
-auto star::getSpecType() -> string { return spec_type; }
+auto star::getSpecType() -> std::string { return spec_type; }
 
 /// @brief 
 /// @return 
-auto star::getDesig() -> string { return desig; }
+auto star::getDesig() -> std::string { return desig; }
 
 /// @brief 
 /// @return 
@@ -326,7 +325,7 @@ auto star::getLuminosity2() -> long double { return luminosity2; }
 
 /// @brief 
 /// @return 
-auto star::getSpecType2() -> string { return spec_type2; }
+auto star::getSpecType2() -> std::string { return spec_type2; }
 
 /// @brief 
 /// @param d 
@@ -354,29 +353,29 @@ void star::setMass2(long double m) { mass2 = m; }
 
 /// @brief 
 /// @param s 
-void star::setSpecType2(string s) { spec_type2 = std::move(s); }
+void star::setSpecType2(std::string s) { spec_type2 = std::move(s); }
 
 /// @brief 
-/// @param right 
+/// @param std::right 
 /// @return 
-auto star::operator<(star& right) -> bool {
-  if (desig == "Sol" && right.desig == "Sol") {
+auto star::operator<(star& rhs) -> bool {
+  if (desig == "Sol" && rhs.desig == "Sol") {
     return false;
   } else if (desig == "Sol") {
     return true;
-  } else if (right.desig == "Sol") {
+  } else if (rhs.desig == "Sol") {
     return false;
-  } else if (name < right.name) {
+  } else if (name < rhs.name) {
     return true;
   }
   return false;
 }
 
 /// @brief 
-/// @param right 
+/// @param std::right 
 /// @return 
-auto star::operator==(const star& right) -> bool {
-  if (name == right.name) {
+auto star::operator==(const star& rhs) -> bool {
+  if (name == rhs.name) {
     return true;
   }
   return false;
@@ -387,7 +386,7 @@ catalog::catalog() : extra_spaces(0) { }
 
 /// @brief 
 /// @param a 
-catalog::catalog(string a) : arg(a), extra_spaces(0) {
+catalog::catalog(std::string a) : arg(a), extra_spaces(0) {
   
 }
 
@@ -398,7 +397,7 @@ auto catalog::count() -> unsigned long { return stars.size(); }
 /// @brief 
 /// @param the_star 
 void catalog::addStar(star& the_star) {
-  string star_name = the_star.getName();;
+  std::string star_name = the_star.getName();;
   unsigned long name_length = star_name.length();
   int diff = 0;
 
@@ -417,7 +416,7 @@ void catalog::addStar(star& the_star) {
 /// @return 
 auto catalog::operator[](const int& sub) -> star& {
   if (sub < 0 || sub > (stars.size() - 1)) {
-    cerr << "Non existant star!\n";
+    std::cerr << "Non existant star!\n";
     exit(EXIT_FAILURE);
   }
   return stars[sub];
@@ -447,41 +446,41 @@ catalog::~catalog() {
 /// @param strm 
 /// @param obj 
 /// @return 
-auto operator<<(ostream& strm, catalog& obj) -> ostream& {
+auto operator<<(std::ostream& strm, catalog& obj) -> std::ostream& {
   int total_stars = obj.count();
-  strm << setw(14) << "Name" << setw(37 + obj.extra_spaces) << "Mass"
-       << setw(12) << "Luminosity" << setw(13) << "Temperature" << setw(11)
+  strm << std::setw(14) << "Name" << std::setw(37 + obj.extra_spaces) << "Mass"
+       << std::setw(12) << "Luminosity" << std::setw(13) << "Temperature" << std::setw(11)
        << "Star Type\n";
-  strm << fixed;
+  strm << std::fixed;
 
   for (int i = 0; i < total_stars; i++) {
     obj[i].setExtraSpaces(obj.extra_spaces);
-    strm << setw(8) << right << i << ". " << obj[i] << endl;
+    strm << std::setw(8) << std::right << i << ". " << obj[i] << std::endl;
   }
 
   return strm;
 }
 
 /// @brief 
-/// @param right 
+/// @param std::right 
 /// @return 
-auto catalog::operator=(catalog& right) -> catalog& {
-  arg = right.arg;
+auto catalog::operator=(catalog& rhs) -> catalog& {
+  arg = rhs.arg;
   stars.clear();
-  unsigned long new_stars = right.count();
+  unsigned long new_stars = rhs.count();
   for (int i = 0; i < new_stars; i++) {
-    stars.push_back(right[i]);
+    stars.push_back(rhs.stars[i]);
   }
   return *this;
 }
 
 /// @brief 
 /// @param a 
-void catalog::setArg(string a) { arg = std::move(a); }
+void catalog::setArg(std::string a) { arg = std::move(a); }
 
 /// @brief 
 /// @return 
-auto catalog::getArg() -> string { return arg; }
+auto catalog::getArg() -> std::string { return arg; }
 
 /// @brief 
 void catalog::sort() {
@@ -533,7 +532,7 @@ Chemical::Chemical() : num(0), symbol(""), htmlSymbol(""), name(""), weight(0), 
 /// @param r 
 /// @param ma 
 /// @param mi 
-Chemical::Chemical(int nu, string s, string h, string na, long double w,
+Chemical::Chemical(int nu, std::string s, std::string h, std::string na, long double w,
                    long double m, long double b, long double d, long double p,
                    long double c2, long double n2, long double ae,
                    long double as, long double r, long double ma,
@@ -564,8 +563,8 @@ Chemical::Chemical(int nu, string s, string h, string na, long double w,
 }
 
 /// @brief 
-/// @param right 
-Chemical::Chemical(Chemical& right) : num(right.num), symbol(right.symbol), htmlSymbol(right.htmlSymbol), name(right.name), weight(right.weight), melt(right.melt), boil(right.boil), density(right.density), pzero(right.pzero), c(right.c), n(right.n), abunde(right.abunde), abunds(right.abunds), reactivity(right.reactivity), maxIpp(right.maxIpp), minIpp(right.minIpp) {
+/// @param std::right 
+Chemical::Chemical(Chemical& rhs) : num(rhs.num), symbol(rhs.symbol), htmlSymbol(rhs.htmlSymbol), name(rhs.name), weight(rhs.weight), melt(rhs.melt), boil(rhs.boil), density(rhs.density), pzero(rhs.pzero), c(rhs.c), n(rhs.n), abunde(rhs.abunde), abunds(rhs.abunds), reactivity(rhs.reactivity), maxIpp(rhs.maxIpp), minIpp(rhs.minIpp) {
   
   
   
@@ -592,8 +591,8 @@ Chemical::Chemical(Chemical& right) : num(right.num), symbol(right.symbol), html
 }
 
 /// @brief 
-/// @param right 
-Chemical::Chemical(const Chemical& right) : num(right.num), symbol(right.symbol), htmlSymbol(right.htmlSymbol), name(right.name), weight(right.weight), melt(right.melt), boil(right.boil), density(right.density), pzero(right.pzero), c(right.c), n(right.n), abunde(right.abunde), abunds(right.abunds), reactivity(right.reactivity), maxIpp(right.maxIpp), minIpp(right.minIpp) {
+/// @param std::right 
+Chemical::Chemical(const Chemical& rhs) : num(rhs.num), symbol(rhs.symbol), htmlSymbol(rhs.htmlSymbol), name(rhs.name), weight(rhs.weight), melt(rhs.melt), boil(rhs.boil), density(rhs.density), pzero(rhs.pzero), c(rhs.c), n(rhs.n), abunde(rhs.abunde), abunds(rhs.abunds), reactivity(rhs.reactivity), maxIpp(rhs.maxIpp), minIpp(rhs.minIpp) {
   
   
   
@@ -644,25 +643,25 @@ Chemical::~Chemical() {
 
 
 /// @brief 
-/// @param right 
+/// @param std::right 
 /// @return 
-auto Chemical::operator=(const Chemical& right) -> Chemical& {
-  num = right.num;
-  symbol = right.symbol;
-  htmlSymbol = right.htmlSymbol;
-  name = right.name;
-  weight = right.weight;
-  melt = right.melt;
-  boil = right.boil;
-  density = right.density;
-  pzero = right.pzero;
-  c = right.c;
-  n = right.n;
-  abunde = right.abunde;
-  abunds = right.abunds;
-  reactivity = right.reactivity;
-  maxIpp = right.maxIpp;
-  minIpp = right.minIpp;
+auto Chemical::operator=(const Chemical& rhs) -> Chemical& {
+  num = rhs.num;
+  symbol = rhs.symbol;
+  htmlSymbol = rhs.htmlSymbol;
+  name = rhs.name;
+  weight = rhs.weight;
+  melt = rhs.melt;
+  boil = rhs.boil;
+  density = rhs.density;
+  pzero = rhs.pzero;
+  c = rhs.c;
+  n = rhs.n;
+  abunde = rhs.abunde;
+  abunds = rhs.abunds;
+  reactivity = rhs.reactivity;
+  maxIpp = rhs.maxIpp;
+  minIpp = rhs.minIpp;
   fixBoil();
   fixMelt();
   fixAbunde();
@@ -756,22 +755,22 @@ auto Chemical::getNameSpaces() -> int { return nameSpaces; }
 
 auto Chemical::getSymbolSpaces() -> int { return symbolSpaces; }
 
-auto Chemical::operator<(Chemical& right) -> bool {
+auto Chemical::operator<(Chemical& rhs) -> bool {
   long double xx = abunds * abunde;
-  long double yy = right.abunds * right.abunde;
+  long double yy = rhs.abunds * rhs.abunde;
 
-  // cout << xx << " < " << yy << endl;
+  // std::cout << xx << " < " << yy << std::endl;
 
   if (xx > yy) {
     return true;
   } else if (xx == yy) {
-    if (weight < right.weight) {
+    if (weight < rhs.weight) {
       return true;
-    } else if (weight == right.weight) {
-      if (boil < right.boil) {
+    } else if (weight == rhs.weight) {
+      if (boil < rhs.boil) {
         return true;
-      } else if (boil == right.boil) {
-        if (num < right.num) {
+      } else if (boil == rhs.boil) {
+        if (num < rhs.num) {
           return true;
         }
       }
@@ -780,19 +779,19 @@ auto Chemical::operator<(Chemical& right) -> bool {
   return false;
 }
 
-auto Chemical::operator==(Chemical& right) -> bool {
+auto Chemical::operator==(Chemical& rhs) -> bool {
   long double xx = abunds * abunde;
-  long double yy = right.abunds * right.abunde;
+  long double yy = rhs.abunds * rhs.abunde;
 
-  if (xx == yy && weight == right.weight && boil == right.boil &&
-      num == right.num) {
+  if (xx == yy && weight == rhs.weight && boil == rhs.boil &&
+      num == rhs.num) {
     return true;
   }
   return false;
 }
 
-auto operator<<(ostream& strm, Chemical& obj) -> ostream& {
-  strm << left << obj.getNum() << ".\t" << right << obj.getSymbol();
+auto operator<<(std::ostream& strm, Chemical& obj) -> std::ostream& {
+  strm << std::left << obj.getNum() << ".\t" << std::right << obj.getSymbol();
   for (int i = 0; i < obj.getSymbolSpaces(); i++) {
     strm << " ";
   }
@@ -800,9 +799,9 @@ auto operator<<(ostream& strm, Chemical& obj) -> ostream& {
   for (int i = 0; i < obj.getNameSpaces(); i++) {
     strm << " ";
   }
-  strm << fixed << right << setprecision(4) << setw(10) << obj.getWeight()
-       << setw(22) << obj.getMinIpp() << setw(20) << obj.getMaxIpp() << setw(15)
-       << scientific << (obj.getAbunde() * obj.getAbunds());
+  strm << std::fixed << std::right << std::setprecision(4) << std::setw(10) << obj.getWeight()
+       << std::setw(22) << obj.getMinIpp() << std::setw(20) << obj.getMaxIpp() << std::setw(15)
+       << std::scientific << (obj.getAbunde() * obj.getAbunds());
   return strm;
 }
 
@@ -815,19 +814,19 @@ auto ChemTable::count() -> const unsigned long { return chemicles.size(); }
 
 auto ChemTable::operator[](const int& index) -> Chemical& {
   if (index < 0 || index >= chemicles.size()) {
-    cerr << "ERROR: Subscript out of range.\n";
+    std::cerr << "ERROR: Subscript out of range.\n";
     exit(EXIT_FAILURE);
   }
   return chemicles[index];
 }
 
-auto operator<<(ostream& strm, ChemTable& obj) -> ostream& {
-  cout << "Num\t" << setw(6) << "Symbol" << setw(13) << "Name" << setw(24)
-       << "Weight" << setw(22) << "Min breathable IPP" << setw(20)
-       << "Max Breathable IPP" << setw(15) << "Abund\n";
-  strm << fixed;
+auto operator<<(std::ostream& strm, ChemTable& obj) -> std::ostream& {
+  std::cout << "Num\t" << std::setw(6) << "Symbol" << std::setw(13) << "Name" << std::setw(24)
+       << "Weight" << std::setw(22) << "Min breathable IPP" << std::setw(20)
+       << "Max Breathable IPP" << std::setw(15) << "Abund\n";
+  strm << std::fixed;
   for (int i = 0; i < obj.count(); i++) {
-    strm << setprecision(0) << obj[i] << endl;
+    strm << std::setprecision(0) << obj[i] << std::endl;
   }
   return strm;
 }
@@ -847,8 +846,8 @@ sun::sun() {
   combinedEffTemp = 0;
 }
 
-sun::sun(long double l, long double m, long double t, string s, long double a,
-         string n) {
+sun::sun(long double l, long double m, long double t, std::string s, long double a,
+         std::string n) {
   luminosity = l;
   mass = m;
   effTemp = t;
@@ -876,21 +875,21 @@ sun::sun(long double l, long double m, long double t, string s, long double a,
   }
 }
 
-sun::sun(sun& right) {
-  luminosity = right.luminosity;
-  mass = right.mass;
-  effTemp = right.effTemp;
-  specType = right.specType;
-  age = right.age;
-  name = right.name;
-  isCircumbinary = right.isCircumbinary;
-  secondaryMass = right.secondaryMass;
-  secondaryLuminosity = right.secondaryLuminosity;
-  secondaryEffTemp = right.secondaryEffTemp;
-  secondarySpecType = right.secondarySpecType;
-  seperation = right.seperation;
-  eccentricity = right.eccentricity;
-  combinedEffTemp = right.combinedEffTemp;
+sun::sun(sun& rhs) {
+  luminosity = rhs.luminosity;
+  mass = rhs.mass;
+  effTemp = rhs.effTemp;
+  specType = rhs.specType;
+  age = rhs.age;
+  name = rhs.name;
+  isCircumbinary = rhs.isCircumbinary;
+  secondaryMass = rhs.secondaryMass;
+  secondaryLuminosity = rhs.secondaryLuminosity;
+  secondaryEffTemp = rhs.secondaryEffTemp;
+  secondarySpecType = rhs.secondarySpecType;
+  seperation = rhs.seperation;
+  eccentricity = rhs.eccentricity;
+  combinedEffTemp = rhs.combinedEffTemp;
   if (luminosity == 0) {
     luminosity = mass_to_luminosity(mass);
   }
@@ -906,21 +905,21 @@ sun::sun(sun& right) {
   }
 }
 
-sun::sun(const sun& right) {
-  luminosity = right.luminosity;
-  mass = right.mass;
-  effTemp = right.effTemp;
-  specType = right.specType;
-  age = right.age;
-  name = right.name;
-  isCircumbinary = right.isCircumbinary;
-  secondaryMass = right.secondaryMass;
-  secondaryLuminosity = right.secondaryLuminosity;
-  secondaryEffTemp = right.secondaryEffTemp;
-  secondarySpecType = right.secondarySpecType;
-  seperation = right.seperation;
-  eccentricity = right.eccentricity;
-  combinedEffTemp = right.combinedEffTemp;
+sun::sun(const sun& rhs) {
+  luminosity = rhs.luminosity;
+  mass = rhs.mass;
+  effTemp = rhs.effTemp;
+  specType = rhs.specType;
+  age = rhs.age;
+  name = rhs.name;
+  isCircumbinary = rhs.isCircumbinary;
+  secondaryMass = rhs.secondaryMass;
+  secondaryLuminosity = rhs.secondaryLuminosity;
+  secondaryEffTemp = rhs.secondaryEffTemp;
+  secondarySpecType = rhs.secondarySpecType;
+  seperation = rhs.seperation;
+  eccentricity = rhs.eccentricity;
+  combinedEffTemp = rhs.combinedEffTemp;
   if (luminosity == 0) {
     luminosity = mass_to_luminosity(mass);
   }
@@ -955,13 +954,13 @@ auto sun::getLuminosity() -> long double { return luminosity; }
 
 auto sun::getMass() -> long double { return mass; }
 
-auto sun::getName() -> string { return name; }
+auto sun::getName() -> std::string { return name; }
 
 auto sun::getREcosphere(long double mass) -> long double {
   return habitable_zone_distance(*this, EARTH_LIKE, mass);
 }
 
-auto sun::getSpecType() -> string {
+auto sun::getSpecType() -> std::string {
   if (specType.empty()) {
     specType = eff_temp_to_spec_type(effTemp, luminosity);
   }
@@ -981,9 +980,9 @@ void sun::setLuminosity(long double l) { luminosity = l; }
 
 void sun::setMass(long double m) { mass = m; }
 
-void sun::setName(string n) { name = std::move(n); }
+void sun::setName(std::string n) { name = std::move(n); }
 
-void sun::setSpecType(string s) {
+void sun::setSpecType(std::string s) {
   specType = std::move(s);
   specType = my_strtoupper(specType);
   if (effTemp == 0) {
@@ -999,7 +998,7 @@ auto sun::getSecondaryLuminosity() -> long double { return secondaryLuminosity; 
 
 auto sun::getSecondaryMass() -> long double { return secondaryMass; }
 
-auto sun::getSecondarySpecType() -> string { return secondarySpecType; }
+auto sun::getSecondarySpecType() -> std::string { return secondarySpecType; }
 
 void sun::setIsCircumbinary(bool cb) {
   isCircumbinary = cb;
@@ -1030,7 +1029,7 @@ void sun::setSecondaryMass(long double m) {
   }
 }
 
-void sun::setSecondarySpecType(string t) {
+void sun::setSecondarySpecType(std::string t) {
   secondarySpecType = std::move(t);
   if (secondaryEffTemp == 0) {
     secondaryEffTemp = spec_type_to_eff_temp(secondarySpecType);
@@ -1078,22 +1077,25 @@ auto sun::getCombinedEffTemp() -> long double {
     // effTemp = 5800;
     // secondaryEffTemp = 4400;
     curr = peak = 0;
-    // todo this is bad. figure out what accuracy for peak is
-    // then change the loop counter to not be a long double.
-    for (long double i = 0; i < 1500.0; i += ACCURACY_FOR_PEAK) {
+    // Find peak wavelength of combined stellar flux
+    // Using integer counter to avoid floating-point accumulation errors
+    constexpr long double max_wavelength_nm = 1500.0;
+    const int num_steps = static_cast<int>(max_wavelength_nm / ACCURACY_FOR_PEAK);
+    for (int step = 0; step < num_steps; step++) {
+      long double wavelength = step * ACCURACY_FOR_PEAK;
       prev = curr;
-      f1 = calcFlux(effTemp, i);
-      f2 = calcFlux(secondaryEffTemp, i);
+      f1 = calcFlux(effTemp, wavelength);
+      f2 = calcFlux(secondaryEffTemp, wavelength);
       curr = f1 + f2;
-      // cout << i << ": " << f1 << " " << f2 << " " << curr << endl;
+      // std::cout << wavelength << ": " << f1 << " " << f2 << " " << curr << std::endl;
       if (prev > curr) {
-        peak = i - ACCURACY_FOR_PEAK;
+        peak = wavelength - ACCURACY_FOR_PEAK;
         break;
       }
     }
-    // cout << "Primary Temp: " << toString(effTemp) << endl;
-    // cout << "Secondary Temp: " << toString(secondaryEffTemp) << endl;
-    // cout << "Peak: " << toString(peak) << endl;;
+    // std::cout << "Primary Temp: " << toString(effTemp) << std::endl;
+    // std::cout << "Secondary Temp: " << toString(secondaryEffTemp) << std::endl;
+    // std::cout << "Peak: " << toString(peak) << std::endl;;
     a = 0.0;
     m = 1000000000.0;
     b = 1.0;
@@ -1103,7 +1105,7 @@ auto sun::getCombinedEffTemp() -> long double {
     m = 1.0;
     b = 1.0;
     temperature = (pow(temperature, b) * m) + a;
-    // cout << "Combined temp: " << toString(temperature) << endl;
+    // std::cout << "Combined temp: " << toString(temperature) << std::endl;
     // exit(EXIT_FAILURE);
     combinedEffTemp = temperature;
     return temperature;
@@ -1214,7 +1216,7 @@ void planet::clearGases() {
 /*void planet::deleteMoon(int i)
 {
   planet *the_moon = temp_moon[i];
-  vector<planet *>::iterator it;
+  std::vector<planet *>::iterator it;
   if (temp_moon[i] != NULL)
   {
     if (temp_moon[i]->next_planet == NULL)
@@ -1364,7 +1366,7 @@ auto planet::getOblateness() -> long double {
     equatorial_radius_in_cm = radius * CM_PER_KM;
     k2 = calculate_moment_of_inertia_coeffient(the_planet);
     while (day == 0) {
-      cerr << "Error! The day is 0 hours long!\n";
+      std::cerr << "Error! The day is 0 hours long!\n";
       exit(EXIT_FAILURE);
     }
     ang_velocity = RADIANS_PER_ROTATION / (SECONDS_PER_HOUR * day);
@@ -1572,7 +1574,7 @@ void planet::sortMoons() {
   planet* next = nullptr;
   planet* node = nullptr;
   // planet *temp = NULL;
-  vector<planet*> temp_vector;
+  std::vector<planet*> temp_vector;
   long double roche_limit = 0;
   long double hill_sphere = 0;
   for (node = first_moon; node != nullptr; node = next) {
@@ -1620,22 +1622,22 @@ void planet::sortMoons() {
   }
 }
 
-auto planet::operator<(planet& right) -> bool {
-  if (a < right.a) {
+auto planet::operator<(planet& rhs) -> bool {
+  if (a < rhs.a) {
     return true;
-  } else if (moonA < right.moonA) {
+  } else if (moonA < rhs.moonA) {
     return true;
-  } else if (e < right.e) {
+  } else if (e < rhs.e) {
     return true;
-  } else if (moonE < right.moonE) {
+  } else if (moonE < rhs.moonE) {
     return true;
   }
   return false;
 }
 
-auto planet::operator==(planet& right) -> bool {
-  if (a == right.a && moonA == right.moonA && e == right.e &&
-      moonE == right.moonE) {
+auto planet::operator==(planet& rhs) -> bool {
+  if (a == rhs.a && moonA == rhs.moonA && e == rhs.e &&
+      moonE == rhs.moonE) {
     return true;
   }
   return false;
@@ -1705,21 +1707,21 @@ void gas::setNum(int n) { num = n; }
 
 void gas::setSurfPressure(long double s) { surfPressure = s; }
 
-auto gas::operator<(gas& right) -> bool {
-  if (surfPressure > right.surfPressure) {
+auto gas::operator<(gas& rhs) -> bool {
+  if (surfPressure > rhs.surfPressure) {
     return true;
   }
   return false;
 }
 
-auto gas::operator==(gas& right) -> bool {
-  if (surfPressure == right.surfPressure) {
+auto gas::operator==(gas& rhs) -> bool {
+  if (surfPressure == rhs.surfPressure) {
     return true;
   }
   return false;
 }
 
-auto operator<<(ostream& strm, gas& obj) -> ostream& {
-  strm << obj.getNum() << " - " << obj.getSurfPressure() << endl;
+auto operator<<(std::ostream& strm, gas& obj) -> std::ostream& {
+  strm << obj.getNum() << " - " << obj.getSurfPressure() << std::endl;
   return strm;
 }

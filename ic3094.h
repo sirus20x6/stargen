@@ -2,7 +2,6 @@
 #define IC3094_H
 #include "structs.h"
 
-using namespace std;
 
 extern catalog ic3094;
 

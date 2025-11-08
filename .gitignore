@@ -12,5 +12,9 @@ compile_commands.json
 # Compiled executables
 stargen
 
+# Compiled object files and libraries
+*.a
+*.o
+
 # Backup files
 *.backup

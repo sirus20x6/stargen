@@ -1,12 +1,12 @@
 #ifndef STARGEN_H
 #define STARGEN_H
 #include <iosfwd>     // for std
-#include <string>     // for string
+#include <string>     // for std::string
 #include "structs.h"  // for sun
 class accrete;
-
-
-using namespace std;
+class Config;
+class SimulationContext;
+class RandomContext;
 
 #ifdef macintosh
 #define SUBDIR "html"
@@ -64,101 +64,105 @@ using actions = enum actions {  // Callable StarGen can:
   aListVerbosity,               //  - List values of the -v option
 };
 
-extern int flags_arg_clone;
-extern sun the_sun_clone;
+// Global instances for configuration, simulation state, and RNG
+extern Config g_config;
+extern SimulationContext g_sim_context;
+extern RandomContext g_random_context;
 
-extern int flag_verbose;
-extern bool allow_planet_migration;
-extern bool is_circumbinary;
-extern long double compainion_mass_arg;
-extern long double compainion_eccentricity_arg;
-extern long double compainion_distant_arg;
-extern long double compainion_lum_arg;
-extern long double compainion_eff_arg;
-extern string companion_spec_arg;
-extern long double min_age;
-extern long double max_age;
-extern long double max_age_backup;
-extern long double temp_arg;
-extern string type_arg;
-extern int decimals_arg;
-extern long double max_distance_arg;
+// Backward-compatible references to global instances
+extern int& flags_arg_clone;
+extern sun& the_sun_clone;
+extern int& flag_verbose;
+extern bool& allow_planet_migration;
+extern bool& is_circumbinary;
+extern long double& compainion_mass_arg;
+extern long double& compainion_eccentricity_arg;
+extern long double& compainion_distant_arg;
+extern long double& compainion_lum_arg;
+extern long double& compainion_eff_arg;
+extern std::string& companion_spec_arg;
+extern long double& min_age;
+extern long double& max_age;
+extern long double& max_age_backup;
+extern long double& temp_arg;
+extern std::string& type_arg;
+extern int& decimals_arg;
+extern long double& max_distance_arg;
+extern long& flag_seed;
 
 // Various statistics that are kept:
-extern int total_earthlike;
-extern int total_habitable;
-extern int total_habitable_earthlike;
-extern int total_habitable_conservative;
-extern int total_habitable_optimistic;
-extern int total_potentially_habitable;
-extern int total_potentially_habitable_earthlike;
-extern int total_potentially_habitable_conservative;
-extern int total_potentially_habitable_optimistic;
-extern int total_worlds;
+extern int& total_earthlike;
+extern int& total_habitable;
+extern int& total_habitable_earthlike;
+extern int& total_habitable_conservative;
+extern int& total_habitable_optimistic;
+extern int& total_potentially_habitable;
+extern int& total_potentially_habitable_earthlike;
+extern int& total_potentially_habitable_conservative;
+extern int& total_potentially_habitable_optimistic;
+extern int& total_worlds;
 
-extern long double min_breathable_terrestrial_g;
-extern long double min_breathable_g;
-extern long double max_breathable_terrestrial_g;
-extern long double max_breathable_g;
-extern long double min_breathable_terrestrial_l;
-extern long double min_breathable_l;
-extern long double max_breathable_terrestrial_l;
-extern long double max_breathable_l;
-extern long double min_breathable_temp;
-extern long double max_breathable_temp;
-extern long double min_breathable_p;
-extern long double max_breathable_p;
-extern long double min_breathable_mass;
-extern long double max_breathable_mass;
+extern long double& min_breathable_terrestrial_g;
+extern long double& min_breathable_g;
+extern long double& max_breathable_terrestrial_g;
+extern long double& max_breathable_g;
+extern long double& min_breathable_terrestrial_l;
+extern long double& min_breathable_l;
+extern long double& max_breathable_terrestrial_l;
+extern long double& max_breathable_l;
+extern long double& min_breathable_temp;
+extern long double& max_breathable_temp;
+extern long double& min_breathable_p;
+extern long double& max_breathable_p;
+extern long double& min_breathable_mass;
+extern long double& max_breathable_mass;
 
-extern long double min_potential_terrestrial_g;
-extern long double min_potential_g;
-extern long double max_potential_terrestrial_g;
-extern long double max_potential_g;
-extern long double min_potential_terrestrial_l;
-extern long double min_potential_l;
-extern long double max_potential_terrestrial_l;
-extern long double max_potential_l;
-extern long double min_potential_temp;
-extern long double max_potential_temp;
-extern long double min_potential_p;
-extern long double max_potential_p;
-extern long double min_potential_mass;
-extern long double max_potential_mass;
+extern long double& min_potential_terrestrial_g;
+extern long double& min_potential_g;
+extern long double& max_potential_terrestrial_g;
+extern long double& max_potential_g;
+extern long double& min_potential_terrestrial_l;
+extern long double& min_potential_l;
+extern long double& max_potential_terrestrial_l;
+extern long double& max_potential_l;
+extern long double& min_potential_temp;
+extern long double& max_potential_temp;
+extern long double& min_potential_p;
+extern long double& max_potential_p;
+extern long double& min_potential_mass;
+extern long double& max_potential_mass;
 
-extern string stargen_revision;
-
-extern long flag_seed;
+extern std::string stargen_revision;
 
 void init();
 void generate_planet(planet* /*the_planet*/, int /*planet_no*/,
                      sun& /*the_sun*/, bool /*random_tilt*/,
-                     const string& /*planet_id*/, bool /*do_gases*/,
+                     const std::string& /*planet_id*/, bool /*do_gases*/,
                      bool /*do_moons*/, bool /*is_moon*/,
                      long double /*parent_mass*/);
 void generate_planets(sun& /*the_sun*/, bool /*random_tilt*/,
-                      const string& /*flag_char*/, int /*sys_no*/,
-                      const string& /*system_name*/, bool /*do_gases*/,
+                      const std::string& /*flag_char*/, int /*sys_no*/,
+                      const std::string& /*system_name*/, bool /*do_gases*/,
                       bool /*do_moons*/);
 void generate_stellar_system(sun &the_sun, bool use_seed_system,
-                             planet *seed_system, const string& flag_char, int sys_no,
-                             const string& system_name, long double inner_dust_limit,
+                             planet *seed_system, const std::string& flag_char, int sys_no,
+                             const std::string& system_name, long double inner_dust_limit,
                              long double outer_planet_limit,
                              long double ecc_coef,
                              long double inner_planet_factor, bool do_gases,
                              bool do_moons, accrete &myAccreteObject);
-auto stargen(actions /*action*/, const string& /*flag_char*/, string /*path*/,
-             const string& /*url_path_arg*/, const string& /*filename_arg*/,
-             const string& /*sys_name_arg*/, string /*prognam*/,
+auto stargen(actions /*action*/, const std::string& /*flag_char*/, std::string /*path*/,
+             const std::string& /*url_path_arg*/, const std::string& /*filename_arg*/,
+             const std::string& /*sys_name_arg*/, std::string /*prognam*/,
              long double /*mass_arg*/, long double /*luminosity_arg*/,
              long /*seed_arg*/, int /*count_arg*/, int /*incr_arg*/,
              catalog& /*cat_arg*/, int /*sys_no_arg*/,
              long double /*ratio_arg*/, long double /*ecc_coef_arg*/,
              long double /*inner_planet_factor_arg*/, int /*flags_arg*/,
              int /*out_format*/, int /*graphic_format*/) -> int;
-void check_planet(planet* /*the_planet*/, const string& /*planet_id*/,
+void check_planet(planet* /*the_planet*/, const std::string& /*planet_id*/,
                   bool /*is_moon*/);
 void assign_type(sun& /*the_sun*/, planet* /*the_planet*/,
-                 const string& /*planet_id*/, bool /*is_moon*/,
+                 const std::string& /*planet_id*/, bool /*is_moon*/,
                  bool /*do_gases*/, bool /*second_time*/);
 #endif

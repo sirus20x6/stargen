@@ -4,8 +4,8 @@
 #include <cstdlib>                 // for exit, EXIT_FAILURE, atoi
 #include <cstring>                 // for strstr, strcmp
 #include <iostream>                // for operator<<, basic_ostream, endl
-#include <map>                     // for map, map<>::mapped_type
-#include <string>                  // for string, operator<<, operator==
+#include <map>                     // for std::map, std::map<>::mapped_type
+#include <string>                  // for std::string, operator<<, operator==
 #include <vector>                  // for vector
 #include <functional>
 #include "const.h"                 // for SUN_MASS_IN_EARTH_MASSES, AVE, pow2
@@ -18,12 +18,11 @@
 #include "utils.h"                 // for toString, random_number, about
 
 
-using namespace std;
 
-string breathability_phrase[4] = {"none", "breathable", "unbreathable",
+std::string breathability_phrase[4] = {"none", "breathable", "unbreathable",
                                   "poisonous"};
 
-map<map<long double, long double>, vector<long double> > polynomial_cache;
+std::map<std::map<long double, long double>, std::vector<long double> > polynomial_cache;
 
 /**
  * @brief mass to luminosity
@@ -68,15 +67,15 @@ auto luminosity_to_mass(long double luminosity) -> long double {
  * @param spec_type 
  * @return int 
  */
-int getLumIndex(const string& spec_type) {
-    if (spec_type.find("Ia0") != string::npos || 
-        spec_type.find("Ia") != string::npos || 
-        spec_type.find("Ib") != string::npos || 
-        spec_type.find("II") != string::npos) {
+int getLumIndex(const std::string& spec_type) {
+    if (spec_type.find("Ia0") != std::string::npos || 
+        spec_type.find("Ia") != std::string::npos || 
+        spec_type.find("Ib") != std::string::npos || 
+        spec_type.find("II") != std::string::npos) {
         return 2;
     }
-    if (spec_type.find("III") != string::npos || 
-        spec_type.find("IV") != string::npos) {
+    if (spec_type.find("III") != std::string::npos || 
+        spec_type.find("IV") != std::string::npos) {
         return 1;
     }
     return 0;
@@ -86,12 +85,12 @@ int getLumIndex(const string& spec_type) {
  * @brief Get the Star Type
  * 
  * @param spec_type 
- * @return string 
+ * @return std::string 
  */
-string getStarType(string spec_type) {
+std::string getStarType(std::string spec_type) {
     spec_type = my_strtoupper(spec_type);
-    
-    const vector<pair<string, string>> starTypes = {
+
+    static const std::vector<std::pair<std::string, std::string>> starTypes = {
         {"DA", "WD"}, {"DB", "WD"}, {"DC", "WD"}, {"DO", "WD"}, {"DQ", "WD"}, {"DZ", "WD"},
         {"WN", "WN"}, {"WC", "WC"},
         {"O", "O"}, {"B", "B"}, {"A", "A"}, {"F", "F"}, {"G", "G"}, {"K", "K"},
@@ -100,12 +99,12 @@ string getStarType(string spec_type) {
     };
     
     for (const auto& [prefix, type] : starTypes) {
-        if (spec_type.find(prefix) != string::npos) {
+        if (spec_type.find(prefix) != std::string::npos) {
             return type;
         }
     }
     
-    cerr << "Unsupported star type: " << spec_type << endl;
+    std::cerr << "Unsupported star type: " << spec_type << std::endl;
     exit(EXIT_FAILURE);
 }
 
@@ -115,12 +114,12 @@ string getStarType(string spec_type) {
  * @param spec_type 
  * @return int 
  */
-auto getSubType(string spec_type) -> int {
+auto getSubType(std::string spec_type) -> int {
   int total_chars = 0;
   // total_chars = spec_type.size();
-  string buffer;
+  std::string buffer;
 
-  for (string::iterator it = spec_type.begin(); it < spec_type.end(); it++) {
+  for (std::string::iterator it = spec_type.begin(); it < spec_type.end(); it++) {
     if (isdigit(*it)) {
       buffer += *it;
       return atoi(buffer.c_str());
@@ -135,12 +134,12 @@ auto getSubType(string spec_type) -> int {
  * @param spec_type 
  * @return long double 
  */
-long double spec_type_to_eff_temp(const string& spec_type) {
+long double spec_type_to_eff_temp(const std::string& spec_type) {
     if (spec_type.empty()) {
         return 0;
     }
 
-    string star_type = getStarType(spec_type);
+    std::string star_type = getStarType(spec_type);
     int sub_type = getSubType(spec_type);
     int lumIndex = getLumIndex(spec_type);
 
@@ -165,7 +164,7 @@ long double spec_type_to_eff_temp(const string& spec_type) {
         case 'E': return tempE[sub_type];
     }
 
-    cerr << "Unsupported star type: " << star_type << endl;
+    std::cerr << "Unsupported star type: " << star_type << std::endl;
     exit(EXIT_FAILURE);
 }
 
@@ -174,10 +173,10 @@ long double spec_type_to_eff_temp(const string& spec_type) {
  * 
  * @param eff_temp 
  * @param luminosity 
- * @return string 
+ * @return std::string 
  */
-string eff_temp_to_spec_type(long double eff_temp, long double luminosity) {
-    const vector<pair<long double, string>> temp_classes = {
+std::string eff_temp_to_spec_type(long double eff_temp, long double luminosity) {
+    static const std::vector<std::pair<long double, std::string>> temp_classes = {
         {52000, "O"}, {30000, "B"}, {10000, "A"}, {7500, "F"}, 
         {6000, "G"}, {5000, "K"}, {3500, "M"}, {2000, "L"}, 
         {1300, "T"}, {700, "Y"}
@@ -192,16 +191,16 @@ string eff_temp_to_spec_type(long double eff_temp, long double luminosity) {
                 return class_name + to_string(max(0, min(9, subclass)));
             }
         }
-        return string("Y9");
+        return std::string("Y9");
     };
 
-    string spec_class = eff_temp > 52000 ? "WN" + to_string(min(9, max(0, int(10 - 10 * (eff_temp - 52000) / 148000))))
+    std::string spec_class = eff_temp > 52000 ? "WN" + to_string(min(9, max(0, int(10 - 10 * (eff_temp - 52000) / 148000))))
                                          : get_spec_class();
 
     if (luminosity == 0) luminosity = 1e-7;
     long double xmag = 4.83 - 2.5 * log10(luminosity);
 
-    const vector<pair<string, std::function<string(double)>>> lum_classes = {
+    static const std::vector<std::pair<std::string, std::function<std::string(double)>>> lum_classes = {
         {"O", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -6 ? "Ib" : m < -4.9 ? "II" : m < -4 ? "III" : "V"; }},
         {"B", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -5 ? "Ib" : m < -4.5 ? "II" : m < -0.5 ? "III" : "V"; }},
         {"A", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2.25 ? "II" : m < 0 ? "III" : m < 0.125 ? "IV" : "V"; }},
@@ -694,7 +693,7 @@ auto vol_inventory(long double mass, long double escape_vel,
         break;
       default:
 
-        cout << "Error: orbital zone not initialized correctly!\n";
+        std::cout << "Error: orbital zone not initialized correctly!\n";
         exit(EXIT_FAILURE);
         return EXIT_FAILURE;
         break;
@@ -1083,7 +1082,7 @@ void calculate_surface_temp(planet *the_planet, bool first,
   if (the_planet->getGreenhouseEffect() &&
       the_planet->getMaxTemp() < the_planet->getBoilPoint()) {
     if (flag_verbose & 0x0010) {
-      cerr << "Deluge: " << the_planet->getTheSun().getName() << " "
+      std::cerr << "Deluge: " << the_planet->getTheSun().getName() << " "
            << the_planet->getPlanetNo() << " max ("
            << toString(the_planet->getMaxTemp()) << ") < boil ("
            << toString(the_planet->getBoilPoint()) << ")\n";
@@ -1204,11 +1203,11 @@ void calculate_surface_temp(planet *the_planet, bool first,
   set_temp_range(the_planet);
 
   if (flag_verbose & 0x0020) {
-    string greenhouse_string = "";
+    std::string greenhouse_string = "";
     if (the_planet->getGreenhouseEffect()) {
       greenhouse_string = "*";
     }
-    cerr << toString(the_planet->getA()) << " AU: "
+    std::cerr << toString(the_planet->getA()) << " AU: "
          << toString(the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER)
          << " = " << toString(effective_temp - FREEZING_POINT_OF_WATER)
          << " ef + " << toString(greenhouse_temp) << " gh" << greenhouse_string
@@ -1236,7 +1235,7 @@ void iterate_surface_temp(planet *the_planet, bool do_gasses) {
   do_gasses = (flags_arg_clone & fDoGases) != 0;
 
   if (flag_verbose & 0x20000) {
-    cerr << the_planet->getPlanetNo() << ":                     "
+    std::cerr << the_planet->getPlanetNo() << ":                     "
          << toString(initial_temp) << " it ["
          << toString(the_planet->getTheSun().getREcosphere(
                 the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES))
@@ -1245,10 +1244,10 @@ void iterate_surface_temp(planet *the_planet, bool do_gasses) {
   }
 
   if (flag_verbose & 0x0040) {
-    cerr << endl
+    std::cerr << endl
          << "Gas lifetimes: H2 - " << toString(h2_life) << ", H2O - "
          << toString(h2o_life) << ", N - " << toString(n_life) << ", N2 - "
-         << toString(n2_life) << endl;
+         << toString(n2_life) << std::endl;
   }
 
   calculate_surface_temp(the_planet, true, 0, 0, 0, 0, 0, do_gasses);
@@ -1271,7 +1270,7 @@ void iterate_surface_temp(planet *the_planet, bool do_gasses) {
   the_planet->setGreenhsRise(the_planet->getSurfTemp() - initial_temp);
 
   if (flag_verbose & 0x20000) {
-    cerr << the_planet->getPlanetNo() << ": "
+    std::cerr << the_planet->getPlanetNo() << ": "
          << toString(the_planet->getGreenhsRise())
          << " gh = " << toString(the_planet->getSurfTemp()) << " ("
          << toString(the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER)
@@ -1456,9 +1455,9 @@ auto radius_improved(long double mass, long double imf, long double rmf,
   long double radius = 0.0;
   long double radius1 = 0.0;
   long double radius2 = 0.0;
-  map<long double, long double> non_ice_rock_radii;
-  map<long double, long double> ice_rock_radii;
-  map<long double, long double> ice_iron_radii;
+  std::map<long double, long double> non_ice_rock_radii;
+  std::map<long double, long double> ice_rock_radii;
+  std::map<long double, long double> ice_iron_radii;
   long double range = NAN, upper_fraction = NAN, lower_fraction = NAN;
   long double half_mass_factor = 0.0;
   long double iron_ratio = 0.0;
@@ -1486,8 +1485,8 @@ auto radius_improved(long double mass, long double imf, long double rmf,
                                              ice_rock_radii[0.5], 0.75,
                                              ice_rock_radii[0.75], false);
     } else if (imf < 0.75) {
-      // cout << "test1\n";
-      // cout << toString(mass) << endl;
+      // std::cout << "test1\n";
+      // std::cout << toString(mass) << std::endl;
       radius1 = planet_radius_helper(imf, 0.0, ice_rock_radii[0.0], 0.5,
                                      ice_rock_radii[0.5], 0.75,
                                      ice_rock_radii[0.75], false);
@@ -1496,8 +1495,8 @@ auto radius_improved(long double mass, long double imf, long double rmf,
                                      ice_rock_radii[1.0], false);
       ice_rock_radius = rangeAdjust(imf, radius1, radius2, 0.5, 0.75);
     } else {
-      // cout << "test2\n";
-      // cout << toString(mass) << endl;
+      // std::cout << "test2\n";
+      // std::cout << toString(mass) << std::endl;
       radius1 = planet_radius_helper(imf, 0.5, ice_rock_radii[0.5], 0.75,
                                      ice_rock_radii[0.75], 1.0,
                                      ice_rock_radii[1.0], false);
@@ -1643,7 +1642,7 @@ auto gas_radius(long double temperature, long double core_mass,
   long double upper_fraction = 0.0;
   long double range = 0.0;
   long double radius = NAN;
-  map<double, long double> age_radii;
+  std::map<double, long double> age_radii;
   age_radii[300.0E6] = gas_radius_300Myr(temperature, core_earth_masses,
                                          total_earth_masses, the_planet);
   age_radii[1.0E9] = gas_radius_1Gyr(temperature, core_earth_masses,
@@ -1736,7 +1735,7 @@ auto calc_stellar_flux(long double a, long double b, long double c,
                               long double d, long double seff,
                               long double star_temp, long double star_lum) -> long double {
   long double t = star_temp - 5780.0;
-  // cout << star_temp << endl;
+  // std::cout << star_temp << std::endl;
   return (seff) + (a * t) + (b * std::pow(t, 2.0)) + (c * std::pow(t, 3.0)) +
          (d * std::pow(t, 4.0));
 }
@@ -1889,32 +1888,32 @@ auto habitable_zone_distance(sun &the_sun, int mode, long double mass) -> long d
     }
 
     if (stellar_flux <= 0) {
-      cerr << "Error! Program caluclated an invalid stellar flux!\n";
-      cerr << "Star Name: " << the_sun.getName() << endl;
-      cerr << "Star Mass: " << toString(the_sun.getMass()) << endl;
-      cerr << "Star Luminosity: " << toString(the_sun.getLuminosity()) << endl;
-      cerr << "Star Temperature: " << toString(the_sun.getEffTemp()) << endl;
-      cerr << "Star Type: " << the_sun.getSpecType() << endl;
-      cerr << "Zone: ";
+      std::cerr << "Error! Program caluclated an invalid stellar flux!\n";
+      std::cerr << "Star Name: " << the_sun.getName() << std::endl;
+      std::cerr << "Star Mass: " << toString(the_sun.getMass()) << std::endl;
+      std::cerr << "Star Luminosity: " << toString(the_sun.getLuminosity()) << std::endl;
+      std::cerr << "Star Temperature: " << toString(the_sun.getEffTemp()) << std::endl;
+      std::cerr << "Star Type: " << the_sun.getSpecType() << std::endl;
+      std::cerr << "Zone: ";
       if (mode == RECENT_VENUS) {
-        cerr << "Recent Venus";
+        std::cerr << "Recent Venus";
       } else if (mode == RUNAWAY_GREENHOUSE) {
-        cerr << "Runaway Greenhouse";
+        std::cerr << "Runaway Greenhouse";
       } else if (mode == MOIST_GREENHOUSE) {
-        cerr << "Moist Greenhouse";
+        std::cerr << "Moist Greenhouse";
       } else if (mode == EARTH_LIKE) {
-        cerr << "Earth-like";
+        std::cerr << "Earth-like";
       } else if (mode == FIRST_CO2_CONDENSATION_LIMIT) {
-        cerr << "First CO2 Condensation";
+        std::cerr << "First CO2 Condensation";
       } else if (mode == MAXIMUM_GREENHOUSE) {
-        cerr << "Maximum Greenhouse";
+        std::cerr << "Maximum Greenhouse";
       } else if (mode == EARLY_MARS) {
-        cerr << "Early Mars";
+        std::cerr << "Early Mars";
       } else if (mode == TWO_AU_CLOUD_LIMIT) {
-        cerr << "Two AU Cloud Limit\n";
+        std::cerr << "Two AU Cloud Limit\n";
       }
-      cerr << endl;
-      cerr << "Stellar Flux: " << toString(stellar_flux) << endl;
+      std::cerr << std::endl;
+      std::cerr << "Stellar Flux: " << toString(stellar_flux) << std::endl;
       exit(EXIT_FAILURE);
       return 0;
     }
@@ -2045,13 +2044,13 @@ void gas_giant_temperature_albedo(planet *the_planet, long double parent_mass,
     new_obleteness = calcOblateness(the_planet);
     temp6 = (temp6 + (new_obleteness * 2.0)) / 3.0;
     if (temp1 > 900 && temp1 < 1400) {
-      // cout << "blada\n";
+      // std::cout << "blada\n";
       if (fabs(temp1 - temp2) < 0.0025 &&
           fabs(the_planet->getAlbedo() - new_albedo) < 0.001) {
         break;
       }
     } else {
-      // cout << temp1 << " " << temp2 << " " << fabs(temp1 - temp2) << endl;
+      // std::cout << temp1 << " " << temp2 << " " << fabs(temp1 - temp2) << std::endl;
       if (fabs(temp1 - temp2) < 0.25) {
         break;
       }
@@ -2065,7 +2064,7 @@ void gas_giant_temperature_albedo(planet *the_planet, long double parent_mass,
   the_planet->setOblateness(temp6);
 }
 
-auto getGasGiantAlbedo(const string& sudusky_class, const string& star_type,
+auto getGasGiantAlbedo(const std::string& sudusky_class, const std::string& star_type,
                               long double luminosity) -> long double {
   int num = star_type_to_num(star_type, luminosity);
 
@@ -2085,7 +2084,7 @@ auto getGasGiantAlbedo(const string& sudusky_class, const string& star_type,
     return logistal_trend(0.0205970047, -0.0332241697, 0.6005902693,
                           (long double)num);
   } else {
-    cout << "Error!\n";
+    std::cout << "Error!\n";
     exit(EXIT_FAILURE);
     return EXIT_FAILURE;
   }
@@ -2103,12 +2102,14 @@ struct GasRetentionFactors {
 
 /**
  * @brief Calculate gas retention factors for Argon
+ *
+ * Argon accumulates slowly through radioactive decay over stellar age
  */
 static auto calculate_argon_retention(Chemical& the_gas, sun& the_sun,
                                      long double base_abundance) -> GasRetentionFactors {
   GasRetentionFactors factors;
   factors.abundance = base_abundance;
-  factors.reactivity = 0.15 * the_sun.getAge() / 4e9;
+  factors.reactivity = 0.15 * the_sun.getAge() / 4e9;  // Accumulation factor
   factors.pressure_factor = 1.0;
   factors.retention_fraction = 1.0;
   return factors;
@@ -2116,11 +2117,15 @@ static auto calculate_argon_retention(Chemical& the_gas, sun& the_sun,
 
 /**
  * @brief Calculate gas retention factors for Helium
+ *
+ * Helium abundance is affected by gas giant mass fraction
+ * Helium escapes more easily from low-mass planets
  */
 static auto calculate_helium_retention(Chemical& the_gas, sun& the_sun,
                                       planet* the_planet, long double base_abundance,
                                       long double pressure) -> GasRetentionFactors {
   GasRetentionFactors factors;
+  // Helium enhanced in gas giants due to primordial retention
   factors.abundance = base_abundance *
                      (0.001 + (the_planet->getGasMass() / the_planet->getMass()));
   factors.pressure_factor = (0.75 + pressure);
@@ -2132,6 +2137,9 @@ static auto calculate_helium_retention(Chemical& the_gas, sun& the_sun,
 
 /**
  * @brief Calculate gas retention factors for Oxygen/O2
+ *
+ * Oxygen production requires stellar age > 2Gyr and specific temperature range
+ * Free oxygen indicates photosynthesis or photochemical processes
  */
 static auto calculate_oxygen_retention(Chemical& the_gas, sun& the_sun,
                                       planet* the_planet, long double base_abundance,
@@ -2139,6 +2147,7 @@ static auto calculate_oxygen_retention(Chemical& the_gas, sun& the_sun,
   GasRetentionFactors factors;
   factors.abundance = base_abundance;
 
+  // Oxygen only accumulates on mature systems with suitable temperatures
   if (the_sun.getAge() > 2e9 &&
       (the_planet->getGasGiant() ||
        (the_planet->getSurfTemp() > 270 && the_planet->getSurfTemp() < 400))) {
@@ -2146,6 +2155,7 @@ static auto calculate_oxygen_retention(Chemical& the_gas, sun& the_sun,
     factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
                                  std::pow(the_sun.getAge() / 2e9, 0.25) * factors.pressure_factor);
   } else {
+    // Default retention for young systems or unsuitable temperatures
     factors.pressure_factor = (0.75 + pressure);
     factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
                                  the_sun.getAge() / 2e9 * factors.pressure_factor);
@@ -2156,6 +2166,8 @@ static auto calculate_oxygen_retention(Chemical& the_gas, sun& the_sun,
 
 /**
  * @brief Calculate gas retention factors for CO2
+ *
+ * CO2 accumulates through volcanic outgassing and weathering cycles
  */
 static auto calculate_co2_retention(Chemical& the_gas, sun& the_sun,
                                    planet* the_planet, long double base_abundance,
@@ -2163,13 +2175,14 @@ static auto calculate_co2_retention(Chemical& the_gas, sun& the_sun,
   GasRetentionFactors factors;
   factors.abundance = base_abundance;
 
+  // CO2 accumulation enhanced on mature, warm planets
   if (the_sun.getAge() > 2e9 &&
       (the_planet->getGasGiant() ||
        (the_planet->getSurfTemp() > 270 && the_planet->getSurfTemp() < 400))) {
     factors.pressure_factor = (0.75 + pressure);
     factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
                                  std::pow(the_sun.getAge() / 2e9, 0.5) * factors.pressure_factor);
-    factors.reactivity *= 1.5;
+    factors.reactivity *= 1.5;  // Enhanced CO2 retention
   } else {
     factors.pressure_factor = (0.75 + pressure);
     factors.reactivity = std::pow(1.0 / (1.0 + the_gas.getReactivity()),
@@ -2181,6 +2194,8 @@ static auto calculate_co2_retention(Chemical& the_gas, sun& the_sun,
 
 /**
  * @brief Calculate generic gas retention factors
+ *
+ * Used for gases without specific chemical behavior models
  */
 static auto calculate_generic_retention(Chemical& the_gas, sun& the_sun,
                                        long double base_abundance,
@@ -2196,6 +2211,8 @@ static auto calculate_generic_retention(Chemical& the_gas, sun& the_sun,
 
 /**
  * @brief Calculate final gas amount based on retention factors
+ *
+ * Combines abundance, velocity retention, reactivity, and molecular weight fraction
  */
 static auto calculate_gas_amount(Chemical& the_gas, planet* the_planet,
                                 sun& the_sun, const GasRetentionFactors& factors,
@@ -2209,7 +2226,16 @@ static auto calculate_gas_amount(Chemical& the_gas, planet* the_planet,
 }
 
 /**
- * @brief Adjust gas amount to meet IPP constraints
+ * @brief Adjust gas amount to meet IPP (Inspired Partial Pressure) constraints
+ *
+ * Iteratively adjusts gas amount to ensure it falls within min/max IPP range.
+ * - If IPP too high: reduces amount by 1% per iteration
+ * - If IPP too low: increases amount by 1% per iteration
+ *
+ * @param the_gas The gas being adjusted
+ * @param the_planet The planet whose atmosphere is being adjusted
+ * @param gas_amount Reference to the gas amount (will be modified)
+ * @param total_amount Reference to total gas amount (will be modified)
  */
 static void adjust_gas_ipp_to_range(Chemical& the_gas, planet* the_planet,
                                     long double& gas_amount, long double& total_amount) {
@@ -2217,21 +2243,23 @@ static void adjust_gas_ipp_to_range(Chemical& the_gas, planet* the_planet,
   long double ipp = inspired_partial_pressure(the_planet->getSurfPressure(), pressure);
 
   if (ipp > the_gas.getMaxIpp()) {
+    // Gas level too high - reduce iteratively
     while (ipp > the_gas.getMaxIpp()) {
       long double old_amount = gas_amount;
-      gas_amount *= 0.99;
+      gas_amount *= 0.99;  // Reduce by 1%
       total_amount -= old_amount;
       total_amount += gas_amount;
       ipp = inspired_partial_pressure(the_planet->getSurfPressure(),
                                       the_planet->getSurfPressure() * (gas_amount / total_amount));
     }
   } else if (ipp < the_gas.getMinIpp()) {
+    // Gas level too low - increase iteratively
     while (ipp < the_gas.getMinIpp()) {
       long double old_amount = gas_amount;
       if (gas_amount <= 0.0) {
-        gas_amount = 1.0E-9;
+        gas_amount = 1.0E-9;  // Start with tiny amount if zero
       } else {
-        gas_amount *= 1.01;
+        gas_amount *= 1.01;  // Increase by 1%
         total_amount -= old_amount;
       }
       total_amount += gas_amount;
@@ -2242,18 +2270,31 @@ static void adjust_gas_ipp_to_range(Chemical& the_gas, planet* the_planet,
 }
 
 /**
- * @brief Adjust all gases for potentially habitable planets
+ * @brief Adjust all gases for potentially habitable planets to meet IPP constraints
+ *
+ * For potentially habitable planets with suitable pressure, iteratively adjusts
+ * gas amounts to ensure breathable atmosphere within safe IPP ranges.
+ *
+ * This implements a constraint satisfaction algorithm:
+ * 1. For each gas, adjust amount to meet min/max IPP constraints
+ * 2. Validate all gases meet constraints
+ * 3. Repeat until all constraints satisfied or max iterations reached
+ *
+ * @param the_planet The planet being evaluated
+ * @param amounts Array of gas amounts (will be modified)
+ * @param total_amount Reference to total gas amount (will be modified)
+ * @param planet_id Planet identifier for debugging
  */
 static void adjust_gases_for_habitability(planet* the_planet, long double* amounts,
                                           long double& total_amount,
-                                          const string& planet_id) {
+                                          const std::string& planet_id) {
   if (!is_potentialy_habitable(the_planet)) {
-    return;
+    return;  // Skip non-habitable planets
   }
 
   if (the_planet->getSurfPressure() < (1.2 * MIN_O2_IPP) ||
       the_planet->getSurfPressure() > MAX_HABITABLE_PRESSURE) {
-    return;
+    return;  // Pressure outside habitable range
   }
 
   std::map<int, long double> new_values;
@@ -2263,11 +2304,13 @@ static void adjust_gases_for_habitability(planet* the_planet, long double* amoun
   const int MAX_ITERATIONS = 1000;
 
   do {
+    // First pass: adjust each gas to meet IPP constraints
     for (int i = 0; i < gases.count(); i++) {
       new_values[i] = 0;
       adjust_gas_ipp_to_range(gases[i], the_planet, amounts[i], total_amount);
     }
 
+    // Second pass: validate all gases meet constraints
     bad_air = false;
     for (int i = 0; i < gases.count(); i++) {
       if (new_values[i] > 0.0) {
@@ -2284,6 +2327,7 @@ static void adjust_gases_for_habitability(planet* the_planet, long double* amoun
         do_overs_more[i] = false;
         break;
       } else if (ipp < gases[i].getMinIpp() && gases[i].getNum() == AN_O) {
+        // Oxygen is critical - must meet minimum
         bad_air = true;
         do_overs_less[i] = false;
         do_overs_more[i] = true;
@@ -2296,23 +2340,23 @@ static void adjust_gases_for_habitability(planet* the_planet, long double* amoun
 
     counter++;
     if (counter > MAX_ITERATIONS) {
-      break;
+      break;  // Prevent infinite loops
     }
   } while (bad_air);
 }
 
-void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
+void calculate_gases(sun &the_sun, planet *the_planet, std::string planet_id) {
   the_sun = the_planet->getTheSun();
   if ((the_planet->getSurfPressure() > 0 || the_planet->getGasGiant()) &&
       the_sun.getAge() > 0) {
-    // cout << "test 1\n";
-    // cout << planet_id << endl;
+    // std::cout << "test 1\n";
+    // std::cout << planet_id << std::endl;
     long double *amount = nullptr;
     long double totalamount = 0;
     long double pressure = the_planet->getSurfPressure() / MILLIBARS_PER_BAR;
     amount = new long double[gases.count()];
     int n = 0;
-    // vector<gas> temp_vector; // just incase for what ever reason, it doesn't
+    // std::vector<gas> temp_vector; // just incase for what ever reason, it doesn't
     // replace the gases in the atmosphere
 
     if (the_planet->getNumGases() > 0) {
@@ -2329,12 +2373,13 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
       long double yp =
           gases[i].getBoil() /
           (373. * ((log((pressure) + 0.001) / -5050.5) + (1.0 / 373.0)));
-      // cout << planet_id << endl;
-      // cout << gases[i].getName() << " boiling point: " << yp << endl;
+      // std::cout << planet_id << std::endl;
+      // std::cout << gases[i].getName() << " boiling point: " << yp << std::endl;
       if (((yp >= 0 && yp < the_planet->getLowTemp()) ||
            is_gas_planet(the_planet)) &&
           (gases[i].getWeight() >= the_planet->getMolecWeight())) {
-        // Use helper functions to calculate gas-specific retention factors
+
+        // Calculate gas-specific retention factors
         GasRetentionFactors factors;
         long double base_abundance = gases[i].getAbunds();
 
@@ -2354,22 +2399,25 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
                                                base_abundance, pressure);
         }
 
+        // Calculate final gas amount using retention factors
         amount[i] = calculate_gas_amount(gases[i], the_planet, the_sun, factors, 1.0);
 
-        // cout << toString(amount[i]) <<  " " << toString(vrms) << " " <<
-        // toString(pvrms) << " " << toString(abund) << " " << toString(react)
-        // << " " << toString(fract) << " " << toString(pres2) << endl;
-
+        // Debug output for verbose mode
         if (flag_verbose & 0x4000 &&
             (gases[i].getSymbol() == "O" || gases[i].getSymbol() == "N" ||
              gases[i].getSymbol() == "Ar" || gases[i].getSymbol() == "He" ||
              gases[i].getSymbol() == "CO2")) {
-          cerr << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
+          long double vrms = rms_vel(gases[i].getWeight(), the_planet->getExosphericTemp());
+          long double pvrms = std::pow(1.0 / (1.0 + vrms / the_planet->getEscVelocity()),
+                                       the_sun.getAge() / 1e9);
+          long double fract = 1.0 - (the_planet->getMolecWeight() / gases[i].getWeight());
+
+          std::cerr << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
                << " " << gases[i].getSymbol() << ", " << toString(amount[i])
-               << " = a " << toString(factors.abundance)
-               << " * r " << toString(factors.reactivity)
-               << " * p2 " << toString(factors.pressure_factor)
-               << " * f " << toString(factors.retention_fraction) << "\t("
+               << " = a " << toString(factors.abundance) << " * p " << toString(pvrms)
+               << " * r " << toString(factors.reactivity) << " * p2 "
+               << toString(factors.pressure_factor)
+               << " * f " << toString(fract) << "\t("
                << toString(100.0 *
                            (the_planet->getGasMass() / the_planet->getMass()))
                << "%)\n";
@@ -2379,26 +2427,28 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
         if (amount[i] > 0.0) {
           n++;
         } else {
-          /*cout << planet_id << endl;
-          cout << "No " << gases[i].getName() << endl;
-          cout << "abund: " << abund << endl;
-          cout << "pvrms: " << pvrms << endl;
-          cout << "react: " << react << endl;
-          cout << "fract: " << fract << endl;*/
+          /*std::cout << planet_id << std::endl;
+          std::cout << "No " << gases[i].getName() << std::endl;
+          std::cout << "abund: " << abund << std::endl;
+          std::cout << "pvrms: " << pvrms << std::endl;
+          std::cout << "react: " << react << std::endl;
+          std::cout << "fract: " << fract << std::endl;*/
         }
       } else {
         amount[i] = 0.0;
       }
     }
 
-    // Apply habitability constraints and assign final gas amounts
+    // Adjust gas amounts for potentially habitable planets to meet IPP constraints
     if (n > 0) {
+      // Generate planet ID for debugging if not provided
       if (planet_id == "" && is_potentialy_habitable(the_planet)) {
         std::stringstream ss;
         ss << toString(the_planet->getA()) << " " << toString(the_planet->getMoonA());
         planet_id = ss.str();
       }
 
+      // Adjust gases to meet habitability constraints
       adjust_gases_for_habitability(the_planet, amount, totalamount, planet_id);
 
       // Assign final gas amounts to planet atmosphere
@@ -2410,33 +2460,26 @@ void calculate_gases(sun &the_sun, planet *the_planet, string planet_id) {
                                     amount[i] / totalamount);
           the_planet->addGas(substance);
 
+          // Check for oxygen poisoning in verbose mode
           if (flag_verbose & 0x2000) {
             if ((the_planet->getGas(n).getNum() == AN_O) &&
                 inspired_partial_pressure(
                     the_planet->getSurfPressure(),
                     the_planet->getGas(n).getSurfPressure()) >
                     gases[i].getMaxIpp()) {
-              cerr << planet_id << "\t Poisoned by O2\n";
+              std::cerr << planet_id << "\t Poisoned by O2\n";
             }
           }
+          n++;
         }
-        n++;
       }
     }
     delete[] amount;
-    /*if (the_planet->getNumGases() == 0 && temp_vector.size() > 0)
-    {
-      for (int i = 0; i < temp_vector.size(); i++)
-      {
-        the_planet->addGas(temp_vector[i]);
-      }
-      temp_vector.clear();
-    }*/
 
+    // Validate atmosphere
     if (the_planet->getNumGases() && (the_planet->getSurfPressure() /
                                       EARTH_SURF_PRES_IN_MILLIBARS) > 0.001) {
-      // cerr << "We have a serious air! The atmosphere of " << planet_id << "
-      // contains no gases!\n";
+      // Atmosphere successfully generated
     }
   }
 }
@@ -2648,7 +2691,7 @@ auto calcOblateness(planet *the_planet) -> long double {
     equatorial_radius_in_cm = the_planet->getRadius() * CM_PER_KM;
     k2 = calculate_moment_of_inertia_coeffient(the_planet);
     while (the_planet->getDay() == 0) {
-      cerr << "Error! The day is 0 hours long!\n";
+      std::cerr << "Error! The day is 0 hours long!\n";
       exit(EXIT_FAILURE);
     }
     ang_velocity =
@@ -2780,13 +2823,13 @@ auto is_potentialy_habitable_optimistic_size(planet *the_planet) -> bool {
 
 auto is_potentialy_habitable_optimistic(planet *the_planet) -> bool {
   sun the_sun = the_planet->getTheSun();
-  string spec_type = the_sun.getSpecType();
+  std::string spec_type = the_sun.getSpecType();
   if (compare_string_char(spec_type, 1, "?")) {
     the_planet->setTheSun(the_sun_clone);
     the_sun = the_planet->getTheSun();
     spec_type = the_sun.getSpecType();
   }
-  string star_type = getStarType(spec_type);
+  std::string star_type = getStarType(spec_type);
   if (the_sun.getMass() <
       0.3)  // the Plantary Habitablity Laboratory feels that stars less that it
             // is very unlikey 0.3 solar masses due to the tidal heating planets
@@ -2851,7 +2894,7 @@ auto calcRelHumidity(planet *the_planet) -> long double {
   }
 }
 
-auto getPlantLifeAlbedo(const string& star_type, long double luminosity) -> long double {
+auto getPlantLifeAlbedo(const std::string& star_type, long double luminosity) -> long double {
   int num = star_type_to_num(star_type, luminosity);
 
   if (num >= 31 && num <= 33) {
@@ -2882,10 +2925,10 @@ auto calcFlux(long double temperature, long double wavelength) -> long double {
   long double fifth = third / fourth;
   long double sixth = exp(fifth);
   long double seventh = sixth - 1.0;
-  // cout << toString(wavelength) << ": " << toString(first) << " " <<
+  // std::cout << toString(wavelength) << ": " << toString(first) << " " <<
   // toString(second) << " " << toString(third) << " " << toString(fourth) << "
   // " << toString(fifth) << " " << toString(sixth) << " " << toString(seventh)
-  // << endl;
+  // << std::endl;
   return (first / second) * (1.0 / seventh);
 }
 
@@ -3000,37 +3043,37 @@ auto planet_radius_helper(long double planet_mass, long double mass1,
   bool show_debug = false;
 
   if (mass1 != 0.0 && radius1 == 0.0) {
-    cout << "invalid radius for " << mass1 << endl;
+    std::cout << "invalid radius for " << mass1 << std::endl;
     show_debug = true;
   } else if (mass2 != 0.0 && radius2 == 0.0) {
-    cout << "invalid radius for " << mass2 << endl;
+    std::cout << "invalid radius for " << mass2 << std::endl;
     show_debug = true;
   } else if (mass3 != 0.0 && radius3 == 0.0) {
-    cout << "invalid radius for " << mass3 << endl;
+    std::cout << "invalid radius for " << mass3 << std::endl;
     show_debug = true;
   }
   if (show_debug) {
-    cout << endl;
-    cout << "Please send an email to omega13a@yahoo.com of this problem with "
+    std::cout << std::endl;
+    std::cout << "Please send an email to omega13a@yahoo.com of this problem with "
             "the following debug info: "
-         << endl;
-    cout << "Input was:\n";
-    cout << "planet_mass = " << planet_mass << endl;
-    cout << "mass1 = " << to_string((long double)mass1) << endl;
-    cout << "radius1 = " << to_string((long double)radius1) << endl;
-    cout << "mass2 = " << to_string((long double)mass2) << endl;
-    cout << "radius2 = " << to_string((long double)radius2) << endl;
-    cout << "mass3 = " << to_string((long double)mass3) << endl;
-    cout << "radius3 = " << to_string((long double)radius3) << endl;
+         << std::endl;
+    std::cout << "Input was:\n";
+    std::cout << "planet_mass = " << planet_mass << std::endl;
+    std::cout << "mass1 = " << to_string((long double)mass1) << std::endl;
+    std::cout << "radius1 = " << to_string((long double)radius1) << std::endl;
+    std::cout << "mass2 = " << to_string((long double)mass2) << std::endl;
+    std::cout << "radius2 = " << to_string((long double)radius2) << std::endl;
+    std::cout << "mass3 = " << to_string((long double)mass3) << std::endl;
+    std::cout << "radius3 = " << to_string((long double)radius3) << std::endl;
     exit(EXIT_FAILURE);
   }
   long double radius = 0.0;
   long double a = 0.0;
   long double b = 0.0;
   long double c = 0.0;
-  map<long double, long double> cache_name;
+  std::map<long double, long double> cache_name;
   long double coeff[3];
-  vector<long double> coeff_cache;
+  std::vector<long double> coeff_cache;
   if (use_cache) {
     cache_name[mass1] = radius1;
     cache_name[mass2] = radius2;
@@ -3109,11 +3152,11 @@ auto is_potentialy_habitable_conservative_size(planet *the_planet) -> bool {
 
 auto is_potentialy_habitable_conservative(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_optimistic(the_planet)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
     // potentionally habitable by optimistic\n";
     return false;
   } else if (!is_potentialy_habitable_conservative_size(the_planet)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
     // conservative size\n";
     return false;
   } else if (the_planet->getA() <
@@ -3124,7 +3167,7 @@ auto is_potentialy_habitable_conservative(planet *the_planet) -> bool {
                  habitable_zone_distance(
                      the_sun_clone, MAXIMUM_GREENHOUSE,
                      the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong
     // distance for extended\n";
     return false;
   }
@@ -3133,11 +3176,11 @@ auto is_potentialy_habitable_conservative(planet *the_planet) -> bool {
 
 auto is_habitable_conservative(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_conservative(the_planet)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
     // potentionally habitable by conservative\n";
     return false;
   } else if (breathability(the_planet) != BREATHABLE) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
     // breathable for conservative\n";
     return false;
   }
@@ -3156,9 +3199,9 @@ auto is_potentialy_habitable_extended_size(planet *the_planet) -> bool {
 
 auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
   sun the_sun = the_planet->getTheSun();
-  string star_type = the_sun.getSpecType();
+  std::string star_type = the_sun.getSpecType();
   if (!is_potentialy_habitable_extended_size(the_planet)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not extended
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not extended
     // size\n";
     return false;
   } else if (the_sun.getMass() <
@@ -3167,7 +3210,7 @@ auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
                    // heating planets would expirence before their orbits
                    // stablize.
   {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": too small a
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": too small a
     // star for extended\n";
     return false;
   } else if (star_type == "O")  // Types O, B, and A don't live long enough to
@@ -3176,21 +3219,21 @@ auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
 								// to encourage science fantasy planets. ;) )
 								// ~ PlutonianEmpire
   {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong star
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong star
     // for extended\n";
     return false;
   } else if (fabs(the_planet->getHzc()) >
              1.0)  // The planet can't have too much iron or too much water or
                    // gas making up its mass.
   {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong
     // composition for extended\n";
     return false;
   } else if (fabs(the_planet->getHza()) >
              1.0)  // The planet can't have the potential of having a too thick
                    // or too thin atmosphere.
   {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": potential for
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": potential for
     // too thick or thin an atmosphere for extended\n";
     return false;
   } else if (the_planet->getA() <
@@ -3201,7 +3244,7 @@ auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
                  habitable_zone_distance(
                      the_sun_clone, TWO_AU_CLOUD_LIMIT,
                      the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": wrong
     // distance for extended\n";
     return false;
   }
@@ -3210,11 +3253,11 @@ auto is_potentialy_habitable_extended(planet *the_planet) -> bool {
 
 auto is_habitable_extended(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_extended(the_planet)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
     // potentionally extended\n";
     return false;
   } else if (breathability(the_planet) != BREATHABLE) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
     // breathable for extended\n";
     return false;
   }
@@ -3223,15 +3266,15 @@ auto is_habitable_extended(planet *the_planet) -> bool {
 
 auto is_potentialy_habitable_earth_like(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_conservative(the_planet)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
     // potentionally habitable by conservative\n";
     return false;
   } else if (!is_earth_like_size(the_planet)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": not
     // earth-like size\n";
     return false;
   } else if (the_planet->getEsi() < 0.8) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": too low esi
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": too low esi
     // for earth-like\n";
     return false;
   }
@@ -3240,11 +3283,11 @@ auto is_potentialy_habitable_earth_like(planet *the_planet) -> bool {
 
 auto is_habitable_earth_like(planet *the_planet) -> bool {
   if (!is_potentialy_habitable_earth_like(the_planet)) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
     // potentialy earth-like\n";
     return false;
   } else if (breathability(the_planet) != BREATHABLE) {
-    // cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
+    // std::cout << flag_seed << "-" << the_planet->getPlanetNo() << ": Not
     // breathable for earth-like\n";
     return false;
   }
@@ -3279,14 +3322,14 @@ auto is_habitable(planet *the_planet) -> bool {
 
 auto convert_km_to_eu(long double km) -> long double { return km / KM_EARTH_RADIUS; }
 
-void makeHabitable(sun &the_sun, planet *the_planet, const string& planet_id,
+void makeHabitable(sun &the_sun, planet *the_planet, const std::string& planet_id,
                    bool is_moon, bool do_gases) {
-  // cout << planet_id << " " << the_planet->getA() << endl;
+  // std::cout << planet_id << " " << the_planet->getA() << std::endl;
   if (!is_gas_planet(the_planet) && is_potentialy_habitable(the_planet) &&
       the_planet->getMinTemp() < the_planet->getBoilPoint() &&
       (the_planet->getSurfPressure() < (1.2 * MIN_O2_IPP) ||
        the_planet->getSurfPressure() > MAX_HABITABLE_PRESSURE)) {
-    // cout << "test3 " << planet_id << endl;
+    // std::cout << "test3 " << planet_id << std::endl;
     the_planet->setSurfPressure(calcPhlPressure(the_planet) *
                                 EARTH_SURF_PRES_IN_MILLIBARS);
     while (the_planet->getSurfPressure() > 6000) {
@@ -3297,8 +3340,8 @@ void makeHabitable(sun &the_sun, planet *the_planet, const string& planet_id,
       the_planet->clearGases();
       calculate_gases(the_sun, the_planet, planet_id);
     }
-    // cout << "test4 " << planet_id << endl;
+    // std::cout << "test4 " << planet_id << std::endl;
     assign_type(the_sun, the_planet, planet_id, is_moon, do_gases, true);
-    // cout << "test5 " << planet_id << endl;
+    // std::cout << "test5 " << planet_id << std::endl;
   }
 }
