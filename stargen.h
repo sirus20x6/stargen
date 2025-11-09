@@ -7,6 +7,7 @@ class accrete;
 class Config;
 class SimulationContext;
 class RandomContext;
+class StarGenerator;
 
 #ifdef macintosh
 #define SUBDIR "html"
@@ -64,10 +65,14 @@ using actions = enum actions {  // Callable StarGen can:
   aListVerbosity,               //  - List values of the -v option
 };
 
-// Global instances for configuration, simulation state, and RNG
-extern Config g_config;
-extern SimulationContext g_sim_context;
-extern RandomContext g_random_context;
+// Global StarGenerator instance - encapsulates configuration, simulation state, and RNG
+// TODO: Eventually this should be passed as a parameter instead of being global
+extern StarGenerator g_generator;
+
+// Legacy global references for backward compatibility (deprecated)
+extern Config& g_config;
+extern SimulationContext& g_sim_context;
+extern RandomContext& g_random_context;
 
 // Backward-compatible references to global instances
 extern int& flags_arg_clone;

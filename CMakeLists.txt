@@ -79,6 +79,7 @@ add_executable(stargen
     ring_universe.cpp
     solid_radius_helpers.cpp
     solstation.cpp
+    StarGenerator.cpp
     stargen.cpp
     star_temps.cpp
     star_trek.cpp

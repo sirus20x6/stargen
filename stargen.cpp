@@ -13,18 +13,25 @@
 #include "Config.h"    // for Config
 #include "SimulationContext.h"  // for SimulationContext
 #include "RandomContext.h"  // for RandomContext
+#include "StarGenerator.h"  // for StarGenerator
 
-// Global instances for configuration, simulation state, and RNG
-Config g_config;
-SimulationContext g_sim_context;
-RandomContext g_random_context;
+// Global StarGenerator instance - encapsulates config, simulation state, and RNG
+// TODO: This will eventually be passed as a parameter instead of being global
+StarGenerator g_generator;
+
+// Legacy global references for backward compatibility
+Config& g_config = g_generator.config;
+SimulationContext& g_sim_context = g_generator.sim_context;
+RandomContext& g_random_context = g_generator.random_context;
 
 // Initialize Config defaults
 void initConfig() {
-    g_config.dust_density_ratio = DUST_DENSITY_COEFF;
-    g_config.max_age = 10.0E9;
-    g_config.max_age_backup = 10.0E9;
-    g_sim_context.dust_density_coeff = DUST_DENSITY_COEFF;
+    // Initialization now handled by StarGenerator constructor
+    // Keep this function for backward compatibility
+    g_generator.config.dust_density_ratio = DUST_DENSITY_COEFF;
+    g_generator.config.max_age = 10.0E9;
+    g_generator.config.max_age_backup = 10.0E9;
+    g_generator.sim_context.dust_density_coeff = DUST_DENSITY_COEFF;
 }
 
 // Legacy global references - these now point to Config members for compatibility

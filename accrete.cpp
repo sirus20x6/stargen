@@ -10,9 +10,6 @@
 #include "utils.h"    // for toString, random_eccentricity, random_number
 #include "RandomContext.h"  // for RandomContext
 
-extern RandomContext g_random_context;
-
-
 /**
  * @brief Destructor for accrete class - ensures all allocated memory is freed
  */
