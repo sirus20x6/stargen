@@ -499,13 +499,10 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
   }
 
   // Determine if we can use parallel execution
-  // NOTE: Parallel mode currently disabled due to memory management issues
-  // TODO: Debug double-free error in planet cleanup between accrete and SimulationContext
   // Parallel mode is only safe for simple cases: fixed star, no catalogs, no special modes
-  bool can_use_parallel = false;  // Temporarily disabled - memory issue to resolve
-  // bool can_use_parallel = (num_threads > 1) && (system_count > 1) && !do_catalog &&
-  //                         (sys_no_arg == 0) && !use_solar_system && !reuse_solar_system &&
-  //                         (out_format == ffHTML || out_format == ffTEXT || out_format == ffSVG);
+  bool can_use_parallel = (num_threads > 1) && (system_count > 1) && !do_catalog &&
+                          (sys_no_arg == 0) && !use_solar_system && !reuse_solar_system &&
+                          (out_format == ffHTML || out_format == ffTEXT || out_format == ffSVG);
 
   if (can_use_parallel && num_threads > system_count) {
     num_threads = system_count;  // Don't use more threads than systems

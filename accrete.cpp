@@ -73,6 +73,10 @@ void accrete::set_initial_conditions(long double inner_limit_of_dust,
   hist->planets = planet_head;
   hist->next = hist_head;
   hist_head = hist;
+
+  // Transfer ownership: planets are now owned by history, prevent double-free
+  planet_head = nullptr;
+
   ZoneScoped;
 }
 
@@ -959,7 +963,11 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
     // std::cout << "test 3\n";
   }
   ZoneScoped;
-  return planet_head;
+
+  // Transfer ownership to caller - prevent double-free in destructor
+  planet *result = planet_head;
+  planet_head = nullptr;
+  return result;
 }
 
 /**
