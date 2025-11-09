@@ -2677,6 +2677,10 @@ auto calcOblateness(planet *the_planet) -> long double {
   long double k2 = 0;
   long double ang_velocity = 0;
   if (is_gas_planet(the_planet)) {
+    if (the_planet->getDay() == 0) {
+      // Day length not yet calculated - return 0 oblateness as placeholder
+      return 0.0;
+    }
     mass_in_eu = the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES;
     if (the_planet->getType() == tSubGasGiant ||
         the_planet->getType() == tSubSubGasGiant) {
@@ -2690,9 +2694,10 @@ auto calcOblateness(planet *the_planet) -> long double {
     planetary_mass_in_grams = the_planet->getMass() * SOLAR_MASS_IN_GRAMS;
     equatorial_radius_in_cm = the_planet->getRadius() * CM_PER_KM;
     k2 = calculate_moment_of_inertia_coeffient(the_planet);
-    while (the_planet->getDay() == 0) {
-      std::cerr << "Error! The day is 0 hours long!\n";
-      exit(EXIT_FAILURE);
+    if (the_planet->getDay() == 0) {
+      // Day length not yet calculated - return 0 oblateness as placeholder
+      // This can happen if calcOblateness() is called before day length is set
+      return 0.0;
     }
     ang_velocity =
         RADIANS_PER_ROTATION / (SECONDS_PER_HOUR * the_planet->getDay());

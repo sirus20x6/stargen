@@ -1363,6 +1363,10 @@ auto planet::getOblateness() -> long double {
 
   if (type == tBrownDwarf || type == tGasGiant || type == tSubGasGiant ||
       type == tSubSubGasGiant) {
+    if (day == 0) {
+      // Day length not yet calculated - return 0 oblateness as placeholder
+      return 0.0;
+    }
     mass_in_eu = (dustMass + gasMass) * SUN_MASS_IN_EARTH_MASSES;
     if (type == tSubGasGiant || type == tSubSubGasGiant) {
       multiplier = 4.94E-12;
@@ -1374,9 +1378,10 @@ auto planet::getOblateness() -> long double {
     planetary_mass_in_grams = getMass() * SOLAR_MASS_IN_GRAMS;
     equatorial_radius_in_cm = radius * CM_PER_KM;
     k2 = calculate_moment_of_inertia_coeffient(the_planet);
-    while (day == 0) {
-      std::cerr << "Error! The day is 0 hours long!\n";
-      exit(EXIT_FAILURE);
+    if (day == 0) {
+      // Day length not yet calculated - return 0 oblateness as placeholder
+      // This can happen if getOblateness() is called before setDay()
+      return 0.0;
     }
     ang_velocity = RADIANS_PER_ROTATION / (SECONDS_PER_HOUR * day);
     result = calcOblateness_improved(ang_velocity, planetary_mass_in_grams,
