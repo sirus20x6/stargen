@@ -678,7 +678,7 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     type_count = 0;
     // std::cout << index << "\n";
     the_sun_clone = the_sun;
-    generate_stellar_system(the_sun, use_seed_system, seed_planets, flag_char,
+    generate_stellar_system(&g_generator, the_sun, use_seed_system, seed_planets, flag_char,
                             sys_no, system_name, inner_dust_limit, outer_limit,
                             ecc_coef_arg, inner_planet_factor_arg, do_gases,
                             do_moons, myAccreteObject);
@@ -867,7 +867,7 @@ int system_counter = 0;
  * @param do_moons 
  * @param myAccreteObject 
  */
-void generate_stellar_system(sun &the_sun, bool use_seed_system,
+void generate_stellar_system(StarGenerator* gen, sun &the_sun, bool use_seed_system,
                              planet *seed_system, const std::string& flag_char, int sys_no,
                              const std::string& system_name, long double inner_dust_limit,
                              long double outer_planet_limit,
@@ -938,7 +938,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
     the_sun.setAge(random_number(min_age, max_age));
   }
   // std::cout << "test" << system_counter << "\n";
-  generate_planets(the_sun, !use_seed_system, flag_char, sys_no,
+  generate_planets(gen, the_sun, !use_seed_system, flag_char, sys_no,
                    system_name, do_gases, do_moons);
 
   // Build planet vector for efficient iteration (replacing linked list traversal)
@@ -958,7 +958,7 @@ void generate_stellar_system(sun &the_sun, bool use_seed_system,
  * @param do_gases 
  * @param do_moons 
  */
-void generate_planets(sun &the_sun, bool random_tilt, const std::string &flag_char,
+void generate_planets(StarGenerator* gen, sun &the_sun, bool random_tilt, const std::string &flag_char,
                       int sys_no, const std::string &system_name, bool do_gases,
                       bool do_moons) {
     do_gases = (flags_arg_clone & fDoGases) != 0;
@@ -984,10 +984,10 @@ void generate_planets(sun &the_sun, bool random_tilt, const std::string &flag_ch
     }
 
     if (!the_sun.getIsCircumbinary()) {
-      generate_planet(the_planet, planet_no, the_sun, random_tilt, planet_id,
+      generate_planet(gen, the_planet, planet_no, the_sun, random_tilt, planet_id,
                       do_gases, do_moons, false, the_sun.getMass());
     } else {
-      generate_planet(the_planet, planet_no, the_sun, random_tilt, planet_id,
+      generate_planet(gen, the_planet, planet_no, the_sun, random_tilt, planet_id,
                       do_gases, do_moons, false, the_sun.getCombinedMass());
     }
 
@@ -1187,7 +1187,7 @@ static bool check_moon_collision(planet *the_planet, long double distance,
   return false;  // No collision
 }
 
-static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
+static void generate_moons(StarGenerator* gen, planet *the_planet, int planet_no, sun &the_sun,
                           bool random_tilt, const std::string &planet_id,
                           bool do_gases, bool do_moons, bool is_moon) {
   if (!do_moons || is_moon) {
@@ -1324,7 +1324,7 @@ static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
           ptr->setOrbPeriod(
               period(ptr->getMoonA(), ptr->getMass(), the_planet->getMass()));
           ptr->setType(tUnknown);
-          generate_planet(ptr, n, the_sun, random_tilt, moon_id, do_gases,
+          generate_planet(gen, ptr, n, the_sun, random_tilt, moon_id, do_gases,
                           do_moons, true, the_planet->getMass());
 
           if ((flag_verbose & 0x40000) != 0) {
@@ -1567,7 +1567,7 @@ static void generate_moons(planet *the_planet, int planet_no, sun &the_sun,
         }
       } else {
         attempts = 0;
-        generate_planet(new_moon, n, the_sun, random_tilt, moon_id, do_gases,
+        generate_planet(gen, new_moon, n, the_sun, random_tilt, moon_id, do_gases,
                         do_moons, true, the_planet->getMass());
         if (tmp != nullptr) {
           tmp->next_planet = new_moon;
@@ -1724,7 +1724,7 @@ static void finalize_rocky_planet_properties(planet *the_planet, sun &the_sun,
  * @param is_moon
  * @param parent_mass
  */
-void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
+void generate_planet(StarGenerator* gen, planet *the_planet, int planet_no, sun &the_sun,
                      bool random_tilt, const std::string &planet_id, bool do_gases,
                      bool do_moons, bool is_moon, long double parent_mass) {
     do_gases = (flags_arg_clone & fDoGases) != 0;
@@ -1856,7 +1856,7 @@ void generate_planet(planet *the_planet, int planet_no, sun &the_sun,
   the_planet->setSph(calcSph(the_planet));
 
   // Generate moons for this planet (if not a moon itself)
-  generate_moons(the_planet, planet_no, the_sun, random_tilt, planet_id,
+  generate_moons(gen, the_planet, planet_no, the_sun, random_tilt, planet_id,
                  do_gases, do_moons, is_moon);
 
   ZoneScoped;

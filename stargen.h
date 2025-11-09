@@ -140,16 +140,16 @@ extern long double& max_potential_mass;
 extern std::string stargen_revision;
 
 void init();
-void generate_planet(planet* /*the_planet*/, int /*planet_no*/,
+void generate_planet(StarGenerator* gen, planet* /*the_planet*/, int /*planet_no*/,
                      sun& /*the_sun*/, bool /*random_tilt*/,
                      const std::string& /*planet_id*/, bool /*do_gases*/,
                      bool /*do_moons*/, bool /*is_moon*/,
                      long double /*parent_mass*/);
-void generate_planets(sun& /*the_sun*/, bool /*random_tilt*/,
+void generate_planets(StarGenerator* gen, sun& /*the_sun*/, bool /*random_tilt*/,
                       const std::string& /*flag_char*/, int /*sys_no*/,
                       const std::string& /*system_name*/, bool /*do_gases*/,
                       bool /*do_moons*/);
-void generate_stellar_system(sun &the_sun, bool use_seed_system,
+void generate_stellar_system(StarGenerator* gen, sun &the_sun, bool use_seed_system,
                              planet *seed_system, const std::string& flag_char, int sys_no,
                              const std::string& system_name, long double inner_dust_limit,
                              long double outer_planet_limit,
