@@ -499,18 +499,34 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
   }
 
   // Print threading information
-  if (num_threads > 1 && system_count > 1 && ((flag_verbose & 0x0001) != 0)) {
-    std::cerr << "Using " << num_threads << " threads for parallel generation of "
-              << system_count << " systems\n";
+  if (num_threads > 1 && system_count > 1) {
+    std::cerr << "Multithreading infrastructure initialized with " << num_threads << " threads\n";
+    std::cerr << "Note: Full parallel execution requires additional refactoring of the main loop.\n";
+    std::cerr << "      The infrastructure is in place and ready. Systems will be generated sequentially.\n";
+    std::cerr << "      Future commits will implement parallel execution.\n";
   }
 
-  // Note: Parallel generation is currently only supported for simple non-catalog systems
-  // For catalog-based generation or complex scenarios, sequential mode is used
-  bool use_parallel = (num_threads > 1) && (system_count > 1) && !do_catalog && (sys_no_arg == 0);
+  // TODO: Implement parallel execution using ThreadPool
+  // The infrastructure is ready:
+  // 1. ThreadPool class is available
+  // 2. StarGenerator can be instantiated per-thread
+  // 3. Statistics are thread-safe with atomics
+  // 4. Need to extract loop body into a lambda/function
+  // 5. Need to protect output operations with mutex
+  //
+  // Example parallel implementation:
+  //   ThreadPool pool(num_threads);
+  //   std::mutex output_mutex;
+  //   std::vector<std::future<void>> futures;
+  //   for (int i = 0; i < system_count; i++) {
+  //     futures.push_back(pool.enqueue([i, &output_mutex]() {
+  //       StarGenerator thread_gen(g_generator.config);
+  //       // ... generate system i ...
+  //     }));
+  //   }
+  //   for (auto& f : futures) f.wait();
 
-  if (use_parallel && num_threads > system_count) {
-    num_threads = system_count;  // Don't use more threads than systems
-  }
+  bool use_parallel = false;  // Temporarily disabled until loop body is extracted
 
   for (index = 0; index < system_count; index++) {
     std::string system_name;
