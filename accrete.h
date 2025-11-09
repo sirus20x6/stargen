@@ -7,6 +7,7 @@ class dust;
 class gen;
 class planet;
 class sun;
+class RandomContext;
 
 class accrete {
 
@@ -16,12 +17,14 @@ class accrete {
 
         void free_generations();
         void reset(); // Reset state for object pool reuse
+        void setRandomContext(RandomContext* ctx) { random_ctx = ctx; }
         auto stellar_dust_limit(long double) -> long double;
         auto dist_planetary_masses(sun &, long double, long double, long double,
                             long double, long double, long double, planet *,
                             bool) -> planet *;
 
     private:
+        RandomContext* random_ctx = nullptr;  // Random context for this accrete instance
 
     /* Now for some variables global to the accretion process:	    */
     bool dust_left;

@@ -565,6 +565,7 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
           acc->reset();
 
           gen->random_context.setSeed(seed_arg + (sys_index * seed_increment));
+          acc->setRandomContext(&gen->random_context);
 
           // Create sun object (lightweight)
           sun thread_sun;
@@ -576,10 +577,8 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
           thread_sun.setEffTemp(temp_arg);
           thread_sun.setSpecType(type_arg);
 
-          // Generate system name
-          std::stringstream ss;
-          ss << prognam << " " << (seed_arg + sys_index * seed_increment);
-          std::string sys_name = ss.str();
+          // Generate system name (optimized - avoid stringstream allocation)
+          std::string sys_name = prognam + " " + std::to_string(seed_arg + sys_index * seed_increment);
           thread_sun.setName(sys_name);
 
           // Generate the stellar system
@@ -802,6 +801,13 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     type_count = 0;
     // std::cout << index << "\n";
     the_sun_clone = the_sun;
+
+    // Reset generator and accrete for clean state (matches parallel path)
+    g_generator.reset();
+    myAccreteObject.reset();
+    g_generator.random_context.setSeed(flag_seed + (index * seed_increment));
+    myAccreteObject.setRandomContext(&g_generator.random_context);
+
     generate_stellar_system(&g_generator, the_sun, use_seed_system, seed_planets, flag_char,
                             sys_no, system_name, inner_dust_limit, outer_limit,
                             ecc_coef_arg, inner_planet_factor_arg, do_gases,

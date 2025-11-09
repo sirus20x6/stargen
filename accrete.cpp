@@ -896,7 +896,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
             new_e = random_eccentricity(ecc_coef);
           }
           if (total_mass >= ((0.7 * JUPITER_MASS) / SUN_MASS_IN_EARTH_MASSES)) {
-            if (g_random_context.randInt(14) == 0 && min_distance < 0.2) {
+            if (random_ctx->randInt(14) == 0 && min_distance < 0.2) {
               new_a = random_number(min_distance, 0.2);
               new_e = random_eccentricity(ecc_coef);
               for (int i = 0;(calcPerihelion(new_a, new_e) < min_distance) && (i < 1000); i++) {
@@ -904,7 +904,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
                 new_e = random_eccentricity(ecc_coef);
               }
             }
-            if (g_random_context.randInt(10) == 0 &&
+            if (random_ctx->randInt(10) == 0 &&
                 calcPerihelion(new_a, 0.1) > min_distance) {
               while (new_e < 0.1) {
                 new_e = random_eccentricity(0.25);
@@ -918,7 +918,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
                      total_mass <= (10.0 / SUN_MASS_IN_EARTH_MASSES) &&
                      a >= (4.0 * sqrt(stell_luminosity_ratio)) &&
                      (dust_mass / total_mass) >= 0.75) {
-            if (g_random_context.randInt(4) == 0) {
+            if (random_ctx->randInt(4) == 0) {
               new_a = random_number(min_distance, a / 2.0);
               new_e = random_eccentricity(ecc_coef);
               for (int i = 0;calcPerihelion(new_a, new_e) < planet_inner_bound && i < 1000;i++) {
@@ -1043,8 +1043,9 @@ void accrete::reset() {
     seed_moons = nullptr;
   }
 
-  // Clear dust bands
+  // Clear dust bands and preallocate capacity
   dust_bands.clear();
+  dust_bands.reserve(32);  // Preallocate for typical accretion (prevents reallocations)
 
   // Reset state variables to defaults
   dust_left = false;
