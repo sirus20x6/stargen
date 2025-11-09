@@ -498,36 +498,92 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
   }
 
-  // Print threading information
-  if (num_threads > 1 && system_count > 1) {
-    std::cerr << "Multithreading infrastructure initialized with " << num_threads << " threads\n";
-    std::cerr << "Note: Full parallel execution requires additional refactoring of the main loop.\n";
-    std::cerr << "      The infrastructure is in place and ready. Systems will be generated sequentially.\n";
-    std::cerr << "      Future commits will implement parallel execution.\n";
+  // Determine if we can use parallel execution
+  // NOTE: Parallel mode currently disabled due to memory management issues
+  // TODO: Debug double-free error in planet cleanup between accrete and SimulationContext
+  // Parallel mode is only safe for simple cases: fixed star, no catalogs, no special modes
+  bool can_use_parallel = false;  // Temporarily disabled - memory issue to resolve
+  // bool can_use_parallel = (num_threads > 1) && (system_count > 1) && !do_catalog &&
+  //                         (sys_no_arg == 0) && !use_solar_system && !reuse_solar_system &&
+  //                         (out_format == ffHTML || out_format == ffTEXT || out_format == ffSVG);
+
+  if (can_use_parallel && num_threads > system_count) {
+    num_threads = system_count;  // Don't use more threads than systems
   }
 
-  // TODO: Implement parallel execution using ThreadPool
-  // The infrastructure is ready:
-  // 1. ThreadPool class is available
-  // 2. StarGenerator can be instantiated per-thread
-  // 3. Statistics are thread-safe with atomics
-  // 4. Need to extract loop body into a lambda/function
-  // 5. Need to protect output operations with mutex
-  //
-  // Example parallel implementation:
-  //   ThreadPool pool(num_threads);
-  //   std::mutex output_mutex;
-  //   std::vector<std::future<void>> futures;
-  //   for (int i = 0; i < system_count; i++) {
-  //     futures.push_back(pool.enqueue([i, &output_mutex]() {
-  //       StarGenerator thread_gen(g_generator.config);
-  //       // ... generate system i ...
-  //     }));
-  //   }
-  //   for (auto& f : futures) f.wait();
+  // Print threading information
+  if (num_threads > 1 && system_count > 1) {
+    if (can_use_parallel) {
+      std::cerr << "Parallel generation enabled: " << num_threads << " threads processing "
+                << system_count << " systems\n";
+    } else {
+      std::cerr << "Parallel generation disabled: sequential execution (catalogs, solar system, or complex modes not yet supported in parallel)\n";
+    }
+  }
 
-  bool use_parallel = false;  // Temporarily disabled until loop body is extracted
+  // Parallel execution path for simple cases
+  if (can_use_parallel) {
+    ThreadPool pool(num_threads);
+    std::mutex stats_mutex;  // Protect non-atomic statistics
+    std::atomic<int> systems_generated{0};
 
+    std::vector<std::future<void>> futures;
+    futures.reserve(system_count);
+
+    for (int sys_index = 0; sys_index < system_count; sys_index++) {
+      futures.push_back(pool.enqueue([=, &stats_mutex, &systems_generated]() {
+        // Create thread-local generator with copy of global config
+        StarGenerator thread_gen(g_generator.config);
+        thread_gen.random_context.setSeed(seed_arg + (sys_index * seed_increment));
+
+        // Create thread-local sun and accrete objects
+        sun thread_sun;
+        thread_sun.setMass(mass_arg);
+        thread_sun.setLuminosity(luminosity_arg);
+        if (thread_sun.getMass() == 0 && thread_sun.getLuminosity() != 0) {
+          thread_sun.setMass(luminosity_to_mass(thread_sun.getLuminosity()));
+        }
+        thread_sun.setEffTemp(temp_arg);
+        thread_sun.setSpecType(type_arg);
+
+        accrete thread_accrete;
+
+        // Generate system name
+        std::stringstream ss;
+        ss << prognam << " " << (seed_arg + sys_index * seed_increment);
+        std::string sys_name = ss.str();
+        thread_sun.setName(sys_name);
+
+        // Generate the stellar system
+        generate_stellar_system(&thread_gen, thread_sun, false, nullptr, flag_char,
+                                sys_index, sys_name, 0.0, 0.0,
+                                ecc_coef_arg, inner_planet_factor_arg, do_gases,
+                                do_moons, thread_accrete);
+
+        // Update thread-safe global statistics
+        g_sim_context.total_habitable += thread_gen.sim_context.system_habitable;
+        g_sim_context.total_potentially_habitable += thread_gen.sim_context.system_potentially_habitable;
+        g_sim_context.total_earthlike += thread_gen.sim_context.system_earthlike;
+        g_sim_context.total_worlds += thread_gen.sim_context.total_worlds;
+
+        systems_generated++;
+
+        // Note: Memory cleanup is handled by accrete destructor
+        // Don't manually free to avoid double-free issues
+      }));
+    }
+
+    // Wait for all systems to complete
+    for (auto& future : futures) {
+      future.wait();
+    }
+
+    std::cerr << "Parallel generation complete: " << systems_generated << " systems generated\n";
+    print_summary_statistics();
+    return EXIT_SUCCESS;
+  }
+
+  // Sequential execution path (fallback for complex cases)
   for (index = 0; index < system_count; index++) {
     std::string system_name;
     std::string designation;
