@@ -3,8 +3,6 @@
 #include <iosfwd>     // for std
 #include "structs.h"  // for catalog
 
-using namespace std;
-
 extern catalog andromeda;
 
 void initAndromeda();

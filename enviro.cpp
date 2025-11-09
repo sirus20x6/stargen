@@ -188,13 +188,13 @@ std::string eff_temp_to_spec_type(long double eff_temp, long double luminosity) 
             if (eff_temp > temp) {
                 long double prev_temp = (i > 0) ? temp_classes[i-1].first : 200000; // Assuming 200000 as max temp
                 int subclass = floor(10.0 - 10.0 * (eff_temp - temp) / (prev_temp - temp));
-                return class_name + to_string(max(0, min(9, subclass)));
+                return class_name + std::to_string(std::max(0, std::min(9, subclass)));
             }
         }
         return std::string("Y9");
     };
 
-    std::string spec_class = eff_temp > 52000 ? "WN" + to_string(min(9, max(0, int(10 - 10 * (eff_temp - 52000) / 148000))))
+    std::string spec_class = eff_temp > 52000 ? "WN" + std::to_string(std::min(9, std::max(0, int(10 - 10 * (eff_temp - 52000) / 148000))))
                                          : get_spec_class();
 
     if (luminosity == 0) luminosity = 1e-7;
@@ -1244,7 +1244,7 @@ void iterate_surface_temp(planet *the_planet, bool do_gasses) {
   }
 
   if (flag_verbose & 0x0040) {
-    std::cerr << endl
+    std::cerr << std::endl
          << "Gas lifetimes: H2 - " << toString(h2_life) << ", H2O - "
          << toString(h2o_life) << ", N - " << toString(n_life) << ", N2 - "
          << toString(n2_life) << std::endl;
@@ -3059,12 +3059,12 @@ auto planet_radius_helper(long double planet_mass, long double mass1,
          << std::endl;
     std::cout << "Input was:\n";
     std::cout << "planet_mass = " << planet_mass << std::endl;
-    std::cout << "mass1 = " << to_string((long double)mass1) << std::endl;
-    std::cout << "radius1 = " << to_string((long double)radius1) << std::endl;
-    std::cout << "mass2 = " << to_string((long double)mass2) << std::endl;
-    std::cout << "radius2 = " << to_string((long double)radius2) << std::endl;
-    std::cout << "mass3 = " << to_string((long double)mass3) << std::endl;
-    std::cout << "radius3 = " << to_string((long double)radius3) << std::endl;
+    std::cout << "mass1 = " << std::to_string((long double)mass1) << std::endl;
+    std::cout << "radius1 = " << std::to_string((long double)radius1) << std::endl;
+    std::cout << "mass2 = " << std::to_string((long double)mass2) << std::endl;
+    std::cout << "radius2 = " << std::to_string((long double)radius2) << std::endl;
+    std::cout << "mass3 = " << std::to_string((long double)mass3) << std::endl;
+    std::cout << "radius3 = " << std::to_string((long double)radius3) << std::endl;
     exit(EXIT_FAILURE);
   }
   long double radius = 0.0;

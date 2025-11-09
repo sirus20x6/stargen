@@ -2,8 +2,6 @@
 #define RADIUS_TABLES_H
 #include <map>
 
-using namespace std;
-
 extern std::map<int, long double> gas_300Myr_1960K_0core_mass;
 extern std::map<int, long double> gas_300Myr_1960K_10core_mass;
 extern std::map<int, long double> gas_300Myr_1960K_25core_mass;

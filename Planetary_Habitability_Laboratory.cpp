@@ -2,8 +2,6 @@
 #include "const.h"
 #include "planets.h"
 
-using namespace std;
-
 catalog phl;
 
 void initPlanetaryHabitabilityLaboratory()

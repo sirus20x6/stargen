@@ -6,8 +6,6 @@
 #include <yaml-cpp/yaml.h> // for YAML parsing
 #include <fstream>
 
-using namespace std;
-
 ChemTable gases;
 
 void loadElementsFromYAML(const std::string& filename) {
