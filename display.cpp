@@ -1787,19 +1787,20 @@ void html_thumbnail_totals(std::fstream& the_file) {
     the_file << std::vformat(row_template, std::make_format_args(BGTABLE, label, value));
   };
 
-  add_row("Earthlike worlds", total_earthlike);
-  add_row("Total Habitable worlds (Earth-like Definition)", total_habitable_earthlike);
-  add_row("Total Habitable worlds (Conservative Definition)", total_habitable_conservative);
-  add_row("Total Habitable worlds (Optimistic Definition)", total_habitable_optimistic);
-  add_row("Total Habitable worlds (Extended Definition)", total_habitable);
+  // Load atomic values for formatting
+  add_row("Earthlike worlds", g_sim_context.total_earthlike.load());
+  add_row("Total Habitable worlds (Earth-like Definition)", g_sim_context.total_habitable_earthlike.load());
+  add_row("Total Habitable worlds (Conservative Definition)", g_sim_context.total_habitable_conservative.load());
+  add_row("Total Habitable worlds (Optimistic Definition)", g_sim_context.total_habitable_optimistic.load());
+  add_row("Total Habitable worlds (Extended Definition)", g_sim_context.total_habitable.load());
   add_row("Total Potentially Habitable worlds (Earth-like Definition)",
-          total_potentially_habitable_earthlike);
+          g_sim_context.total_potentially_habitable_earthlike.load());
   add_row("Total Potentially Habitable worlds (Conservative Definition)",
-          total_potentially_habitable_conservative);
+          g_sim_context.total_potentially_habitable_conservative.load());
   add_row("Total Potentially Habitable worlds (Optimistic Definition)",
-          total_potentially_habitable_optimistic);
-  add_row("Total Potentially Habitable worlds (Extended Definition)", total_potentially_habitable);
-  add_row("Total worlds", total_worlds);
+          g_sim_context.total_potentially_habitable_optimistic.load());
+  add_row("Total Potentially Habitable worlds (Extended Definition)", g_sim_context.total_potentially_habitable.load());
+  add_row("Total worlds", g_sim_context.total_worlds.load());
 
   add_row("Habitable mass range",
           std::format("{:.2f} EM - {:.2f} EM", min_breathable_mass * SUN_MASS_IN_EARTH_MASSES,

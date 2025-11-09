@@ -53,17 +53,10 @@ planet*& innermost_planet = g_sim_context.innermost_planet;
 long double& dust_density_coeff = g_sim_context.dust_density_coeff;
 long& system_seed = g_sim_context.current_system_seed;
 
-// Global statistics - now point to SimulationContext members
-int& total_earthlike = g_sim_context.total_earthlike;
-int& total_habitable = g_sim_context.total_habitable;
-int& total_worlds = g_sim_context.total_worlds;
-int& total_habitable_earthlike = g_sim_context.total_habitable_earthlike;
-int& total_habitable_conservative = g_sim_context.total_habitable_conservative;
-int& total_habitable_optimistic = g_sim_context.total_habitable_optimistic;
-int& total_potentially_habitable = g_sim_context.total_potentially_habitable;
-int& total_potentially_habitable_earthlike = g_sim_context.total_potentially_habitable_earthlike;
-int& total_potentially_habitable_conservative = g_sim_context.total_potentially_habitable_conservative;
-int& total_potentially_habitable_optimistic = g_sim_context.total_potentially_habitable_optimistic;
+// Global statistics - now atomic types in SimulationContext
+// NOTE: Can't create references to atomics - access g_sim_context.total_* directly
+// Removed: int& g_sim_context.total_earthlike, g_sim_context.total_habitable, etc.
+// Use: g_sim_context.g_sim_context.total_earthlike++, g_sim_context.g_sim_context.total_habitable.load(), etc.
 
 // Per-system statistics - now point to SimulationContext members
 int& earthlike = g_sim_context.system_earthlike;
@@ -291,8 +284,8 @@ static auto should_output_system(bool only_habitable, bool only_multi_habitable,
  */
 static void print_summary_statistics() {
   if (((flag_verbose & 0x0001) != 0) || ((flag_verbose & 0x0002) != 0)) {
-    std::cerr << "Earthlike planets: " << total_earthlike << "\n";
-    std::cerr << "Breathable atmospheres: " << total_habitable << "\n";
+    std::cerr << "Earthlike planets: " << g_sim_context.total_earthlike << "\n";
+    std::cerr << "Breathable atmospheres: " << g_sim_context.total_habitable << "\n";
     std::cerr << "Breathable g range: " << toString(min_breathable_g) << " - "
          << toString(max_breathable_g) << "\n";
     std::cerr << "Terrestrial g range: " << toString(min_breathable_terrestrial_g)
@@ -713,9 +706,9 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
            << "]\n";
     }
 
-    total_habitable += habitable;
-    total_potentially_habitable += potential_habitable;
-    total_earthlike += earthlike;
+    g_sim_context.total_habitable += habitable;
+    g_sim_context.total_potentially_habitable += potential_habitable;
+    g_sim_context.total_earthlike += earthlike;
     if (should_output_system(only_habitable, only_multi_habitable, only_jovian_habitable,
                             only_earthlike, only_three_habitable, only_superterrans,
                             only_potential_habitable, habitable, habitable_jovians,
@@ -1966,7 +1959,7 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
   // habitable_zone_distance(the_planet->getTheSun(), RECENT_VENUS) &&
   // the_planet->getA() < habitable_zone_distance(the_planet->getTheSun(),
   // EARLY_MARS))
-  total_worlds++;
+  g_sim_context.total_worlds++;
   if (is_habitable(the_planet)) {
     bool list_it = false;
     long double illumination = calcLuminosity(the_planet);
@@ -1974,14 +1967,14 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
     habitable++;
 
     if (is_habitable_earth_like(the_planet)) {
-      total_habitable_earthlike++;
-      total_habitable_conservative++;
-      total_habitable_optimistic++;
+      g_sim_context.total_habitable_earthlike++;
+      g_sim_context.total_habitable_conservative++;
+      g_sim_context.total_habitable_optimistic++;
     } else if (is_habitable_conservative(the_planet)) {
-      total_habitable_conservative++;
-      total_habitable_optimistic++;
+      g_sim_context.total_habitable_conservative++;
+      g_sim_context.total_habitable_optimistic++;
     } else if (is_habitable_optimistic(the_planet)) {
-      total_habitable_optimistic++;
+      g_sim_context.total_habitable_optimistic++;
     }
 
     if (((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) >= 5.0 &&
@@ -2009,14 +2002,14 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
     long double illumination = calcLuminosity(the_planet);
 
     if (is_potentialy_habitable_earth_like(the_planet)) {
-      total_potentially_habitable_earthlike++;
-      total_potentially_habitable_conservative++;
-      total_potentially_habitable_optimistic++;
+      g_sim_context.total_potentially_habitable_earthlike++;
+      g_sim_context.total_potentially_habitable_conservative++;
+      g_sim_context.total_potentially_habitable_optimistic++;
     } else if (is_potentialy_habitable_conservative(the_planet)) {
-      total_potentially_habitable_conservative++;
-      total_potentially_habitable_optimistic++;
+      g_sim_context.total_potentially_habitable_conservative++;
+      g_sim_context.total_potentially_habitable_optimistic++;
     } else if (is_potentialy_habitable_optimistic(the_planet)) {
-      total_potentially_habitable_optimistic++;
+      g_sim_context.total_potentially_habitable_optimistic++;
     }
 
     // Update potentially habitable planet statistics
