@@ -110,7 +110,7 @@ auto is_habitable_earth_like(planet *) -> bool;
 auto is_potentialy_habitable(planet *) -> bool;
 auto is_habitable(planet *) -> bool;
 auto convert_km_to_eu(long double) -> long double;
-void makeHabitable(sun &, planet *, const std::string&, bool, bool);
+void makeHabitable(StarGenerator*, sun &, planet *, const std::string&, bool, bool);
 
 template <typename Key, typename T>
 void radiusDebug(const std::string &text, planet *the_planet,

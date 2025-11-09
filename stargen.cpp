@@ -874,9 +874,9 @@ void generate_stellar_system(StarGenerator* gen, sun &the_sun, bool use_seed_sys
                              long double ecc_coef,
                              long double inner_planet_factor, bool do_gases,
                              bool do_moons, accrete &myAccreteObject) {
-  do_gases = (flags_arg_clone & fDoGases) != 0;
-  do_moons = (flags_arg_clone & fDoMoons) != 0;
-  system_counter++;
+  do_gases = (gen->config.flags & fDoGases) != 0;
+  do_moons = (gen->config.flags & fDoMoons) != 0;
+  gen->sim_context.system_counter++;
   long double outer_dust_limit = NAN;
 
   if (!the_sun.getIsCircumbinary()) {
@@ -899,50 +899,50 @@ void generate_stellar_system(StarGenerator* gen, sun &the_sun, bool use_seed_sys
   if (the_sun.getEffTemp() == 0) {
     the_sun.setEffTemp(spec_type_to_eff_temp(the_sun.getSpecType()));
   }
-  max_age = max_age_backup;
+  gen->config.max_age = gen->config.max_age_backup;
   if (use_seed_system) {
-    innermost_planet = seed_system;
+    gen->sim_context.innermost_planet = seed_system;
 
     long double max_age_of_star = the_sun.getLife();
     if (max_age_of_star > 10E9) {
       max_age_of_star = 10E9;
     }
-    if (max_age > max_age_of_star) {
-      max_age = max_age_of_star;
+    if (gen->config.max_age > max_age_of_star) {
+      gen->config.max_age = max_age_of_star;
     }
-    if (min_age > max_age_of_star) {
-      min_age = max_age_of_star;
+    if (gen->config.min_age > max_age_of_star) {
+      gen->config.min_age = max_age_of_star;
     }
     // std::cout << min_age << " " << max_age << "\n";
-    the_sun.setAge(random_number(min_age, max_age));
+    the_sun.setAge(random_number(gen->config.min_age, gen->config.max_age));
   } else {
     long double max_age_of_star = the_sun.getLife();
     if (max_age_of_star > 10E9) {
       max_age_of_star = 10E9;
     }
-    if (max_age > max_age_of_star) {
-      max_age = max_age_of_star;
+    if (gen->config.max_age > max_age_of_star) {
+      gen->config.max_age = max_age_of_star;
     }
-    if (min_age > max_age_of_star) {
-      min_age = max_age_of_star;
+    if (gen->config.min_age > max_age_of_star) {
+      gen->config.min_age = max_age_of_star;
     }
     // std::cout << min_age << " " << max_age << "\n";
-    innermost_planet =
+    gen->sim_context.innermost_planet =
         myAccreteObject.dist_planetary_masses(the_sun, inner_dust_limit, outer_dust_limit,
-                              outer_planet_limit, dust_density_coeff, ecc_coef,
+                              outer_planet_limit, gen->sim_context.dust_density_coeff, ecc_coef,
                               inner_planet_factor, seed_system, do_moons);
-    if (innermost_planet == nullptr) {
+    if (gen->sim_context.innermost_planet == nullptr) {
       // Failed to generate planets (e.g., zero stellar mass)
       return;
     }
-    the_sun.setAge(random_number(min_age, max_age));
+    the_sun.setAge(random_number(gen->config.min_age, gen->config.max_age));
   }
   // std::cout << "test" << system_counter << "\n";
   generate_planets(gen, the_sun, !use_seed_system, flag_char, sys_no,
                    system_name, do_gases, do_moons);
 
   // Build planet vector for efficient iteration (replacing linked list traversal)
-  g_sim_context.buildPlanetVector();
+  gen->sim_context.buildPlanetVector();
 
   ZoneScoped;
 }
@@ -961,19 +961,19 @@ void generate_stellar_system(StarGenerator* gen, sun &the_sun, bool use_seed_sys
 void generate_planets(StarGenerator* gen, sun &the_sun, bool random_tilt, const std::string &flag_char,
                       int sys_no, const std::string &system_name, bool do_gases,
                       bool do_moons) {
-    do_gases = (flags_arg_clone & fDoGases) != 0;
-  do_moons = (flags_arg_clone & fDoMoons) != 0;
+    do_gases = (gen->config.flags & fDoGases) != 0;
+  do_moons = (gen->config.flags & fDoMoons) != 0;
   planet *the_planet = nullptr;
   int planet_no = 1;
   planet *moon = nullptr;
   int moons = 0;
 
-  for (planet* the_planet : g_sim_context.planets) {
+  for (planet* the_planet : gen->sim_context.planets) {
     std::string planet_id;
     std::stringstream ss;
 
     ss.str("");
-    ss << system_name << " (-s" << toString(flag_seed) << " -" << flag_char
+    ss << system_name << " (-s" << toString(gen->random_context.seed) << " -" << flag_char
        << toString(sys_no) << ") " << toString(planet_no);
     planet_id = ss.str();
     // std::cout << planet_id << "\n";
@@ -991,7 +991,7 @@ void generate_planets(StarGenerator* gen, sun &the_sun, bool random_tilt, const 
                       do_gases, do_moons, false, the_sun.getCombinedMass());
     }
 
-    check_planet(the_planet, planet_id, false);
+    check_planet(gen, the_planet, planet_id, false);
 
     if (do_moons) {
       moons = 1;
@@ -1002,7 +1002,7 @@ void generate_planets(StarGenerator* gen, sun &the_sun, bool random_tilt, const 
         ss << planet_id << "-" << toString(moons);
         moon_id = ss.str();
 
-        check_planet(moon, moon_id, true);
+        check_planet(gen, moon, moon_id, true);
         moons++;
       }
     }
@@ -1644,7 +1644,7 @@ static void generate_moons(StarGenerator* gen, planet *the_planet, int planet_no
               tmp->clearGases();
               calculate_gases(the_sun, tmp, moon_id);
             }
-            assign_type(the_sun, tmp, moon_id, true, do_gases, false);
+            assign_type(gen, the_sun, tmp, moon_id, true, do_gases, false);
           }
         }
 
@@ -1667,7 +1667,7 @@ static void generate_moons(StarGenerator* gen, planet *the_planet, int planet_no
  * @param is_moon Whether this is a moon
  * @param the_fudged_radius Fudged radius for calculations
  */
-static void finalize_rocky_planet_properties(planet *the_planet, sun &the_sun,
+static void finalize_rocky_planet_properties(StarGenerator* gen, planet *the_planet, sun &the_sun,
                                             const std::string &planet_id, bool do_gases,
                                             bool is_moon, long double the_fudged_radius) {
   the_planet->setEstimatedTemp(est_temp(
@@ -1708,7 +1708,7 @@ static void finalize_rocky_planet_properties(planet *the_planet, sun &the_sun,
     calculate_gases(the_sun, the_planet, planet_id);
   }
 
-  assign_type(the_sun, the_planet, planet_id, is_moon, do_gases, false);
+  assign_type(gen, the_sun, the_planet, planet_id, is_moon, do_gases, false);
 }
 
 /**
@@ -1727,15 +1727,15 @@ static void finalize_rocky_planet_properties(planet *the_planet, sun &the_sun,
 void generate_planet(StarGenerator* gen, planet *the_planet, int planet_no, sun &the_sun,
                      bool random_tilt, const std::string &planet_id, bool do_gases,
                      bool do_moons, bool is_moon, long double parent_mass) {
-    do_gases = (flags_arg_clone & fDoGases) != 0;
-  do_moons = (flags_arg_clone & fDoMoons) != 0;
+    do_gases = (gen->config.flags & fDoGases) != 0;
+  do_moons = (gen->config.flags & fDoMoons) != 0;
   long double tmp = NAN;
   long double ecc_coef = 0.077;
   long double lambda = NAN;
   long double the_fudged_radius = 0.0;
 
   if (do_moons && !is_moon) {
-    srandf(system_seed + (1000 * planet_no));
+    srandf(gen->sim_context.current_system_seed + (1000 * planet_no));
   }
 
   the_planet->setTheSun(the_sun);
@@ -1846,7 +1846,7 @@ void generate_planet(StarGenerator* gen, planet *the_planet, int planet_no, sun 
     finalize_gas_giant_properties(the_planet, the_sun, planet_id, do_gases,
                                   force_gas_giant, parent_mass, is_moon);
   } else {
-    finalize_rocky_planet_properties(the_planet, the_sun, planet_id, do_gases,
+    finalize_rocky_planet_properties(gen, the_planet, the_sun, planet_id, do_gases,
                                      is_moon, the_fudged_radius);
   }
 
@@ -1949,16 +1949,16 @@ static void log_planet_info(planet* the_planet, const std::string& planet_id, lo
 /**
  * @brief Check planet and update statistics
  */
-void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon) {
+void check_planet(StarGenerator* gen, planet *the_planet, const std::string &planet_id, bool is_moon) {
   int tIndex = 0;
 
   tIndex = the_planet->getType();
 
-  if (type_counts[tIndex] == 0) {
-    ++type_count;
+  if (gen->sim_context.type_counts[tIndex] == 0) {
+    ++gen->sim_context.type_count;
   }
 
-  ++type_counts[tIndex];
+  ++gen->sim_context.type_counts[tIndex];
 
   unsigned int breathe = 0;
 
@@ -1966,37 +1966,37 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
   // habitable_zone_distance(the_planet->getTheSun(), RECENT_VENUS) &&
   // the_planet->getA() < habitable_zone_distance(the_planet->getTheSun(),
   // EARLY_MARS))
-  g_sim_context.total_worlds++;
+  gen->sim_context.total_worlds++;
   if (is_habitable(the_planet)) {
     bool list_it = false;
     long double illumination = calcLuminosity(the_planet);
 
-    habitable++;
+    gen->sim_context.system_habitable++;
 
     if (is_habitable_earth_like(the_planet)) {
-      g_sim_context.total_habitable_earthlike++;
-      g_sim_context.total_habitable_conservative++;
-      g_sim_context.total_habitable_optimistic++;
+      gen->sim_context.total_habitable_earthlike++;
+      gen->sim_context.total_habitable_conservative++;
+      gen->sim_context.total_habitable_optimistic++;
     } else if (is_habitable_conservative(the_planet)) {
-      g_sim_context.total_habitable_conservative++;
-      g_sim_context.total_habitable_optimistic++;
+      gen->sim_context.total_habitable_conservative++;
+      gen->sim_context.total_habitable_optimistic++;
     } else if (is_habitable_optimistic(the_planet)) {
-      g_sim_context.total_habitable_optimistic++;
+      gen->sim_context.total_habitable_optimistic++;
     }
 
     if (((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) >= 5.0 &&
          (the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) < 10.0) ||
         (convert_km_to_eu(the_planet->getRadius()) >= 1.5 &&
          convert_km_to_eu(the_planet->getRadius()) <= 2.5)) {
-      habitable_superterrans++;
+      gen->sim_context.system_habitable_superterrans++;
     }
 
     // Update breathable planet statistics
-    if (update_breathable_statistics(the_planet, illumination) && ((flag_verbose & 0x0002) != 0)) {
+    if (update_breathable_statistics(the_planet, illumination) && ((gen->config.verbose_level & 0x0002) != 0)) {
       list_it = true;
     }
 
-    if ((flag_verbose & 0x0004) != 0) {
+    if ((gen->config.verbose_level & 0x0004) != 0) {
       list_it = true;
     }
 
@@ -2004,27 +2004,27 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
       log_planet_info(the_planet, planet_id, illumination);
     }
   } else if (is_potentialy_habitable(the_planet)) {
-    potential_habitable++;
+    gen->sim_context.system_potentially_habitable++;
     bool list_it = false;
     long double illumination = calcLuminosity(the_planet);
 
     if (is_potentialy_habitable_earth_like(the_planet)) {
-      g_sim_context.total_potentially_habitable_earthlike++;
-      g_sim_context.total_potentially_habitable_conservative++;
-      g_sim_context.total_potentially_habitable_optimistic++;
+      gen->sim_context.total_potentially_habitable_earthlike++;
+      gen->sim_context.total_potentially_habitable_conservative++;
+      gen->sim_context.total_potentially_habitable_optimistic++;
     } else if (is_potentialy_habitable_conservative(the_planet)) {
-      g_sim_context.total_potentially_habitable_conservative++;
-      g_sim_context.total_potentially_habitable_optimistic++;
+      gen->sim_context.total_potentially_habitable_conservative++;
+      gen->sim_context.total_potentially_habitable_optimistic++;
     } else if (is_potentialy_habitable_optimistic(the_planet)) {
-      g_sim_context.total_potentially_habitable_optimistic++;
+      gen->sim_context.total_potentially_habitable_optimistic++;
     }
 
     // Update potentially habitable planet statistics
-    if (update_potential_statistics(the_planet, illumination) && ((flag_verbose & 0x0002) != 0)) {
+    if (update_potential_statistics(the_planet, illumination) && ((gen->config.verbose_level & 0x0002) != 0)) {
       list_it = true;
     }
 
-    if ((flag_verbose & 0x0004) != 0) {
+    if ((gen->config.verbose_level & 0x0004) != 0) {
       list_it = true;
     }
 
@@ -2033,10 +2033,10 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
     }
   }
 
-  if (is_moon && max_moon_mass < the_planet->getMass()) {
-    max_moon_mass = the_planet->getMass();
+  if (is_moon && gen->sim_context.system_max_moon_mass < the_planet->getMass()) {
+    gen->sim_context.system_max_moon_mass = the_planet->getMass();
 
-    if ((flag_verbose & 0x0002) != 0) {
+    if ((gen->config.verbose_level & 0x0002) != 0) {
       std::cerr << type_string(the_planet)
            << "\tp=" << toString(the_planet->getSurfPressure()) << "\tm="
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
@@ -2046,7 +2046,7 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
     }
   }
 
-  if (((flag_verbose & 0x0800) != 0) &&
+  if (((gen->config.verbose_level & 0x0800) != 0) &&
       (the_planet->getDustMass() * SUN_MASS_IN_EARTH_MASSES) >= 0.0006 &&
       (the_planet->getGasMass() * SUN_MASS_IN_EARTH_MASSES) >= 0.0006 &&
       the_planet->getType() != tGasGiant &&
@@ -2076,25 +2076,25 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
   breathe = breathability(the_planet);
 
   if (is_earth_like(the_planet)) {
-    earthlike++;
+    gen->sim_context.system_earthlike++;
 
-    if ((flag_verbose & 0x0008) != 0) {
+    if ((gen->config.verbose_level & 0x0008) != 0) {
       std::cerr << type_string(the_planet)
            << "\tp=" << toString(the_planet->getSurfPressure()) << "\tm="
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
            << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
            << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN) << "\t"
-           << habitable << " " << planet_id << "\tEarth-like\n";
+           << gen->sim_context.system_habitable << " " << planet_id << "\tEarth-like\n";
     }
   } else if (breathe == BREATHABLE && gravity > 1.3 && rel_temp < -2.0 &&
-             ice < 10.0 && habitable > 1) {
-    if ((flag_verbose & 0x0008) != 0) {
+             ice < 10.0 && gen->sim_context.system_habitable > 1) {
+    if ((gen->config.verbose_level & 0x0008) != 0) {
       std::cerr << type_string(the_planet)
            << "\tp=" << toString(the_planet->getSurfPressure()) << "\tm="
            << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)
            << "\tg=" << toString(the_planet->getSurfGrav()) << "\tt="
            << toString(the_planet->getSurfTemp() - EARTH_AVERAGE_KELVIN) << "\t"
-           << habitable << " " << planet_id << "\tSphinx-like\n";
+           << gen->sim_context.system_habitable << " " << planet_id << "\tSphinx-like\n";
     }
   }
   ZoneScoped;
@@ -2110,7 +2110,7 @@ void check_planet(planet *the_planet, const std::string &planet_id, bool is_moon
  * @param do_gases 
  * @param second_time 
  */
-void assign_type(sun &the_sun, planet *the_planet, const std::string &planet_id,
+void assign_type(StarGenerator* gen, sun &the_sun, planet *the_planet, const std::string &planet_id,
                  bool is_moon, bool do_gases, bool second_time) {
     if (the_planet->getSurfPressure() < 1.0) {
     if (the_planet->getRadius() < round_threshold(the_planet->getDensity())) {
@@ -2139,7 +2139,7 @@ void assign_type(sun &the_sun, planet *the_planet, const std::string &planet_id,
         !is_moon) {
       the_planet->setType(t1Face);
       if (!second_time) {
-        makeHabitable(the_sun, the_planet, planet_id, is_moon, do_gases);
+        makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
     } else if (the_planet->getImf() >= 0.05 &&
                the_planet->getHydrosphere() == 0.0) {
@@ -2151,7 +2151,7 @@ void assign_type(sun &the_sun, planet *the_planet, const std::string &planet_id,
       }*/
       the_planet->setHydrosphere(0.0);
       if (!second_time) {
-        makeHabitable(the_sun, the_planet, planet_id, is_moon, do_gases);
+        makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
     } else if (the_planet->getHydrosphere() >=
                0.8)  // In Star Trek, any planet that is 80% covered with water,
@@ -2163,7 +2163,7 @@ void assign_type(sun &the_sun, planet *the_planet, const std::string &planet_id,
         the_planet->setType(tWater);
       }
       if (!second_time) {
-        makeHabitable(the_sun, the_planet, planet_id, is_moon, do_gases);
+        makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
     } else if (the_planet->getIceCover() >=
                0.8)  // In Star Trek, any planet that is 80% covered with ice,
@@ -2171,7 +2171,7 @@ void assign_type(sun &the_sun, planet *the_planet, const std::string &planet_id,
     {
       the_planet->setType(tIce);
       if (!second_time) {
-        makeHabitable(the_sun, the_planet, planet_id, is_moon, do_gases);
+        makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
     } else if (the_planet->getHydrosphere() >= 0.05) {
       if (the_planet->getCmf() >= 0.75) {
@@ -2180,37 +2180,37 @@ void assign_type(sun &the_sun, planet *the_planet, const std::string &planet_id,
         the_planet->setType(tTerrestrial);
       }
       if (!second_time) {
-        makeHabitable(the_sun, the_planet, planet_id, is_moon, do_gases);
+        makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
     } else if (the_planet->getSurfTemp() > the_planet->getBoilPoint()) {
       the_planet->setType(tVenusian);
       if (!second_time) {
-        makeHabitable(the_sun, the_planet, planet_id, is_moon, do_gases);
+        makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
     } else if ((the_planet->getGasMass() / the_planet->getMass()) > 0.0001) {
       the_planet->setType(
           tIce);  // Accreted gas but no Greenhouseor or liquid water
       the_planet->setIceCover(1.0);
       if (!second_time) {
-        makeHabitable(the_sun, the_planet, planet_id, is_moon, do_gases);
+        makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
     } else if (the_planet->getSurfPressure() < 250) {
       the_planet->setType(tMartian);
       if (!second_time) {
-        makeHabitable(the_sun, the_planet, planet_id, is_moon, do_gases);
+        makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
     } else if (the_planet->getSurfTemp() < FREEZING_POINT_OF_WATER) {
       the_planet->setType(tIce);
       if (!second_time) {
-        makeHabitable(the_sun, the_planet, planet_id, is_moon, do_gases);
+        makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
     } else {
       the_planet->setType(tUnknown);
       if (!second_time) {
-        makeHabitable(the_sun, the_planet, planet_id, is_moon, do_gases);
+        makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
 
-      if ((flag_verbose & 0x0001) != 0) {
+      if ((gen->config.verbose_level & 0x0001) != 0) {
         std::string one_face_string;
         if (((int)the_planet->getDay() ==
              (int)(the_planet->getOrbPeriod() * 24.0)) ||

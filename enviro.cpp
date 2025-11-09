@@ -3322,7 +3322,7 @@ auto is_habitable(planet *the_planet) -> bool {
 
 auto convert_km_to_eu(long double km) -> long double { return km / KM_EARTH_RADIUS; }
 
-void makeHabitable(sun &the_sun, planet *the_planet, const std::string& planet_id,
+void makeHabitable(StarGenerator* gen, sun &the_sun, planet *the_planet, const std::string& planet_id,
                    bool is_moon, bool do_gases) {
   // std::cout << planet_id << " " << the_planet->getA() << std::endl;
   if (!is_gas_planet(the_planet) && is_potentialy_habitable(the_planet) &&
@@ -3341,7 +3341,7 @@ void makeHabitable(sun &the_sun, planet *the_planet, const std::string& planet_i
       calculate_gases(the_sun, the_planet, planet_id);
     }
     // std::cout << "test4 " << planet_id << std::endl;
-    assign_type(the_sun, the_planet, planet_id, is_moon, do_gases, true);
+    assign_type(gen, the_sun, the_planet, planet_id, is_moon, do_gases, true);
     // std::cout << "test5 " << planet_id << std::endl;
   }
 }

@@ -28,6 +28,7 @@ public:
     std::vector<planet*> moons_cache; // Temporary cache for moon processing
     long double dust_density_coeff = 0.0;  // Dust density coefficient for accretion
     long current_system_seed = 0;  // Seed for current system being generated
+    int system_counter = 0;  // Counter for number of systems generated
 
     // Global/cross-system statistics counters (thread-safe with atomics)
     std::atomic<int> total_earthlike{0};
