@@ -15,6 +15,7 @@
 #include "RandomContext.h"  // for RandomContext
 #include "StarGenerator.h"  // for StarGenerator
 #include "ThreadPool.h"  // for ThreadPool (parallel generation)
+#include "ObjectPool.h"  // for ObjectPool (object reuse)
 #include <mutex>  // for std::mutex (thread-safe output)
 
 // Global StarGenerator instance - encapsulates config, simulation state, and RNG
@@ -518,59 +519,97 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     }
   }
 
-  // Parallel execution path for simple cases
+  // Parallel execution path with work batching for performance
   if (can_use_parallel) {
     ThreadPool pool(num_threads);
-    std::mutex stats_mutex;  // Protect non-atomic statistics
     std::atomic<int> systems_generated{0};
 
+    // Create object pools (one per thread to minimize contention)
+    ObjectPool<StarGenerator> generator_pool(num_threads, [&]() {
+      return new StarGenerator(g_generator.config);
+    });
+
+    ObjectPool<accrete> accrete_pool(num_threads, []() {
+      return new accrete();
+    });
+
+    // Divide work into batches - one batch per thread
+    int systems_per_thread = system_count / num_threads;
+    int remainder = system_count % num_threads;
+
     std::vector<std::future<void>> futures;
-    futures.reserve(system_count);
+    futures.reserve(num_threads);
 
-    for (int sys_index = 0; sys_index < system_count; sys_index++) {
-      futures.push_back(pool.enqueue([=, &stats_mutex, &systems_generated]() {
-        // Create thread-local generator with copy of global config
-        StarGenerator thread_gen(g_generator.config);
-        thread_gen.random_context.setSeed(seed_arg + (sys_index * seed_increment));
+    for (int thread_id = 0; thread_id < num_threads; thread_id++) {
+      // Calculate the range of systems this thread will process
+      int start_index = thread_id * systems_per_thread + std::min(thread_id, remainder);
+      int count = systems_per_thread + (thread_id < remainder ? 1 : 0);
 
-        // Create thread-local sun and accrete objects
-        sun thread_sun;
-        thread_sun.setMass(mass_arg);
-        thread_sun.setLuminosity(luminosity_arg);
-        if (thread_sun.getMass() == 0 && thread_sun.getLuminosity() != 0) {
-          thread_sun.setMass(luminosity_to_mass(thread_sun.getLuminosity()));
+      futures.push_back(pool.enqueue([=, &generator_pool, &accrete_pool, &systems_generated]() {
+        // Acquire objects from pools (one pair per thread)
+        StarGenerator* gen = generator_pool.acquire();
+        accrete* acc = accrete_pool.acquire();
+
+        // Local statistics accumulators (avoid atomic contention)
+        int local_habitable = 0;
+        int local_potentially_habitable = 0;
+        int local_earthlike = 0;
+        int local_worlds = 0;
+
+        // Process all systems assigned to this thread
+        for (int i = 0; i < count; i++) {
+          int sys_index = start_index + i;
+
+          // Reset objects for reuse
+          gen->reset();
+          acc->reset();
+
+          gen->random_context.setSeed(seed_arg + (sys_index * seed_increment));
+
+          // Create sun object (lightweight)
+          sun thread_sun;
+          thread_sun.setMass(mass_arg);
+          thread_sun.setLuminosity(luminosity_arg);
+          if (thread_sun.getMass() == 0 && thread_sun.getLuminosity() != 0) {
+            thread_sun.setMass(luminosity_to_mass(thread_sun.getLuminosity()));
+          }
+          thread_sun.setEffTemp(temp_arg);
+          thread_sun.setSpecType(type_arg);
+
+          // Generate system name
+          std::stringstream ss;
+          ss << prognam << " " << (seed_arg + sys_index * seed_increment);
+          std::string sys_name = ss.str();
+          thread_sun.setName(sys_name);
+
+          // Generate the stellar system
+          generate_stellar_system(gen, thread_sun, false, nullptr, flag_char,
+                                  sys_index, sys_name, 0.0, 0.0,
+                                  ecc_coef_arg, inner_planet_factor_arg, do_gases,
+                                  do_moons, *acc);
+
+          // Accumulate statistics locally
+          local_habitable += gen->sim_context.system_habitable;
+          local_potentially_habitable += gen->sim_context.system_potentially_habitable;
+          local_earthlike += gen->sim_context.system_earthlike;
+          local_worlds += gen->sim_context.total_worlds;
         }
-        thread_sun.setEffTemp(temp_arg);
-        thread_sun.setSpecType(type_arg);
 
-        accrete thread_accrete;
+        // Update global statistics once per thread (not per system)
+        g_sim_context.total_habitable += local_habitable;
+        g_sim_context.total_potentially_habitable += local_potentially_habitable;
+        g_sim_context.total_earthlike += local_earthlike;
+        g_sim_context.total_worlds += local_worlds;
 
-        // Generate system name
-        std::stringstream ss;
-        ss << prognam << " " << (seed_arg + sys_index * seed_increment);
-        std::string sys_name = ss.str();
-        thread_sun.setName(sys_name);
+        systems_generated += count;
 
-        // Generate the stellar system
-        generate_stellar_system(&thread_gen, thread_sun, false, nullptr, flag_char,
-                                sys_index, sys_name, 0.0, 0.0,
-                                ecc_coef_arg, inner_planet_factor_arg, do_gases,
-                                do_moons, thread_accrete);
-
-        // Update thread-safe global statistics
-        g_sim_context.total_habitable += thread_gen.sim_context.system_habitable;
-        g_sim_context.total_potentially_habitable += thread_gen.sim_context.system_potentially_habitable;
-        g_sim_context.total_earthlike += thread_gen.sim_context.system_earthlike;
-        g_sim_context.total_worlds += thread_gen.sim_context.total_worlds;
-
-        systems_generated++;
-
-        // Note: Memory cleanup is handled by accrete destructor
-        // Don't manually free to avoid double-free issues
+        // Return objects to pools
+        generator_pool.release(gen);
+        accrete_pool.release(acc);
       }));
     }
 
-    // Wait for all systems to complete
+    // Wait for all batches to complete
     for (auto& future : futures) {
       future.wait();
     }

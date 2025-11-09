@@ -61,6 +61,14 @@ public:
     void resetSystemStatistics();
 
     /**
+     * @brief Reset generator state for reuse in object pool
+     *
+     * Clears system-specific state while preserving configuration.
+     * Allows safe reuse from object pool.
+     */
+    void reset();
+
+    /**
      * @brief Get reference to configuration (for legacy code)
      */
     Config& getConfig() { return config; }

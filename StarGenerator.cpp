@@ -41,3 +41,14 @@ void StarGenerator::resetAllStatistics() {
 void StarGenerator::resetSystemStatistics() {
     sim_context.resetSystemStatistics();
 }
+
+void StarGenerator::reset() {
+    // Reset system-specific state
+    sim_context.resetSystemStatistics();
+    sim_context.clearPlanets();
+    sim_context.system_counter = 0;
+    sim_context.current_system_seed = 0;
+
+    // Config remains unchanged - set once per pooled object
+    // Global statistics remain unchanged - they accumulate across systems
+}

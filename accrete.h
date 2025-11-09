@@ -15,6 +15,7 @@ class accrete {
         ~accrete(); // Destructor to clean up allocated memory
 
         void free_generations();
+        void reset(); // Reset state for object pool reuse
         auto stellar_dust_limit(long double) -> long double;
         auto dist_planetary_masses(sun &, long double, long double, long double,
                             long double, long double, long double, planet *,

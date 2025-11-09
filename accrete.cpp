@@ -1021,6 +1021,41 @@ void accrete::free_generations() {
 }
 
 /**
+ * @brief Reset accrete state for object pool reuse
+ *
+ * Clears all internal state so the object can be safely reused.
+ */
+void accrete::reset() {
+  // Free any existing data
+  if (hist_head != nullptr) {
+    free_generations();
+    hist_head = nullptr;
+  }
+
+  if (planet_head != nullptr) {
+    // Planet head should be nullptr after update_hist transfer
+    // But check just in case
+    planet_head = nullptr;
+  }
+
+  if (seed_moons != nullptr) {
+    free_planet(seed_moons);
+    seed_moons = nullptr;
+  }
+
+  // Clear dust bands
+  dust_bands.clear();
+
+  // Reset state variables to defaults
+  dust_left = false;
+  r_inner = 0.0;
+  r_outer = 0.0;
+  reduced_mass = 0.0;
+  dust_density = 0.0;
+  cloud_eccentricity = 0.2;
+}
+
+/**
  * @brief is predefined planet helper
  * 
  * @param the_planet 
