@@ -38,6 +38,7 @@ struct CommandLineArgs {
   long int seed_arg = 0;
   int count_arg = 1;
   int increment_arg = 1;
+  int num_threads = 1;  // Number of threads for parallel generation
   catalog star_catalog{};
   int sys_no_arg = 0;
 
@@ -173,6 +174,11 @@ bool parseCommandLine(int argc, char** argv, const std::string& prognam, Command
 
       case 'i':  // Increment
         args.increment_arg = atoi(temp_string.substr(2, temp_string.length() - 2).c_str());
+        break;
+
+      case 'T':  // Number of threads for parallel generation
+        args.num_threads = atoi(temp_string.substr(2, temp_string.length() - 2).c_str());
+        if (args.num_threads < 1) args.num_threads = 1;  // Minimum 1 thread
         break;
 
       case 'x':  // Use solar system
@@ -522,7 +528,8 @@ int main(int argc, char **argv) {
     args.inner_planet_factor_arg,
     args.flags_arg,
     args.out_format,
-    args.graphic_format
+    args.graphic_format,
+    args.num_threads
   );
 }
 

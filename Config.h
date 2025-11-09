@@ -64,6 +64,7 @@ public:
     long random_seed = 0;
     int seed_increment = 1;
     int system_count = 1;
+    int num_threads = 1;  // Number of threads for parallel generation (1 = sequential)
 
     // Flags (bitfield for backward compatibility)
     int flags = 0;

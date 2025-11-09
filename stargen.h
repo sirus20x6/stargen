@@ -164,7 +164,7 @@ auto stargen(actions /*action*/, const std::string& /*flag_char*/, std::string /
              catalog& /*cat_arg*/, int /*sys_no_arg*/,
              long double /*ratio_arg*/, long double /*ecc_coef_arg*/,
              long double /*inner_planet_factor_arg*/, int /*flags_arg*/,
-             int /*out_format*/, int /*graphic_format*/) -> int;
+             int /*out_format*/, int /*graphic_format*/, int /*num_threads*/) -> int;
 void check_planet(StarGenerator* gen, planet* /*the_planet*/, const std::string& /*planet_id*/,
                   bool /*is_moon*/);
 void assign_type(StarGenerator* gen, sun& /*the_sun*/, planet* /*the_planet*/,

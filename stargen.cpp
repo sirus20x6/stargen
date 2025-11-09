@@ -14,6 +14,8 @@
 #include "SimulationContext.h"  // for SimulationContext
 #include "RandomContext.h"  // for RandomContext
 #include "StarGenerator.h"  // for StarGenerator
+#include "ThreadPool.h"  // for ThreadPool (parallel generation)
+#include <mutex>  // for std::mutex (thread-safe output)
 
 // Global StarGenerator instance - encapsulates config, simulation state, and RNG
 // TODO: This will eventually be passed as a parameter instead of being global
@@ -346,7 +348,7 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
              int incr_arg, catalog &cat_arg, int sys_no_arg,
              long double ratio_arg, long double ecc_coef_arg,
              long double inner_planet_factor_arg, int flags_arg, int out_format,
-             int graphic_format) -> int {
+             int graphic_format, int num_threads) -> int {
   sun the_sun;
   long double min_mass = 0.4;
   long double inc_mass = 0.05;
@@ -494,6 +496,20 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     csv_file_name = ss.str();
     openCVSorJson(path, csv_file_name, csv_file);
 
+  }
+
+  // Print threading information
+  if (num_threads > 1 && system_count > 1 && ((flag_verbose & 0x0001) != 0)) {
+    std::cerr << "Using " << num_threads << " threads for parallel generation of "
+              << system_count << " systems\n";
+  }
+
+  // Note: Parallel generation is currently only supported for simple non-catalog systems
+  // For catalog-based generation or complex scenarios, sequential mode is used
+  bool use_parallel = (num_threads > 1) && (system_count > 1) && !do_catalog && (sys_no_arg == 0);
+
+  if (use_parallel && num_threads > system_count) {
+    num_threads = system_count;  // Don't use more threads than systems
   }
 
   for (index = 0; index < system_count; index++) {
