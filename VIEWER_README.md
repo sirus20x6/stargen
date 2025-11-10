@@ -13,23 +13,47 @@ Real-time interactive visualization of generated stellar systems with orbital mo
 - **Top-down orbital view**: View solar systems from above
 - **Planet rendering**: Circles sized and colored by planet type
 - **Orbit paths**: Visual elliptical orbits for each planet
-- **Camera system**:
+- **Basic camera system**:
   - Pan with mouse drag
   - Zoom with mouse wheel
-- **UI overlay**:
+- **Basic UI overlay**:
   - FPS counter
   - Simulation time display
   - Time scale control
   - Control hints
   - Pause/resume indicator
 
+### Phase 2.5: Advanced Camera Features ✅
+- **Follow modes**:
+  - Free mode: Manual camera control
+  - Follow sun: Center on star
+  - Follow planet: Track selected planet automatically
+- **Smooth camera transitions**: Interpolated movement and zoom
+- **Planet selection**:
+  - Click planets to select and follow
+  - Number keys (1-9) for direct selection
+  - F key to cycle through modes
+- **Auto-zoom**: Automatic zoom adjustment when following planets
+- **Visual highlights**: Green outline on followed objects
+
 ## Controls
 
+### Basic Controls
 - **SPACE**: Pause/Resume simulation
 - **+/-** or **Numpad +/-**: Adjust time scale (speed up/slow down)
 - **Mouse Wheel**: Zoom in/out
-- **Left Mouse Drag**: Pan camera
 - **ESC**: Exit viewer
+
+### Camera Controls
+- **Right Mouse Drag**: Pan camera (free mode only)
+- **Left Mouse Click**: Select and follow planet
+- **F**: Cycle camera modes (Free → Follow Sun → Follow Planets → Free)
+- **1-9**: Directly follow planet by number
+
+### Camera Modes
+- **Free Mode**: Manual control with mouse drag
+- **Follow Sun**: Camera centers on the star
+- **Follow Planet**: Camera tracks selected planet with auto-zoom
 
 ## Building
 
@@ -117,9 +141,9 @@ raylib provides:
 - [ ] Background system generation (parallel loading)
 - [ ] ImGui integration for advanced UI
 - [ ] System library (browse multiple systems)
-- [ ] Follow planet camera mode
-- [ ] System information panels
+- [ ] Detailed system information panels
 - [ ] Screenshot/video export
+- [ ] Multiple stellar systems loaded simultaneously
 
 ## Code Structure
 
