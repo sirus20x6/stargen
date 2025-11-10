@@ -3,6 +3,8 @@
 #include <cstdlib>     // for EXIT_SUCCESS, srand, rand
 #include <ctime>       // for time, time_t
 #include <iostream>    // for operator<<, basic_ostream, std::ostream, "\n", stri...
+#include <iomanip>     // for std::setfill, std::setw
+#include <sstream>     // for std::stringstream
 #include "accrete.h"   // for accrete
 #include "const.h"     // for SUN_MASS_IN_EARTH_MASSES, KM_PER_AU, EARTH_AVE...
 #include "display.h"   // for type_string, close_html_file, create_svg_file
@@ -111,6 +113,55 @@ long double& max_potential_mass = g_sim_context.max_potential_mass;
 
 // Version identifier
 std::string stargen_revision = "$Revision: 3.0 $";
+
+/**
+ * @brief Data structure to hold system information for deferred output in parallel mode
+ *
+ * In parallel generation, we need to store planet data until all systems are generated,
+ * then output them. This struct holds all necessary data and maintains ownership of
+ * the generator and accrete objects (which own the planet memory).
+ */
+struct SystemOutputData {
+    // Ownership of generator and accrete (to keep planet data alive)
+    StarGenerator* generator;
+    accrete* accrete_obj;
+
+    // Core system data
+    planet* innermost_planet;
+    sun the_sun;  // Copy of the sun for this system
+
+    // System identification
+    long flag_seed;
+    std::string system_name;
+    std::string file_name;
+    int sys_no;
+
+    // Habitability statistics
+    int habitable;
+    int earthlike;
+    int potential_habitable;
+    int habitable_jovians;
+    int habitable_superterrans;
+
+    // For Celestia output
+    std::string designation;
+    long double sys_inc;
+    long double sys_an;
+
+    // Constructor
+    SystemOutputData(StarGenerator* gen, accrete* acc, planet* planets, const sun& sun_obj,
+                     long seed, const std::string& name, const std::string& fname,
+                     int sysno, int hab, int earth, int pot_hab, int hab_jov, int hab_super)
+        : generator(gen), accrete_obj(acc), innermost_planet(planets), the_sun(sun_obj),
+          flag_seed(seed), system_name(name), file_name(fname), sys_no(sysno),
+          habitable(hab), earthlike(earth), potential_habitable(pot_hab),
+          habitable_jovians(hab_jov), habitable_superterrans(hab_super),
+          sys_inc(0.0), sys_an(0.0) {}
+};
+
+// Thread-safe storage for parallel output
+std::vector<SystemOutputData> g_pending_outputs;
+std::mutex g_output_mutex;
 
 /**
  * @brief Handle aListGases action - list all gases with their properties
@@ -592,6 +643,48 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
           local_potentially_habitable += gen->sim_context.system_potentially_habitable;
           local_earthlike += gen->sim_context.system_earthlike;
           local_worlds += gen->sim_context.total_worlds;
+
+          // Check if this system should be output
+          bool should_output = should_output_system(
+              only_habitable, only_multi_habitable, only_jovian_habitable,
+              only_earthlike, only_three_habitable, only_superterrans,
+              only_potential_habitable,
+              gen->sim_context.system_habitable,
+              gen->sim_context.system_habitable_jovians,
+              gen->sim_context.system_earthlike,
+              gen->sim_context.system_habitable_superterrans,
+              gen->sim_context.system_potentially_habitable);
+
+          if (should_output && gen->sim_context.innermost_planet != nullptr) {
+            // Generate filename for this system
+            std::stringstream fname_ss;
+            fname_ss << prognam << std::setfill('0') << std::setw(4)
+                     << (seed_arg + sys_index * seed_increment);
+            std::string file_name = fname_ss.str();
+
+            // Store system data for later output
+            // Transfer ownership of generator and accrete to SystemOutputData
+            {
+              std::lock_guard<std::mutex> lock(g_output_mutex);
+              g_pending_outputs.emplace_back(
+                  gen, acc,
+                  gen->sim_context.innermost_planet,
+                  thread_sun,  // Pass the sun object
+                  seed_arg + (sys_index * seed_increment),
+                  sys_name,
+                  file_name,
+                  sys_index,
+                  gen->sim_context.system_habitable,
+                  gen->sim_context.system_earthlike,
+                  gen->sim_context.system_potentially_habitable,
+                  gen->sim_context.system_habitable_jovians,
+                  gen->sim_context.system_habitable_superterrans);
+            }
+
+            // Get new objects for next iteration (ownership transferred)
+            gen = generator_pool.acquire();
+            acc = accrete_pool.acquire();
+          }
         }
 
         // Update global statistics once per thread (not per system)
@@ -602,7 +695,7 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
         systems_generated += count;
 
-        // Return objects to pools
+        // Return objects to pools (if not transferred to output)
         generator_pool.release(gen);
         accrete_pool.release(acc);
       }));
@@ -614,6 +707,49 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     }
 
     std::cerr << "Parallel generation complete: " << systems_generated << " systems generated\n";
+
+    // Output phase - process all stored systems
+    std::cerr << "Outputting " << g_pending_outputs.size() << " systems...\n";
+    for (auto& sys_data : g_pending_outputs) {
+      // Temporarily restore globals for output functions
+      planet* saved_innermost = innermost_planet;
+      long saved_seed = flag_seed;
+      sun saved_sun = the_sun_clone;
+
+      innermost_planet = sys_data.innermost_planet;
+      flag_seed = sys_data.flag_seed;
+      the_sun_clone = sys_data.the_sun;
+
+      // Output based on format
+      switch (out_format) {
+        case ffTEXT:
+          text_describe_system(sys_data.innermost_planet, do_gases, sys_data.flag_seed, do_moons);
+          break;
+
+        case ffHTML:
+          // TODO: Implement HTML output
+          break;
+
+        case ffSVG:
+          // TODO: Implement SVG output
+          break;
+
+        default:
+          break;
+      }
+
+      // Restore globals
+      innermost_planet = saved_innermost;
+      flag_seed = saved_seed;
+      the_sun_clone = saved_sun;
+
+      // Clean up this system's data
+      sys_data.accrete_obj->free_generations();
+      delete sys_data.generator;
+      delete sys_data.accrete_obj;
+    }
+
+    g_pending_outputs.clear();
     print_summary_statistics();
     return EXIT_SUCCESS;
   }
@@ -1068,11 +1204,13 @@ void generate_stellar_system(StarGenerator* gen, sun &the_sun, bool use_seed_sys
     the_sun.setAge(random_number(gen->config.min_age, gen->config.max_age));
   }
   // std::cout << "test" << system_counter << "\n";
-  generate_planets(gen, the_sun, !use_seed_system, flag_char, sys_no,
-                   system_name, do_gases, do_moons);
 
   // Build planet vector for efficient iteration (replacing linked list traversal)
+  // MUST be called before generate_planets() which iterates over the vector
   gen->sim_context.buildPlanetVector();
+
+  generate_planets(gen, the_sun, !use_seed_system, flag_char, sys_no,
+                   system_name, do_gases, do_moons);
 
   ZoneScoped;
 }

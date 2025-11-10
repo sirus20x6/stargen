@@ -105,7 +105,7 @@ target_link_libraries(stargen PRIVATE
     nlohmann_json::nlohmann_json
     m                               # Standard math library
     yaml-cpp
-    jemalloc                        # Thread-optimized allocator for parallel performance
+    # jemalloc                        # Thread-optimized allocator for parallel performance (disabled for testing)
 )
 # REMOVED: target_include_directories(stargen PRIVATE ${tracy_SOURCE_DIR})
 # Linking TracyClient handles include directories automatically and correctly.
