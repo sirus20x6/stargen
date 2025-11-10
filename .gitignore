@@ -11,6 +11,7 @@ compile_commands.json
 
 # Compiled executables
 stargen
+orbital_demo
 
 # Compiled object files and libraries
 *.a
