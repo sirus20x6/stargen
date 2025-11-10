@@ -86,6 +86,7 @@ add_executable(stargen
     structs.cpp
     utils.cpp
     PerformanceMonitor.cpp
+    OrbitalSimulator.cpp  # NEW: Orbital mechanics simulator (optional, for viewer)
     # DO NOT add TracyClient.cpp here. It's built as part of the TracyClient library.
     # REMOVED: _deps/tracy-src/public/TracyClient.cpp
 )
@@ -118,3 +119,54 @@ set_target_properties(stargen PROPERTIES
 # Install commands are commented out, as per your existing file.
 # install(TARGETS stargen RUNTIME DESTINATION bin)
 # install(DIRECTORY html ref DESTINATION bin)
+
+# ============================================================================
+# Optional: Orbital Simulator Demo
+# ============================================================================
+# This demo shows OrbitalSimulator working alongside existing generation code
+# without modifying it. Build with: cmake --build . --target orbital_demo
+
+add_executable(orbital_demo
+    orbital_simulator_demo.cpp
+    OrbitalSimulator.cpp
+    StarGenerator.cpp
+    stargen.cpp
+    accrete.cpp
+    display.cpp
+    dole.cpp
+    elements.cpp
+    enviro.cpp
+    gas_radius_helpers.cpp
+    planets.cpp
+    radius_tables.cpp
+    solid_radius_helpers.cpp
+    star_temps.cpp
+    structs.cpp
+    utils.cpp
+    PerformanceMonitor.cpp
+    # Include catalog files needed by generation
+    andromeda.cpp
+    andromeda2.cpp
+    ic3094.cpp
+    ic3094_2.cpp
+    jimb.cpp
+    omega_galaxy.cpp
+    omega_galaxy2.cpp
+    Planetary_Habitability_Laboratory.cpp
+    ring_universe.cpp
+    solstation.cpp
+    star_trek.cpp
+)
+
+target_compile_definitions(orbital_demo PRIVATE TRACY_ENABLE)
+target_include_directories(orbital_demo PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
+target_link_libraries(orbital_demo PRIVATE
+    TracyClient
+    nlohmann_json::nlohmann_json
+    m
+    yaml-cpp
+)
+
+set_target_properties(orbital_demo PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+)
