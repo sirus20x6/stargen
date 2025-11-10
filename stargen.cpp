@@ -360,6 +360,56 @@ static auto should_output_system(bool only_habitable, bool only_multi_habitable,
 }
 
 /**
+ * @brief Output a single system based on format
+ *
+ * Encapsulates output logic to avoid duplication between parallel and sequential paths.
+ * Note: Currently only TEXT format is implemented for parallel mode.
+ *
+ * @param planets Innermost planet in the system
+ * @param out_format Output format (ffTEXT, ffHTML, etc.)
+ * @param do_gases Whether to include gas data
+ * @param do_moons Whether to include moon data
+ * @param seed System seed
+ */
+static void output_system(planet* planets, int out_format,
+                         bool do_gases, bool do_moons, long seed) {
+  switch (out_format) {
+    case ffTEXT:
+      text_describe_system(planets, do_gases, seed, do_moons);
+      break;
+
+    case ffHTML:
+      // TODO: Implement HTML output for parallel mode
+      std::cerr << "Warning: HTML output not yet supported in parallel mode\n";
+      break;
+
+    case ffSVG:
+      // TODO: Implement SVG output for parallel mode
+      std::cerr << "Warning: SVG output not yet supported in parallel mode\n";
+      break;
+
+    case ffCSV:
+    case ffCSVdl:
+      // TODO: Implement CSV output for parallel mode
+      std::cerr << "Warning: CSV output not yet supported in parallel mode\n";
+      break;
+
+    case ffJSON:
+      // TODO: Implement JSON output for parallel mode
+      std::cerr << "Warning: JSON output not yet supported in parallel mode\n";
+      break;
+
+    case ffCELESTIA:
+      // TODO: Implement CELESTIA output for parallel mode
+      std::cerr << "Warning: CELESTIA output not yet supported in parallel mode\n";
+      break;
+
+    default:
+      break;
+  }
+}
+
+/**
  * @brief Print summary statistics at the end of generation
  */
 static void print_summary_statistics() {
@@ -594,12 +644,16 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     ThreadPool pool(num_threads);
     std::atomic<int> systems_generated{0};
 
-    // Create object pools (one per thread to minimize contention)
-    ObjectPool<StarGenerator> generator_pool(num_threads, [&]() {
+    // Create object pools with extra capacity for output storage
+    // Each thread needs 1 object, but may transfer ownership when storing output
+    // Reserve 2x capacity to reduce dynamic allocation during generation
+    int pool_capacity = num_threads * 2;
+
+    ObjectPool<StarGenerator> generator_pool(pool_capacity, [&]() {
       return new StarGenerator(g_generator.config);
     });
 
-    ObjectPool<accrete> accrete_pool(num_threads, []() {
+    ObjectPool<accrete> accrete_pool(pool_capacity, []() {
       return new accrete();
     });
 
@@ -733,6 +787,15 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
     std::cerr << "Parallel generation complete: " << systems_generated << " systems generated\n";
 
+    // Report pool statistics
+    size_t gen_created = generator_pool.getTotalCreated();
+    size_t acc_created = accrete_pool.getTotalCreated();
+    if (gen_created > pool_capacity || acc_created > pool_capacity) {
+      std::cerr << "Object pool growth: "
+                << "generators=" << gen_created << "/" << pool_capacity
+                << ", accrete=" << acc_created << "/" << pool_capacity << "\n";
+    }
+
     // Sort systems by seed for consistent output ordering
     std::sort(g_pending_outputs.begin(), g_pending_outputs.end(),
               [](const SystemOutputData& a, const SystemOutputData& b) {
@@ -761,23 +824,8 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
         flag_seed = sys_data.flag_seed;
         the_sun_clone = sys_data.the_sun;
 
-        // Output based on format
-        switch (out_format) {
-          case ffTEXT:
-            text_describe_system(sys_data.innermost_planet, do_gases, sys_data.flag_seed, do_moons);
-            break;
-
-          case ffHTML:
-            // TODO: Implement HTML output
-            break;
-
-          case ffSVG:
-            // TODO: Implement SVG output
-            break;
-
-          default:
-            break;
-        }
+        // Output system using centralized helper
+        output_system(sys_data.innermost_planet, out_format, do_gases, do_moons, sys_data.flag_seed);
 
         // Restore globals
         innermost_planet = saved_innermost;

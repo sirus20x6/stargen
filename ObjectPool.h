@@ -23,7 +23,7 @@ public:
      * @param factory Function to create new objects when pool is empty
      */
     ObjectPool(size_t initial_size, std::function<T*()> factory)
-        : factory_(factory) {
+        : factory_(factory), total_created_(initial_size) {
         pool_.reserve(initial_size);
         for (size_t i = 0; i < initial_size; ++i) {
             pool_.push_back(factory_());
@@ -54,6 +54,7 @@ public:
 
         if (pool_.empty()) {
             // Pool exhausted - create new object
+            total_created_++;
             return factory_();
         }
 
@@ -85,6 +86,14 @@ public:
     size_t size() const {
         std::lock_guard<std::mutex> lock(mutex_);
         return pool_.size();
+    }
+
+    /**
+     * @brief Get total objects created (initial + dynamically allocated)
+     */
+    size_t getTotalCreated() const {
+        std::lock_guard<std::mutex> lock(mutex_);
+        return total_created_;
     }
 
     /**
@@ -137,6 +146,7 @@ private:
     std::vector<T*> pool_;
     mutable std::mutex mutex_;
     std::function<T*()> factory_;
+    size_t total_created_ = 0;  // Track total objects created (for statistics)
 };
 
 #endif // OBJECT_POOL_H
