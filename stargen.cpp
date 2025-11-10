@@ -119,11 +119,52 @@ std::string stargen_revision = "$Revision: 3.0 $";
 /**
  * @brief Data structure to hold system information for deferred output in parallel mode
  *
- * In parallel generation, we need to store planet data until all systems are generated,
- * then output them. This struct holds all necessary data and maintains ownership of
- * the generator and accrete objects (which own the planet memory).
+ * ## Architecture Overview
  *
- * Uses RAII with unique_ptr for automatic memory management and exception safety.
+ * In sequential mode, systems are output immediately after generation:
+ *   generate_system() -> output_system() -> free_planets()
+ *
+ * In parallel mode, output must be deferred until all generation completes:
+ *   1. Generation phase: generate_system() -> store SystemOutputData
+ *   2. Sort phase: sort systems by seed for consistent ordering
+ *   3. Output phase: for each SystemOutputData -> output_system()
+ *   4. Cleanup phase: SystemOutputData destructors free memory
+ *
+ * ## Memory Management
+ *
+ * This struct maintains ownership of generator and accrete objects, which in turn
+ * own the planet memory. Uses RAII with unique_ptr for automatic cleanup and
+ * exception safety.
+ *
+ * Memory lifecycle:
+ *   - Thread acquires generator/accrete from pool
+ *   - If system should be output, ownership transferred to SystemOutputData
+ *   - Thread acquires new generator/accrete for next system
+ *   - After output phase, SystemOutputData destructor:
+ *       1. Calls accrete->free_generations() to free planet linked list
+ *       2. unique_ptr automatically deletes generator and accrete objects
+ *
+ * ## Memory Usage Estimates
+ *
+ * Per system stored for output:
+ *   - SystemOutputData struct: ~200 bytes
+ *   - StarGenerator object: ~500 bytes
+ *   - accrete object: ~500 bytes
+ *   - Planet chain: ~1KB per planet (varies by planet count)
+ *   - Typical total: ~2-10 KB per system
+ *
+ * Example: 10,000 systems = ~20-100 MB RAM
+ *
+ * For very large runs, consider:
+ *   - Filters to reduce output count (--only-habitable)
+ *   - Smaller batch sizes
+ *   - Sequential mode for minimal memory usage
+ *
+ * ## Thread Safety
+ *
+ * - g_pending_outputs guarded by g_output_mutex
+ * - emplace_back() performed inside lock
+ * - Output phase is single-threaded (processes stored systems sequentially)
  */
 struct SystemOutputData {
     // Ownership of generator and accrete (to keep planet data alive)
