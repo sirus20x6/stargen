@@ -5,6 +5,8 @@
 #include <iostream>    // for operator<<, basic_ostream, std::ostream, "\n", stri...
 #include <iomanip>     // for std::setfill, std::setw
 #include <sstream>     // for std::stringstream
+#include <algorithm>   // for std::sort
+#include <memory>      // for std::unique_ptr
 #include "accrete.h"   // for accrete
 #include "const.h"     // for SUN_MASS_IN_EARTH_MASSES, KM_PER_AU, EARTH_AVE...
 #include "display.h"   // for type_string, close_html_file, create_svg_file
@@ -120,11 +122,14 @@ std::string stargen_revision = "$Revision: 3.0 $";
  * In parallel generation, we need to store planet data until all systems are generated,
  * then output them. This struct holds all necessary data and maintains ownership of
  * the generator and accrete objects (which own the planet memory).
+ *
+ * Uses RAII with unique_ptr for automatic memory management and exception safety.
  */
 struct SystemOutputData {
     // Ownership of generator and accrete (to keep planet data alive)
-    StarGenerator* generator;
-    accrete* accrete_obj;
+    // Using unique_ptr for automatic cleanup and exception safety
+    std::unique_ptr<StarGenerator> generator;
+    std::unique_ptr<accrete> accrete_obj;
 
     // Core system data
     planet* innermost_planet;
@@ -148,7 +153,7 @@ struct SystemOutputData {
     long double sys_inc;
     long double sys_an;
 
-    // Constructor
+    // Constructor - takes ownership of raw pointers
     SystemOutputData(StarGenerator* gen, accrete* acc, planet* planets, const sun& sun_obj,
                      long seed, const std::string& name, const std::string& fname,
                      int sysno, int hab, int earth, int pot_hab, int hab_jov, int hab_super)
@@ -157,6 +162,20 @@ struct SystemOutputData {
           habitable(hab), earthlike(earth), potential_habitable(pot_hab),
           habitable_jovians(hab_jov), habitable_superterrans(hab_super),
           sys_inc(0.0), sys_an(0.0) {}
+
+    // Destructor - cleanup happens automatically via unique_ptr
+    ~SystemOutputData() {
+        if (accrete_obj) {
+            accrete_obj->free_generations();
+        }
+        // unique_ptr will automatically delete generator and accrete_obj
+    }
+
+    // Moveable but not copyable (unique ownership)
+    SystemOutputData(SystemOutputData&&) = default;
+    SystemOutputData& operator=(SystemOutputData&&) = default;
+    SystemOutputData(const SystemOutputData&) = delete;
+    SystemOutputData& operator=(const SystemOutputData&) = delete;
 };
 
 // Thread-safe storage for parallel output
@@ -664,7 +683,7 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
             // Store system data for later output
             // Transfer ownership of generator and accrete to SystemOutputData
-            {
+            try {
               std::lock_guard<std::mutex> lock(g_output_mutex);
               g_pending_outputs.emplace_back(
                   gen, acc,
@@ -679,11 +698,17 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
                   gen->sim_context.system_potentially_habitable,
                   gen->sim_context.system_habitable_jovians,
                   gen->sim_context.system_habitable_superterrans);
-            }
 
-            // Get new objects for next iteration (ownership transferred)
-            gen = generator_pool.acquire();
-            acc = accrete_pool.acquire();
+              // Get new objects for next iteration (ownership transferred)
+              gen = generator_pool.acquire();
+              acc = accrete_pool.acquire();
+            } catch (const std::bad_alloc& e) {
+              std::cerr << "\nWarning: Memory exhausted storing system " << sys_name
+                        << ". System will not be output.\n";
+              // Keep using current gen/acc for next iteration
+              // Clean up manually since we couldn't store
+              acc->free_generations();
+            }
           }
         }
 
@@ -708,48 +733,73 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
     std::cerr << "Parallel generation complete: " << systems_generated << " systems generated\n";
 
-    // Output phase - process all stored systems
+    // Sort systems by seed for consistent output ordering
+    std::sort(g_pending_outputs.begin(), g_pending_outputs.end(),
+              [](const SystemOutputData& a, const SystemOutputData& b) {
+                return a.flag_seed < b.flag_seed;
+              });
+
+    // Output phase - process all stored systems with exception safety
     std::cerr << "Outputting " << g_pending_outputs.size() << " systems...\n";
+    size_t output_count = 0;
+    size_t failed_count = 0;
+
     for (auto& sys_data : g_pending_outputs) {
-      // Temporarily restore globals for output functions
-      planet* saved_innermost = innermost_planet;
-      long saved_seed = flag_seed;
-      sun saved_sun = the_sun_clone;
-
-      innermost_planet = sys_data.innermost_planet;
-      flag_seed = sys_data.flag_seed;
-      the_sun_clone = sys_data.the_sun;
-
-      // Output based on format
-      switch (out_format) {
-        case ffTEXT:
-          text_describe_system(sys_data.innermost_planet, do_gases, sys_data.flag_seed, do_moons);
-          break;
-
-        case ffHTML:
-          // TODO: Implement HTML output
-          break;
-
-        case ffSVG:
-          // TODO: Implement SVG output
-          break;
-
-        default:
-          break;
+      output_count++;
+      if (g_pending_outputs.size() > 10) {
+        std::cerr << "\rOutputting system " << output_count << "/" << g_pending_outputs.size()
+                  << " (seed " << sys_data.flag_seed << ")..." << std::flush;
       }
 
-      // Restore globals
-      innermost_planet = saved_innermost;
-      flag_seed = saved_seed;
-      the_sun_clone = saved_sun;
+      try {
+        // Temporarily restore globals for output functions
+        planet* saved_innermost = innermost_planet;
+        long saved_seed = flag_seed;
+        sun saved_sun = the_sun_clone;
 
-      // Clean up this system's data
-      sys_data.accrete_obj->free_generations();
-      delete sys_data.generator;
-      delete sys_data.accrete_obj;
+        innermost_planet = sys_data.innermost_planet;
+        flag_seed = sys_data.flag_seed;
+        the_sun_clone = sys_data.the_sun;
+
+        // Output based on format
+        switch (out_format) {
+          case ffTEXT:
+            text_describe_system(sys_data.innermost_planet, do_gases, sys_data.flag_seed, do_moons);
+            break;
+
+          case ffHTML:
+            // TODO: Implement HTML output
+            break;
+
+          case ffSVG:
+            // TODO: Implement SVG output
+            break;
+
+          default:
+            break;
+        }
+
+        // Restore globals
+        innermost_planet = saved_innermost;
+        flag_seed = saved_seed;
+        the_sun_clone = saved_sun;
+
+      } catch (const std::exception& e) {
+        std::cerr << "\nError outputting system " << sys_data.system_name
+                  << " (seed " << sys_data.flag_seed << "): " << e.what() << "\n";
+        failed_count++;
+      }
+      // Cleanup happens automatically via SystemOutputData destructor
+    }
+
+    if (failed_count > 0) {
+      std::cerr << "\nWarning: " << failed_count << " system(s) failed to output\n";
     }
 
     g_pending_outputs.clear();
+    if (output_count > 10) {
+      std::cerr << "\n";  // Clear progress line
+    }
     print_summary_statistics();
     return EXIT_SUCCESS;
   }
