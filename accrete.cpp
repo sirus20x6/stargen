@@ -1017,6 +1017,12 @@ void accrete::free_generations() {
     delete node;
     // std::cout << "Deleted Generation\n";
   }
+
+  // CRITICAL: Nullify hist_head to prevent double-free in parallel mode
+  // Without this, if free_generations() is called twice (e.g., from SystemOutputData
+  // destructor and then from reset()), it will try to traverse already-freed memory
+  hist_head = nullptr;
+
   ZoneScoped;
 }
 

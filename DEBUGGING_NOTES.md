@@ -51,14 +51,29 @@ The issue is deeper than the copy constructor. Possible causes:
 - `structs.cpp:1578` - `setTheSun()` implementation uses assignment
 - `stargen.cpp:169-220` - SystemOutputData struct definition
 
-## Next Steps
+## RESOLUTION - FIXED!
 
-1. Add explicit move/copy semantics to sun class (Rule of Five)
-2. Consider using shared_ptr for sun objects to avoid copying
-3. Investigate if compiler-generated assignment operator is correct
-4. Check if there's hidden state/caching in sun that isn't being copied
-5. Use AddressSanitizer for more detailed memory tracking
-6. Add logging to track sun object creation/destruction
+**Root Cause Found with AddressSanitizer:**
+- heap-use-after-free in `accrete::free_generations()` at line 1009
+- `hist_head` linked list was being freed but pointer not nullified
+- In parallel mode, `free_generations()` was called multiple times
+- Second call tried to traverse already-freed memory
+
+**The Fix:**
+Added `hist_head = nullptr;` at the end of `free_generations()`
+
+```cpp
+void accrete::free_generations() {
+  // ... free the linked list ...
+
+  hist_head = nullptr;  // CRITICAL: Prevent use-after-free
+}
+```
+
+**Testing:**
+- With AddressSanitizer: No errors
+- Release build: j4 c20 completes successfully
+- All parallel output modes work correctly
 
 ## Testing Commands
 
