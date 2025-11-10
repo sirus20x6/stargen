@@ -404,40 +404,65 @@ static auto should_output_system(bool only_habitable, bool only_multi_habitable,
  * @brief Output a single system based on format
  *
  * Encapsulates output logic to avoid duplication between parallel and sequential paths.
- * Note: Currently only TEXT format is implemented for parallel mode.
  *
  * @param planets Innermost planet in the system
  * @param out_format Output format (ffTEXT, ffHTML, etc.)
  * @param do_gases Whether to include gas data
  * @param do_moons Whether to include moon data
  * @param seed System seed
+ * @param csv_file Optional file stream for CSV/JSON output (nullptr for other formats)
+ * @param path Output path for HTML/SVG files
+ * @param file_name Base filename for HTML/SVG files
+ * @param prognam Program name for file headers
+ * @param url_path URL path for HTML links
  */
 static void output_system(planet* planets, int out_format,
-                         bool do_gases, bool do_moons, long seed) {
+                         bool do_gases, bool do_moons, long seed,
+                         std::fstream* csv_file = nullptr,
+                         const std::string& path = "",
+                         const std::string& file_name = "",
+                         const std::string& prognam = "",
+                         const std::string& url_path = "") {
   switch (out_format) {
     case ffTEXT:
       text_describe_system(planets, do_gases, seed, do_moons);
       break;
 
     case ffHTML:
-      // TODO: Implement HTML output for parallel mode
-      std::cerr << "Warning: HTML output not yet supported in parallel mode\n";
+      if (!path.empty() && !file_name.empty()) {
+        std::fstream html_file;
+        open_html_file(planets->getTheSun().getName(), seed, path, url_path,
+                      file_name, ".html", prognam, html_file);
+        html_describe_system(planets, do_gases, do_moons, url_path, html_file);
+        close_html_file(html_file);
+      } else {
+        std::cerr << "Warning: HTML output requires path and filename\n";
+      }
       break;
 
     case ffSVG:
-      // TODO: Implement SVG output for parallel mode
-      std::cerr << "Warning: SVG output not yet supported in parallel mode\n";
+      if (!path.empty() && !file_name.empty()) {
+        create_svg_file(planets, path, file_name, ".svg", prognam, do_moons);
+      } else {
+        std::cerr << "Warning: SVG output requires path and filename\n";
+      }
       break;
 
     case ffCSV:
     case ffCSVdl:
-      // TODO: Implement CSV output for parallel mode
-      std::cerr << "Warning: CSV output not yet supported in parallel mode\n";
+      if (csv_file && csv_file->is_open()) {
+        csv_describe_system(*csv_file, planets, do_gases, seed, do_moons);
+      } else {
+        std::cerr << "Warning: CSV output requires an open file stream\n";
+      }
       break;
 
     case ffJSON:
-      // TODO: Implement JSON output for parallel mode
-      std::cerr << "Warning: JSON output not yet supported in parallel mode\n";
+      if (csv_file && csv_file->is_open()) {
+        jsonDescribeSystem(*csv_file, planets, do_gases, seed, do_moons);
+      } else {
+        std::cerr << "Warning: JSON output requires an open file stream\n";
+      }
       break;
 
     case ffCELESTIA:
@@ -664,7 +689,8 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
   // Parallel mode is only safe for simple cases: fixed star, no catalogs, no special modes
   bool can_use_parallel = (num_threads > 1) && (system_count > 1) && !do_catalog &&
                           (sys_no_arg == 0) && !use_solar_system && !reuse_solar_system &&
-                          (out_format == ffHTML || out_format == ffTEXT || out_format == ffSVG);
+                          (out_format == ffHTML || out_format == ffTEXT || out_format == ffSVG ||
+                           out_format == ffCSV || out_format == ffCSVdl || out_format == ffJSON);
 
   if (can_use_parallel && num_threads > system_count) {
     num_threads = system_count;  // Don't use more threads than systems
@@ -865,8 +891,11 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
         flag_seed = sys_data.flag_seed;
         the_sun_clone = sys_data.the_sun;
 
-        // Output system using centralized helper
-        output_system(sys_data.innermost_planet, out_format, do_gases, do_moons, sys_data.flag_seed);
+        // Output system using centralized helper with all necessary parameters
+        // Only pass csv_file pointer if it's open (for CSV/JSON formats)
+        std::fstream* csv_ptr = (csv_file.is_open()) ? &csv_file : nullptr;
+        output_system(sys_data.innermost_planet, out_format, do_gases, do_moons, sys_data.flag_seed,
+                     csv_ptr, path, sys_data.file_name, prognam, url_path);
 
         // Restore globals
         innermost_planet = saved_innermost;
