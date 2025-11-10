@@ -58,6 +58,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(yaml-cpp) # Defines yaml-cpp target
 
+# Add raylib dependency for viewer
+FetchContent_Declare(
+  raylib
+  GIT_REPOSITORY https://github.com/raysan5/raylib.git
+  GIT_TAG 5.0
+)
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # Don't build raylib examples
+FetchContent_MakeAvailable(raylib) # Defines raylib target
+
 add_executable(stargen
     accrete.cpp
     andromeda.cpp
@@ -86,7 +95,8 @@ add_executable(stargen
     structs.cpp
     utils.cpp
     PerformanceMonitor.cpp
-    OrbitalSimulator.cpp  # NEW: Orbital mechanics simulator (optional, for viewer)
+    OrbitalSimulator.cpp       # NEW: Orbital mechanics simulator (optional, for viewer)
+    OrbitalStateManager.cpp    # NEW: Multi-system orbital state management (optional, for viewer)
     # DO NOT add TracyClient.cpp here. It's built as part of the TracyClient library.
     # REMOVED: _deps/tracy-src/public/TracyClient.cpp
 )
@@ -129,6 +139,7 @@ set_target_properties(stargen PROPERTIES
 add_executable(orbital_demo
     orbital_simulator_demo.cpp
     OrbitalSimulator.cpp
+    OrbitalStateManager.cpp
     StarGenerator.cpp
     stargen.cpp
     accrete.cpp
@@ -168,5 +179,58 @@ target_link_libraries(orbital_demo PRIVATE
 )
 
 set_target_properties(orbital_demo PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+)
+
+# ============================================================================
+# Real-time Stellar System Viewer
+# ============================================================================
+# Interactive viewer for visualizing generated stellar systems in real-time
+# with orbital motion. Build with: cmake --build . --target viewer
+
+add_executable(viewer
+    viewer.cpp
+    OrbitalSimulator.cpp
+    OrbitalStateManager.cpp
+    StarGenerator.cpp
+    stargen.cpp
+    accrete.cpp
+    display.cpp
+    dole.cpp
+    elements.cpp
+    enviro.cpp
+    gas_radius_helpers.cpp
+    planets.cpp
+    radius_tables.cpp
+    solid_radius_helpers.cpp
+    star_temps.cpp
+    structs.cpp
+    utils.cpp
+    PerformanceMonitor.cpp
+    # Include catalog files needed by generation
+    andromeda.cpp
+    andromeda2.cpp
+    ic3094.cpp
+    ic3094_2.cpp
+    jimb.cpp
+    omega_galaxy.cpp
+    omega_galaxy2.cpp
+    Planetary_Habitability_Laboratory.cpp
+    ring_universe.cpp
+    solstation.cpp
+    star_trek.cpp
+)
+
+target_compile_definitions(viewer PRIVATE TRACY_ENABLE)
+target_include_directories(viewer PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
+target_link_libraries(viewer PRIVATE
+    TracyClient
+    nlohmann_json::nlohmann_json
+    m
+    yaml-cpp
+    raylib
+)
+
+set_target_properties(viewer PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )
