@@ -875,65 +875,7 @@ sun::sun(long double l, long double m, long double t, std::string s, long double
   }
 }
 
-sun::sun(sun& rhs) {
-  luminosity = rhs.luminosity;
-  mass = rhs.mass;
-  effTemp = rhs.effTemp;
-  specType = rhs.specType;
-  age = rhs.age;
-  name = rhs.name;
-  isCircumbinary = rhs.isCircumbinary;
-  secondaryMass = rhs.secondaryMass;
-  secondaryLuminosity = rhs.secondaryLuminosity;
-  secondaryEffTemp = rhs.secondaryEffTemp;
-  secondarySpecType = rhs.secondarySpecType;
-  seperation = rhs.seperation;
-  eccentricity = rhs.eccentricity;
-  combinedEffTemp = rhs.combinedEffTemp;
-  if (luminosity == 0) {
-    luminosity = mass_to_luminosity(mass);
-  }
-  if (mass == 0) {
-    mass = luminosity_to_mass(luminosity);
-  }
-  // if (effTemp == 0)
-  // {
-  //   effTemp == spec_type_to_eff_temp(specType);
-  // }
-  if (specType.empty()) {
-    specType = eff_temp_to_spec_type(effTemp, luminosity);
-  }
-}
-
-sun::sun(const sun& rhs) {
-  luminosity = rhs.luminosity;
-  mass = rhs.mass;
-  effTemp = rhs.effTemp;
-  specType = rhs.specType;
-  age = rhs.age;
-  name = rhs.name;
-  isCircumbinary = rhs.isCircumbinary;
-  secondaryMass = rhs.secondaryMass;
-  secondaryLuminosity = rhs.secondaryLuminosity;
-  secondaryEffTemp = rhs.secondaryEffTemp;
-  secondarySpecType = rhs.secondarySpecType;
-  seperation = rhs.seperation;
-  eccentricity = rhs.eccentricity;
-  combinedEffTemp = rhs.combinedEffTemp;
-  if (luminosity == 0) {
-    luminosity = mass_to_luminosity(mass);
-  }
-  if (mass == 0) {
-    mass = luminosity_to_mass(luminosity);
-  }
-  // if (effTemp == 0)
-  // {
-  //   effTemp == spec_type_to_eff_temp(specType);
-  // }
-  if (specType.empty()) {
-    specType = eff_temp_to_spec_type(effTemp, luminosity);
-  }
-}
+// Copy constructor is now compiler-generated (= default in header)
 
 auto sun::getAge() -> long double { return age; }
 

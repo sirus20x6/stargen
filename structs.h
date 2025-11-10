@@ -71,8 +71,7 @@ class sun {
  public:
   sun();
   sun(long double, long double, long double, std::string, long double, std::string);
-  sun(sun &);
-  sun(const sun &);
+  sun(const sun &) = default;  // Use compiler-generated copy constructor
   void setLuminosity(long double);
   auto getLuminosity() -> long double;
   void setMass(long double);
