@@ -11,6 +11,8 @@ compile_commands.json
 
 # Compiled executables
 stargen
+orbital_demo
+viewer
 
 # Compiled object files and libraries
 *.a
@@ -21,3 +23,4 @@ stargen
 
 # Generated HTML output
 html/
+vgcore.*
