@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <random>
+#include <nlohmann/json.hpp>
 
 #include "structs.h"
 
@@ -25,8 +26,8 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet,
                          bool do_gases, long int seed, bool do_moons);
 void csv_row(std::fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
              const std::string& id, std::stringstream& ss) ;
-void jsonRow(std::fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
-             std::string id, std::stringstream& ss);
+auto jsonRow(planet* the_planet, bool do_gases, bool is_moon,
+             std::string id, std::stringstream& ss) -> nlohmann::json;
 auto type_string(planet *) -> std::string;
 auto cloud_type_string(planet *) -> std::string;
 void create_svg_file(planet *, std::string, std::string, std::string, std::string, bool);

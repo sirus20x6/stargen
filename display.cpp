@@ -278,9 +278,10 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool d
   planet*      moon;
   int          moons;
 
+  nlohmann::json header;
   if (!the_sun.getIsCircumbinary()) {
-    nlohmann::json header = {
-        {"Body Type",                   "Binary Star"             },
+    header = {
+        {"Body Type",                   "Star"                    },
         {"seed",                        seed                      },
         {"Star Name",                   the_sun.getName()         },
         {"Luminosity",                  the_sun.getLuminosity()   },
@@ -291,10 +292,9 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool d
         {"Age",                         the_sun.getAge()          },
         {"Earth-like Distance",         the_sun.getREcosphere(1.0)}
     };
-    the_file << header.dump(4) << "\n";
   } else {
-    nlohmann::json header = {
-        {"Body Type",                   "Star"                          },
+    header = {
+        {"Body Type",                   "Binary Star"                   },
         {"seed",                        seed                            },
         {"Star Name",                   the_sun.getName()               },
         {"Luminosity of Primary",       the_sun.getLuminosity()         },
@@ -312,28 +312,36 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool d
         {"Age",                         the_sun.getAge()                },
         {"Earth-like Distance",         the_sun.getREcosphere(1.0)      }
     };
-    the_file << header.dump(4) << "\n";
   }
-  nlohmann::json body;
+
+  nlohmann::json planets = nlohmann::json::array();
 
   counter = 1;
   for (planet* the_planet : g_sim_context.planets) {
     ss << the_sun.getName() << " " << counter;
     id = ss.str();
     ss.str("");
-    jsonRow(the_file, the_planet, do_gases, false, id, ss);
+    nlohmann::json planet_json = jsonRow(the_planet, do_gases, false, id, ss);
     if (do_moons && !the_planet->moons.empty()) {
+      nlohmann::json moon_array = nlohmann::json::array();
       moons = 1;
       for (planet* moon : the_planet->moons) {
         ss << the_sun.getName() << " " << counter << "." << moons;
         id = ss.str();
         ss.str("");
-        jsonRow(the_file, moon, do_gases, true, id, ss);
+        moon_array.push_back(jsonRow(moon, do_gases, true, id, ss));
         moons++;
       }
+      planet_json["Moons"] = std::move(moon_array);
     }
+    planets.push_back(std::move(planet_json));
     counter++;
   }
+
+  nlohmann::json document;
+  document["star"]    = std::move(header);
+  document["planets"] = std::move(planets);
+  the_file << document.dump(4) << "\n";
   ZoneScoped;
 }
 
@@ -449,8 +457,8 @@ std::string generate_atmosphere_string(planet* the_planet, bool do_gases) {
   return atmosphere;
 }
 
-void jsonRow(std::fstream& the_file, planet* the_planet, bool do_gases, bool is_moon, std::string id,
-             std::stringstream& ss) {
+auto jsonRow(planet* the_planet, bool do_gases, bool is_moon, std::string id,
+             std::stringstream& ss) -> nlohmann::json {
   do_gases = (flags_arg_clone & fDoGases) != 0;
   std::string      atmosphere;
   long double ipp;
@@ -510,9 +518,9 @@ void jsonRow(std::fstream& the_file, planet* the_planet, bool do_gases, bool is_
   body["Rock Mass Fraction"]              = the_planet->getRmf();
   body["Carbon Mass Fraction"]            = the_planet->getCmf();
   body["Total Mass"]                      = the_planet->getMass();
-  body["Is Gas Giant"]                    = the_planet->getGasMass();
+  body["Is Gas Giant"]                    = the_planet->getGasGiant();
   body["Dust Mass"]                       = the_planet->getDustMass();
-  body["Gas Mass"]                        = the_planet->getMass();
+  body["Gas Mass"]                        = the_planet->getGasMass();
   body["Radius of Core"]                  = the_planet->getCoreRadius();
   body["Total Radius"]                    = the_planet->getRadius();
   body["Orbit Zone"]                      = the_planet->getOrbitZone();
@@ -545,8 +553,8 @@ void jsonRow(std::fstream& the_file, planet* the_planet, bool do_gases, bool is_
   body["Atmosphere"]                      = atmosphere;
   body["Type"]                            = type_string(the_planet);
   body["Minor Moons"]                     = the_planet->getMinorMoons();
-  the_file << body.dump(4) << "\n";
   ZoneScoped;
+  return body;
 }
 
 /**
