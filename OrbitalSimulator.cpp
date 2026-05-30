@@ -41,16 +41,22 @@ void OrbitalSimulator::updatePositions() {
         double a = planet_ptr->getA();           // Semi-major axis (AU)
         double e = planet_ptr->getE();           // Eccentricity
         double i = planet_ptr->getInclination(); // Inclination (degrees)
-        double omega = planet_ptr->getAscendingNode();  // Long. of ascending node (degrees)
-        double w = planet_ptr->getLongitudeOfPericenter();  // Longitude of pericenter (degrees)
+        double omega = planet_ptr->getAscendingNode();  // Long. of ascending node Ω (degrees)
+        // Argument of pericenter ω = ϖ − Ω (longitude of pericenter minus ascending node).
+        // The rotation R_z(Ω)·R_x(i)·R_z(ω) requires the ARGUMENT of pericenter, not the
+        // longitude of pericenter, so subtract the ascending node here.
+        double w = planet_ptr->getLongitudeOfPericenter() - omega;  // Argument of pericenter ω (degrees)
 
         // Convert angles to radians
         double i_rad = i * PI / 180.0;
         double omega_rad = omega * PI / 180.0;
         double w_rad = w * PI / 180.0;
 
+        // Stellar mass in solar masses (μ ∝ M_star in AU³/year² units where G·M_sun = 1)
+        double m_star = static_cast<double>(planet_ptr->getTheSun().getMass());
+
         // Calculate mean anomaly at current time
-        state.mean_anomaly = calculateMeanAnomaly(a, current_time_, 0.0);
+        state.mean_anomaly = calculateMeanAnomaly(a, current_time_, m_star, 0.0);
 
         // Solve Kepler's equation for eccentric anomaly
         double E = solveKeplersEquation(state.mean_anomaly, e);
@@ -138,12 +144,15 @@ double OrbitalSimulator::solveKeplersEquation(double M, double e,
     return E;
 }
 
-double OrbitalSimulator::calculateMeanAnomaly(double a, double t, double M0) const {
+double OrbitalSimulator::calculateMeanAnomaly(double a, double t, double m_star, double M0) const {
     if (a <= 0) return 0.0;
 
-    // Mean motion: n = 2π / T = 2π / (a^(3/2))
-    // (Using G*M_sun = 1 in units where 1 AU³/year² = G*M_sun)
-    double n = TWO_PI / (std::pow(a, 1.5));
+    // Mean motion: n = sqrt(μ / a³) = 2π·sqrt(M_star) / a^(3/2)
+    // In units where 1 AU³/year² = G·M_sun, μ = G·M_star = M_star (in solar masses),
+    // so the period scales as 1/sqrt(M_star). Fall back to a solar-mass star if the
+    // stellar mass is missing or non-positive.
+    double mu = (m_star > 0.0) ? m_star : 1.0;
+    double n = TWO_PI * std::sqrt(mu) / (std::pow(a, 1.5));
 
     // Mean anomaly: M = M0 + n*t
     double M = M0 + n * t;

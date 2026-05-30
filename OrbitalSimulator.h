@@ -180,14 +180,15 @@ private:
      * @brief Calculate mean anomaly at given time
      *
      * M = M0 + n*t
-     * where n = mean motion = 2π/T = sqrt(μ/a³)
+     * where n = mean motion = sqrt(μ/a³) = 2π·sqrt(M_star)/a^(3/2)
      *
      * @param a Semi-major axis (AU)
      * @param t Time (years)
+     * @param m_star Stellar mass (solar masses); scales μ. <=0 falls back to 1.
      * @param M0 Initial mean anomaly (radians)
      * @return Current mean anomaly (radians)
      */
-    double calculateMeanAnomaly(double a, double t, double M0 = 0.0) const;
+    double calculateMeanAnomaly(double a, double t, double m_star, double M0 = 0.0) const;
 };
 
 #endif // ORBITAL_SIMULATOR_H
