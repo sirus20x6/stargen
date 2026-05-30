@@ -280,6 +280,8 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool d
 
   if (!the_sun.getIsCircumbinary()) {
     nlohmann::json header = {
+        {"schema_version",              "1.0.0"                   },
+        {"generator",                   "stargen"                 },
         {"Body Type",                   "Binary Star"             },
         {"seed",                        seed                      },
         {"Star Name",                   the_sun.getName()         },
@@ -294,6 +296,8 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool d
     the_file << header.dump(4) << "\n";
   } else {
     nlohmann::json header = {
+        {"schema_version",              "1.0.0"                         },
+        {"generator",                   "stargen"                       },
         {"Body Type",                   "Star"                          },
         {"seed",                        seed                            },
         {"Star Name",                   the_sun.getName()               },
