@@ -537,7 +537,7 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
           ((the_planet->getMass() / the_planet->getA()) + (mass / a));
 
       temp = the_planet->getMass() * sqrt(the_planet->getA()) * sqrt(1.0 - std::pow(the_planet->getE(), 2.0));
-      temp += (mass * sqrt(a) * sqrt(sqrt(1.0 - std::pow(e, 2.0))));
+      temp += (mass * sqrt(a) * sqrt(1.0 - std::pow(e, 2.0)));
       temp /= ((the_planet->getMass() + mass) * sqrt(new_a));
       temp = 1.0 - std::pow(temp, 2.0);
       if (temp < 0.0 || temp >= 1.0) {
