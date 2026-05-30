@@ -1,6 +1,7 @@
 # Unit tests for stargen, built against the stargen_core static library.
 add_executable(stargen_tests
     test_basic.cpp
+    enviro_test.cpp
 )
 
 target_link_libraries(stargen_tests PRIVATE
