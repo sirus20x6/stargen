@@ -67,7 +67,23 @@ FetchContent_Declare(
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # Don't build raylib examples
 FetchContent_MakeAvailable(raylib) # Defines raylib target
 
-add_executable(stargen
+# Add Catch2 v3 dependency for unit testing
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG v3.5.4 # Specific released tag
+)
+FetchContent_MakeAvailable(Catch2) # Defines Catch2::Catch2 and Catch2::Catch2WithMain
+
+# Enable CTest-based testing
+enable_testing()
+
+# ============================================================================
+# stargen_core: STATIC library of all stargen sources except main.cpp
+# ============================================================================
+# The stargen executable and the test binary both link this library, so the
+# generation/catalog logic is compiled once and exercised identically by tests.
+add_library(stargen_core STATIC
     accrete.cpp
     andromeda.cpp
     andromeda2.cpp
@@ -79,7 +95,6 @@ add_executable(stargen
     ic3094.cpp
     ic3094_2.cpp
     jimb.cpp
-    main.cpp
     omega_galaxy.cpp
     omega_galaxy2.cpp
     Planetary_Habitability_Laboratory.cpp
@@ -98,33 +113,43 @@ add_executable(stargen
     OrbitalSimulator.cpp       # NEW: Orbital mechanics simulator (optional, for viewer)
     OrbitalStateManager.cpp    # NEW: Multi-system orbital state management (optional, for viewer)
     # DO NOT add TracyClient.cpp here. It's built as part of the TracyClient library.
-    # REMOVED: _deps/tracy-src/public/TracyClient.cpp
+)
+
+target_compile_definitions(stargen_core PUBLIC TRACY_ENABLE)
+target_include_directories(stargen_core PUBLIC
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/tracy
+)
+target_link_libraries(stargen_core PUBLIC
+    TracyClient                     # Links the Tracy library and sets up its include paths.
+    nlohmann_json::nlohmann_json
+    m                               # Standard math library
+    yaml-cpp
+)
+
+# stargen executable = main.cpp + stargen_core
+add_executable(stargen
+    main.cpp
 )
 
 # Define Tracy enabling macro - This is correct for enabling Tracy
 target_compile_definitions(stargen PRIVATE TRACY_ENABLE)
 
 # This line includes ${CMAKE_SOURCE_DIR}/tracy.
-# If you have project-specific files in a "tracy" folder at your source root, keep this.
-# If this was an attempt to help find the *fetched* Tracy library, it's not the correct way and
-# would be superseded by linking TracyClient. Preserving it in case it's for unrelated local headers.
 target_include_directories(stargen PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
 
 # Link libraries
 target_link_libraries(stargen PRIVATE
-    TracyClient                     # ADDED: This links the Tracy library and correctly sets up its include paths.
-    nlohmann_json::nlohmann_json
-    m                               # Standard math library
-    yaml-cpp
-    # jemalloc                        # Thread-optimized allocator for parallel performance (disabled for testing)
+    stargen_core
 )
-# REMOVED: target_include_directories(stargen PRIVATE ${tracy_SOURCE_DIR})
-# Linking TracyClient handles include directories automatically and correctly.
 
 # Set the binary output directory to the source directory
 set_target_properties(stargen PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )
+
+# Unit tests
+add_subdirectory(tests)
 
 # Install commands are commented out, as per your existing file.
 # install(TARGETS stargen RUNTIME DESTINATION bin)
