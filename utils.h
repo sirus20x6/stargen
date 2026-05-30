@@ -267,10 +267,9 @@ auto replaceStrChar(std::string str, T old, T the_new) -> std::string {
 
 template <typename T>
 auto is_close(T a, T b, long double percent) -> bool {
-  long double decimal = percent / (long double)100;
-  long double range = b * decimal;
+  long double range = std::fabs((long double)b) * (percent / 100.0L);
 
-  return static_cast<bool>(a > (b - decimal) && a < (b + decimal));
+  return static_cast<bool>(a > (b - range) && a < (b + range));
 }
 
 template <typename T>
