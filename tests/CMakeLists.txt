@@ -14,6 +14,8 @@ target_link_libraries(stargen_tests PRIVATE
 # It also depends on the binary existing at test time.
 target_compile_definitions(stargen_tests PRIVATE
     STARGEN_BIN="$<TARGET_FILE:stargen>"
+    STARGEN_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+    STARGEN_TEST_WORKDIR="${CMAKE_CURRENT_BINARY_DIR}"
 )
 add_dependencies(stargen_tests stargen)
 
