@@ -18,6 +18,7 @@
 #include "SimulationContext.h"  // for SimulationContext
 #include "RandomContext.h"  // for RandomContext
 #include "StarGenerator.h"  // for StarGenerator
+#include "radius_tables.h"  // for initRadii (per-thread gas-table population)
 #include "ThreadPool.h"  // for ThreadPool (parallel generation)
 #include "ObjectPool.h"  // for ObjectPool (object reuse)
 #include <mutex>  // for std::mutex (thread-safe output)
@@ -43,7 +44,15 @@ void initConfig() {
 
 // Legacy global references - these now point to Config members for compatibility
 int& flags_arg_clone = g_config.flags;
-sun& the_sun_clone = g_sim_context.current_sun;
+// the_sun_clone is the "active sun" of the system currently being generated. It
+// is thread_local (NOT a reference into the shared g_generator) so each parallel
+// worker owns its own copy: generate_stellar_system assigns this thread's fully
+// initialised sun into it before generate_planets() runs. Previously this aliased
+// g_generator.sim_context.current_sun, so all 8 ThreadPool workers read/wrote one
+// shared sun unsynchronised -- the source of the gas-giant Density/Total Radius
+// run-to-run jitter (the gas-radius age==0 fallback and the habitability
+// getEffTemp() lazy-init both read it). TSan confirmed the race was on g_generator.
+thread_local sun the_sun_clone;
 int& flag_verbose = g_config.verbose_level;
 long& flag_seed = g_config.random_seed;
 long double& min_age = g_config.min_age;
@@ -752,6 +761,13 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
         int local_earthlike = 0;
         int local_worlds = 0;
 
+        // Populate THIS worker thread's thread_local gas-radius interpolation
+        // tables. They are thread_local (the gas-radius helpers write per-planet
+        // anchors into them), so the main thread's initRadii() in main.cpp does
+        // not reach worker threads; each thread must initialise its own copy.
+        // The guard inside initRadii() makes this a one-time cost per thread.
+        initRadii();
+
         // Process all systems assigned to this thread
         for (int i = 0; i < count; i++) {
           int sys_index = start_index + i;
@@ -1399,6 +1415,14 @@ void generate_stellar_system(StarGenerator* gen, sun &the_sun, bool use_seed_sys
     the_sun.setAge(random_number(gen->config.min_age, gen->config.max_age));
   }
   // std::cout << "test" << system_counter << "\n";
+
+  // Publish THIS system's fully-initialised sun (mass, luminosity, effTemp, age
+  // are all set by this point) into the per-thread active-sun clone, so the
+  // gas-radius and habitability helpers in enviro.cpp/gas_radius_helpers.cpp read
+  // this worker's sun rather than a sun shared across threads. This is what makes
+  // parallel generation deterministic; it also pre-computes effTemp so the later
+  // getEffTemp() on the clone is a pure read (no lazy-init write race).
+  the_sun_clone = the_sun;
 
   // Build planet vector for efficient iteration (replacing linked list traversal)
   // MUST be called before generate_planets() which iterates over the vector

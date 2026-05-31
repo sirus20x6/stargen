@@ -55,7 +55,7 @@ std::string read_file(const fs::path& p) {
 // Run stargen with the given thread count inside a private working directory
 // and return the generated JSON. With the default output path stargen writes
 // <cwd>/html/<out_name>.json.
-std::string generate_json(const fs::path& run_dir, int threads,
+std::string generate_json(const fs::path& run_dir, int threads, long seed,
                           const std::string& out_name) {
   std::error_code ec;
   fs::remove_all(run_dir, ec);
@@ -72,7 +72,7 @@ std::string generate_json(const fs::path& run_dir, int threads,
   // runs; JSON output (-JS); -o sets the base filename; -T# the thread count.
   cmd << "cd \"" << run_dir.string() << "\" && "
       << '"' << STARGEN_BIN << '"'
-      << " -s12345 -n12 -m1.0 -JS"
+      << " -s" << seed << " -n12 -m1.0 -JS"
       << " -o " << out_name
       << " -T" << threads
       << " > /dev/null 2>&1";
@@ -89,17 +89,43 @@ std::string generate_json(const fs::path& run_dir, int threads,
 
 }  // namespace
 
+// The determinism bug this guards against (per-thread RNG / sun / gas-radius
+// table state) was INTERMITTENT: a single -T1-vs--T8 comparison passed by luck
+// most of the time. To reliably catch a regression we (a) repeat the parallel
+// run several times to expose run-to-run jitter at a fixed thread count, and
+// (b) sweep several worker-thread counts, all byte-compared against the
+// single-threaded baseline for the same seed. A few seeds are checked because
+// some seeds produce more gas giants (the former jitter source) than others.
 TEST_CASE("output is identical regardless of worker-thread count",
           "[determinism][threads]") {
   const fs::path base = fs::path(STARGEN_TEST_WORKDIR) / "determinism_run";
   const std::string name = "detsys";
 
-  std::string single = generate_json(base / "t1", 1, name);
-  std::string multi = generate_json(base / "t8", 8, name);
+  const long seeds[] = {12345, 777, 31337};
+  const int thread_counts[] = {2, 4, 8, 16};
+  constexpr int kParallelRepeats = 6;  // catch run-to-run nondeterminism at -T8
 
-  // Byte-for-byte identical: same seed must yield the same systems no matter
-  // how many threads generated them.
-  REQUIRE(single == multi);
+  for (long seed : seeds) {
+    // Single-threaded output is the deterministic reference for this seed.
+    const std::string reference = generate_json(base / "ref", 1, seed, name);
+
+    // Repeat the same parallel thread count: a data race shows up as run-to-run
+    // variation even when the thread count is held fixed.
+    for (int rep = 0; rep < kParallelRepeats; ++rep) {
+      std::string repeated = generate_json(base / "rep", 8, seed, name);
+      INFO("seed=" << seed << " repeated -T8 run #" << rep
+                   << " differs from single-threaded reference");
+      REQUIRE(repeated == reference);
+    }
+
+    // Sweep thread counts: output must not depend on how many workers ran.
+    for (int t : thread_counts) {
+      std::string multi = generate_json(base / "t", t, seed, name);
+      INFO("seed=" << seed << " -T" << t
+                   << " differs from single-threaded reference");
+      REQUIRE(multi == reference);
+    }
+  }
 
   std::error_code ec;
   fs::remove_all(base, ec);
