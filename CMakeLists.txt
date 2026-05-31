@@ -37,6 +37,17 @@ if(SANITIZE)
   message(STATUS "Sanitizers enabled: ${SANITIZE}")
 endif()
 
+# Where the executables land. Normal builds drop them in the source dir for
+# convenience (ctest, the golden test, and the pre-commit hook all run the
+# source-tree ./stargen). A sanitizer build, however, must NOT overwrite that
+# binary -- an ASan-instrumented ./stargen makes the normal ctest fail -- so
+# sanitizer builds keep their executables inside their own build dir instead.
+if(SANITIZE)
+  set(STARGEN_BIN_OUTPUT_DIR "${CMAKE_BINARY_DIR}")
+else()
+  set(STARGEN_BIN_OUTPUT_DIR "${CMAKE_SOURCE_DIR}")
+endif()
+
 option(CLANG "Use Clang instead of GCC" OFF)
 if(CLANG AND NOT CMAKE_C_COMPILER AND NOT CMAKE_CXX_COMPILER)
   set(CMAKE_C_COMPILER clang)
@@ -165,7 +176,7 @@ target_link_libraries(stargen PRIVATE
 
 # Set the binary output directory to the source directory
 set_target_properties(stargen PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${STARGEN_BIN_OUTPUT_DIR}"
 )
 
 # Unit tests
@@ -224,7 +235,7 @@ target_link_libraries(orbital_demo PRIVATE
 )
 
 set_target_properties(orbital_demo PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${STARGEN_BIN_OUTPUT_DIR}"
 )
 
 # ============================================================================
@@ -277,5 +288,5 @@ target_link_libraries(viewer PRIVATE
 )
 
 set_target_properties(viewer PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${STARGEN_BIN_OUTPUT_DIR}"
 )

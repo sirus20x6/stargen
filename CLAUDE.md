@@ -30,6 +30,18 @@ claims have outrun reality here before:
   Do **not** run a bare `cmake --build build` — the `viewer` target is currently broken
   (raylib `Vector3` clash) and unrelated; a full build will fail through no fault of yours.
 - Tests: `ctest --test-dir build --output-on-failure`.
+- Sanitizer builds (`-DSANITIZE=address|thread|undefined`) use a SEPARATE build dir
+  (`cmake -B build-asan -DSANITIZE=address`); their executables land in that build dir,
+  not the source tree, so they no longer overwrite the normal `./stargen`.
+
+## Shell gotcha (zsh)
+
+The default Bash tool runs under **zsh**, which expands globs differently from bash:
+- `grep --include=*.cpp` fails with `no matches found: --include=*.cpp` because zsh tries to
+  glob `*.cpp` itself. Quote the pattern (`grep '--include=*.cpp'`), use `git grep`, or run
+  the command via the `delegator` `execute` MCP tool (plain `sh`), which is also unaffected by
+  the `/tmp` quota. Several "0 results" greps during the determinism work were false negatives
+  from this — verify a surprising empty grep with `git grep` before acting on it.
 
 ## Running the generator (for manual checks)
 
