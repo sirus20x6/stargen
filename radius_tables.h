@@ -77,16 +77,16 @@ extern thread_local std::map<int, long double> gas_4point5Gyr_78K_10core_mass;
 extern thread_local std::map<int, long double> gas_4point5Gyr_78K_25core_mass;
 extern thread_local std::map<int, long double> gas_4point5Gyr_78K_50core_mass;
 extern thread_local std::map<int, long double> gas_4point5Gyr_78K_100core_mass;
-extern std::map<long double, long double> solid_water;
-extern std::map<long double, long double> solid_one_quater_rock_three_fourths_water;
-extern std::map<long double, long double> solid_half_rock_half_water;
-extern std::map<long double, long double> solid_rock;
-extern std::map<long double, long double> solid_half_rock_half_iron;
-extern std::map<long double, long double> solid_iron;
-extern std::map<long double, long double> solid_0point953_iron_0point047_water;
-extern std::map<long double, long double> solid_0point51_iron_0point49_water;
-extern std::map<long double, long double> solid_0point264_iron_0point736_water;
-extern std::map<long double, long double> earth_like;
+extern thread_local std::map<long double, long double> solid_water;
+extern thread_local std::map<long double, long double> solid_one_quater_rock_three_fourths_water;
+extern thread_local std::map<long double, long double> solid_half_rock_half_water;
+extern thread_local std::map<long double, long double> solid_rock;
+extern thread_local std::map<long double, long double> solid_half_rock_half_iron;
+extern thread_local std::map<long double, long double> solid_iron;
+extern thread_local std::map<long double, long double> solid_0point953_iron_0point047_water;
+extern thread_local std::map<long double, long double> solid_0point51_iron_0point49_water;
+extern thread_local std::map<long double, long double> solid_0point264_iron_0point736_water;
+extern thread_local std::map<long double, long double> earth_like;
 
 long double solid_iron_calc(double x);
 

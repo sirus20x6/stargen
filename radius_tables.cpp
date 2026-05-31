@@ -77,16 +77,16 @@ thread_local std::map<int, long double> gas_4point5Gyr_78K_10core_mass;
 thread_local std::map<int, long double> gas_4point5Gyr_78K_25core_mass;
 thread_local std::map<int, long double> gas_4point5Gyr_78K_50core_mass;
 thread_local std::map<int, long double> gas_4point5Gyr_78K_100core_mass;
-std::map<long double, long double> solid_water;
-std::map<long double, long double> solid_one_quater_rock_three_fourths_water;
-std::map<long double, long double> solid_half_rock_half_water;
-std::map<long double, long double> solid_rock;
-std::map<long double, long double> solid_half_rock_half_iron;
-std::map<long double, long double> solid_iron;
-std::map<long double, long double> solid_0point953_iron_0point047_water;
-std::map<long double, long double> solid_0point51_iron_0point49_water;
-std::map<long double, long double> solid_0point264_iron_0point736_water;
-std::map<long double, long double> earth_like;
+thread_local std::map<long double, long double> solid_water;
+thread_local std::map<long double, long double> solid_one_quater_rock_three_fourths_water;
+thread_local std::map<long double, long double> solid_half_rock_half_water;
+thread_local std::map<long double, long double> solid_rock;
+thread_local std::map<long double, long double> solid_half_rock_half_iron;
+thread_local std::map<long double, long double> solid_iron;
+thread_local std::map<long double, long double> solid_0point953_iron_0point047_water;
+thread_local std::map<long double, long double> solid_0point51_iron_0point49_water;
+thread_local std::map<long double, long double> solid_0point264_iron_0point736_water;
+thread_local std::map<long double, long double> earth_like;
 
 long double solid_iron_calc(double x){
 return 0.79250 + 0.22077 * log(x) + 0.01845 * log(x)*log(x);

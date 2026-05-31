@@ -232,6 +232,14 @@ struct SystemOutputData {
 std::vector<SystemOutputData> g_pending_outputs;
 std::mutex g_output_mutex;
 
+// Guards the run-wide summary-statistics globals (the breathable and
+// potentially-habitable min/max aggregates, which alias g_sim_context members).
+// Every parallel worker funnels its planets through update_breathable_statistics
+// / update_potential_statistics, so these shared reductions would otherwise race.
+// They are commutative (min/max), so serialising them keeps the final summary
+// identical regardless of thread interleaving -- determinism is preserved.
+std::mutex g_stats_mutex;
+
 /**
  * @brief Handle aListGases action - list all gases with their properties
  */
@@ -2376,6 +2384,8 @@ static auto update_min_max_stat(long double value, long double& min_stat, long d
  * @return true if any new min/max was set (for verbose logging)
  */
 static auto update_breathable_statistics(planet* the_planet, long double illumination) -> bool {
+  // Serialise the shared min/max aggregate updates against other worker threads.
+  std::lock_guard<std::mutex> stats_lock(g_stats_mutex);
   bool stats_updated = false;
 
   stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), min_breathable_temp, max_breathable_temp);
@@ -2400,6 +2410,8 @@ static auto update_breathable_statistics(planet* the_planet, long double illumin
  * @return true if any new min/max was set (for verbose logging)
  */
 static auto update_potential_statistics(planet* the_planet, long double illumination) -> bool {
+  // Serialise the shared min/max aggregate updates against other worker threads.
+  std::lock_guard<std::mutex> stats_lock(g_stats_mutex);
   bool stats_updated = false;
 
   stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), min_potential_temp, max_potential_temp);

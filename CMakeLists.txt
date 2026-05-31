@@ -48,6 +48,22 @@ else()
   set(STARGEN_BIN_OUTPUT_DIR "${CMAKE_SOURCE_DIR}")
 endif()
 
+# Tracy is a profiler. Its bundled rpmalloc allocator recycles memory spans
+# across threads without synchronization that ThreadSanitizer can observe, and
+# its profiler worker threads touch shared globals -- both produce a flood of
+# TSan false positives that drown out real data races. So in a sanitizer build
+# we disable Tracy entirely: the Tracy CMake option is forced OFF (TracyClient
+# becomes a stub with no profiler threads and no rpmalloc), and we do not define
+# TRACY_ENABLE for our targets (the Tracy.hpp macros like ZoneScoped then expand
+# to nothing). TracyClient is still linked so its headers remain on the include
+# path. Normal (non-sanitizer) builds keep full Tracy instrumentation.
+if(SANITIZE)
+  set(TRACY_ENABLE OFF CACHE BOOL "" FORCE)   # affects the fetched Tracy build
+  set(STARGEN_TRACY_DEFINES "")               # no TRACY_ENABLE for our code
+else()
+  set(STARGEN_TRACY_DEFINES TRACY_ENABLE)
+endif()
+
 option(CLANG "Use Clang instead of GCC" OFF)
 if(CLANG AND NOT CMAKE_C_COMPILER AND NOT CMAKE_CXX_COMPILER)
   set(CMAKE_C_COMPILER clang)
@@ -146,7 +162,7 @@ add_library(stargen_core STATIC
     # DO NOT add TracyClient.cpp here. It's built as part of the TracyClient library.
 )
 
-target_compile_definitions(stargen_core PUBLIC TRACY_ENABLE)
+target_compile_definitions(stargen_core PUBLIC ${STARGEN_TRACY_DEFINES})
 target_include_directories(stargen_core PUBLIC
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/tracy
@@ -163,8 +179,8 @@ add_executable(stargen
     main.cpp
 )
 
-# Define Tracy enabling macro - This is correct for enabling Tracy
-target_compile_definitions(stargen PRIVATE TRACY_ENABLE)
+# Define Tracy enabling macro (empty in sanitizer builds; see STARGEN_TRACY_DEFINES)
+target_compile_definitions(stargen PRIVATE ${STARGEN_TRACY_DEFINES})
 
 # This line includes ${CMAKE_SOURCE_DIR}/tracy.
 target_include_directories(stargen PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
@@ -225,7 +241,7 @@ add_executable(orbital_demo
     star_trek.cpp
 )
 
-target_compile_definitions(orbital_demo PRIVATE TRACY_ENABLE)
+target_compile_definitions(orbital_demo PRIVATE ${STARGEN_TRACY_DEFINES})
 target_include_directories(orbital_demo PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
 target_link_libraries(orbital_demo PRIVATE
     TracyClient
@@ -277,7 +293,7 @@ add_executable(viewer
     star_trek.cpp
 )
 
-target_compile_definitions(viewer PRIVATE TRACY_ENABLE)
+target_compile_definitions(viewer PRIVATE ${STARGEN_TRACY_DEFINES})
 target_include_directories(viewer PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
 target_link_libraries(viewer PRIVATE
     TracyClient
