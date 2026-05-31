@@ -24,3 +24,5 @@ viewer
 # Generated HTML output
 html/
 vgcore.*
+build-asan/
+build-tsan/

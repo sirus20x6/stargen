@@ -17,6 +17,26 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON) # Explicitly enable compiler-specific extensions.
 
+# Optional sanitizers for finding memory/UB/data-race bugs. OFF by default so
+# normal builds and the pre-commit hook are unaffected. Use a separate build dir:
+#   cmake -B build-asan -DSANITIZE=address && cmake --build build-asan --target stargen
+#   cmake -B build-tsan -DSANITIZE=thread   && cmake --build build-tsan --target stargen
+set(SANITIZE "" CACHE STRING "Enable sanitizers: address | thread | undefined (default off)")
+if(SANITIZE)
+  if(SANITIZE STREQUAL "address")
+    set(_san_flags -fsanitize=address,undefined -fno-omit-frame-pointer -g)
+  elseif(SANITIZE STREQUAL "thread")
+    set(_san_flags -fsanitize=thread -fno-omit-frame-pointer -g)
+  elseif(SANITIZE STREQUAL "undefined")
+    set(_san_flags -fsanitize=undefined -fno-omit-frame-pointer -g)
+  else()
+    message(FATAL_ERROR "Unknown SANITIZE='${SANITIZE}' (use address|thread|undefined)")
+  endif()
+  add_compile_options(${_san_flags})
+  add_link_options(${_san_flags})
+  message(STATUS "Sanitizers enabled: ${SANITIZE}")
+endif()
+
 option(CLANG "Use Clang instead of GCC" OFF)
 if(CLANG AND NOT CMAKE_C_COMPILER AND NOT CMAKE_CXX_COMPILER)
   set(CMAKE_C_COMPILER clang)
