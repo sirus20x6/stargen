@@ -22,7 +22,7 @@
 std::string breathability_phrase[4] = {"none", "breathable", "unbreathable",
                                   "poisonous"};
 
-std::map<std::map<long double, long double>, std::vector<long double> > polynomial_cache;
+thread_local std::map<std::map<long double, long double>, std::vector<long double> > polynomial_cache;
 
 /**
  * @brief mass to luminosity

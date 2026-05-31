@@ -21,6 +21,13 @@ long& jseed = g_random_context.jseed;
 long& ifrst = g_random_context.ifrst;
 long& nextn = g_random_context.nextn;
 
+// Per-thread active RNG context (nullptr -> use the global g_random_context).
+thread_local RandomContext* t_active_random_context = nullptr;
+void set_active_random_context(RandomContext* ctx) { t_active_random_context = ctx; }
+static inline RandomContext& active_rng() {
+  return t_active_random_context ? *t_active_random_context : g_random_context;
+}
+
 auto compare_string_char(std::string &a_string, int place, const char *a_character,
                          int length) -> bool {
   if (a_string.compare(place, length, a_character) == 0) {
@@ -34,7 +41,7 @@ auto compare_string_char(std::string &a_string, int place, const char *a_charact
 /// @param outer Upper bound
 /// @return Random number in range [inner, outer)
 auto random_number(long double inner, long double outer) -> long double {
-  return g_random_context.randDouble(inner, outer);
+  return active_rng().randDouble(inner, outer);
 }
 
 /*-----------------------------------------------------------------*/
@@ -219,29 +226,34 @@ auto randf() -> double {
   long momdmp = 2836;
   long hvlue = 0, lvlue = 0, testv = 0;
 
-  if (ifrst == 0) {
-    nextn = jseed;
-    ifrst = 1;
+  // Use the current thread's active RNG context so the legacy LCG state
+  // (jseed/ifrst/nextn) is per-system in parallel mode, not shared globally.
+  RandomContext& rc = active_rng();
+
+  if (rc.ifrst == 0) {
+    rc.nextn = rc.jseed;
+    rc.ifrst = 1;
   }
 
-  hvlue = nextn / mobymp;
-  lvlue = nextn % mobymp;
+  hvlue = rc.nextn / mobymp;
+  lvlue = rc.nextn % mobymp;
   testv = (mplier * lvlue) - (momdmp * hvlue);
 
   if (testv > 0) {
-    nextn = testv;
+    rc.nextn = testv;
   } else {
-    nextn = testv + modlus;
+    rc.nextn = testv + modlus;
   }
 
-  return (double)nextn / (double)modlus;
+  return (double)rc.nextn / (double)modlus;
 }
 
 /// @brief 
 /// @param a_seed 
 void srandf(long a_seed) {
-  jseed = a_seed;
-  ifrst = 0;
+  RandomContext& rc = active_rng();
+  rc.jseed = a_seed;
+  rc.ifrst = 0;
 }
 
 /// @brief 

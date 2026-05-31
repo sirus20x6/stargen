@@ -17,6 +17,14 @@ extern long& jseed;
 extern long& ifrst;
 extern long& nextn;
 
+// Per-thread active RNG context. When non-null, the free RNG functions
+// (random_number/about/random_eccentricity/gaussian/exponential/randf/srandf)
+// draw from it instead of the global g_random_context, so each parallel worker
+// uses its own deterministic per-system stream. nullptr -> fall back to global.
+class RandomContext;
+extern thread_local RandomContext* t_active_random_context;
+void set_active_random_context(RandomContext* ctx);
+
 auto compare_string_char(std::string& a_string, int place, const char* a_character,
                          int length = 1) -> bool;
 // std::string replaceStrChar(std::string, const char *, const char *);

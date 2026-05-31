@@ -687,7 +687,12 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
   // Determine if we can use parallel execution
   // Parallel mode is only safe for simple cases: fixed star, no catalogs, no special modes
-  bool can_use_parallel = (num_threads > 1) && (system_count > 1) && !do_catalog &&
+  // Unified generation path: ALL eligible multi-system runs go through the pool,
+  // including single-threaded ones (num_threads == 1 -> a pool of one). Routing
+  // -T1 through the same path as -T8 makes output byte-identical regardless of
+  // thread count and gives one canonical generator. Single-system and
+  // catalog/solar/seed-system runs still use the serial fallback below.
+  bool can_use_parallel = (num_threads >= 1) && (system_count > 1) && !do_catalog &&
                           (sys_no_arg == 0) && !use_solar_system && !reuse_solar_system &&
                           (out_format == ffHTML || out_format == ffTEXT || out_format == ffSVG ||
                            out_format == ffCSV || out_format == ffCSVdl || out_format == ffJSON);
@@ -757,6 +762,11 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
           gen->random_context.setSeed(seed_arg + (sys_index * seed_increment));
           acc->setRandomContext(&gen->random_context);
+
+          // Route the free RNG functions (random_number/randf/...) used by
+          // enviro/accrete generation to THIS worker's per-system context.
+          // gen may have been reacquired from the pool, so set it each iteration.
+          set_active_random_context(&gen->random_context);
 
           // Create sun object (lightweight)
           sun thread_sun;
@@ -841,6 +851,10 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
         systems_generated += count;
 
+        // Clear this thread's active RNG pointer before the pooled objects are
+        // released, so no dangling pointer survives for thread reuse.
+        set_active_random_context(nullptr);
+
         // Return objects to pools (if not transferred to output)
         generator_pool.release(gen);
         accrete_pool.release(acc);
@@ -891,6 +905,17 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
         flag_seed = sys_data.flag_seed;
         the_sun_clone = sys_data.the_sun;
 
+        // The describe_system serializers (text/JSON/CSV/SVG/HTML in display.cpp)
+        // iterate the GLOBAL g_sim_context.planets vector, not their
+        // innermost_planet argument. In parallel mode each system was built into
+        // its own per-thread context, so rebuild the global vector from THIS
+        // system's planet list before output. The output phase is single-threaded,
+        // so mutating the global here is safe.
+        std::vector<planet*> saved_planets = g_sim_context.planets;
+        planet* saved_global_innermost = g_sim_context.innermost_planet;
+        g_sim_context.innermost_planet = sys_data.innermost_planet;
+        g_sim_context.buildPlanetVector();
+
         // Output system using centralized helper with all necessary parameters
         // Only pass csv_file pointer if it's open (for CSV/JSON formats)
         std::fstream* csv_ptr = (csv_file.is_open()) ? &csv_file : nullptr;
@@ -901,6 +926,8 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
         innermost_planet = saved_innermost;
         flag_seed = saved_seed;
         the_sun_clone = saved_sun;
+        g_sim_context.planets = saved_planets;
+        g_sim_context.innermost_planet = saved_global_innermost;
 
       } catch (const std::exception& e) {
         std::cerr << "\nError outputting system " << sys_data.system_name

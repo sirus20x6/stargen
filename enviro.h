@@ -6,7 +6,11 @@
 #include "utils.h"
 
 extern std::string breathability_phrase[4];
-extern std::map<std::map<long double, long double>, std::vector<long double> >
+// thread_local: each worker thread gets its own radius-coefficient cache.
+// A shared cache was written without synchronization during parallel
+// generation, producing torn state and nondeterministic gas-giant
+// radius/density values run-to-run.
+extern thread_local std::map<std::map<long double, long double>, std::vector<long double> >
     polynomial_cache;
 
 auto mass_to_luminosity(long double) -> long double;
