@@ -1558,7 +1558,7 @@ static void calculate_gas_loss(planet *the_planet, sun &the_sun, const std::stri
  * @param parent_mass Mass of parent body (for moons)
  * @param is_moon Whether this is a moon
  */
-static void finalize_gas_giant_properties(planet *the_planet, sun &the_sun,
+static void finalize_gas_giant_properties(StarGenerator* gen, planet *the_planet, sun &the_sun,
                                          const std::string &planet_id, bool do_gases,
                                          bool force_gas_giant, long double parent_mass,
                                          bool is_moon) {
@@ -1595,7 +1595,7 @@ static void finalize_gas_giant_properties(planet *the_planet, sun &the_sun,
   long double temp = the_planet->getEstimatedTerrTemp();
 
   if (is_habitable_jovian(the_planet)) {
-    habitable_jovians++;
+    gen->sim_context.system_habitable_jovians++;
 
     if ((flag_verbose & 0x8000) != 0) {
       std::string planet_type = type_string(the_planet);
@@ -2338,7 +2338,7 @@ void generate_planet(StarGenerator* gen, planet *the_planet, int planet_no, sun 
 
   // Finalize planet properties based on type
   if (is_gas_planet(the_planet)) {
-    finalize_gas_giant_properties(the_planet, the_sun, planet_id, do_gases,
+    finalize_gas_giant_properties(gen, the_planet, the_sun, planet_id, do_gases,
                                   force_gas_giant, parent_mass, is_moon);
   } else {
     finalize_rocky_planet_properties(gen, the_planet, the_sun, planet_id, do_gases,

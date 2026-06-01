@@ -30,6 +30,7 @@ auto compare_string_char(std::string& a_string, int place, const char* a_charact
 // std::string replaceStrChar(std::string, const char *, const char *);
 auto float_to_string(long double) -> std::string;
 auto random_number(long double, long double) -> long double;
+auto random_number_int(int min, int max) -> int;
 auto about(long double, long double) -> long double;
 auto random_eccentricity(long double) -> long double;
 auto gaussian(long double) -> long double;

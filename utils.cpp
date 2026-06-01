@@ -44,6 +44,16 @@ auto random_number(long double inner, long double outer) -> long double {
   return active_rng().randDouble(inner, outer);
 }
 
+/// @brief Random integer in the inclusive range [min, max], drawn from the
+///        active (per-thread, seeded) RandomContext. Replaces the old
+///        std::random_device-seeded static RNG so dependent output (e.g.
+///        Celestia textures) is reproducible from the run seed and free of the
+///        shared-static data race the static generator would have on the
+///        parallel path.
+auto random_number_int(int min, int max) -> int {
+  return active_rng().randIntInclusive(min, max);
+}
+
 /*-----------------------------------------------------------------*/
 /* This function returns a value within a certain variation of the */
 /* exact value given it in 'value'.                                */
