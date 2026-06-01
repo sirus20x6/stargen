@@ -711,9 +711,15 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
       }
     }
   }
-  if (hist_head->planets == nullptr) {
-    hist_head->planets = planet_head;
-  }
+  // Pin history's chain pointer to the CURRENT head every pass. Planetesimals
+  // are PREPENDED as the new head (see the `a < planet_head->getA()` case above),
+  // so a one-time snapshot (the old `if (... == nullptr)`) left hist_head->planets
+  // pointing at an interior node: free_generations() then freed only the suffix
+  // and every planet prepended afterwards leaked (ASan: the chain returned by
+  // dist_planetary_masses and stored as innermost_planet was never fully freed).
+  // hist_head->planets and the returned chain are the SAME nodes, and only the
+  // history path frees them, so re-pinning frees the whole chain exactly once.
+  hist_head->planets = planet_head;
   ZoneScoped;
 }
 
