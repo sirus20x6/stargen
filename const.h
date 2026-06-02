@@ -215,21 +215,26 @@ constexpr double pow4(double a) {
     return a * a * a * a;
 }
 
-// Note: std::sqrt and std::pow are not constexpr until C++20, so these functions
-// cannot be used in a constexpr context in earlier standards.
-constexpr double pow1_4(double a) {
+// These transcendental helpers call std::pow / std::sqrt / std::log10. C++23
+// makes those <cmath> overloads constexpr on paper (P0533), but real-world
+// availability is toolchain-dependent: GCC's libstdc++ constant-folds them,
+// whereas clang (e.g. clang-18 on CI) rejects a `constexpr` function that calls
+// them, with -Winvalid-constexpr ("never produces a constant expression"). None
+// of these helpers are ever used in a constant-expression context, so keep them
+// plain `inline` for portability across compilers.
+inline double pow1_4(double a) {
     return std::sqrt(std::sqrt(a));
 }
 
-constexpr double pow1_3(double a) {
+inline double pow1_3(double a) {
     return std::pow(a, 1.0 / 3.0);
 }
 
-constexpr double pow1_2(double a) {
+inline double pow1_2(double a) {
     return std::sqrt(a);
 }
 // mass based on luminosity (a) */
-constexpr double mass(double a) {
+inline double mass(double a) {
     if (a <= (0.3815 * std::pow(0.6224, 2.5185))) {
         return 1.46613 * std::pow(a, 0.3970617431010522);
     } else if (a <= 1) {
@@ -244,8 +249,8 @@ constexpr double mass(double a) {
 }
 
 /* calculates luminosity based on absolute magnitude (a) */
-constexpr double abs2luminosity(double a) { return std::pow(N2, (SUNMAG - a)); }
-constexpr double vis2abs(double v, double d) { return v - 5 * (std::log10(d / PARSEC) - 1); }
+inline double abs2luminosity(double a) { return std::pow(N2, (SUNMAG - a)); }
+inline double vis2abs(double v, double d) { return v - 5 * (std::log10(d / PARSEC) - 1); }
 
 constexpr double JUPITER_MASS = 317.8; /* mass of Jupiter in Earth Masses */
 constexpr double EM(double x) {
