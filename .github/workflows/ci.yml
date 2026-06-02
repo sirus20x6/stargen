@@ -4,6 +4,14 @@ on:
   push:
   pull_request:
 
+# Auto-cancel superseded runs of this workflow on the same ref. Without it,
+# every push + pull_request across the stacked kanban branches piled up with no
+# way to clear, and the redundant runs starved the free-tier runner pool (jobs
+# sat queued for over an hour behind builds for commits that no longer mattered).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -11,8 +19,14 @@ jobs:
       fail-fast: false
       matrix:
         compiler:
-          - { name: gcc, cc: gcc-14, cxx: g++-14 }
-          - { name: clang, cc: clang-18, cxx: clang++-18 }
+          # `jobs` caps build parallelism per compiler. clang-18 compiling the
+          # C++23 module units needs a lot of RAM per translation unit; at
+          # Ninja's default (~cores+2) the parallel clang processes exhausted
+          # the runner's memory and "Build stargen" thrashed for 40+ min without
+          # finishing, while gcc (lighter per TU) built in ~5 min. Pin clang to
+          # a single job; gcc can use two.
+          - { name: gcc, cc: gcc-14, cxx: g++-14, jobs: 2 }
+          - { name: clang, cc: clang-18, cxx: clang++-18, jobs: 1 }
 
     name: build-and-test (${{ matrix.compiler.name }})
 
@@ -37,10 +51,10 @@ jobs:
       # NOTE: build only the specific targets. The `viewer` target is currently
       # broken, so a bare full build would make CI red.
       - name: Build stargen
-        run: cmake --build build --target stargen -j
+        run: cmake --build build --target stargen -j ${{ matrix.compiler.jobs }}
 
       - name: Build stargen_tests
-        run: cmake --build build --target stargen_tests -j
+        run: cmake --build build --target stargen_tests -j ${{ matrix.compiler.jobs }}
 
       # Skip local-only tests (golden_regression): they byte-compare ~20-sig-fig
       # FP output and only match the toolchain that produced the goldens. They
