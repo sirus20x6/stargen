@@ -29,8 +29,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ninja-build cmake ${{ matrix.compiler.cxx }}
 
+      # The `viewer` target needs raylib (GLFW + a display backend) at configure
+      # time and is unrelated to the generator; keep it out of CI entirely.
       - name: Configure
-        run: cmake -S . -B build -G Ninja
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DSTARGEN_BUILD_VIEWER=OFF
 
       # NOTE: build only the specific targets. The `viewer` target is currently
       # broken, so a bare full build would make CI red.
@@ -40,5 +42,8 @@ jobs:
       - name: Build stargen_tests
         run: cmake --build build --target stargen_tests -j
 
+      # Skip local-only tests (golden_regression): they byte-compare ~20-sig-fig
+      # FP output and only match the toolchain that produced the goldens. They
+      # still run locally via verify.sh and the pre-commit hook.
       - name: Test
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build --output-on-failure --label-exclude local-only
