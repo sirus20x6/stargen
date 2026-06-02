@@ -1,4 +1,3 @@
-#include <bits/std_abs.h>           // for abs
 #include <iostream>
 #include <numeric>
 #include <vector>
