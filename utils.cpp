@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>                  // for std::stringstream (not guaranteed via <iostream>)
 #include <numeric>
 #include <vector>
 #include <algorithm>                // for remove_if

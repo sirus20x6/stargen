@@ -4,7 +4,8 @@
 #include <algorithm>  // for replace
 #include <cmath>      // for isnan
 #include <iomanip>    // for operator<<, setprecision
-#include <iostream>   // for std::stringstream, cout, basic_ostream<>::__ostream_...
+#include <iostream>   // for cout, basic_ostream<>::__ostream_...
+#include <sstream>    // for std::stringstream (not guaranteed via <iostream>)
 #include <map>        // for std::map
 #include <string>     // for std::string, to_string
 #include <vector>     // for std::vector
