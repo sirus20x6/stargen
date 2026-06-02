@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install GCC 13
       run: |
@@ -28,19 +28,23 @@ jobs:
         echo "CXX=g++-13" >> $GITHUB_ENV
 
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_STANDARD=20 -DSTARGEN_BUILD_VIEWER=OFF
 
+    # Build only the shipped targets; the `viewer` is gated off above.
     - name: Build
-      run: cmake --build build --config ${{env.BUILD_TYPE}} --verbose
+      run: |
+        cmake --build build --config ${{env.BUILD_TYPE}} --target stargen -j
+        cmake --build build --config ${{env.BUILD_TYPE}} --target stargen_tests -j
 
     - name: Test
       working-directory: build
-      run: ctest -C ${{env.BUILD_TYPE}}
+      # Skip local-only tests (golden_regression) — non-portable FP goldens; see ci.yml.
+      run: ctest -C ${{env.BUILD_TYPE}} --label-exclude local-only
 
     - name: Package
       run: tar -czvf stargen.tar.gz -C build .
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: stargen-ubuntu-latest.tar.gz
         path: stargen.tar.gz

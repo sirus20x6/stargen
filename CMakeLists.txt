@@ -70,6 +70,12 @@ if(CLANG AND NOT CMAKE_C_COMPILER AND NOT CMAKE_CXX_COMPILER)
   set(CMAKE_CXX_COMPILER clang++)
 endif()
 
+# The real-time viewer needs raylib, which pulls in GLFW + a display backend
+# (X11/Wayland/GL) at *configure* time. Headless CI and the generator/test
+# targets need none of that, so make the viewer opt-out. Default ON preserves
+# the local developer experience; CI configures with -DSTARGEN_BUILD_VIEWER=OFF.
+option(STARGEN_BUILD_VIEWER "Build the raylib-based real-time viewer" ON)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
 cmake_host_system_information(RESULT logical QUERY NUMBER_OF_LOGICAL_CORES)
@@ -105,14 +111,17 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(yaml-cpp) # Defines yaml-cpp target
 
-# Add raylib dependency for viewer
-FetchContent_Declare(
-  raylib
-  GIT_REPOSITORY https://github.com/raysan5/raylib.git
-  GIT_TAG 5.0
-)
-set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # Don't build raylib examples
-FetchContent_MakeAvailable(raylib) # Defines raylib target
+# Add raylib dependency for viewer (only when building the viewer; raylib's
+# configure step requires a display backend that headless CI lacks).
+if(STARGEN_BUILD_VIEWER)
+  FetchContent_Declare(
+    raylib
+    GIT_REPOSITORY https://github.com/raysan5/raylib.git
+    GIT_TAG 5.0
+  )
+  set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # Don't build raylib examples
+  FetchContent_MakeAvailable(raylib) # Defines raylib target
+endif()
 
 # Add Catch2 v3 dependency for unit testing
 FetchContent_Declare(
@@ -259,7 +268,9 @@ set_target_properties(orbital_demo PROPERTIES
 # ============================================================================
 # Interactive viewer for visualizing generated stellar systems in real-time
 # with orbital motion. Build with: cmake --build . --target viewer
+# Gated on STARGEN_BUILD_VIEWER so headless builds need no raylib/display deps.
 
+if(STARGEN_BUILD_VIEWER)
 add_executable(viewer
     viewer.cpp
     OrbitalSimulator.cpp
@@ -306,3 +317,4 @@ target_link_libraries(viewer PRIVATE
 set_target_properties(viewer PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${STARGEN_BIN_OUTPUT_DIR}"
 )
+endif()  # STARGEN_BUILD_VIEWER

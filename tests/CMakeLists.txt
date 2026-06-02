@@ -50,3 +50,11 @@ add_test(
         -DWORKING_DIR=${CMAKE_SOURCE_DIR}
         -P ${CMAKE_CURRENT_SOURCE_DIR}/golden_regression.cmake
 )
+
+# golden_regression byte-compares ~20-significant-digit stargen output against
+# goldens baked with one specific toolchain. Floating-point codegen differs
+# across compiler / glibc / -march, so the goldens are NOT portable to CI
+# runners (they fail there even in Release). Label it "local-only" so CI can
+# skip it with `ctest --label-exclude local-only`, while verify.sh and the
+# pre-commit hook still run it under the canonical local toolchain.
+set_tests_properties(golden_regression PROPERTIES LABELS "local-only")
