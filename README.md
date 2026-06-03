@@ -1,30 +1,25 @@
-![CI](https://github.com/sirus20x6/stargen/actions/workflows/main.yml/badge.svg)
+![CI](https://github.com/PlutonianEmpire/stargen/actions/workflows/main.yml/badge.svg)
 
-This is a fork of a version of stargen from https://github.com/omega13a/stargen
-
-My goal is to update and modernize the code, and then add features in that order. I had found an older version of accrete/accrete2 written in K&R C that had been partially updated to ANSI C. I added JSON exporting to that before stumbling on this newer fork. I have been going back and forth between modernizing by hand and using static analyzers to improve the code, but some of it is so old the analyzers have trouble.
-
-
-Then I found comments from this old sister fork https://github.com/fusiongyro/starform I'm trying to bring over the appropriate comments one by one in a painstakingly manual way, while updating them to doxygen style. the code diverges from whats in this branch so it's not always easy to find where to shoe horn it in.
-
-Strangly some of the code in that fork is more modular / object oriented / better despite having fewer features. I may steal some of it for refactoring
+This is a fork of a version of stargen from https://github.com/sirus20x6/stargen
 
 ## New Features
-- Replaced orbital ressonance look up table with formulaic version that is more accurate
-- Added JSON exporting
-- Removed dependency on boost
-- Removed dependency on GNU Scientific Library
+- Preset Mie Atmospheres.
+- Fixed IC 3094 Spectral types.
+- Earthlike generation around B and A stars. (Unrealistic, I know.)
 
-## TODO
-- Convert existing data in the code over to JSON
-- Remove all global variables
-- Make the code more modular and compliant with modern C++ code
-- Add multithreading probably through OpenMP
-- ~~JSON support for exporting solar data~~
+## TODO (Probably too optimistic given my limited abilities, but w/e.)
+- Port over whatever additional changes made by sirus20x6.
+- Fix certain rotational parameters.
+- Split albedos into BondAlbedo and GeomAlbedo.
+- Add an export option to export planets to SpaceEngine .sc script.
+- Fix distances of moons; they are currently based solely on hill spheres; making the innermost moons take 90 days to orbit a planet that is far from their sun(s).
+
+## Known Issues
+- A typo I can't find is causing radius errors for certain planet masses, causing StarGen to quit. This will interfere with large batches of systems. Only solution is to start over. :(
 
 ## Build instructions
 ```bash
-git clone https://github.com/sirus20x6/stargen.git
+git clone https://github.com/PlutonianEmpire/stargen.git
 cd stargen
 cmake ./CMakeLists.txt
 cmake --build .
