@@ -1064,9 +1064,6 @@ planet::planet(int n, long double a2, long double e2, long double t, bool gg,
 }
 
 planet::~planet() {
-  planet* node = nullptr;
-  planet* next = nullptr;
-
   a = 0;
   e = 0;
   axialTilt = 0;
@@ -1113,29 +1110,32 @@ planet::~planet() {
   meanLongitude = 0;
   atmosphere.clear();
 
-  // Clean up moons vector (delete generated moons, preserve predefined ones)
+  // Single-source moon ownership. The `moons` vector and the legacy
+  // `first_moon` linked list alias the SAME moon objects after
+  // buildMoonVector()/sortMoons() (structs.h:304, planet::sortMoons), so the old
+  // destructor — which deleted each moon once from the vector and then AGAIN
+  // while walking first_moon — was a latent double-free. It was masked only
+  // because the leaked planet chain (see accrete hist re-pin fix) was never
+  // reachable for destruction. Delete from a single source: the vector.
+  //
+  // If only the legacy chain was populated (a moon that never went through
+  // sortMoons/buildMoonVector, e.g. seed-injected or nested moons), mirror the
+  // chain into the vector first so those are still freed exactly once.
+  if (moons.empty() && first_moon != nullptr) {
+    for (planet* m = first_moon; m != nullptr; m = m->next_planet) {
+      moons.push_back(m);
+    }
+  }
   for (planet* moon : moons) {
     if (moon->getDeletable()) {
       delete moon;
+    } else {
+      moon->next_planet = moon->reconnect_to;  // preserve predefined-global relink
     }
   }
   moons.clear();
   moons_backup.clear();
-
-  // Legacy cleanup for old linked list approach (during transition)
-  if (first_moon != nullptr) {
-    for (node = first_moon; node != nullptr; node = next) {
-      next = node->next_planet;
-      if (node->getDeletable()) {
-        delete node;
-      } else {
-        node->next_planet = node->reconnect_to;
-      }
-    }
-  }
-  if (first_moon_backup != nullptr) {
-    first_moon = first_moon_backup;
-  }
+  first_moon = nullptr;  // chain is now a dangling view of freed moons; drop it
 }
 
 void planet::addGas(gas g) {
