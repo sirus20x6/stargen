@@ -19,12 +19,14 @@ jobs:
       fail-fast: false
       matrix:
         compiler:
-          # clang-18 (the Ubuntu default) hangs indefinitely compiling this
-          # project's C++23 named-module units: "Build stargen" sat in progress
-          # for 50+ min even at -j1, while gcc built in ~5 min. It is a clang-18
-          # module-support bug -- gcc and clang-21+ build the same tree fine --
-          # so the clang lane pulls clang-21 from apt.llvm.org instead.
-          # `jobs` caps build parallelism per compiler (keeps peak RAM sane).
+          # The clang lane uses clang-21 from apt.llvm.org (newer than the
+          # Ubuntu default clang-18) for current C++23 support. Note: clang's
+          # optimizer hangs effectively forever ("Build stargen" stuck 50+ min,
+          # even at -j1, vs ~5 min for gcc) on the huge predefined star-catalogue
+          # initializers -- ring_universe.cpp et al., tens of thousands of
+          # mass(abs2luminosity(...)) calls in one dynamic initializer. That is
+          # worked around per-file in CMakeLists.txt (-O0 for those data TUs
+          # under clang); gcc is unaffected. `jobs` caps build parallelism.
           - { name: gcc, cc: gcc-14, cxx: g++-14, jobs: 2 }
           - { name: clang, cc: clang-21, cxx: clang++-21, jobs: 2 }
 

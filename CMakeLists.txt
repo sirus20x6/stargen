@@ -171,6 +171,27 @@ add_library(stargen_core STATIC
     # DO NOT add TracyClient.cpp here. It's built as part of the TracyClient library.
 )
 
+# ----------------------------------------------------------------------------
+# clang optimizer workaround for the large predefined star catalogues.
+# ring_universe.cpp, ic3094_2.cpp and andromeda2.cpp (and the not-currently-
+# compiled ring_universe2.cpp) are enormous static tables whose entries are
+# built from runtime calls -- mass(abs2luminosity(...)) -- tens of thousands of
+# times, producing one huge dynamic initializer. clang's optimizer (verified on
+# clang-18/21/22) spins on that effectively forever at every -O level except
+# -O0, while gcc compiles it fine in seconds. These translation units are pure
+# data, so forcing -O0 under clang costs nothing at runtime and lets the clang
+# build complete. (Source COMPILE_OPTIONS are emitted after CMAKE_CXX_FLAGS_*,
+# so this -O0 overrides the Release -O3 for just these files.)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set_source_files_properties(
+        ring_universe.cpp
+        ring_universe2.cpp
+        ic3094_2.cpp
+        andromeda2.cpp
+        PROPERTIES COMPILE_OPTIONS "-O0"
+    )
+endif()
+
 target_compile_definitions(stargen_core PUBLIC ${STARGEN_TRACY_DEFINES})
 target_include_directories(stargen_core PUBLIC
     ${CMAKE_SOURCE_DIR}
