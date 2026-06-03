@@ -19,14 +19,14 @@ jobs:
       fail-fast: false
       matrix:
         compiler:
-          # `jobs` caps build parallelism per compiler. clang-18 compiling the
-          # C++23 module units needs a lot of RAM per translation unit; at
-          # Ninja's default (~cores+2) the parallel clang processes exhausted
-          # the runner's memory and "Build stargen" thrashed for 40+ min without
-          # finishing, while gcc (lighter per TU) built in ~5 min. Pin clang to
-          # a single job; gcc can use two.
+          # clang-18 (the Ubuntu default) hangs indefinitely compiling this
+          # project's C++23 named-module units: "Build stargen" sat in progress
+          # for 50+ min even at -j1, while gcc built in ~5 min. It is a clang-18
+          # module-support bug -- gcc and clang-21+ build the same tree fine --
+          # so the clang lane pulls clang-21 from apt.llvm.org instead.
+          # `jobs` caps build parallelism per compiler (keeps peak RAM sane).
           - { name: gcc, cc: gcc-14, cxx: g++-14, jobs: 2 }
-          - { name: clang, cc: clang-18, cxx: clang++-18, jobs: 1 }
+          - { name: clang, cc: clang-21, cxx: clang++-21, jobs: 2 }
 
     name: build-and-test (${{ matrix.compiler.name }})
 
@@ -41,7 +41,18 @@ jobs:
       - name: Install toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build cmake ${{ matrix.compiler.cxx }}
+          sudo apt-get install -y ninja-build cmake
+          if [ "${{ matrix.compiler.name }}" = "clang" ]; then
+            # clang-21 is not in the Ubuntu apt repos; pull it from apt.llvm.org.
+            # clang-tools-21 provides clang-scan-deps-21, which CMake needs to
+            # scan the C++23 module dependency graph for the clang build.
+            wget -qO llvm.sh https://apt.llvm.org/llvm.sh
+            chmod +x llvm.sh
+            sudo ./llvm.sh 21
+            sudo apt-get install -y clang-tools-21
+          else
+            sudo apt-get install -y ${{ matrix.compiler.cxx }}
+          fi
 
       # The `viewer` target needs raylib (GLFW + a display backend) at configure
       # time and is unrelated to the generator; keep it out of CI entirely.
