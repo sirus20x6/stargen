@@ -26,10 +26,14 @@ void ensure_directory_exists(const std::string& path) {
 }
 
 int random_numberInt(int min, int max) {
-  static std::random_device              rd;
-  static std::mt19937                    gen(rd());
-  static std::uniform_int_distribution<> dis(min, max);
-  return dis(gen);
+  // Draw from the active seeded RandomContext (see utils.cpp) rather than a
+  // static std::random_device generator. The old static RNG was (a) seeded
+  // from system entropy -> Celestia (-c) texture indices differed every run,
+  // (b) a shared-mutable static -> a latent data race if ever reached from the
+  // parallel path, and (c) buggy: the static uniform_int_distribution was
+  // constructed once and ignored min/max on later calls. This routes through
+  // the same deterministic path as random_number() and respects min/max.
+  return random_number_int(min, max);
 }
 
 /**
@@ -280,6 +284,8 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool d
 
   if (!the_sun.getIsCircumbinary()) {
     nlohmann::json header = {
+        {"schema_version",              "1.0.0"                   },
+        {"generator",                   "stargen"                 },
         {"Body Type",                   "Binary Star"             },
         {"seed",                        seed                      },
         {"Star Name",                   the_sun.getName()         },
@@ -294,6 +300,8 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool d
     the_file << header.dump(4) << "\n";
   } else {
     nlohmann::json header = {
+        {"schema_version",              "1.0.0"                         },
+        {"generator",                   "stargen"                       },
         {"Body Type",                   "Star"                          },
         {"seed",                        seed                            },
         {"Star Name",                   the_sun.getName()               },

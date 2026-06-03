@@ -18,6 +18,7 @@
 #include "SimulationContext.h"  // for SimulationContext
 #include "RandomContext.h"  // for RandomContext
 #include "StarGenerator.h"  // for StarGenerator
+#include "radius_tables.h"  // for initRadii (per-thread gas-table population)
 #include "ThreadPool.h"  // for ThreadPool (parallel generation)
 #include "ObjectPool.h"  // for ObjectPool (object reuse)
 #include <mutex>  // for std::mutex (thread-safe output)
@@ -43,7 +44,15 @@ void initConfig() {
 
 // Legacy global references - these now point to Config members for compatibility
 int& flags_arg_clone = g_config.flags;
-sun& the_sun_clone = g_sim_context.current_sun;
+// the_sun_clone is the "active sun" of the system currently being generated. It
+// is thread_local (NOT a reference into the shared g_generator) so each parallel
+// worker owns its own copy: generate_stellar_system assigns this thread's fully
+// initialised sun into it before generate_planets() runs. Previously this aliased
+// g_generator.sim_context.current_sun, so all 8 ThreadPool workers read/wrote one
+// shared sun unsynchronised -- the source of the gas-giant Density/Total Radius
+// run-to-run jitter (the gas-radius age==0 fallback and the habitability
+// getEffTemp() lazy-init both read it). TSan confirmed the race was on g_generator.
+thread_local sun the_sun_clone;
 int& flag_verbose = g_config.verbose_level;
 long& flag_seed = g_config.random_seed;
 long double& min_age = g_config.min_age;
@@ -222,6 +231,14 @@ struct SystemOutputData {
 // Thread-safe storage for parallel output
 std::vector<SystemOutputData> g_pending_outputs;
 std::mutex g_output_mutex;
+
+// Guards the run-wide summary-statistics globals (the breathable and
+// potentially-habitable min/max aggregates, which alias g_sim_context members).
+// Every parallel worker funnels its planets through update_breathable_statistics
+// / update_potential_statistics, so these shared reductions would otherwise race.
+// They are commutative (min/max), so serialising them keeps the final summary
+// identical regardless of thread interleaving -- determinism is preserved.
+std::mutex g_stats_mutex;
 
 /**
  * @brief Handle aListGases action - list all gases with their properties
@@ -687,7 +704,12 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
   // Determine if we can use parallel execution
   // Parallel mode is only safe for simple cases: fixed star, no catalogs, no special modes
-  bool can_use_parallel = (num_threads > 1) && (system_count > 1) && !do_catalog &&
+  // Unified generation path: ALL eligible multi-system runs go through the pool,
+  // including single-threaded ones (num_threads == 1 -> a pool of one). Routing
+  // -T1 through the same path as -T8 makes output byte-identical regardless of
+  // thread count and gives one canonical generator. Single-system and
+  // catalog/solar/seed-system runs still use the serial fallback below.
+  bool can_use_parallel = (num_threads >= 1) && (system_count > 1) && !do_catalog &&
                           (sys_no_arg == 0) && !use_solar_system && !reuse_solar_system &&
                           (out_format == ffHTML || out_format == ffTEXT || out_format == ffSVG ||
                            out_format == ffCSV || out_format == ffCSVdl || out_format == ffJSON);
@@ -747,6 +769,13 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
         int local_earthlike = 0;
         int local_worlds = 0;
 
+        // Populate THIS worker thread's thread_local gas-radius interpolation
+        // tables. They are thread_local (the gas-radius helpers write per-planet
+        // anchors into them), so the main thread's initRadii() in main.cpp does
+        // not reach worker threads; each thread must initialise its own copy.
+        // The guard inside initRadii() makes this a one-time cost per thread.
+        initRadii();
+
         // Process all systems assigned to this thread
         for (int i = 0; i < count; i++) {
           int sys_index = start_index + i;
@@ -757,6 +786,11 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
           gen->random_context.setSeed(seed_arg + (sys_index * seed_increment));
           acc->setRandomContext(&gen->random_context);
+
+          // Route the free RNG functions (random_number/randf/...) used by
+          // enviro/accrete generation to THIS worker's per-system context.
+          // gen may have been reacquired from the pool, so set it each iteration.
+          set_active_random_context(&gen->random_context);
 
           // Create sun object (lightweight)
           sun thread_sun;
@@ -841,6 +875,10 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
 
         systems_generated += count;
 
+        // Clear this thread's active RNG pointer before the pooled objects are
+        // released, so no dangling pointer survives for thread reuse.
+        set_active_random_context(nullptr);
+
         // Return objects to pools (if not transferred to output)
         generator_pool.release(gen);
         accrete_pool.release(acc);
@@ -891,6 +929,17 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
         flag_seed = sys_data.flag_seed;
         the_sun_clone = sys_data.the_sun;
 
+        // The describe_system serializers (text/JSON/CSV/SVG/HTML in display.cpp)
+        // iterate the GLOBAL g_sim_context.planets vector, not their
+        // innermost_planet argument. In parallel mode each system was built into
+        // its own per-thread context, so rebuild the global vector from THIS
+        // system's planet list before output. The output phase is single-threaded,
+        // so mutating the global here is safe.
+        std::vector<planet*> saved_planets = g_sim_context.planets;
+        planet* saved_global_innermost = g_sim_context.innermost_planet;
+        g_sim_context.innermost_planet = sys_data.innermost_planet;
+        g_sim_context.buildPlanetVector();
+
         // Output system using centralized helper with all necessary parameters
         // Only pass csv_file pointer if it's open (for CSV/JSON formats)
         std::fstream* csv_ptr = (csv_file.is_open()) ? &csv_file : nullptr;
@@ -901,6 +950,8 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
         innermost_planet = saved_innermost;
         flag_seed = saved_seed;
         the_sun_clone = saved_sun;
+        g_sim_context.planets = saved_planets;
+        g_sim_context.innermost_planet = saved_global_innermost;
 
       } catch (const std::exception& e) {
         std::cerr << "\nError outputting system " << sys_data.system_name
@@ -1373,6 +1424,14 @@ void generate_stellar_system(StarGenerator* gen, sun &the_sun, bool use_seed_sys
   }
   // std::cout << "test" << system_counter << "\n";
 
+  // Publish THIS system's fully-initialised sun (mass, luminosity, effTemp, age
+  // are all set by this point) into the per-thread active-sun clone, so the
+  // gas-radius and habitability helpers in enviro.cpp/gas_radius_helpers.cpp read
+  // this worker's sun rather than a sun shared across threads. This is what makes
+  // parallel generation deterministic; it also pre-computes effTemp so the later
+  // getEffTemp() on the clone is a pure read (no lazy-init write race).
+  the_sun_clone = the_sun;
+
   // Build planet vector for efficient iteration (replacing linked list traversal)
   // MUST be called before generate_planets() which iterates over the vector
   gen->sim_context.buildPlanetVector();
@@ -1499,7 +1558,7 @@ static void calculate_gas_loss(planet *the_planet, sun &the_sun, const std::stri
  * @param parent_mass Mass of parent body (for moons)
  * @param is_moon Whether this is a moon
  */
-static void finalize_gas_giant_properties(planet *the_planet, sun &the_sun,
+static void finalize_gas_giant_properties(StarGenerator* gen, planet *the_planet, sun &the_sun,
                                          const std::string &planet_id, bool do_gases,
                                          bool force_gas_giant, long double parent_mass,
                                          bool is_moon) {
@@ -1536,7 +1595,7 @@ static void finalize_gas_giant_properties(planet *the_planet, sun &the_sun,
   long double temp = the_planet->getEstimatedTerrTemp();
 
   if (is_habitable_jovian(the_planet)) {
-    habitable_jovians++;
+    gen->sim_context.system_habitable_jovians++;
 
     if ((flag_verbose & 0x8000) != 0) {
       std::string planet_type = type_string(the_planet);
@@ -2279,7 +2338,7 @@ void generate_planet(StarGenerator* gen, planet *the_planet, int planet_no, sun 
 
   // Finalize planet properties based on type
   if (is_gas_planet(the_planet)) {
-    finalize_gas_giant_properties(the_planet, the_sun, planet_id, do_gases,
+    finalize_gas_giant_properties(gen, the_planet, the_sun, planet_id, do_gases,
                                   force_gas_giant, parent_mass, is_moon);
   } else {
     finalize_rocky_planet_properties(gen, the_planet, the_sun, planet_id, do_gases,
@@ -2325,6 +2384,8 @@ static auto update_min_max_stat(long double value, long double& min_stat, long d
  * @return true if any new min/max was set (for verbose logging)
  */
 static auto update_breathable_statistics(planet* the_planet, long double illumination) -> bool {
+  // Serialise the shared min/max aggregate updates against other worker threads.
+  std::lock_guard<std::mutex> stats_lock(g_stats_mutex);
   bool stats_updated = false;
 
   stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), min_breathable_temp, max_breathable_temp);
@@ -2349,6 +2410,8 @@ static auto update_breathable_statistics(planet* the_planet, long double illumin
  * @return true if any new min/max was set (for verbose logging)
  */
 static auto update_potential_statistics(planet* the_planet, long double illumination) -> bool {
+  // Serialise the shared min/max aggregate updates against other worker threads.
+  std::lock_guard<std::mutex> stats_lock(g_stats_mutex);
   bool stats_updated = false;
 
   stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), min_potential_temp, max_potential_temp);
