@@ -45,8 +45,20 @@ public:
 
     // Generate a random long double in range [min, max)
     long double randDouble(long double min, long double max) {
-        std::uniform_real_distribution<long double> dist(min, max);
-        return dist(rng);
+        // Several callers pass swapped bounds (min > max), e.g. enviro.cpp's
+        // random_number(0.2, 1.0 - imf) when imf > 0.8. std::uniform_real_
+        // distribution requires a <= b: a release libstdc++ silently computes
+        // u*(b-a)+a, but a hardened/sanitizer libstdc++ asserts '_M_a <= _M_b'
+        // and aborts. Keep the valid path byte-identical to the release build,
+        // and for the inverted path reproduce that exact unchecked formula with
+        // one canonical [0,1) draw (generate_canonical consumes the RNG the same
+        // way regardless of a/b, so output stays bit-for-bit identical).
+        if (min <= max) {
+            std::uniform_real_distribution<long double> dist(min, max);
+            return dist(rng);
+        }
+        std::uniform_real_distribution<long double> unit(0.0L, 1.0L);
+        return min + (max - min) * unit(rng);  // == u*(max-min)+min
     }
 
     // Generate a random integer in range [min, max]
