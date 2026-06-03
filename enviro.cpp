@@ -122,12 +122,17 @@ auto getSubType(std::string spec_type) -> int {
   std::string buffer;
 
   for (std::string::iterator it = spec_type.begin(); it < spec_type.end(); it++) {
-    if (isdigit(*it)) {
+    if (isdigit(static_cast<unsigned char>(*it)) || (*it == '.' && !buffer.empty())) {
       buffer += *it;
-      return atoi(buffer.c_str());
+    } else if (!buffer.empty()) {
+      // Stop at the first non-numeric character after the numeric subtype began.
+      break;
     }
   }
-  return 0;
+  if (buffer.empty()) {
+    return 0;
+  }
+  return static_cast<int>(strtod(buffer.c_str(), nullptr));
 }
 
 /**
@@ -921,7 +926,7 @@ auto planet_albedo(planet *the_planet) -> long double {
     components += 1.0;
   }
 
-  cloud_adjustment = cloud_fraction / components;
+  cloud_adjustment = (components > 0.0) ? (cloud_fraction / components) : 0.0;
 
   if (rock_fraction >= cloud_adjustment) {
     rock_fraction -= cloud_adjustment;
@@ -974,7 +979,7 @@ auto planet_albedo(planet *the_planet) -> long double {
 
 long double opacity(long double molecular_weight, long double surf_pressure, long double effective_temp) {
     // Base opacity calculation
-    double base_opacity = 0.0;
+    long double base_opacity = 0.0;
 
     if (molecular_weight < 10.0) {
         base_opacity = 3.0 - 0.066 * (10.0 - molecular_weight);
@@ -989,8 +994,8 @@ long double opacity(long double molecular_weight, long double surf_pressure, lon
     }
 
     // Pressure contribution
-    double pressure_in_earth = surf_pressure / EARTH_SURF_PRES_IN_MILLIBARS;
-    double pressure_factor = 1.0;
+    long double pressure_in_earth = surf_pressure / EARTH_SURF_PRES_IN_MILLIBARS;
+    long double pressure_factor = 1.0;
     
     if (pressure_in_earth >= 70.0) {
         pressure_factor = 8.333;
@@ -1008,10 +1013,15 @@ long double opacity(long double molecular_weight, long double surf_pressure, lon
 
     // Temperature dependence
     // Assuming opacity increases with temperature (simplified model)
-    double temp_factor = 1.0 + 0.01 * (effective_temp - 273.15); // 273.15 is 0°C in Kelvin
+    long double temp_factor = 1.0L + 0.01L * (effective_temp - 273.15L); // 273.15 is 0°C in Kelvin
+    // Clamp to >= 0 so very cold worlds (below ~173K) don't produce a
+    // negative optical depth feeding into the greenhouse math.
+    if (temp_factor < 0.0L) {
+        temp_factor = 0.0L;
+    }
 
     // Combine all factors
-    double optical_depth = base_opacity * pressure_factor * temp_factor;
+    long double optical_depth = base_opacity * pressure_factor * temp_factor;
 
     return optical_depth;
 }
@@ -2244,9 +2254,10 @@ static void adjust_gas_ipp_to_range(Chemical& the_gas, planet* the_planet,
   long double pressure = the_planet->getSurfPressure() * (gas_amount / total_amount);
   long double ipp = inspired_partial_pressure(the_planet->getSurfPressure(), pressure);
 
+  int loops = 0;
   if (ipp > the_gas.getMaxIpp()) {
     // Gas level too high - reduce iteratively
-    while (ipp > the_gas.getMaxIpp()) {
+    while (ipp > the_gas.getMaxIpp() && loops++ < 10000) {
       long double old_amount = gas_amount;
       gas_amount *= 0.99;  // Reduce by 1%
       total_amount -= old_amount;
@@ -2256,7 +2267,7 @@ static void adjust_gas_ipp_to_range(Chemical& the_gas, planet* the_planet,
     }
   } else if (ipp < the_gas.getMinIpp()) {
     // Gas level too low - increase iteratively
-    while (ipp < the_gas.getMinIpp()) {
+    while (ipp < the_gas.getMinIpp() && loops++ < 10000) {
       long double old_amount = gas_amount;
       if (gas_amount <= 0.0) {
         gas_amount = 1.0E-9;  // Start with tiny amount if zero
