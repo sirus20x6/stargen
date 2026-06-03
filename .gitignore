@@ -26,3 +26,6 @@ html/
 vgcore.*
 build-asan*/
 build-tsan*/
+
+# CTest scratch dir (created when ctest runs from the source root)
+Testing/
