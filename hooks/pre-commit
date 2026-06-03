@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Block-on-red pre-commit hook for StarGen.
+#
+# Enabled via:  git config core.hooksPath hooks
+#
+# Refuses the commit if the tree does not build and pass ctest. This exists
+# because "I verified it" claims in commit messages repeatedly outran reality;
+# the machine now gates the commit so a red tree cannot be committed with a
+# green-sounding message.
+#
+# Escape hatch (use sparingly, and say so): SKIP_VERIFY=1 git commit ...
+#   - intended only for docs-only / non-code commits where building is moot.
+
+if [ "${SKIP_VERIFY:-}" = "1" ]; then
+  echo "pre-commit: SKIP_VERIFY=1 set — skipping build/test gate."
+  exit 0
+fi
+
+repo_root="$(git rev-parse --show-toplevel)"
+if [ ! -x "$repo_root/scripts/verify.sh" ]; then
+  echo "pre-commit: scripts/verify.sh missing or not executable; refusing commit."
+  echo "            (chmod +x scripts/verify.sh, or SKIP_VERIFY=1 to override.)"
+  exit 1
+fi
+
+echo "pre-commit: running scripts/verify.sh (build + ctest)..."
+if "$repo_root/scripts/verify.sh"; then
+  exit 0
+else
+  echo
+  echo "pre-commit: verification FAILED — commit refused."
+  echo "  Fix the build/tests, or use SKIP_VERIFY=1 for a deliberate non-code commit."
+  exit 1
+fi

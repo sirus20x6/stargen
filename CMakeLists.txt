@@ -17,11 +17,64 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON) # Explicitly enable compiler-specific extensions.
 
+# Optional sanitizers for finding memory/UB/data-race bugs. OFF by default so
+# normal builds and the pre-commit hook are unaffected. Use a separate build dir:
+#   cmake -B build-asan -DSANITIZE=address && cmake --build build-asan --target stargen
+#   cmake -B build-tsan -DSANITIZE=thread   && cmake --build build-tsan --target stargen
+set(SANITIZE "" CACHE STRING "Enable sanitizers: address | thread | undefined (default off)")
+if(SANITIZE)
+  if(SANITIZE STREQUAL "address")
+    set(_san_flags -fsanitize=address,undefined -fno-omit-frame-pointer -g)
+  elseif(SANITIZE STREQUAL "thread")
+    set(_san_flags -fsanitize=thread -fno-omit-frame-pointer -g)
+  elseif(SANITIZE STREQUAL "undefined")
+    set(_san_flags -fsanitize=undefined -fno-omit-frame-pointer -g)
+  else()
+    message(FATAL_ERROR "Unknown SANITIZE='${SANITIZE}' (use address|thread|undefined)")
+  endif()
+  add_compile_options(${_san_flags})
+  add_link_options(${_san_flags})
+  message(STATUS "Sanitizers enabled: ${SANITIZE}")
+endif()
+
+# Where the executables land. Normal builds drop them in the source dir for
+# convenience (ctest, the golden test, and the pre-commit hook all run the
+# source-tree ./stargen). A sanitizer build, however, must NOT overwrite that
+# binary -- an ASan-instrumented ./stargen makes the normal ctest fail -- so
+# sanitizer builds keep their executables inside their own build dir instead.
+if(SANITIZE)
+  set(STARGEN_BIN_OUTPUT_DIR "${CMAKE_BINARY_DIR}")
+else()
+  set(STARGEN_BIN_OUTPUT_DIR "${CMAKE_SOURCE_DIR}")
+endif()
+
+# Tracy is a profiler. Its bundled rpmalloc allocator recycles memory spans
+# across threads without synchronization that ThreadSanitizer can observe, and
+# its profiler worker threads touch shared globals -- both produce a flood of
+# TSan false positives that drown out real data races. So in a sanitizer build
+# we disable Tracy entirely: the Tracy CMake option is forced OFF (TracyClient
+# becomes a stub with no profiler threads and no rpmalloc), and we do not define
+# TRACY_ENABLE for our targets (the Tracy.hpp macros like ZoneScoped then expand
+# to nothing). TracyClient is still linked so its headers remain on the include
+# path. Normal (non-sanitizer) builds keep full Tracy instrumentation.
+if(SANITIZE)
+  set(TRACY_ENABLE OFF CACHE BOOL "" FORCE)   # affects the fetched Tracy build
+  set(STARGEN_TRACY_DEFINES "")               # no TRACY_ENABLE for our code
+else()
+  set(STARGEN_TRACY_DEFINES TRACY_ENABLE)
+endif()
+
 option(CLANG "Use Clang instead of GCC" OFF)
 if(CLANG AND NOT CMAKE_C_COMPILER AND NOT CMAKE_CXX_COMPILER)
   set(CMAKE_C_COMPILER clang)
   set(CMAKE_CXX_COMPILER clang++)
 endif()
+
+# The real-time viewer needs raylib, which pulls in GLFW + a display backend
+# (X11/Wayland/GL) at *configure* time. Headless CI and the generator/test
+# targets need none of that, so make the viewer opt-out. Default ON preserves
+# the local developer experience; CI configures with -DSTARGEN_BUILD_VIEWER=OFF.
+option(STARGEN_BUILD_VIEWER "Build the raylib-based real-time viewer" ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
@@ -58,16 +111,35 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(yaml-cpp) # Defines yaml-cpp target
 
-# Add raylib dependency for viewer
-FetchContent_Declare(
-  raylib
-  GIT_REPOSITORY https://github.com/raysan5/raylib.git
-  GIT_TAG 5.0
-)
-set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # Don't build raylib examples
-FetchContent_MakeAvailable(raylib) # Defines raylib target
+# Add raylib dependency for viewer (only when building the viewer; raylib's
+# configure step requires a display backend that headless CI lacks).
+if(STARGEN_BUILD_VIEWER)
+  FetchContent_Declare(
+    raylib
+    GIT_REPOSITORY https://github.com/raysan5/raylib.git
+    GIT_TAG 5.0
+  )
+  set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # Don't build raylib examples
+  FetchContent_MakeAvailable(raylib) # Defines raylib target
+endif()
 
-add_executable(stargen
+# Add Catch2 v3 dependency for unit testing
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG v3.5.4 # Specific released tag
+)
+FetchContent_MakeAvailable(Catch2) # Defines Catch2::Catch2 and Catch2::Catch2WithMain
+
+# Enable CTest-based testing
+enable_testing()
+
+# ============================================================================
+# stargen_core: STATIC library of all stargen sources except main.cpp
+# ============================================================================
+# The stargen executable and the test binary both link this library, so the
+# generation/catalog logic is compiled once and exercised identically by tests.
+add_library(stargen_core STATIC
     accrete.cpp
     andromeda.cpp
     andromeda2.cpp
@@ -79,7 +151,6 @@ add_executable(stargen
     ic3094.cpp
     ic3094_2.cpp
     jimb.cpp
-    main.cpp
     omega_galaxy.cpp
     omega_galaxy2.cpp
     Planetary_Habitability_Laboratory.cpp
@@ -98,33 +169,64 @@ add_executable(stargen
     OrbitalSimulator.cpp       # NEW: Orbital mechanics simulator (optional, for viewer)
     OrbitalStateManager.cpp    # NEW: Multi-system orbital state management (optional, for viewer)
     # DO NOT add TracyClient.cpp here. It's built as part of the TracyClient library.
-    # REMOVED: _deps/tracy-src/public/TracyClient.cpp
 )
 
-# Define Tracy enabling macro - This is correct for enabling Tracy
-target_compile_definitions(stargen PRIVATE TRACY_ENABLE)
+# ----------------------------------------------------------------------------
+# clang optimizer workaround for the large predefined star catalogues.
+# ring_universe.cpp, ic3094_2.cpp and andromeda2.cpp (and the not-currently-
+# compiled ring_universe2.cpp) are enormous static tables whose entries are
+# built from runtime calls -- mass(abs2luminosity(...)) -- tens of thousands of
+# times, producing one huge dynamic initializer. clang's optimizer (verified on
+# clang-18/21/22) spins on that effectively forever at every -O level except
+# -O0, while gcc compiles it fine in seconds. These translation units are pure
+# data, so forcing -O0 under clang costs nothing at runtime and lets the clang
+# build complete. (Source COMPILE_OPTIONS are emitted after CMAKE_CXX_FLAGS_*,
+# so this -O0 overrides the Release -O3 for just these files.)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set_source_files_properties(
+        ring_universe.cpp
+        ring_universe2.cpp
+        ic3094_2.cpp
+        andromeda2.cpp
+        PROPERTIES COMPILE_OPTIONS "-O0"
+    )
+endif()
+
+target_compile_definitions(stargen_core PUBLIC ${STARGEN_TRACY_DEFINES})
+target_include_directories(stargen_core PUBLIC
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/tracy
+)
+target_link_libraries(stargen_core PUBLIC
+    TracyClient                     # Links the Tracy library and sets up its include paths.
+    nlohmann_json::nlohmann_json
+    m                               # Standard math library
+    yaml-cpp
+)
+
+# stargen executable = main.cpp + stargen_core
+add_executable(stargen
+    main.cpp
+)
+
+# Define Tracy enabling macro (empty in sanitizer builds; see STARGEN_TRACY_DEFINES)
+target_compile_definitions(stargen PRIVATE ${STARGEN_TRACY_DEFINES})
 
 # This line includes ${CMAKE_SOURCE_DIR}/tracy.
-# If you have project-specific files in a "tracy" folder at your source root, keep this.
-# If this was an attempt to help find the *fetched* Tracy library, it's not the correct way and
-# would be superseded by linking TracyClient. Preserving it in case it's for unrelated local headers.
 target_include_directories(stargen PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
 
 # Link libraries
 target_link_libraries(stargen PRIVATE
-    TracyClient                     # ADDED: This links the Tracy library and correctly sets up its include paths.
-    nlohmann_json::nlohmann_json
-    m                               # Standard math library
-    yaml-cpp
-    # jemalloc                        # Thread-optimized allocator for parallel performance (disabled for testing)
+    stargen_core
 )
-# REMOVED: target_include_directories(stargen PRIVATE ${tracy_SOURCE_DIR})
-# Linking TracyClient handles include directories automatically and correctly.
 
 # Set the binary output directory to the source directory
 set_target_properties(stargen PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${STARGEN_BIN_OUTPUT_DIR}"
 )
+
+# Unit tests
+add_subdirectory(tests)
 
 # Install commands are commented out, as per your existing file.
 # install(TARGETS stargen RUNTIME DESTINATION bin)
@@ -169,7 +271,7 @@ add_executable(orbital_demo
     star_trek.cpp
 )
 
-target_compile_definitions(orbital_demo PRIVATE TRACY_ENABLE)
+target_compile_definitions(orbital_demo PRIVATE ${STARGEN_TRACY_DEFINES})
 target_include_directories(orbital_demo PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
 target_link_libraries(orbital_demo PRIVATE
     TracyClient
@@ -179,7 +281,7 @@ target_link_libraries(orbital_demo PRIVATE
 )
 
 set_target_properties(orbital_demo PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${STARGEN_BIN_OUTPUT_DIR}"
 )
 
 # ============================================================================
@@ -187,7 +289,9 @@ set_target_properties(orbital_demo PROPERTIES
 # ============================================================================
 # Interactive viewer for visualizing generated stellar systems in real-time
 # with orbital motion. Build with: cmake --build . --target viewer
+# Gated on STARGEN_BUILD_VIEWER so headless builds need no raylib/display deps.
 
+if(STARGEN_BUILD_VIEWER)
 add_executable(viewer
     viewer.cpp
     OrbitalSimulator.cpp
@@ -221,7 +325,7 @@ add_executable(viewer
     star_trek.cpp
 )
 
-target_compile_definitions(viewer PRIVATE TRACY_ENABLE)
+target_compile_definitions(viewer PRIVATE ${STARGEN_TRACY_DEFINES})
 target_include_directories(viewer PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
 target_link_libraries(viewer PRIVATE
     TracyClient
@@ -232,5 +336,6 @@ target_link_libraries(viewer PRIVATE
 )
 
 set_target_properties(viewer PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${STARGEN_BIN_OUTPUT_DIR}"
 )
+endif()  # STARGEN_BUILD_VIEWER

@@ -14,7 +14,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     # Install LLVM (Clang)
     - name: Install LLVM
@@ -40,18 +40,21 @@ jobs:
     - name: Configure CMake
       shell: pwsh
       run: |
-        cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+        cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DSTARGEN_BUILD_VIEWER=OFF
 
-    # Build the project
+    # Build only the shipped targets; the `viewer` is gated off above.
     - name: Build Project
       shell: pwsh
-      run: cmake --build build --config ${{ env.BUILD_TYPE }} --verbose
+      run: |
+        cmake --build build --config ${{ env.BUILD_TYPE }} --target stargen
+        cmake --build build --config ${{ env.BUILD_TYPE }} --target stargen_tests
 
     # Test
     - name: Run Tests
       shell: pwsh
       working-directory: build
-      run: ctest -C ${{ env.BUILD_TYPE }}
+      # Skip local-only tests (golden_regression) — non-portable FP goldens; see ci.yml.
+      run: ctest -C ${{ env.BUILD_TYPE }} --label-exclude local-only
 
     # Package
     - name: Package the Build (Windows)
@@ -59,7 +62,7 @@ jobs:
       run: Compress-Archive -Path build\* -DestinationPath stargen.zip
 
     # Upload Artifact
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: stargen-clang.zip
         path: stargen.zip
