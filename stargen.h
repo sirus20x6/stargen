@@ -76,7 +76,8 @@ extern RandomContext& g_random_context;
 
 // Backward-compatible references to global instances
 extern int& flags_arg_clone;
-extern sun& the_sun_clone;
+// Per-thread "active sun" for the system currently being generated; see stargen.cpp.
+extern thread_local sun the_sun_clone;
 extern int& flag_verbose;
 extern bool& allow_planet_migration;
 extern bool& is_circumbinary;

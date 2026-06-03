@@ -7,6 +7,8 @@
 #include <map>                     // for std::map, std::map<>::mapped_type
 #include <string>                  // for std::string, operator<<, operator==
 #include <vector>                  // for vector
+#include <sstream>                 // for std::stringstream (not guaranteed via <iostream>)
+#include <numbers>                 // for std::numbers::pi (portable replacement for M_PI)
 #include <functional>
 #include "const.h"                 // for SUN_MASS_IN_EARTH_MASSES, AVE, pow2
 #include "elements.h"              // for gases
@@ -22,7 +24,7 @@
 std::string breathability_phrase[4] = {"none", "breathable", "unbreathable",
                                   "poisonous"};
 
-std::map<std::map<long double, long double>, std::vector<long double> > polynomial_cache;
+thread_local std::map<std::map<long double, long double>, std::vector<long double> > polynomial_cache;
 
 /**
  * @brief mass to luminosity
@@ -632,7 +634,7 @@ auto acceleration_oblateness_refinement(planet *the_planet) -> long double {
 
   // Angular velocity (omega) based on day length (convert hours to seconds)
   long double day_seconds      = the_planet->getDay() * 3600;
-  long double angular_velocity = (day_seconds > 0) ? (2 * M_PI / day_seconds) : 0.0;
+  long double angular_velocity = (day_seconds > 0) ? (2 * std::numbers::pi / day_seconds) : 0.0;
 
   // Adjust gravity for centrifugal force at the equator
   long double centrifugal_force =
