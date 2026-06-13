@@ -19,10 +19,10 @@ Planets present at:
 11	3.0651501624522978849 AU	0.5838073532638178418 EM	o
 12	4.4095270134381198187 AU	1.8592443363213155542 EM	o
 13	6.726467233692802118 AU	656.6125651986302291 EM	o
-14	13.649826586948702691 AU	0.74669522179036088813 EM	*
+14	13.649826586948702691 AU	0.74669522179036088813 EM	o
 15	18.99636213411846734 AU	5.680529274432274575 EM	o
 16	26.744272453248485406 AU	2.4075481771534598201 EM	o
-17	44.657360133327362775 AU	0.91125685055301357967 EM	*
+17	44.657360133327362775 AU	0.91125685055301357967 EM	o
 
 
 
@@ -197,7 +197,7 @@ Planet 8
    Surface temperature:		-89.110027179315197995 degrees Celcius
    Boiling point of water:	53.355861830369860854 degrees Celcius
    Hydrosphere percentage:	0%
-   Cloud cover percentage:	0.576452782901377081%
+   Cloud cover percentage:	0.576452782901376663%
    Ice cover percentage:	96.231749279429779506%
    Equatorial radius:		3972.2114418087746652 Km
    Density:			7.9396542666011936224 grams/cc
@@ -205,7 +205,7 @@ Planet 8
    Molecular weight retained:	5.9278064136401201036 and above
    Surface acceleration:	1045.5877460313689162 cm/sec2
    Axial tilt:			18.012065841058547022 degrees
-   Planetary albedo:		0.67982225118062005283
+   Planetary albedo:		0.6798222511806200524
 
 
 Planet 9
@@ -284,7 +284,7 @@ Planet 12	*gas giant*
 
 Planet 13	*gas giant*
    Distance from primary star:	6.726467233692802118 AU
-   Eccentricity of orbit:	0.0135835026550625778685
+   Eccentricity of orbit:	0.013585796883454768352
    Length of year:		6365.7542064773044928 days
    Length of day:		8.493588046675119057 hours
    Mass:			656.6125651986302291 Earth masses
@@ -305,23 +305,23 @@ Planet 14
    Mass:			0.74669522179036088813 Earth masses
    Surface gravity:		0.6753907973406547 Earth gees
    Surface pressure:		0.22241231042874857309 Earth atmospheres
-   Surface temperature:		-nan degrees Celcius
+   Surface temperature:		-209.00135397564610665 degrees Celcius
    Boiling point of water:	62.871821580101880045 degrees Celcius
-   Hydrosphere percentage:	34.499107965851873746%
-   Cloud cover percentage:	-nan%
-   Ice cover percentage:	-nan%
+   Hydrosphere percentage:	0%
+   Cloud cover percentage:	5.0061949059455136432e-06%
+   Ice cover percentage:	51.748661948777810622%
    Equatorial radius:		5925.844686218449168 Km
    Density:			5.1199975907036131945 grams/cc
    Escape Velocity:		10.024724917287180433 Km/sec
    Molecular weight retained:	0.06104982162839416776 and above
    Surface acceleration:	662.33211627407311684 cm/sec2
    Axial tilt:			5.785304912532390098 degrees
-   Planetary albedo:		-nan
+   Planetary albedo:		0.4346176454741630934
 
 
 Planet 15	*gas giant*
    Distance from primary star:	18.99636213411846734 AU
-   Eccentricity of orbit:	0.0878506286412571169
+   Eccentricity of orbit:	0.1277516186068076709
    Length of year:		30241.22031808308316 days
    Length of day:		24.913795236991554068 hours
    Mass:			5.680529274432274575 Earth masses
@@ -351,16 +351,16 @@ Planet 16	*gas giant*
 
 Planet 17
    Distance from primary star:	44.657360133327362775 AU
-   Eccentricity of orbit:	0.14806893851404717699
+   Eccentricity of orbit:	0.15662262191842463155
    Length of year:		109002.46874060795037 days
    Length of day:		24.553299916560122439 hours
    Mass:			0.91125685055301357967 Earth masses
    Surface gravity:		0.120682106966068422716 Earth gees
    Surface pressure:		0.047498150666866485557 Earth atmospheres
-   Surface temperature:		-nan degrees Celcius
+   Surface temperature:		-242.88091526656917907 degrees Celcius
    Boiling point of water:	31.572134334052805116 degrees Celcius
-   Hydrosphere percentage:	9.3623777863827307745%
-   Cloud cover percentage:	-nan%
+   Hydrosphere percentage:	0%
+   Cloud cover percentage:	1.540709811597812056e-07%
    Ice cover percentage:	100%
    Equatorial radius:		8870.482186653432684 Km
    Density:			1.8628431973639149469 grams/cc
@@ -368,4 +368,4 @@ Planet 17
    Molecular weight retained:	0.02798414836758644397 and above
    Surface acceleration:	118.34871842787948537 cm/sec2
    Axial tilt:			30.546286130806766579 degrees
-   Planetary albedo:		-nan
+   Planetary albedo:		0.69999999972267218953
