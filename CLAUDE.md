@@ -52,18 +52,24 @@ path, writes to `<cwd>/html/<name>.json`. To run it standalone, use a scratch di
 then `cd` into it. Useful flags: `-s<seed>`, `-n<count>`, `-m<mass>`, `-JS` (JSON),
 `-o <name>`, `-T<threads>`, `-t` (text to stdout).
 
-## Known open issue: parallel-generation determinism
+## Parallel-generation determinism (resolved)
 
-Parallel generation (`-T>1`) is **not** deterministic and the single-thread vs parallel
-paths diverge. A read-only investigation mapped ~76 shared-mutable-global access sites on the
-generation path; the confirmed culprits are:
-- `polynomial_cache` — a **file-scope global** `std::map` at `enviro.cpp:25`, written without
-  synchronization during radius calculation (the gas-giant radius/density FP jitter source).
-- the free RNG functions in `utils.cpp` (`random_number`/`about`/`random_eccentricity`/
-  `gaussian`/`exponential`/`randf`/`srandf`) draw from the global `g_random_context`.
-- `the_sun_clone` (= `g_sim_context.current_sun`) fallback reads/writes in `enviro.cpp`
-  habitability + gas-radius helpers (`gas_radius_helpers.cpp` too).
+Parallel generation (`-T>1`) is now **deterministic** — single-thread and parallel runs are
+byte-identical and the output does not depend on the worker-thread count. The previously
+shared-mutable globals on the generation path (the gas-radius `polynomial_cache`, the
+`the_sun_clone`/`g_sim_context.current_sun` fallback, the `utils.cpp` RNG context, the jovian
+counter, and the Celestia texture RNG) were migrated to per-thread / `thread_local` state.
+Relevant commits:
+- `9aa0a3c` — make parallel generation deterministic (per-thread sun + gas tables)
+- `9f2a639` — eliminate all ThreadSanitizer data races + fix a latent `min>max` abort
+- `2607829` — fix jovian-counter data race + nondeterministic Celestia texture RNG
 
-The correct fix is a per-thread/`thread_local` active-context migration of those globals.
-`flags_arg_clone`, `allow_planet_migration`, `max_distance_arg` are read-only-after-init and
-do NOT need migration. Track this on the "Determinism test" kanban card.
+Guarded against regression:
+- the ctest case **"output is identical regardless of worker-thread count"** sweeps several
+  worker-thread counts and repeats the parallel run, byte-comparing each against the
+  single-threaded baseline. It runs on **every** CI lane — gcc, clang, and the Windows
+  (clang/MSVC) lane — not just locally.
+- `scripts/verify.sh --determinism` adds a 10x `-T8` plus `-T1/-T2/-T4` byte-compare locally.
+
+`flags_arg_clone`, `allow_planet_migration`, and `max_distance_arg` are read-only-after-init
+and were correctly left shared.
