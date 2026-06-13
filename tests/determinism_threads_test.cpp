@@ -60,22 +60,39 @@ std::string generate_json(const fs::path& run_dir, int threads, long seed,
   std::error_code ec;
   fs::remove_all(run_dir, ec);
   fs::create_directories(run_dir / "html");
-  // Make stargen's input data resolvable relative to this cwd.
+  // Make stargen's input data resolvable relative to this cwd. On POSIX a
+  // symlink is cheapest, but on Windows creating one needs a privilege the CI
+  // runner lacks (the call would throw), so copy the small data tree instead.
+#ifdef _WIN32
+  fs::copy(fs::path(STARGEN_SOURCE_DIR) / "data", run_dir / "data",
+           fs::copy_options::recursive);
+#else
   fs::create_directory_symlink(fs::path(STARGEN_SOURCE_DIR) / "data",
                                run_dir / "data");
+#endif
   // Drop the sentinel marker so stargen will write into ./html.
   { std::ofstream(run_dir / "html" / kMarkerName) << "marker\n"; }
 
+  // Shell differences: cmd.exe needs the null device spelled NUL and a
+  // drive-aware `cd /d`; POSIX shells use /dev/null and a plain cd. Both honor
+  // `&&`, quoting, and `2>&1`.
+#ifdef _WIN32
+  const char* kCd = "cd /d ";
+  const char* kNull = "NUL";
+#else
+  const char* kCd = "cd ";
+  const char* kNull = "/dev/null";
+#endif
   std::ostringstream cmd;
   // cd into the private dir so data/ resolves and output lands in ./html.
   // Fixed seed (-s) and count (-n) with a star mass (-m) so the parallel path
   // runs; JSON output (-JS); -o sets the base filename; -T# the thread count.
-  cmd << "cd \"" << run_dir.string() << "\" && "
+  cmd << kCd << '"' << run_dir.string() << "\" && "
       << '"' << STARGEN_BIN << '"'
       << " -s" << seed << " -n12 -m1.0 -JS"
       << " -o " << out_name
       << " -T" << threads
-      << " > /dev/null 2>&1";
+      << " > " << kNull << " 2>&1";
 
   int rc = std::system(cmd.str().c_str());
   REQUIRE(rc == 0);

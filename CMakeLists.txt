@@ -1,5 +1,21 @@
 cmake_minimum_required(VERSION 3.5...4.99)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+
+# Windows (clang targeting the MSVC STL): our own targets compile against the
+# dynamic C runtime (msvcrt), but the FetchContent dependencies (Tracy,
+# yaml-cpp) declare old cmake_minimum_required values, so CMP0091 reverts to OLD
+# in their scope and they select a different CRT. lld-link then aborts the final
+# link with "/failifmismatch: mismatch detected for 'RuntimeLibrary'". Forcing
+# CMP0091 NEW for every project -- ours and the dependencies' -- routes all of
+# them through CMAKE_MSVC_RUNTIME_LIBRARY, which we pin to the dynamic CRT so the
+# embedded runtime directives agree. These settings only affect MSVC-ABI builds;
+# on the gcc/clang Linux lanes they are inert.
+set(CMAKE_POLICY_DEFAULT_CMP0091 NEW)
+if(POLICY CMP0091)
+  cmake_policy(SET CMP0091 NEW)
+endif()
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
 project(stargen VERSION 3.0.0.0 DESCRIPTION "A program for generating solar systems")
 
 # Assuming GIT_VERSION is set externally (e.g., by your CI, a FindGit.cmake module, or environment variable)
@@ -77,6 +93,16 @@ endif()
 option(STARGEN_BUILD_VIEWER "Build the raylib-based real-time viewer" ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
+
+# The standard math library is a separate link target on Linux/BSD (libm) but is
+# folded into the C runtime on Windows and macOS. Linking "m" explicitly on
+# Windows makes lld-link search for a nonexistent m.lib and fail; only reference
+# it on platforms where it is a real library.
+if(WIN32)
+  set(STARGEN_MATH_LIB "")
+else()
+  set(STARGEN_MATH_LIB m)
+endif()
 
 cmake_host_system_information(RESULT logical QUERY NUMBER_OF_LOGICAL_CORES)
 cmake_host_system_information(RESULT physical QUERY NUMBER_OF_PHYSICAL_CORES)
@@ -200,7 +226,7 @@ target_include_directories(stargen_core PUBLIC
 target_link_libraries(stargen_core PUBLIC
     TracyClient                     # Links the Tracy library and sets up its include paths.
     nlohmann_json::nlohmann_json
-    m                               # Standard math library
+    ${STARGEN_MATH_LIB}             # Standard math library (libm; empty on Windows/macOS)
     yaml-cpp
 )
 
@@ -276,7 +302,7 @@ target_include_directories(orbital_demo PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
 target_link_libraries(orbital_demo PRIVATE
     TracyClient
     nlohmann_json::nlohmann_json
-    m
+    ${STARGEN_MATH_LIB}
     yaml-cpp
 )
 
@@ -330,7 +356,7 @@ target_include_directories(viewer PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
 target_link_libraries(viewer PRIVATE
     TracyClient
     nlohmann_json::nlohmann_json
-    m
+    ${STARGEN_MATH_LIB}
     yaml-cpp
     raylib
 )
