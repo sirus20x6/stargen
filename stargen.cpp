@@ -232,13 +232,9 @@ struct SystemOutputData {
 std::vector<SystemOutputData> g_pending_outputs;
 std::mutex g_output_mutex;
 
-// Guards the run-wide summary-statistics globals (the breathable and
-// potentially-habitable min/max aggregates, which alias g_sim_context members).
-// Every parallel worker funnels its planets through update_breathable_statistics
-// / update_potential_statistics, so these shared reductions would otherwise race.
-// They are commutative (min/max), so serialising them keeps the final summary
-// identical regardless of thread interleaving -- determinism is preserved.
-std::mutex g_stats_mutex;
+// (The former g_stats_mutex is gone: the breathable/potentially-habitable
+// min/max summary stats are now accumulated per-worker and reduced after the
+// threads join, so no worker touches a shared mutable global during generation.)
 
 /**
  * @brief Handle aListGases action - list all gases with their properties
@@ -753,12 +749,24 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     std::vector<std::future<void>> futures;
     futures.reserve(num_threads);
 
+    // Per-batch habitability min/max accumulators, one slot per worker batch.
+    // Each worker folds its systems' stats into its OWN slot, so no shared
+    // mutable global is touched during generation; the slots are reduced into
+    // the run-wide totals after the threads join. unique_ptr because
+    // SimulationContext holds a std::mutex (non-movable). Fresh contexts already
+    // start at the correct min/max sentinels.
+    std::vector<std::unique_ptr<SimulationContext>> batch_stats;
+    batch_stats.reserve(num_threads);
+    for (int b = 0; b < num_threads; b++) {
+      batch_stats.emplace_back(std::make_unique<SimulationContext>());
+    }
+
     for (int thread_id = 0; thread_id < num_threads; thread_id++) {
       // Calculate the range of systems this thread will process
       int start_index = thread_id * systems_per_thread + std::min(thread_id, remainder);
       int count = systems_per_thread + (thread_id < remainder ? 1 : 0);
 
-      futures.push_back(pool.enqueue([=, &generator_pool, &accrete_pool, &systems_generated]() {
+      futures.push_back(pool.enqueue([=, &generator_pool, &accrete_pool, &systems_generated, &batch_stats]() {
         // Acquire objects from pools (one pair per thread)
         StarGenerator* gen = generator_pool.acquire();
         accrete* acc = accrete_pool.acquire();
@@ -783,6 +791,9 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
           // Reset objects for reuse
           gen->reset();
           acc->reset();
+          // Accumulate each system's breathable/potential min/max in isolation;
+          // folded into this worker's batch slot after generation (below).
+          gen->sim_context.resetHabitabilityStats();
 
           gen->random_context.setSeed(seed_arg + (sys_index * seed_increment));
           acc->setRandomContext(&gen->random_context);
@@ -817,6 +828,11 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
           local_potentially_habitable += gen->sim_context.system_potentially_habitable;
           local_earthlike += gen->sim_context.system_earthlike;
           local_worlds += gen->sim_context.total_worlds;
+
+          // Fold this system's habitability min/max into this worker's batch
+          // slot (its own slot -> no shared write during generation). Captures
+          // every generated system, including ones filtered from output below.
+          batch_stats[thread_id]->mergeHabitabilityStatsFrom(gen->sim_context);
 
           // Check if this system should be output
           bool should_output = should_output_system(
@@ -888,6 +904,15 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
     // Wait for all batches to complete
     for (auto& future : futures) {
       future.wait();
+    }
+
+    // Reduce the per-batch habitability min/max into the run-wide totals now
+    // that all workers have joined (single-threaded). g_sim_context's min/max
+    // summary is what print_summary_statistics and the HTML summary read. Order
+    // does not matter: min/max are commutative, so this is byte-identical to the
+    // old inline-under-g_stats_mutex accumulation.
+    for (auto& bs : batch_stats) {
+      g_sim_context.mergeHabitabilityStatsFrom(*bs);
     }
 
     std::cerr << "Parallel generation complete: " << systems_generated << " systems generated\n";
@@ -1333,8 +1358,6 @@ void init() {
   ZoneScoped;
 }
 
-int system_counter = 0;
-
 /**
  * @brief generate stellar system
  * 
@@ -1422,8 +1445,6 @@ void generate_stellar_system(StarGenerator* gen, sun &the_sun, bool use_seed_sys
     }
     the_sun.setAge(random_number(gen->config.min_age, gen->config.max_age));
   }
-  // std::cout << "test" << system_counter << "\n";
-
   // Publish THIS system's fully-initialised sun (mass, luminosity, effTemp, age
   // are all set by this point) into the per-thread active-sun clone, so the
   // gas-radius and habitability helpers in enviro.cpp/gas_radius_helpers.cpp read
@@ -2383,21 +2404,23 @@ static auto update_min_max_stat(long double value, long double& min_stat, long d
  * @param illumination The planet's illumination value
  * @return true if any new min/max was set (for verbose logging)
  */
-static auto update_breathable_statistics(planet* the_planet, long double illumination) -> bool {
-  // Serialise the shared min/max aggregate updates against other worker threads.
-  std::lock_guard<std::mutex> stats_lock(g_stats_mutex);
+static auto update_breathable_statistics(SimulationContext& sc, planet* the_planet, long double illumination) -> bool {
+  // Accumulate into the caller's per-context stats. On the parallel path this is
+  // the per-worker gen->sim_context (no shared global, no lock); the run-wide
+  // totals are reduced from these after the threads join. On the sequential path
+  // this is g_generator.sim_context, accumulated directly across systems.
   bool stats_updated = false;
 
-  stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), min_breathable_temp, max_breathable_temp);
-  stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_breathable_g, max_breathable_g);
-  stats_updated |= update_min_max_stat(illumination, min_breathable_l, max_breathable_l);
-  stats_updated |= update_min_max_stat(the_planet->getSurfPressure(), min_breathable_p, max_breathable_p);
-  stats_updated |= update_min_max_stat(the_planet->getMass(), min_breathable_mass, max_breathable_mass);
+  stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), sc.min_breathable_temp, sc.max_breathable_temp);
+  stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), sc.min_breathable_g, sc.max_breathable_g);
+  stats_updated |= update_min_max_stat(illumination, sc.min_breathable_l, sc.max_breathable_l);
+  stats_updated |= update_min_max_stat(the_planet->getSurfPressure(), sc.min_breathable_p, sc.max_breathable_p);
+  stats_updated |= update_min_max_stat(the_planet->getMass(), sc.min_breathable_mass, sc.max_breathable_mass);
 
   // Update terrestrial-specific stats if applicable
   if (the_planet->getType() == tTerrestrial) {
-    stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_breathable_terrestrial_g, max_breathable_terrestrial_g);
-    stats_updated |= update_min_max_stat(illumination, min_breathable_terrestrial_l, max_breathable_terrestrial_l);
+    stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), sc.min_breathable_terrestrial_g, sc.max_breathable_terrestrial_g);
+    stats_updated |= update_min_max_stat(illumination, sc.min_breathable_terrestrial_l, sc.max_breathable_terrestrial_l);
   }
 
   return stats_updated;
@@ -2409,24 +2432,23 @@ static auto update_breathable_statistics(planet* the_planet, long double illumin
  * @param illumination The planet's illumination value
  * @return true if any new min/max was set (for verbose logging)
  */
-static auto update_potential_statistics(planet* the_planet, long double illumination) -> bool {
-  // Serialise the shared min/max aggregate updates against other worker threads.
-  std::lock_guard<std::mutex> stats_lock(g_stats_mutex);
+static auto update_potential_statistics(SimulationContext& sc, planet* the_planet, long double illumination) -> bool {
+  // Accumulate into the caller's per-context stats (see update_breathable_statistics).
   bool stats_updated = false;
 
-  stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), min_potential_temp, max_potential_temp);
-  stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_potential_g, max_potential_g);
-  stats_updated |= update_min_max_stat(illumination, min_potential_l, max_potential_l);
-  stats_updated |= update_min_max_stat(the_planet->getSurfPressure(), min_potential_p, max_potential_p);
-  stats_updated |= update_min_max_stat(the_planet->getMass(), min_potential_mass, max_potential_mass);
+  stats_updated |= update_min_max_stat(the_planet->getSurfTemp(), sc.min_potential_temp, sc.max_potential_temp);
+  stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), sc.min_potential_g, sc.max_potential_g);
+  stats_updated |= update_min_max_stat(illumination, sc.min_potential_l, sc.max_potential_l);
+  stats_updated |= update_min_max_stat(the_planet->getSurfPressure(), sc.min_potential_p, sc.max_potential_p);
+  stats_updated |= update_min_max_stat(the_planet->getMass(), sc.min_potential_mass, sc.max_potential_mass);
 
   // Update terrestrial-specific stats if applicable
   if (the_planet->getType() == tTerrestrial ||
       (the_planet->getType() == t1Face &&
        the_planet->getHydrosphere() >= 0.05 &&
        the_planet->getHydrosphere() <= 0.8)) {
-    stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), min_potential_terrestrial_g, max_potential_terrestrial_g);
-    stats_updated |= update_min_max_stat(illumination, min_potential_terrestrial_l, max_potential_terrestrial_l);
+    stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), sc.min_potential_terrestrial_g, sc.max_potential_terrestrial_g);
+    stats_updated |= update_min_max_stat(illumination, sc.min_potential_terrestrial_l, sc.max_potential_terrestrial_l);
   }
 
   return stats_updated;
@@ -2491,7 +2513,7 @@ void check_planet(StarGenerator* gen, planet *the_planet, const std::string &pla
     }
 
     // Update breathable planet statistics
-    if (update_breathable_statistics(the_planet, illumination) && ((gen->config.verbose_level & 0x0002) != 0)) {
+    if (update_breathable_statistics(gen->sim_context, the_planet, illumination) && ((gen->config.verbose_level & 0x0002) != 0)) {
       list_it = true;
     }
 
@@ -2519,7 +2541,7 @@ void check_planet(StarGenerator* gen, planet *the_planet, const std::string &pla
     }
 
     // Update potentially habitable planet statistics
-    if (update_potential_statistics(the_planet, illumination) && ((gen->config.verbose_level & 0x0002) != 0)) {
+    if (update_potential_statistics(gen->sim_context, the_planet, illumination) && ((gen->config.verbose_level & 0x0002) != 0)) {
       list_it = true;
     }
 
