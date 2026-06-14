@@ -163,17 +163,14 @@ enable_testing()
 add_library(stargen_core STATIC
     accrete.cpp
     andromeda.cpp
-    andromeda2.cpp
     display.cpp
     dole.cpp
     elements.cpp
     enviro.cpp
     gas_radius_helpers.cpp
     ic3094.cpp
-    ic3094_2.cpp
     jimb.cpp
     omega_galaxy.cpp
-    omega_galaxy2.cpp
     Planetary_Habitability_Laboratory.cpp
     planets.cpp
     radius_tables.cpp
@@ -189,6 +186,7 @@ add_library(stargen_core STATIC
     PerformanceMonitor.cpp
     OrbitalSimulator.cpp       # NEW: Orbital mechanics simulator (optional, for viewer)
     OrbitalStateManager.cpp    # NEW: Multi-system orbital state management (optional, for viewer)
+    catalog_loader.cpp         # runtime loader for the data/*.tsv predefined-star catalogues
     # DO NOT add TracyClient.cpp here. It's built as part of the TracyClient library.
 )
 
@@ -202,12 +200,9 @@ add_library(stargen_core STATIC
 # clang lane.)
 set(STARGEN_CATALOG_SOURCES
     andromeda.cpp
-    andromeda2.cpp
     ic3094.cpp
-    ic3094_2.cpp
     jimb.cpp
     omega_galaxy.cpp
-    omega_galaxy2.cpp
     Planetary_Habitability_Laboratory.cpp
     ring_universe.cpp
     solstation.cpp
@@ -291,6 +286,7 @@ add_executable(orbital_demo
     OrbitalSimulator.cpp
     OrbitalStateManager.cpp
     StarGenerator.cpp
+    catalog_loader.cpp
     stargen.cpp
     accrete.cpp
     display.cpp
@@ -307,12 +303,9 @@ add_executable(orbital_demo
     PerformanceMonitor.cpp
     # Include catalog files needed by generation
     andromeda.cpp
-    andromeda2.cpp
     ic3094.cpp
-    ic3094_2.cpp
     jimb.cpp
     omega_galaxy.cpp
-    omega_galaxy2.cpp
     Planetary_Habitability_Laboratory.cpp
     ring_universe.cpp
     solstation.cpp
@@ -345,6 +338,7 @@ add_executable(viewer
     OrbitalSimulator.cpp
     OrbitalStateManager.cpp
     StarGenerator.cpp
+    catalog_loader.cpp
     stargen.cpp
     accrete.cpp
     display.cpp
@@ -361,12 +355,9 @@ add_executable(viewer
     PerformanceMonitor.cpp
     # Include catalog files needed by generation
     andromeda.cpp
-    andromeda2.cpp
     ic3094.cpp
-    ic3094_2.cpp
     jimb.cpp
     omega_galaxy.cpp
-    omega_galaxy2.cpp
     Planetary_Habitability_Laboratory.cpp
     ring_universe.cpp
     solstation.cpp
