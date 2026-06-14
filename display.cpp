@@ -2092,10 +2092,13 @@ static void html_write_additional_properties(planet* the_planet, std::fstream& t
                             the_planet->getCloudCover() * 100.0, the_planet->getIceCover() * 100.0);
   }
 
-  long double esir = calcEsiHelper(convert_km_to_eu(the_planet->getRadius()), 1.0, 0.57);
-  long double esid = calcEsiHelper(the_planet->getDensity() / EARTH_DENSITY, 1.0, 1.07);
-  long double esiv = calcEsiHelper((the_planet->getEscVelocity() / CM_PER_KM) / 11.186, 1.0, 0.70);
-  long double esit = calcEsiHelper(the_planet->getSurfTemp(), EARTH_AVERAGE_KELVIN, 5.58);
+  // Sub-indices come from the single calcEsiComponents() source (the headline
+  // ESI cell below uses the_planet->getEsi(), itself the product of these).
+  EsiComponents esi_c = calcEsiComponents(the_planet);
+  long double esir = esi_c.r;
+  long double esid = esi_c.d;
+  long double esiv = esi_c.v;
+  long double esit = esi_c.t;
 
   the_file << std::format(R"(
 <tr><th>Earth Similarity Index (ESI)</th>
