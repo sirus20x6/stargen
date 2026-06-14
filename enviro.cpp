@@ -26,41 +26,70 @@ std::string breathability_phrase[4] = {"none", "breathable", "unbreathable",
 
 thread_local std::map<std::map<long double, long double>, std::vector<long double> > polynomial_cache;
 
-/**
- * @brief mass to luminosity
- * 
- * @param mass 
- * @return long double 
+/*
+ * Main-sequence mass <-> luminosity.
+ *
+ * Eker et al. 2018, "Interrelated Main-Sequence Mass-Luminosity, Mass-Radius and
+ * Mass-Effective Temperature Relations" (MNRAS 479, 5491; arXiv:1807.02568): a
+ * six-piece classical relation log10(L/Lsun) = a*log10(M/Msun) + b, calibrated to
+ * 509 detached double-lined eclipsing-binary main-sequence stars over
+ * 0.179 <= M/Msun <= 31. Replaces the older uncalibrated Wikipedia power law.
+ *
+ * Below 0.179 Msun and above 31 Msun the nearest piece is extrapolated (the
+ * generator must still produce something for brown-dwarf and very-massive tails).
+ * See research/modern/07-stellar-relations-binaries.md.
+ *
+ * Eker's independent per-piece fits are not perfectly continuous at the regime
+ * boundaries; the small (<~20%) jumps there are inherent to the published
+ * relation and were present in the previous piecewise model too.
  */
-// updated from wikipedia https://en.wikipedia.org/wiki/Mass%E2%80%93luminosity_relation#cite_note-evolutionofstars-2
+namespace {
+// {upper mass bound (Msun), slope a, intercept b}. The last piece's bound is the
+// validity ceiling; masses above it reuse that piece.
+struct EkerPiece { long double m_hi, a, b; };
+constexpr EkerPiece kEkerML[] = {
+    {0.45L, 2.028L, -0.976L},
+    {0.72L, 4.572L, -0.102L},
+    {1.05L, 5.743L, -0.007L},
+    {2.40L, 4.329L,  0.010L},
+    {7.00L, 3.967L,  0.093L},
+    {31.0L, 2.865L,  1.105L},
+};
+}  // namespace
+
+/**
+ * @brief main-sequence mass -> luminosity (Eker et al. 2018)
+ * @param mass stellar mass in solar masses
+ * @return luminosity in solar luminosities
+ */
 long double mass_to_luminosity(long double mass) {
-    if (mass < 0.43) {
-        return 0.23 * std::pow(mass, 2.3);
-    } else if (mass < 2) {
-        return std::pow(mass, 4);
-    } else if (mass < 55) {
-        return 1.4 * std::pow(mass, 3.5);
-    } else {
-        return 32000 * mass;
+    for (const auto& p : kEkerML) {
+        if (mass < p.m_hi) {
+            return std::pow(10.0L, p.a * std::log10(mass) + p.b);
+        }
     }
+    const auto& top = kEkerML[(sizeof kEkerML / sizeof *kEkerML) - 1];
+    return std::pow(10.0L, top.a * std::log10(mass) + top.b);
 }
 
 /**
- * @brief luminosity to mass
- * 
- * @param luminosity 
- * @return long double 
+ * @brief main-sequence luminosity -> mass (inverse of Eker et al. 2018)
+ *
+ * Thresholds are the luminosity at each piece's upper mass bound, so the inverse
+ * selects the same regime the forward relation would.
+ * @param luminosity luminosity in solar luminosities
+ * @return stellar mass in solar masses
  */
 auto luminosity_to_mass(long double luminosity) -> long double {
-    if (luminosity < 0.23) {
-        return std::pow(luminosity / 0.23, 1.0 / 2.3);
-    } else if (luminosity < 1) {
-        return std::pow(luminosity, 1.0 / 4.0);
-    } else if (luminosity < 1.4 * std::pow(55, 3.5)) {
-        return std::pow(luminosity / 1.4, 1.0 / 3.5);
-    } else {
-        return luminosity / 32000;
+    const long double log_l = std::log10(luminosity);
+    for (const auto& p : kEkerML) {
+        const long double l_hi = std::pow(10.0L, p.a * std::log10(p.m_hi) + p.b);
+        if (luminosity < l_hi) {
+            return std::pow(10.0L, (log_l - p.b) / p.a);
+        }
     }
+    const auto& top = kEkerML[(sizeof kEkerML / sizeof *kEkerML) - 1];
+    return std::pow(10.0L, (log_l - top.b) / top.a);
 }
 
 /**
