@@ -764,7 +764,6 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
   planet *new_moon = nullptr;
   planet *prev_moon = nullptr;
   bool is_seed = false;
-  int i = 0;
 
   if (!the_sun.getIsCircumbinary()) {
     stell_mass_ratio = the_sun.getMass();

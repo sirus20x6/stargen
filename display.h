@@ -73,7 +73,6 @@ int random_numberInt(int min, int max);
 void assignTemperatureColors(planet* the_planet, double temp1, double red1, double green1, double blue1,
                              double temp2, double red2, double green2, double blue2);
 void assignDistanceColors(planet* the_planet, double red, double green, double blue);
-void moongen_describe_system(planet *, const std::string&, const std::string&, long);
 void lprint(std::fstream &, bool &, const std::string&);
 auto image_type_string(planet *) -> std::string;
 auto printSpinResonanceFactor(long double) -> std::string;
