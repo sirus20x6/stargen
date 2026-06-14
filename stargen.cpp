@@ -268,7 +268,7 @@ static auto handle_list_catalog_action(catalog& cat_arg) -> int {
 static auto handle_list_catalog_html_action(catalog& cat_arg) -> int {
   int count = cat_arg.count();
   for (int i = 0; i < count; i++) {
-    std::cout << "\t<option value=" << i << ">" << cat_arg[i].getName()
+    std::cout << "\t<option value=" << i << ">" << escapeXmlText(cat_arg[i].getName())
          << "</option>\n";
   }
   return EXIT_SUCCESS;
