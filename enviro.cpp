@@ -456,21 +456,25 @@ auto day_length(planet *the_planet, long double parent_mass,
  * @return long double 
  */
 auto inclination(long double orb_radius, long double parent_mass) -> long double {
-  // seb: Earth's obliquity is not a good test
-  // a. want real result, not integer
-  // b. obliquity of planets near stars is erroded by tidal heating
-  // ref: http://arxiv.org/abs/1101.2156
-  // Tidal obliquity evolution of potentialy habitable planets
-  // Heller et al. (2011)
+  // Primordial obliquity is set by the last few stochastic giant impacts, which
+  // arrive from random directions in a geometrically thick embryo swarm. The
+  // result is an *isotropic* obliquity: cos(eps) is uniform on [-1, 1], i.e.
+  // p(eps) = 0.5*sin(eps) on [0, 180] degrees. This admits retrograde spins
+  // (cf. Venus ~177 deg, Uranus ~98 deg), unlike a folded Gaussian peaked at 0.
+  //   Kokubo & Ida 2007, ApJ 671, 2082; Kokubo & Genda 2010, ApJ 714, L21.
+  //   See research/modern/08-spin-obliquity-validation.md.
+  long double cos_obliquity = 1.0L - 2.0L * random_number(0.0L, 1.0L);
+  long double obliquity = std::acos(cos_obliquity) * 180.0L / PI;  // degrees, [0,180]
 
-  long double temp = NAN;
-  temp = fabs(gaussian(33.3));
-  temp = std::pow(orb_radius / 50.0, 0.2) * temp;
+  // Tides erode obliquity for planets close to the star (Heller et al. 2011,
+  // arXiv:1101.2156); damp toward zero inside the tidal-influence distance. A
+  // full treatment is the tidal-locking-timescale card; this keeps the prior
+  // close-in damping intent.
   if (orb_radius < parent_mass) {
-    temp = (orb_radius / parent_mass) * temp;
+    obliquity *= (orb_radius / parent_mass);
   }
 
-  return temp;
+  return obliquity;
 }
 
 /**
