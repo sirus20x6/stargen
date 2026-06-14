@@ -7,6 +7,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <sstream>
+#include <stdexcept>
 
 #include "PerformanceMonitor.h"
 #include "SimulationContext.h"
@@ -722,9 +723,10 @@ void create_svg_file(planet* innermost_planet, std::string path, std::string fil
                      std::string prognam, bool do_moons) {
   performanceMonitor.recordFileOperation("svg_output");
 
-  std::stringstream ss;
-  ss << path << file_name << svg_ext;
-  std::string the_file_spec = ss.str();
+  // path already carries a trailing separator (see stargen.cpp), and a plain
+  // concat is byte-identical for every input incl. an absolute -o name (fs::path
+  // operator/ would instead let an absolute file_name override the directory).
+  const std::string the_file_spec = path + file_name + svg_ext;
 
   std::fstream output;
 #ifdef macintosh
@@ -736,6 +738,10 @@ void create_svg_file(planet* innermost_planet, std::string path, std::string fil
   _fcreator = 'R*ch';
   _ftype    = 'TEXT';
 #endif
+  if (!output) {
+    throw std::runtime_error("StarGen: cannot open SVG file '" + the_file_spec +
+                             "' for writing");
+  }
 
   // Find outermost planet (last in vector)
   planet* outermost_planet = g_sim_context.planets.empty() ? innermost_planet : g_sim_context.planets.back();
@@ -768,12 +774,7 @@ void create_svg_file(planet* innermost_planet, std::string path, std::string fil
  */
 void openCVSorJson(std::string path, std::string the_filename, std::fstream& output) {
   ensure_directory_exists(path);
-  std::string       the_file_spec;
-  std::stringstream ss;
-
-  ss.str("");
-  ss << path << the_filename;
-  the_file_spec = ss.str();
+  const std::string the_file_spec = path + the_filename;
 
 #ifdef macintosh
   _fcreator = 'MSIE';
@@ -785,7 +786,8 @@ void openCVSorJson(std::string path, std::string the_filename, std::fstream& out
   _ftype    = 'TEXT';
 #endif
   if (!output) {
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("StarGen: cannot open output file '" +
+                             the_file_spec + "' for writing");
   }
   ZoneScoped;
 }
@@ -800,18 +802,14 @@ void openCVSorJson(std::string path, std::string the_filename, std::fstream& out
  */
 void refresh_file_stream(std::fstream& output, const std::string& path, const std::string& file_name,
                          const std::string& ext) {
-  std::string       the_file_spec;
-  std::stringstream ss;
-
   output.close();
 
-  ss.str("");
-  ss << path << file_name << ext;
-  the_file_spec = ss.str();
+  const std::string the_file_spec = path + file_name + ext;
 
   output.open(the_file_spec.c_str(), std::fstream::out | std::fstream::app);
   if (!output) {
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("StarGen: cannot reopen output file '" +
+                             the_file_spec + "' for writing");
   }
 }
 
@@ -831,13 +829,8 @@ void open_html_file(const std::string& system_name, long seed, const std::string
                     const std::string& url_path, const std::string& file_name, const std::string& ext,
                     const std::string& prognam, std::fstream& output) {
   ensure_directory_exists(path);
-  std::string       the_file_spec;
-  bool         noname = system_name.empty();
-  std::stringstream ss;
-
-  ss.str("");
-  ss << path << file_name << ext;
-  the_file_spec = ss.str();
+  const std::string the_file_spec = path + file_name + ext;
+  const bool noname = system_name.empty();
 
 #ifdef macintosh
   _fcreator = 'MSIE';
@@ -849,7 +842,8 @@ void open_html_file(const std::string& system_name, long seed, const std::string
   _ftype    = 'TEXT';
 #endif
   if (!output) {
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("StarGen: cannot open HTML file '" + the_file_spec +
+                             "' for writing");
   }
 
   output << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n";
@@ -1614,8 +1608,7 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
                      const std::string& file_name, bool details, bool terrestrials, bool int_link,
                      bool do_moons, int graphic_format, bool do_gases) {
   if (!the_file) {
-    std::cout << "We have a serious error!\n";
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("StarGen: thumbnail output stream is not open");
   }
 
   sun the_sun = innermost_planet->getTheSun();

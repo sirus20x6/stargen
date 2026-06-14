@@ -516,9 +516,11 @@ int main(int argc, char **argv) {
   // Set global flag for backward compatibility
   flags_arg_clone = args.flags_arg;
 
-  // Run the star generation
+  // Run the star generation. Output file-open failures now throw (instead of
+  // exit()-ing from inside display.cpp); report cleanly and fail non-zero.
   ZoneScoped;
-  return stargen(
+  try {
+    return stargen(
     args.action,
     args.flag_char,
     args.path,
@@ -540,7 +542,11 @@ int main(int argc, char **argv) {
     args.out_format,
     args.graphic_format,
     args.num_threads
-  );
+    );
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << '\n';
+    return EXIT_FAILURE;
+  }
 }
 
 /**
