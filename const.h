@@ -105,6 +105,20 @@ constexpr double CM_PER_METER = 100.0;
 constexpr double MILLIBARS_PER_BAR = 1000.00;
 
 constexpr double GRAV_CONSTANT = 6.672E-8;
+
+// SI-unit physical constants used by the enviro.cpp acceleration helpers. These
+// are the EXACT values those functions previously redefined locally, kept
+// verbatim so generated output stays byte-identical. They intentionally differ
+// in precision and/or unit from the CGS-family constants above (e.g. GRAV_CONSTANT
+// is CGS; SOLAR_MASS_IN_KILOGRAMS is the more-precise 1.98892E30) -- unifying on
+// the precise values would change output and is a separate, deliberate change.
+constexpr double GRAV_CONSTANT_SI        = 6.67430e-11; // m^3 kg^-1 s^-2
+constexpr double SOLAR_MASS_IN_KG_APPROX = 1.989e30;    // kg
+constexpr double EARTH_MASS_IN_KG_APPROX = 5.97e24;     // kg
+constexpr double MEAN_EARTH_RADIUS_KM    = 6371.0;      // km (mean)
+constexpr double MEAN_EARTH_RADIUS_M     = 6.371e6;     // m  (mean)
+constexpr double EARTH_GRAVITY_M_S2      = 9.80665;     // m/s^2
+
 constexpr double MOLAR_GAS_CONST = 8314.41;
 constexpr double K = 50.0;
 constexpr double B = 1.2E-5;

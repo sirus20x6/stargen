@@ -546,11 +546,10 @@ auto acceleration(long double mass, long double radius) -> long double {
 }
 
 auto acceleration(planet *the_planet) -> long double {
-    const long double G = 6.67430e-11;  // gravitational constant in m^3 kg^-1 s^-2
-    const long double SOLAR_MASS_KG = 1.989e30;  // kg
-    const long double EARTH_MASS_KG = 5.97e24;   // kg
-    const long double EARTH_RADIUS_KM = 6371.0;  // km
-    const long double EARTH_GRAVITY_CM_S2 = 980.665;  // cm/s^2
+    const long double SOLAR_MASS_KG = SOLAR_MASS_IN_KG_APPROX;  // kg
+    const long double EARTH_MASS_KG = EARTH_MASS_IN_KG_APPROX;  // kg
+    const long double EARTH_RADIUS_KM = MEAN_EARTH_RADIUS_KM;   // km
+    const long double EARTH_GRAVITY_CM_S2 = EARTH_ACCELERATION; // cm/s^2 (980.665)
 
     // Convert planet mass to Earth masses
     long double mass_earth_masses = the_planet->getMass() * (SOLAR_MASS_KG / EARTH_MASS_KG);
@@ -600,10 +599,10 @@ auto acceleration(planet *the_planet) -> long double {
 }
 
 auto acceleration_oblateness_refinement(planet *the_planet) -> long double {
-  const long double G              = 6.67430e-11;  // gravitational constant in m^3 kg^-1 s^-2
-  const long double EARTH_MASS     = 5.97e24;      // kg
-  const long double EARTH_RADIUS_M = 6.371e6;      // meters (Earth's radius)
-  const long double EARTH_GRAVITY  = 9.80665;      // m/s^2
+  const long double G              = GRAV_CONSTANT_SI;        // m^3 kg^-1 s^-2
+  const long double EARTH_MASS     = EARTH_MASS_IN_KG_APPROX; // kg
+  const long double EARTH_RADIUS_M = MEAN_EARTH_RADIUS_M;     // meters (mean)
+  const long double EARTH_GRAVITY  = EARTH_GRAVITY_M_S2;      // m/s^2
 
   // Constants for transition masses
   const long double ROCKY_TRANSITION_MASS_KG     = 10.0 * EARTH_MASS;   // 10 Earth masses
@@ -611,7 +610,7 @@ auto acceleration_oblateness_refinement(planet *the_planet) -> long double {
 
   // Convert planet mass to kilograms
   long double mass_kg = (the_planet->getDustMass() + the_planet->getGasMass()) *
-                        1.989e30;                   // Convert solar masses to kg
+                        SOLAR_MASS_IN_KG_APPROX;    // Convert solar masses to kg
   long double radius_km = the_planet->getRadius();  // Equatorial radius in km
 
   // Check if radius and mass are valid
@@ -2783,16 +2782,17 @@ auto calcEsiHelper(long double value, long double ref_value,
   return std::pow(1.0 - fabs((value - ref_value) / (value + ref_value)), weight / n);
 }
 
+auto calcEsiComponents(planet *the_planet) -> EsiComponents {
+  return {
+      calcEsiHelper(convert_km_to_eu(the_planet->getRadius()), 1.0, 0.57),
+      calcEsiHelper(the_planet->getDensity() / EARTH_DENSITY, 1.0, 1.07),
+      calcEsiHelper((the_planet->getEscVelocity() / CM_PER_KM) / 11.186, 1.0, 0.70),
+      calcEsiHelper(the_planet->getSurfTemp(), EARTH_AVERAGE_KELVIN, 5.58)};
+}
+
 auto calcEsi(planet *the_planet) -> long double {
-  long double esir =
-      calcEsiHelper(convert_km_to_eu(the_planet->getRadius()), 1.0, 0.57);
-  long double esid =
-      calcEsiHelper(the_planet->getDensity() / EARTH_DENSITY, 1.0, 1.07);
-  long double esiv = calcEsiHelper(
-      (the_planet->getEscVelocity() / CM_PER_KM) / 11.186, 1.0, 0.70);
-  long double esit =
-      calcEsiHelper(the_planet->getSurfTemp(), EARTH_AVERAGE_KELVIN, 5.58);
-  return esir * esid * esiv * esit;
+  EsiComponents c = calcEsiComponents(the_planet);
+  return c.r * c.d * c.v * c.t;
 }
 
 auto calcSphHelper(long double min, long double max, long double opt,

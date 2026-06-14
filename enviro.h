@@ -82,6 +82,13 @@ auto is_habitable_optimistic(planet *) -> bool;
 auto calcHzd(planet *) -> long double;
 auto calcHzc(planet *) -> long double;
 auto calcHza(planet *) -> long double;
+// The four Earth-Similarity-Index sub-indices (radius, density, escape velocity,
+// surface temperature). calcEsi() multiplies them; display.cpp shows them
+// individually, so both share the single calcEsiComponents() source.
+struct EsiComponents {
+  long double r, d, v, t;
+};
+auto calcEsiComponents(planet *) -> EsiComponents;
 auto calcEsi(planet *) -> long double;
 auto calcSph(planet *) -> long double;
 auto calcEsiHelper(long double value, long double ref_value, long double weight,long double n = 4) -> long double;
