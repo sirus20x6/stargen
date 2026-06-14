@@ -22,6 +22,66 @@ static inline RandomContext& active_rng() {
   return t_active_random_context ? *t_active_random_context : g_random_context;
 }
 
+auto escapeXmlText(const std::string &s) -> std::string {
+  std::string out;
+  out.reserve(s.size());
+  for (char c : s) {
+    switch (c) {
+      case '&': out += "&amp;"; break;
+      case '<': out += "&lt;"; break;
+      case '>': out += "&gt;"; break;
+      default:  out += c; break;
+    }
+  }
+  return out;
+}
+
+auto escapeXmlAttr(const std::string &s) -> std::string {
+  std::string out;
+  out.reserve(s.size());
+  for (char c : s) {
+    switch (c) {
+      case '&':  out += "&amp;"; break;
+      case '<':  out += "&lt;"; break;
+      case '>':  out += "&gt;"; break;
+      case '"':  out += "&quot;"; break;
+      case '\'': out += "&#39;"; break;
+      default:   out += c; break;
+    }
+  }
+  return out;
+}
+
+auto escapeCsvField(const std::string &s) -> std::string {
+  std::string out;
+  out.reserve(s.size());
+  for (char c : s) {
+    if (c == '\'') {
+      out += "''";  // single-quote doubling (this code delimits fields with ')
+    } else if (c == '\n' || c == '\r') {
+      out += ' ';   // a literal newline would terminate the row mid-field
+    } else {
+      out += c;
+    }
+  }
+  return out;
+}
+
+auto escapeCelestiaId(const std::string &s) -> std::string {
+  std::string out;
+  out.reserve(s.size());
+  for (char c : s) {
+    if (c == '"') {
+      out += '\'';  // Celestia's parser has no backslash escape inside "..."
+    } else if (c == '\n' || c == '\r') {
+      out += ' ';
+    } else {
+      out += c;
+    }
+  }
+  return out;
+}
+
 auto compare_string_char(std::string &a_string, int place, const char *a_character,
                          int length) -> bool {
   if (a_string.compare(place, length, a_character) == 0) {

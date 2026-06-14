@@ -26,6 +26,19 @@ auto compare_string_char(std::string& a_string, int place, const char* a_charact
                          int length = 1) -> bool;
 // std::string replaceStrChar(std::string, const char *, const char *);
 auto float_to_string(long double) -> std::string;
+
+// Output-escaping helpers. Each is a no-op on strings containing none of the
+// relevant special characters, so default/clean output stays byte-identical.
+//   escapeXmlText  - HTML element text and SVG/XML text: & < >
+//   escapeXmlAttr  - HTML/XML attribute values (any quote style): & < > " '
+//   escapeCsvField - inside the single-quoted CSV fields this code emits:
+//                    ' -> '' (doubling), CR/LF -> space
+//   escapeCelestiaId - inside Celestia's double-quoted identifiers (the parser
+//                    has no backslash escape): " -> ', CR/LF -> space
+auto escapeXmlText(const std::string&) -> std::string;
+auto escapeXmlAttr(const std::string&) -> std::string;
+auto escapeCsvField(const std::string&) -> std::string;
+auto escapeCelestiaId(const std::string&) -> std::string;
 auto random_number(long double, long double) -> long double;
 auto random_number_int(int min, int max) -> int;
 auto about(long double, long double) -> long double;
