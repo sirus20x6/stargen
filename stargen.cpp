@@ -995,7 +995,9 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
       std::cerr << "\n";  // Clear progress line
     }
     print_summary_statistics();
-    return EXIT_SUCCESS;
+    // A failed output (e.g. an unwritable directory throwing from the display.cpp
+    // open functions) must surface as a non-zero exit, not a silent success.
+    return failed_count > 0 ? EXIT_FAILURE : EXIT_SUCCESS;
   }
 
   // Sequential execution path (fallback for complex cases)

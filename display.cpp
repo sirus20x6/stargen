@@ -723,8 +723,10 @@ void create_svg_file(planet* innermost_planet, std::string path, std::string fil
                      std::string prognam, bool do_moons) {
   performanceMonitor.recordFileOperation("svg_output");
 
-  const std::string the_file_spec =
-      (std::filesystem::path(path) / (file_name + svg_ext)).string();
+  // path already carries a trailing separator (see stargen.cpp), and a plain
+  // concat is byte-identical for every input incl. an absolute -o name (fs::path
+  // operator/ would instead let an absolute file_name override the directory).
+  const std::string the_file_spec = path + file_name + svg_ext;
 
   std::fstream output;
 #ifdef macintosh
@@ -772,8 +774,7 @@ void create_svg_file(planet* innermost_planet, std::string path, std::string fil
  */
 void openCVSorJson(std::string path, std::string the_filename, std::fstream& output) {
   ensure_directory_exists(path);
-  const std::string the_file_spec =
-      (std::filesystem::path(path) / the_filename).string();
+  const std::string the_file_spec = path + the_filename;
 
 #ifdef macintosh
   _fcreator = 'MSIE';
@@ -803,8 +804,7 @@ void refresh_file_stream(std::fstream& output, const std::string& path, const st
                          const std::string& ext) {
   output.close();
 
-  const std::string the_file_spec =
-      (std::filesystem::path(path) / (file_name + ext)).string();
+  const std::string the_file_spec = path + file_name + ext;
 
   output.open(the_file_spec.c_str(), std::fstream::out | std::fstream::app);
   if (!output) {
@@ -829,8 +829,7 @@ void open_html_file(const std::string& system_name, long seed, const std::string
                     const std::string& url_path, const std::string& file_name, const std::string& ext,
                     const std::string& prognam, std::fstream& output) {
   ensure_directory_exists(path);
-  const std::string the_file_spec =
-      (std::filesystem::path(path) / (file_name + ext)).string();
+  const std::string the_file_spec = path + file_name + ext;
   const bool noname = system_name.empty();
 
 #ifdef macintosh
