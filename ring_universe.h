@@ -8,7 +8,5 @@ extern catalog ring_universe;
 
 void initRingUniverse();
 
-extern old_star ring_universe_stars[];
-extern int total_ring_universe_stars;
 
 #endif

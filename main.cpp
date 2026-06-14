@@ -203,13 +203,15 @@ bool parseCommandLine(int argc, char** argv, const std::string& prognam, Command
       case 'I':  // IC3094 catalog
       case 'U':  // Andromeda catalog
       case 'G':  // Star Trek catalog
+        // The four large catalogues load lazily from data/*.tsv on first use
+        // (not eagerly in initData), so ordinary runs skip the parse.
         if (flag == 'D') args.star_catalog = dole;
         else if (flag == 'W') args.star_catalog = solstation;
         else if (flag == 'F') args.star_catalog = jimb;
-        else if (flag == 'O') args.star_catalog = omega_galaxy;
-        else if (flag == 'R') args.star_catalog = ring_universe;
-        else if (flag == 'I') args.star_catalog = ic3094;
-        else if (flag == 'U') args.star_catalog = andromeda;
+        else if (flag == 'O') { initOmegaGalaxy(); args.star_catalog = omega_galaxy; }
+        else if (flag == 'R') { initRingUniverse(); args.star_catalog = ring_universe; }
+        else if (flag == 'I') { initIC3094(); args.star_catalog = ic3094; }
+        else if (flag == 'U') { initAndromeda(); args.star_catalog = andromeda; }
         else if (flag == 'G') args.star_catalog = star_trek;
 
         args.sys_no_arg = temp_string.length() > 2 ?
@@ -545,15 +547,22 @@ void initData() {
   initDole();
   initSolStation();
   initJimb();
-  initOmegaGalaxy();
-  initRingUniverse();
-  initIC3094();
-  initAndromeda();
+  // The four large fictional catalogues (Omega Galaxy ~307k stars, Ring
+  // Universe, IC 3094, Andromeda) are loaded lazily from data/*.tsv only when
+  // actually selected (-O/-R/-I/-U) or when usage() prints their counts, so the
+  // common generation path no longer pays their load cost at startup. Each
+  // init*() is idempotent (guarded by a static `loaded` flag).
   initStarTrek();
   initPlanetaryHabitabilityLaboratory();
 }
 
 void usage(std::string program) {
+  // usage() reports each catalogue's star count, so make sure the lazily-loaded
+  // fictional catalogues are populated before the banner is printed.
+  initOmegaGalaxy();
+  initRingUniverse();
+  initIC3094();
+  initAndromeda();
   std::cout << "Usage: " << program
        << " [options] [system name]\n"
           "  Options:\n"
