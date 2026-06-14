@@ -47,7 +47,6 @@ enum {
   ffHTML,
   ffTEXT,
   ffCELESTIA,
-  ffMOONGEN,
   ffCSV,
   ffJSON,
   ffCSVdl,

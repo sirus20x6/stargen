@@ -159,35 +159,3 @@ double OrbitalSimulator::calculateMeanAnomaly(double a, double t, double m_star,
 
     return M;
 }
-
-Vector3 OrbitalSimulator::orbitalToCartesian(double a, double e, double i,
-                                              double omega, double w, double M) const {
-    // This is an alternative implementation (not currently used)
-    // Kept for reference
-
-    // Solve Kepler's equation
-    double E = solveKeplersEquation(M, e);
-
-    // Position in orbital plane
-    double x_orb = a * (std::cos(E) - e);
-    double y_orb = a * std::sqrt(1.0 - e * e) * std::sin(E);
-
-    // Rotation matrices
-    double cos_omega = std::cos(omega);
-    double sin_omega = std::sin(omega);
-    double cos_w = std::cos(w);
-    double sin_w = std::sin(w);
-    double cos_i = std::cos(i);
-    double sin_i = std::sin(i);
-
-    // Transform to 3D
-    double x = (cos_omega * cos_w - sin_omega * sin_w * cos_i) * x_orb +
-               (-cos_omega * sin_w - sin_omega * cos_w * cos_i) * y_orb;
-
-    double y = (sin_omega * cos_w + cos_omega * sin_w * cos_i) * x_orb +
-               (-sin_omega * sin_w + cos_omega * cos_w * cos_i) * y_orb;
-
-    double z = (sin_w * sin_i) * x_orb + (cos_w * sin_i) * y_orb;
-
-    return Vector3(x, y, z);
-}

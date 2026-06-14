@@ -729,15 +729,7 @@ void create_svg_file(planet* innermost_planet, std::string path, std::string fil
   const std::string the_file_spec = path + file_name + svg_ext;
 
   std::fstream output;
-#ifdef macintosh
-  _fcreator = 'MSIE';
-  _ftype    = 'TEXT';
-#endif
   output.open(the_file_spec.c_str(), std::ios::out);
-#ifdef macintosh
-  _fcreator = 'R*ch';
-  _ftype    = 'TEXT';
-#endif
   if (!output) {
     throw std::runtime_error("StarGen: cannot open SVG file '" + the_file_spec +
                              "' for writing");
@@ -776,15 +768,7 @@ void openCVSorJson(std::string path, std::string the_filename, std::fstream& out
   ensure_directory_exists(path);
   const std::string the_file_spec = path + the_filename;
 
-#ifdef macintosh
-  _fcreator = 'MSIE';
-  _ftype    = 'TEXT';
-#endif
   output.open(the_file_spec.c_str(), std::ios::out);
-#ifdef macintosh
-  _fcreator = 'R*ch';
-  _ftype    = 'TEXT';
-#endif
   if (!output) {
     throw std::runtime_error("StarGen: cannot open output file '" +
                              the_file_spec + "' for writing");
@@ -832,15 +816,7 @@ void open_html_file(const std::string& system_name, long seed, const std::string
   const std::string the_file_spec = path + file_name + ext;
   const bool noname = system_name.empty();
 
-#ifdef macintosh
-  _fcreator = 'MSIE';
-  _ftype    = 'TEXT';
-#endif
   output.open(the_file_spec.c_str(), std::fstream::out);
-#ifdef macintosh
-  _fcreator = 'R*ch';
-  _ftype    = 'TEXT';
-#endif
   if (!output) {
     throw std::runtime_error("StarGen: cannot open HTML file '" + the_file_spec +
                              "' for writing");
@@ -2327,11 +2303,6 @@ void celestia_describe_system(planet* innermost_planet, std::string designation,
  * @param is_moon
  * @param planet_num
  */
-#include <format>
-#include <iostream>
-#include <string>
-#include <string_view>
-
 void celestia_describe_world(planet* the_planet, const std::string& designation,
                              const std::string& system_name, long seed, long double inc,
                              long double an, int counter, sun& the_sun, bool is_moon,
@@ -2658,51 +2629,6 @@ void assignDistanceColors(planet* the_planet, double red, double green, double b
 
   std::cout << std::format("\tColor [ {:.2f} {:.2f} {:.2f} ]\n", red, green, blue);
 }
-
-/*
-void moongen_describe_system(planet* innermost_planet, std::string designation,
-std::string system_name, long int seed)
-{
-  planet *the_planet, *moon;
-  sun the_sun = innermost_planet->getTheSun();
-  long tmp;
-  int num_moons = 0;
-  int num_planets = 0;
-  int counter;
-  long double mass = 0;
-  long double total_moon_mass = 0;
-
-  std::cout << "#! /bin/sh -x\n";
-  std::cout << "# Stargen - " << stargen_revision << "; seed=" << seed << "\n";
-  std::cout << "#\n";
-  std::cout << "# Script to generate moons for some planets in the system " <<
-designation << " (" << system_name << ")\n"; std::cout << "#\n";
-
-  counter = 1;
-  for (planet* the_planet : g_sim_context.planets) {
-    mass = the_planet->getMass();
-    total_moon_mass = 0;
-    for (planet* moon : the_planet->moons) {
-      total_moon_mass += moon->getMass();
-    }
-
-    tmp = the_planet->getMinorMoons();
-
-    num_moons += tmp;
-    if (tmp > 0)
-    {
-      num_planets++;
-      std::cout << "moon_orbits -a " << toString(the_planet->getA()) << " -m " <<
-toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) << " -R " <<
-toString(the_planet->getRadius()) << " -M " << toString(the_sun.getMass()) << "
--n p" << counter << " -N " << tmp << " -U " << toString(total_moon_mass *
-SUN_MASS_IN_EARTH_MASSES) << " -s " << (seed + (counter * 1000)) << " -S " <<
-designation << "\n";
-    }
-    counter++;
-  }
-}
-*/
 
 /**
  * @brief lprint

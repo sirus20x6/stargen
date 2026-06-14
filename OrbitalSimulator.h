@@ -142,21 +142,6 @@ private:
     double current_time_ = 0.0;      // Years since epoch
     double time_scale_ = 1.0;        // Speed multiplier
 
-    /**
-     * @brief Calculate position from orbital elements
-     *
-     * Converts Kepler orbital elements to 3D Cartesian coordinates.
-     *
-     * @param a Semi-major axis (AU)
-     * @param e Eccentricity
-     * @param i Inclination (radians)
-     * @param omega Longitude of ascending node (radians)
-     * @param w Argument of periapsis (radians)
-     * @param M Mean anomaly (radians)
-     * @return Position vector in 3D space
-     */
-    Vector3 orbitalToCartesian(double a, double e, double i,
-                               double omega, double w, double M) const;
 
     /**
      * @brief Solve Kepler's equation iteratively

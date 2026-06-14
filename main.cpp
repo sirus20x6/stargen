@@ -475,12 +475,6 @@ bool validateArguments(const CommandLineArgs& args) {
 }
 
 int main(int argc, char **argv) {
-#ifdef macintosh
-  _ftype    = 'TEXT';
-  _fcreator = 'R*ch';
-  argc      = ccommand(&argv);
-#endif
-
   try {
     initData();
   } catch (const std::exception& e) {

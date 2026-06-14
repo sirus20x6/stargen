@@ -98,21 +98,7 @@ star::star(star2& data) {
  * @brief Destroy the star::star object
  * 
  */
-star::~star() {
-  luminosity = 0;
-  mass = 0;
-  eff_temp = 0;
-  spec_type = "";
-  mass2 = 0;
-  eccentricity = 0;
-  distance = 0;
-  inc = 0;
-  an = 0;
-  desig = "";
-  in_celestia = false;
-  name = "";
-  isCircumbinary = false;
-}
+star::~star() {}
 
 /**
  * @brief Calculate Luminosity
@@ -619,26 +605,7 @@ Chemical::Chemical(const Chemical& rhs) : num(rhs.num), symbol(rhs.symbol), html
 }
 
 /// @brief 
-Chemical::~Chemical() {
-  num = 0;
-  symbol = "";
-  htmlSymbol = "";
-  name = "";
-  weight = 0;
-  melt = 0;
-  boil = 0;
-  density = 0;
-  pzero = 0;
-  c = 0;
-  n = 0;
-  abunde = 0;
-  abunds = 0;
-  reactivity = 0;
-  maxIpp = 0;
-  minIpp = 0;
-  nameSpaces = 0;
-  symbolSpaces = 0;
-}
+Chemical::~Chemical() {}
 
 
 
@@ -1064,50 +1031,6 @@ planet::planet(int n, long double a2, long double e2, long double t, bool gg,
 }
 
 planet::~planet() {
-  a = 0;
-  e = 0;
-  axialTilt = 0;
-  gasGiant = false;
-  dustMass = 0;
-  gasMass = 0;
-  imf = 0;
-  rmf = 0;
-  cmf = 0;
-  moonA = 0;
-  moonE = 0;
-  coreRadius = 0;
-  radius = 0;
-  orbitZone = 0;
-  density = 0;
-  orbPeriod = 0;
-  day = 0;
-  resonantPeriod = false;
-  escVelocity = 0;
-  surfAccel = 0;
-  surfGrav = 0;
-  rmsVelocity = 0;
-  molecWeight = 0;
-  volatileGasInventory = 0;
-  surfPressure = 0;
-  greenhouseEffect = false;
-  boilPoint = 0;
-  albedo = 0;
-  exosphericTemp = 0;
-  estimatedTemp = 0;
-  estimatedTerrTemp = 0;
-  surfTemp = 0;
-  greenhsRise = 0;
-  highTemp = 0;
-  lowTemp = 0;
-  maxTemp = 0;
-  minTemp = 0;
-  hydrosphere = 0;
-  cloudCover = 0;
-  iceCover = 0;
-  inclination = 0;
-  ascendingNode = 0;
-  longitudeOfPericenter = 0;
-  meanLongitude = 0;
   atmosphere.clear();
 
   // Single-source moon ownership. The `moons` vector and the legacy
@@ -1603,13 +1526,7 @@ dust::dust() : innerEdge(0), outerEdge(0), dustPresent(true), gasPresent(true) {
   
 }
 
-dust::~dust() {
-  innerEdge = 0;
-  outerEdge = 0;
-  dustPresent = false;
-  gasPresent = false;
-  // next_band = NULL;
-}
+dust::~dust() {}
 
 auto dust::getDustPresent() const -> bool { return dustPresent; }
 

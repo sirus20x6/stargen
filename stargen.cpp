@@ -1282,9 +1282,6 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
           celestia_describe_system(innermost_planet, designation, system_name,
                                    flag_seed, sys_inc, sys_an, do_moons);
           break;
-          /*case ffMOONGEN:
-            moongen_describe_system(innermost_planet, designation, system_name,
-            flag_seed); break;*/
       }
       if (habitable > 1 && ((flag_verbose & 0x0001) != 0)) {
         std::cerr << "System " << flag_seed << " - " << system_name << " (-s"
