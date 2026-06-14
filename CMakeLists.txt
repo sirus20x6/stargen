@@ -1,22 +1,16 @@
 cmake_minimum_required(VERSION 3.5...4.99)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
-# Windows (clang targeting the MSVC STL): our own targets compile against the
-# dynamic C runtime (msvcrt), but the FetchContent dependencies (Tracy,
-# yaml-cpp) declare old cmake_minimum_required values, so CMP0091 reverts to OLD
-# in their scope and they select a different CRT. lld-link then aborts the final
-# link with "/failifmismatch: mismatch detected for 'RuntimeLibrary'". Forcing
-# CMP0091 NEW for every project -- ours and the dependencies' -- routes all of
-# them through CMAKE_MSVC_RUNTIME_LIBRARY, which we pin to the dynamic CRT so the
-# embedded runtime directives agree. These settings only affect MSVC-ABI builds;
-# on the gcc/clang Linux lanes they are inert.
-set(CMAKE_POLICY_DEFAULT_CMP0091 NEW)
-if(POLICY CMP0091)
-  cmake_policy(SET CMP0091 NEW)
-endif()
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-
 project(stargen VERSION 3.0.0.0 DESCRIPTION "A program for generating solar systems")
+
+# The output layer (PlanetRow.h) uses C++26 static reflection (P2996) + member
+# annotations (P3394), which currently require GCC >= 16 with -std=c++26
+# -freflection. Mainline clang does not implement reflection yet, so the clang
+# and Windows CI lanes were dropped. Fail fast on an unsupported compiler.
+if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16)
+  message(FATAL_ERROR "StarGen requires GCC >= 16 for C++26 static reflection; found "
+                      "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}.")
+endif()
 
 # Assuming GIT_VERSION is set externally (e.g., by your CI, a FindGit.cmake module, or environment variable)
 # If GIT_VERSION is meant to be the primary version for your project,
@@ -29,7 +23,7 @@ message(STATUS "CMAKE_PROJECT_VERSION: ${CMAKE_PROJECT_VERSION}")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # The following line is redundant if the one above is set, but harmless.
 # set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON) # Explicitly enable compiler-specific extensions.
 
@@ -85,12 +79,6 @@ if(SANITIZE OR NOT ENABLE_TRACY)
   set(STARGEN_TRACY_DEFINES "")               # no TRACY_ENABLE for our code
 else()
   set(STARGEN_TRACY_DEFINES TRACY_ENABLE)
-endif()
-
-option(CLANG "Use Clang instead of GCC" OFF)
-if(CLANG AND NOT CMAKE_C_COMPILER AND NOT CMAKE_CXX_COMPILER)
-  set(CMAKE_C_COMPILER clang)
-  set(CMAKE_CXX_COMPILER clang++)
 endif()
 
 # The real-time viewer needs raylib, which pulls in GLFW + a display backend
@@ -205,22 +193,13 @@ add_library(stargen_core STATIC
 )
 
 # ----------------------------------------------------------------------------
-# Generated star-catalogue translation units. These are enormous machine-style
-# data tables, not first-party logic, so they get special compile handling:
-#
-#  * -w: keep them OUT of the -Wall/-Wextra first-party warning set added below;
-#    they would otherwise emit thousands of warnings that bury the real ones.
-#  * -O0 under clang: ring_universe.cpp, ic3094_2.cpp and andromeda2.cpp build
-#    their entries from tens of thousands of runtime calls -- mass(abs2luminosity
-#    (...)) -- producing one huge dynamic initializer that clang's optimizer
-#    (verified on clang-18/21/22) spins on effectively forever at every -O level
-#    except -O0, while gcc compiles it in seconds. These TUs are pure data, so
-#    forcing -O0 under clang costs nothing at runtime; applying it to all the
-#    catalogue files (not just the three that hang) is harmless and simpler.
-#
-# COMPILE_OPTIONS is a single per-source list emitted after CMAKE_CXX_FLAGS_*,
-# so -w / -O0 here override the target's -Wall and the Release -O3 for just
-# these files.
+# Generated star-catalogue translation units: enormous machine-style data
+# tables, not first-party logic. Compile them with -w so their machine-generated
+# noise stays out of the -Wall/-Wextra first-party warning set added below.
+# COMPILE_OPTIONS is a single per-source list emitted after CMAKE_CXX_FLAGS_*, so
+# -w overrides the target's -Wall for just these files. (gcc compiles these huge
+# dynamic initializers fine; the former clang -O0 workaround was dropped with the
+# clang lane.)
 set(STARGEN_CATALOG_SOURCES
     andromeda.cpp
     andromeda2.cpp
@@ -234,13 +213,18 @@ set(STARGEN_CATALOG_SOURCES
     solstation.cpp
     star_trek.cpp
 )
-set(STARGEN_CATALOG_COMPILE_OPTIONS -w)
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    list(APPEND STARGEN_CATALOG_COMPILE_OPTIONS -O0)
-endif()
 set_source_files_properties(
     ${STARGEN_CATALOG_SOURCES}
-    PROPERTIES COMPILE_OPTIONS "${STARGEN_CATALOG_COMPILE_OPTIONS}"
+    PROPERTIES COMPILE_OPTIONS "-w"
+)
+
+# display.cpp is the sole consumer of C++26 static reflection (PlanetRow.h's
+# reflective JSON/CSV emitters). -freflection is REQUIRED and is NOT implied by
+# -std=c++26, so enable it for just this translation unit (keeping it off the
+# catalogue TUs and the FetchContent dependencies).
+set_source_files_properties(
+    display.cpp
+    PROPERTIES COMPILE_OPTIONS "-freflection"
 )
 
 target_compile_definitions(stargen_core PUBLIC ${STARGEN_TRACY_DEFINES})

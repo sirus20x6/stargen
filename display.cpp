@@ -15,6 +15,7 @@
 #include "enviro.h"
 #include "stargen.h"
 #include "utils.h"
+#include "PlanetRow.h"
 
 
 void ensure_directory_exists(const std::string& path) {
@@ -226,20 +227,7 @@ void csv_describe_system(std::fstream& the_file, planet* innermost_planet, bool 
              << ", " << toString(the_sun.getAge()) << ", " << toString(the_sun.getREcosphere(1.0))
              << "\n";
   }
-  the_file << "'Planet #', 'Distance', 'Eccentricity', 'Inclination', 'Longitude of "
-              "the Ascending Node', 'Longitude of the Pericenter', 'Mean "
-              "Longitude', 'Axial Tilt', 'Ice Mass Fraction', 'Rock Mass Fraction', "
-              "'Carbon Mass Fraction', 'Total Mass', 'Is Gas Giant', 'Dust Mass', "
-              "'Gas Mass', 'Radius of Core', 'Total Radius', 'Orbit Zone', "
-              "'Density', 'Orbit Period', 'Rotation Period', 'Has Spin Orbit "
-              "Resonance', 'Escape Velocity', 'Surface Acceleration', 'Surface "
-              "Gravity', 'RMS Velocity', 'Minimum Molecular Weight', 'Volatile Gas "
-              "Inventory', 'Surface Pressure', 'Greenhouse Effect', 'Boiling "
-              "Point', 'Albedo', 'Exospheric Temperature', 'Estimated Temperature', "
-              "'Estimated Terran Temperature', 'Surface Temperature', 'Greenhouse "
-              "Rise', 'High Temperature', 'Low Temperature', 'Maximum Temperature', "
-              "'Minimum Temperature', 'Hydrosphere', 'Cloud Cover', 'Ice Cover', "
-              "'Atmosphere', 'Type', 'Minor Moons'\n";
+  the_file << emit_csv_header();
   counter = 1;
   for (planet* the_planet : g_sim_context.planets) {
     ss << the_sun.getName() << " " << counter;
@@ -363,86 +351,104 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool d
  * @param id
  * @param ss
  */
-void csv_row(std::fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
-             const std::string& id, std::stringstream& ss) {
+// Single population point for the per-planet output row consumed by the
+// reflective JSON/CSV emitters (PlanetRow.h). Members hold RAW getter values.
+// Two atmosphere strings are computed because JSON and CSV format gas pressures
+// differently: JSON via toString() (legacy jsonRow formatting), CSV via {:.2f}
+// (generate_atmosphere_string).
+auto to_row(planet* the_planet, bool is_moon, const std::string& id, bool do_gases) -> PlanetRow {
   do_gases = (flags_arg_clone & fDoGases) != 0;
 
-  std::string atmosphere = generate_atmosphere_string(the_planet, do_gases);
-
-  using variant_type                    = std::variant<double, long double, int, bool, std::string>;
-  std::vector<variant_type> planet_data = {id,
-                                           is_moon ? the_planet->getMoonA() : the_planet->getA(),
-                                           is_moon ? the_planet->getMoonE() : the_planet->getE(),
-                                           the_planet->getInclination(),
-                                           the_planet->getAscendingNode(),
-                                           the_planet->getLongitudeOfPericenter(),
-                                           the_planet->getMeanLongitude(),
-                                           the_planet->getAxialTilt(),
-                                           the_planet->getImf(),
-                                           the_planet->getRmf(),
-                                           the_planet->getCmf(),
-                                           the_planet->getMass(),
-                                           the_planet->getGasGiant(),
-                                           the_planet->getDustMass(),
-                                           the_planet->getGasMass(),
-                                           the_planet->getCoreRadius(),
-                                           the_planet->getRadius(),
-                                           the_planet->getOrbitZone(),
-                                           the_planet->getDensity(),
-                                           the_planet->getOrbPeriod(),
-                                           the_planet->getDay(),
-                                           the_planet->getResonantPeriod(),
-                                           the_planet->getEscVelocity(),
-                                           the_planet->getSurfAccel(),
-                                           the_planet->getSurfGrav(),
-                                           the_planet->getRmsVelocity(),
-                                           the_planet->getMolecWeight(),
-                                           the_planet->getVolatileGasInventory(),
-                                           the_planet->getSurfPressure(),
-                                           the_planet->getGreenhouseEffect(),
-                                           the_planet->getBoilPoint(),
-                                           the_planet->getAlbedo(),
-                                           the_planet->getExosphericTemp(),
-                                           the_planet->getEstimatedTemp(),
-                                           the_planet->getEstimatedTerrTemp(),
-                                           the_planet->getSurfTemp(),
-                                           the_planet->getGreenhsRise(),
-                                           the_planet->getHighTemp(),
-                                           the_planet->getLowTemp(),
-                                           the_planet->getMaxTemp(),
-                                           the_planet->getMinTemp(),
-                                           the_planet->getHydrosphere(),
-                                           the_planet->getCloudCover(),
-                                           the_planet->getIceCover(),
-                                           atmosphere,
-                                           type_string(the_planet),
-                                           the_planet->getMinorMoons()};
-
-  std::string row;
-  for (const auto& data : planet_data) {
-    row += std::visit(
-        [](const auto& value) {
-          using T = std::decay_t<decltype(value)>;
-          if constexpr (std::is_same_v<T, std::string>) {
-            return std::format("'{}'", value);
-          } else if constexpr (std::is_floating_point_v<T>) {
-            return std::format("{:.6f}", value);
-          } else {
-            return std::format("{}", value);
-          }
-        },
-        data);
-    row += ", ";
+  // JSON-style atmosphere string, byte-for-byte the legacy jsonRow inline build.
+  std::string atmosphere_json;
+  if (do_gases) {
+    std::stringstream ss;
+    for (int i = 0; i < the_planet->getNumGases(); i++) {
+      int  index     = gases.count();
+      bool poisonous = false;
+      for (int n = 0; n < gases.count(); n++) {
+        if (gases[n].getNum() == the_planet->getGas(i).getNum()) {
+          index = n;
+          break;
+        }
+      }
+      long double ipp = inspired_partial_pressure(the_planet->getSurfPressure(),
+                                                  the_planet->getGas(i).getSurfPressure());
+      if (ipp < 0.0) {
+        ipp = 0.0;
+      }
+      if (ipp > gases[index].getMaxIpp()) {
+        poisonous = true;
+      }
+      ss << gases[index].getSymbol() << " "
+         << toString(100.0 *
+                     (the_planet->getGas(i).getSurfPressure() / the_planet->getSurfPressure()))
+         << " " << toString(the_planet->getGas(i).getSurfPressure()) << " (" << toString(ipp) << ")";
+      if (poisonous) {
+        ss << " poisonous";
+      }
+      ss << ";";
+    }
+    atmosphere_json = ss.str();
   }
 
-  // Remove the trailing ", " and add a newline
-  row.pop_back();
-  row.pop_back();
-  row += '\n';
+  PlanetRow r;
+  r.planet_no                    = id;
+  r.distance                     = is_moon ? the_planet->getMoonA() : the_planet->getA();
+  r.eccentricity                 = is_moon ? the_planet->getMoonE() : the_planet->getE();
+  r.inclination                  = the_planet->getInclination();
+  r.ascending_node               = the_planet->getAscendingNode();
+  r.longitude_of_pericenter      = the_planet->getLongitudeOfPericenter();
+  r.mean_longitude               = the_planet->getMeanLongitude();
+  r.axial_tilt                   = the_planet->getAxialTilt();
+  r.ice_mass_fraction            = the_planet->getImf();
+  r.rock_mass_fraction           = the_planet->getRmf();
+  r.carbon_mass_fraction         = the_planet->getCmf();
+  r.total_mass                   = the_planet->getMass();
+  r.is_gas_giant                 = the_planet->getGasGiant();
+  r.dust_mass                    = the_planet->getDustMass();
+  r.gas_mass                     = the_planet->getGasMass();
+  r.radius_of_core               = the_planet->getCoreRadius();
+  r.total_radius                 = the_planet->getRadius();
+  r.orbit_zone                   = the_planet->getOrbitZone();
+  r.density                      = the_planet->getDensity();
+  r.orbit_period                 = the_planet->getOrbPeriod();
+  r.rotation_period              = the_planet->getDay();
+  r.has_spin_orbit_resonance     = the_planet->getResonantPeriod();
+  r.escape_velocity              = the_planet->getEscVelocity();
+  r.surface_acceleration         = the_planet->getSurfAccel();
+  r.surface_gravity              = the_planet->getSurfGrav();
+  r.rms_velocity                 = the_planet->getRmsVelocity();
+  r.minimum_molecular_weight     = the_planet->getMolecWeight();
+  r.volatile_gas_inventory       = the_planet->getVolatileGasInventory();
+  r.surface_pressure             = the_planet->getSurfPressure();
+  r.greenhouse_effect            = the_planet->getGreenhouseEffect();
+  r.boiling_point                = the_planet->getBoilPoint();
+  r.albedo                       = the_planet->getAlbedo();
+  r.exospheric_temperature       = the_planet->getExosphericTemp();
+  r.estimated_temperature        = the_planet->getEstimatedTemp();
+  r.estimated_terran_temperature = the_planet->getEstimatedTerrTemp();
+  r.surface_temperature          = the_planet->getSurfTemp();
+  r.greenhouse_rise              = the_planet->getGreenhsRise();
+  r.high_temperature             = the_planet->getHighTemp();
+  r.low_temperature              = the_planet->getLowTemp();
+  r.maximum_temperature          = the_planet->getMaxTemp();
+  r.minimum_temperature          = the_planet->getMinTemp();
+  r.hydrosphere                  = the_planet->getHydrosphere();
+  r.cloud_cover                  = the_planet->getCloudCover();
+  r.ice_cover                    = the_planet->getIceCover();
+  r.atmosphere                   = generate_atmosphere_string(the_planet, do_gases);  // CSV-style
+  r.type                         = type_string(the_planet);
+  r.minor_moons                  = the_planet->getMinorMoons();
+  r.atmosphere_json              = atmosphere_json;
+  r.is_moon                      = is_moon;
+  return r;
+}
 
-  the_file << row;
-
+void csv_row(std::fstream& the_file, planet* the_planet, bool do_gases, bool is_moon,
+             const std::string& id, std::stringstream& /*ss*/) {
   ZoneScoped;
+  the_file << emit_csv_row(to_row(the_planet, is_moon, id, do_gases));
 }
 
 std::string generate_atmosphere_string(planet* the_planet, bool do_gases) {
@@ -466,103 +472,9 @@ std::string generate_atmosphere_string(planet* the_planet, bool do_gases) {
 }
 
 auto jsonRow(planet* the_planet, bool do_gases, bool is_moon, std::string id,
-             std::stringstream& ss) -> nlohmann::json {
-  do_gases = (flags_arg_clone & fDoGases) != 0;
-  std::string      atmosphere;
-  long double ipp;
-  int         index;
-  bool        poisonous;
-
-  if (do_gases) {
-    ss.str();
-    for (int i = 0; i < the_planet->getNumGases(); i++) {
-      index     = gases.count();
-      poisonous = false;
-
-      for (int n = 0; n < gases.count(); n++) {
-        if (gases[n].getNum() == the_planet->getGas(i).getNum()) {
-          index = n;
-          break;
-        }
-      }
-
-      ipp = inspired_partial_pressure(the_planet->getSurfPressure(),
-                                      the_planet->getGas(i).getSurfPressure());
-      if (ipp < 0.0) {
-        ipp = 0.0;
-      }
-      if (ipp > gases[index].getMaxIpp()) {
-        poisonous = true;
-      }
-      ss << gases[index].getSymbol() << " "
-         << toString(100.0 *
-                     (the_planet->getGas(i).getSurfPressure() / the_planet->getSurfPressure()))
-         << " " << toString(the_planet->getGas(i).getSurfPressure()) << " (" << toString(ipp)
-         << ")";
-      if (poisonous) {
-        ss << " poisonous";
-      }
-      ss << ";";
-    }
-    atmosphere = ss.str();
-    ss.str("");
-  }
-
-  nlohmann::json body;
-  body["Planet #"] = id;
-  if (!is_moon) {
-    body["Distance"]     = the_planet->getA();
-    body["Eccentricity"] = the_planet->getE();
-  } else {
-    body["Distance au"]  = the_planet->getMoonA();
-    body["Eccentricity"] = the_planet->getMoonE();
-  }
-  body["Inclination"]                     = the_planet->getInclination();
-  body["Longitude of the Ascending Node"] = the_planet->getAscendingNode();
-  body["Longitude of the Pericenter"]     = the_planet->getLongitudeOfPericenter();
-  body["Mean Longitude"]                  = the_planet->getMeanLongitude();
-  body["Axial Tilt"]                      = the_planet->getAxialTilt();
-  body["Ice Mass Fraction"]               = the_planet->getImf();
-  body["Rock Mass Fraction"]              = the_planet->getRmf();
-  body["Carbon Mass Fraction"]            = the_planet->getCmf();
-  body["Total Mass"]                      = the_planet->getMass();
-  body["Is Gas Giant"]                    = the_planet->getGasGiant();
-  body["Dust Mass"]                       = the_planet->getDustMass();
-  body["Gas Mass"]                        = the_planet->getGasMass();
-  body["Radius of Core"]                  = the_planet->getCoreRadius();
-  body["Total Radius"]                    = the_planet->getRadius();
-  body["Orbit Zone"]                      = the_planet->getOrbitZone();
-  body["Density"]                         = the_planet->getDensity();
-  body["Orbit Period"]                    = the_planet->getOrbPeriod();
-  body["Rotation Period"]                 = the_planet->getDay();
-  body["Has Spin Orbit Resonance"]        = the_planet->getResonantPeriod();
-  body["Escape Velocity"]                 = the_planet->getEscVelocity();
-  body["Surface Acceleration"]            = the_planet->getSurfAccel();
-  body["Surface Gravity"]                 = the_planet->getSurfGrav();
-  body["RMS Velocity"]                    = the_planet->getRmsVelocity();
-  body["Minimum Molecular Weight"]        = the_planet->getMolecWeight();
-  body["Volatile Gas Inventory"]          = the_planet->getVolatileGasInventory();
-  body["Get Surface Pressure"]            = the_planet->getSurfPressure();
-  body["Greenhouse Effect"]               = the_planet->getGreenhouseEffect();
-  body["Boiling Point"]                   = the_planet->getBoilPoint();
-  body["Albedo"]                          = the_planet->getAlbedo();
-  body["Exospheric Temperature"]          = the_planet->getExosphericTemp();
-  body["Estimated Temperature"]           = the_planet->getEstimatedTemp();
-  body["Estimated Terran Temperature"]    = the_planet->getEstimatedTerrTemp();
-  body["Surface Temperature"]             = the_planet->getSurfTemp();
-  body["Greenhouse Rise"]                 = the_planet->getGreenhsRise();
-  body["High Temperature"]                = the_planet->getHighTemp();
-  body["Low Temperature"]                 = the_planet->getLowTemp();
-  body["Maximum Temperature"]             = the_planet->getMaxTemp();
-  body["Minimum Temperature"]             = the_planet->getMinTemp();
-  body["Hydrosphere"]                     = the_planet->getHydrosphere();
-  body["Cloud Cover"]                     = the_planet->getCloudCover();
-  body["Ice Cover"]                       = the_planet->getIceCover();
-  body["Atmosphere"]                      = atmosphere;
-  body["Type"]                            = type_string(the_planet);
-  body["Minor Moons"]                     = the_planet->getMinorMoons();
+             std::stringstream& /*ss*/) -> nlohmann::json {
   ZoneScoped;
-  return body;
+  return emit_planet_json(to_row(the_planet, is_moon, id, do_gases));
 }
 
 /**
