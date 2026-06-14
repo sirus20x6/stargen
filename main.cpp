@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <exception>
 #include <iostream>
 #include <string>
 
@@ -480,7 +481,14 @@ int main(int argc, char **argv) {
   argc      = ccommand(&argv);
 #endif
 
-  initData();
+  try {
+    initData();
+  } catch (const std::exception& e) {
+    // Data loaders (e.g. the elements YAML) now throw instead of exit()-ing
+    // from deep in the call stack; report cleanly and fail with a non-zero code.
+    std::cerr << e.what() << '\n';
+    return EXIT_FAILURE;
+  }
 
   // Extract program name
   std::string prognam = argv[0];

@@ -9,6 +9,9 @@
 
 extern ChemTable gases;
 
-void initGases();
+// Load the element/gas table. `path` defaults to the repo-relative location but
+// can be overridden to make the data location configurable. Throws
+// std::runtime_error (not exit()) if the file is missing, malformed, or empty.
+void initGases(const std::string& path = "data/elements.yaml");
 
 #endif
