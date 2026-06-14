@@ -3,6 +3,7 @@ add_executable(stargen_tests
     test_basic.cpp
     enviro_test.cpp
     determinism_threads_test.cpp
+    elements_error_test.cpp
 )
 
 target_link_libraries(stargen_tests PRIVATE

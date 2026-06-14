@@ -12,6 +12,8 @@
 
 #include <iostream>
 #include <cmath>
+#include <cstdlib>      // for EXIT_FAILURE
+#include <exception>    // for std::exception
 #include <vector>
 #include "raylib.h"
 #include "stargen.h"
@@ -313,9 +315,15 @@ void drawUI(const OrbitalStateManager& manager, const ViewState& view,
 }
 
 int main() {
-    // Initialize generation system
+    // Initialize generation system. The data loaders throw std::runtime_error on
+    // a missing/malformed file; fail gracefully instead of std::terminate().
     std::cout << "Initializing stellar system generator...\n";
-    initializeGenerationData();
+    try {
+        initializeGenerationData();
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << '\n';
+        return EXIT_FAILURE;
+    }
 
     // Generate a test system
     std::cout << "Generating stellar system (seed 42)...\n";

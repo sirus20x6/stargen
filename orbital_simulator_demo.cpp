@@ -11,6 +11,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>      // for EXIT_FAILURE
+#include <exception>    // for std::exception
 #include "stargen.h"
 #include "StarGenerator.h"
 #include "OrbitalSimulator.h"
@@ -36,19 +38,26 @@ void printPlanetInfo(planet* p, int index) {
 }
 
 int main() {
-    // Initialize global data tables (REQUIRED for generation)
-    initRadii();
-    initGases();
-    initPlanets();
-    initDole();
-    initSolStation();
-    initJimb();
-    initOmegaGalaxy();
-    initRingUniverse();
-    initIC3094();
-    initAndromeda();
-    initStarTrek();
-    initPlanetaryHabitabilityLaboratory();
+    // Initialize global data tables (REQUIRED for generation). The data loaders
+    // (e.g. the elements YAML) throw std::runtime_error on a missing/malformed
+    // file, so fail gracefully instead of letting it escape to std::terminate().
+    try {
+        initRadii();
+        initGases();
+        initPlanets();
+        initDole();
+        initSolStation();
+        initJimb();
+        initOmegaGalaxy();
+        initRingUniverse();
+        initIC3094();
+        initAndromeda();
+        initStarTrek();
+        initPlanetaryHabitabilityLaboratory();
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << '\n';
+        return EXIT_FAILURE;
+    }
 
     std::cout << "================================================\n";
     std::cout << "OrbitalSimulator Non-Invasive Demo\n";
