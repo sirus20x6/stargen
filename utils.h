@@ -3,11 +3,13 @@
 #include <stddef.h>   // for size_t
 #include <algorithm>  // for replace
 #include <cmath>      // for isnan
+#include <cstdio>     // for std::snprintf (standard-stable float formatting)
 #include <iomanip>    // for operator<<, setprecision
 #include <iostream>   // for cout, basic_ostream<>::__ostream_...
 #include <sstream>    // for std::stringstream (not guaranteed via <iostream>)
 #include <map>        // for std::map
 #include <string>     // for std::string, to_string
+#include <type_traits>  // for std::is_floating_point_v, std::is_same_v
 #include <vector>     // for std::vector
 #include "stargen.h"  // for decimals_arg
 #include "tracy/Tracy.hpp"
@@ -99,7 +101,25 @@ auto toString(T val, int decimals) -> std::string {
   } else {
     if (decimals == 0) {
       // ss << std::showpoint << std::fixed << std::setprecision(getNumDecimals(val));
-      output = std::to_string(val);
+      if constexpr (std::is_floating_point_v<T>) {
+        // C++26 (libstdc++ P2587) changed std::to_string for floating-point
+        // types from printf "%f"/"%Lf" (6 fractional digits) to a shortest
+        // round-trip representation. That silently altered every toString()
+        // value in CSV/HTML/JSON output. Replicate the historical "%f"/"%Lf"
+        // behavior directly so output stays byte-identical and standard-stable.
+        if constexpr (std::is_same_v<T, long double>) {
+          int n = std::snprintf(nullptr, 0, "%Lf", val);
+          output.resize(n);
+          std::snprintf(output.data(), n + 1, "%Lf", val);
+        } else {
+          double d = static_cast<double>(val);
+          int n = std::snprintf(nullptr, 0, "%f", d);
+          output.resize(n);
+          std::snprintf(output.data(), n + 1, "%f", d);
+        }
+      } else {
+        output = std::to_string(val);
+      }
     } else {
       ss << std::showpoint << std::fixed << std::setprecision(decimals);
       ss << val;
