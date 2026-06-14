@@ -12,12 +12,6 @@
 #include "stargen.h"  // for decimals_arg
 #include "tracy/Tracy.hpp"
 
-// RNG state - now references to RandomContext members
-extern long& seed;
-extern long& jseed;
-extern long& ifrst;
-extern long& nextn;
-
 // Per-thread active RNG context. When non-null, the free RNG functions
 // (random_number/about/random_eccentricity/gaussian/exponential/randf/srandf)
 // draw from it instead of the global g_random_context, so each parallel worker

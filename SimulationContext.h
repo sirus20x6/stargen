@@ -146,6 +146,99 @@ public:
         max_type_count = 0;
     }
 
+    // Reset only the breathable/potentially-habitable min/max summary stats to
+    // their initial sentinels. Used by the parallel path so each per-worker
+    // context accumulates exactly one system's stats, which are then reduced
+    // into the run-wide totals after the worker threads join. NOT part of
+    // reset()/resetSystemStatistics(): the sequential path accumulates these
+    // directly across systems and must not have them cleared per system.
+    void resetHabitabilityStats() {
+        min_breathable_terrestrial_g = 1000.0;
+        min_breathable_g = 1000.0;
+        max_breathable_terrestrial_g = 0.0;
+        max_breathable_g = 0.0;
+        min_breathable_terrestrial_l = 1000.0;
+        min_breathable_l = 1000.0;
+        max_breathable_terrestrial_l = 0.0;
+        max_breathable_l = 0.0;
+        min_breathable_temp = 1000.0;
+        max_breathable_temp = 0.0;
+        min_breathable_p = 100000.0;
+        max_breathable_p = 0.0;
+        min_breathable_mass = 0.0;
+        max_breathable_mass = 0.0;
+
+        min_potential_terrestrial_g = 1000.0;
+        min_potential_g = 1000.0;
+        max_potential_terrestrial_g = 0.0;
+        max_potential_g = 0.0;
+        min_potential_terrestrial_l = 1000.0;
+        min_potential_l = 1000.0;
+        max_potential_terrestrial_l = 0.0;
+        max_potential_l = 0.0;
+        min_potential_temp = 1000.0;
+        max_potential_temp = 0.0;
+        min_potential_p = 100000.0;
+        max_potential_p = 0.0;
+        min_potential_mass = 0.0;
+        max_potential_mass = 0.0;
+    }
+
+    // Fold another context's breathable/potential min/max into this one. Used to
+    // reduce per-worker (and per-batch) habitability stats into the run-wide
+    // totals after the parallel region, with no shared-mutable-global writes
+    // during generation. min/max are commutative, so the reduced result is
+    // identical to single-threaded inline accumulation regardless of order.
+    //
+    // Each (min,max) group is folded only when its source actually saw a planet
+    // of that category (gated on max_*_g > 0.0, since surface gravity is always
+    // positive for a real planet) so untouched sentinels never leak in. Within
+    // an active group every field was written, so feeding the source's min and
+    // max through the same rule as update_min_max_stat (mn>v||mn==0.0 ; mx<v)
+    // reproduces inline accumulation exactly.
+    void mergeHabitabilityStatsFrom(const SimulationContext& s) {
+        auto feed = [](long double v, long double& mn, long double& mx) {
+            if (mn > v || mn == 0.0) mn = v;
+            if (mx < v) mx = v;
+        };
+        if (s.max_breathable_g > 0.0) {
+            feed(s.min_breathable_temp, min_breathable_temp, max_breathable_temp);
+            feed(s.max_breathable_temp, min_breathable_temp, max_breathable_temp);
+            feed(s.min_breathable_g, min_breathable_g, max_breathable_g);
+            feed(s.max_breathable_g, min_breathable_g, max_breathable_g);
+            feed(s.min_breathable_l, min_breathable_l, max_breathable_l);
+            feed(s.max_breathable_l, min_breathable_l, max_breathable_l);
+            feed(s.min_breathable_p, min_breathable_p, max_breathable_p);
+            feed(s.max_breathable_p, min_breathable_p, max_breathable_p);
+            feed(s.min_breathable_mass, min_breathable_mass, max_breathable_mass);
+            feed(s.max_breathable_mass, min_breathable_mass, max_breathable_mass);
+        }
+        if (s.max_breathable_terrestrial_g > 0.0) {
+            feed(s.min_breathable_terrestrial_g, min_breathable_terrestrial_g, max_breathable_terrestrial_g);
+            feed(s.max_breathable_terrestrial_g, min_breathable_terrestrial_g, max_breathable_terrestrial_g);
+            feed(s.min_breathable_terrestrial_l, min_breathable_terrestrial_l, max_breathable_terrestrial_l);
+            feed(s.max_breathable_terrestrial_l, min_breathable_terrestrial_l, max_breathable_terrestrial_l);
+        }
+        if (s.max_potential_g > 0.0) {
+            feed(s.min_potential_temp, min_potential_temp, max_potential_temp);
+            feed(s.max_potential_temp, min_potential_temp, max_potential_temp);
+            feed(s.min_potential_g, min_potential_g, max_potential_g);
+            feed(s.max_potential_g, min_potential_g, max_potential_g);
+            feed(s.min_potential_l, min_potential_l, max_potential_l);
+            feed(s.max_potential_l, min_potential_l, max_potential_l);
+            feed(s.min_potential_p, min_potential_p, max_potential_p);
+            feed(s.max_potential_p, min_potential_p, max_potential_p);
+            feed(s.min_potential_mass, min_potential_mass, max_potential_mass);
+            feed(s.max_potential_mass, min_potential_mass, max_potential_mass);
+        }
+        if (s.max_potential_terrestrial_g > 0.0) {
+            feed(s.min_potential_terrestrial_g, min_potential_terrestrial_g, max_potential_terrestrial_g);
+            feed(s.max_potential_terrestrial_g, min_potential_terrestrial_g, max_potential_terrestrial_g);
+            feed(s.min_potential_terrestrial_l, min_potential_terrestrial_l, max_potential_terrestrial_l);
+            feed(s.max_potential_terrestrial_l, min_potential_terrestrial_l, max_potential_terrestrial_l);
+        }
+    }
+
     // Backward compatibility alias
     void resetStatistics() {
         resetGlobalStatistics();

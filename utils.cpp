@@ -15,12 +15,6 @@
 #include "RandomContext.h"          // for RandomContext
 #include "stargen.h"                // for g_random_context
 
-// RNG state - now references to RandomContext members (defined in stargen.cpp)
-long& seed = g_random_context.seed;
-long& jseed = g_random_context.jseed;
-long& ifrst = g_random_context.ifrst;
-long& nextn = g_random_context.nextn;
-
 // Per-thread active RNG context (nullptr -> use the global g_random_context).
 thread_local RandomContext* t_active_random_context = nullptr;
 void set_active_random_context(RandomContext* ctx) { t_active_random_context = ctx; }
