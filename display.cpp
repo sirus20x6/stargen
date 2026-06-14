@@ -204,9 +204,9 @@ void csv_describe_system(std::fstream& the_file, planet* innermost_planet, bool 
     the_file << "'Seed', 'Star Name', 'Luminosity', 'Mass', 'Temperature', "
                 "'Spectral Type', 'Total Time on Main Sequence', 'Age', "
                 "'Earth-like Distance'\n";
-    the_file << seed << ", '" << the_sun.getName() << "', " << toString(the_sun.getLuminosity())
+    the_file << seed << ", '" << escapeCsvField(the_sun.getName()) << "', " << toString(the_sun.getLuminosity())
              << ", " << toString(the_sun.getMass()) << ", " << toString(the_sun.getEffTemp())
-             << ", '" << the_sun.getSpecType() << "', " << toString(the_sun.getLife()) << ", "
+             << ", '" << escapeCsvField(the_sun.getSpecType()) << "', " << toString(the_sun.getLife()) << ", "
              << toString(the_sun.getAge()) << ", " << toString(the_sun.getREcosphere(1.0)) << "\n";
   } else {
     the_file << "'Seed', 'Star Name', 'Luminosity of Primary', 'Mass of Primary', "
@@ -215,12 +215,12 @@ void csv_describe_system(std::fstream& the_file, planet* innermost_planet, bool 
                 "'Spectral Type of Secondary', 'Seperation', 'Eccentricity', "
                 "'Combined Temperature', 'Primary's Total Time on Main Sequence', "
                 "'Age', 'Earth-like Distance'\n";
-    the_file << seed << ", '" << the_sun.getName() << "', " << toString(the_sun.getLuminosity())
+    the_file << seed << ", '" << escapeCsvField(the_sun.getName()) << "', " << toString(the_sun.getLuminosity())
              << ", " << toString(the_sun.getMass()) << ", " << toString(the_sun.getEffTemp())
-             << ", '" << the_sun.getSpecType() << "', "
+             << ", '" << escapeCsvField(the_sun.getSpecType()) << "', "
              << toString(the_sun.getSecondaryLuminosity()) << ", "
              << toString(the_sun.getSecondaryMass()) << ", "
-             << toString(the_sun.getSecondaryEffTemp()) << ", '" << the_sun.getSecondarySpecType()
+             << toString(the_sun.getSecondaryEffTemp()) << ", '" << escapeCsvField(the_sun.getSecondarySpecType())
              << "', " << toString(the_sun.getSeperation()) << ", "
              << toString(the_sun.getEccentricity()) << ", "
              << toString(the_sun.getCombinedEffTemp()) << ", " << toString(the_sun.getLife())
@@ -627,8 +627,8 @@ static void svg_write_header(std::fstream& output, planet* innermost_planet,
          << (params.max_x + (params.margin * 2.0)) << " "
          << (params.max_y + (params.margin * 2.0)) << "' >\n";
   output << "\n";
-  output << "<title>" << innermost_planet->getTheSun().getName() << "</title>\n";
-  output << "<desc>Created by: " << prognam << " - " << stargen_revision << "</desc>\n";
+  output << "<title>" << escapeXmlText(innermost_planet->getTheSun().getName()) << "</title>\n";
+  output << "<desc>Created by: " << escapeXmlText(prognam) << " - " << stargen_revision << "</desc>\n";
   output << "\n";
 }
 
@@ -857,15 +857,16 @@ void open_html_file(const std::string& system_name, long seed, const std::string
   output << "<html>\n";
   output << "<head>\n";
   output << "<meta http-equiv=content-type content='text/html; charset=utf-8'>\n";
-  output << "\t<title>System " << seed << (noname ? "" : " - ") << (noname ? "" : system_name)
-         << "</title>\n";
-  output << "\t<meta name='generator' content='" << prognam << " - " << stargen_revision << "'>\n";
+  output << "\t<title>System " << seed << (noname ? "" : " - ")
+         << (noname ? "" : escapeXmlText(system_name)) << "</title>\n";
+  output << "\t<meta name='generator' content='" << escapeXmlAttr(prognam) << " - "
+         << stargen_revision << "'>\n";
   output << "<style type='text/css'>\n";
   output << "<!--\n";
   output << "table {border-color: #ffd;}\n";
   output << "-->\n";
   output << "</style>\n";
-  output << "<link rel='icon' type='image/png' href='" << url_path << "ref/favicon.png'>\n";
+  output << "<link rel='icon' type='image/png' href='" << escapeXmlAttr(url_path) << "ref/favicon.png'>\n";
   output << "</head>\n";
   output << "<body bgcolor='" << BGCOLOR << "' text='" << TXCOLOR << "' link='" << LINKCOLOR
          << "' vlink='" << TXCOLOR << "' alink='" << ALINKCOLOR << "'>\n\n";
@@ -1272,7 +1273,7 @@ void html_star_details_helper(std::fstream& the_file, const std::string& header,
   the_file << "<tr><td>Temperature</td>\n";
   the_file << "\t<td>" << toString(temperature) << "</td></tr>\n";
   the_file << "<tr><td>Spectral Type</td>\n";
-  the_file << "\t<td>" << spec_type << "</td></tr>\n";
+  the_file << "\t<td>" << escapeXmlText(spec_type) << "</td></tr>\n";
   the_file << "<tr><td>Age</td>\n";
   the_file << "\t<td>" << toString(age / 1.0E9) << " billion years<br>("
            << toString((life - age) / 1.0E9) << " billion left on main sequence)<br></td></tr>";
@@ -1324,16 +1325,16 @@ static void html_write_thumbnail_header(std::fstream& the_file, const std::strin
   the_file << "\t<font size='+2' color='" << TXTABLE << "'>";
 
   if (file_name.empty()) {
-    the_file << system_name;
+    the_file << escapeXmlText(system_name);
   } else {
-    the_file << "<a href='" << system_url << "'>" << system_name << "</a>";
+    the_file << "<a href='" << escapeXmlAttr(system_url) << "'>" << escapeXmlText(system_name) << "</a>";
   }
 
   the_file << "</font></th></tr>\n";
   the_file << "<tr bgcolor='" << BGTABLE << "'><td colspan=2>\n";
 
   if (graphic_format == gfSVG) {
-    the_file << "<object data='" << svg_url << "' type='image/svg+xml'\n";
+    the_file << "<object data='" << escapeXmlAttr(svg_url) << "' type='image/svg+xml'\n";
     the_file << "        width='100%' height='100%' border=1 "
                 "style='background-color:white;'>\n";
   }
@@ -1351,7 +1352,7 @@ static void html_write_thumbnail_header(std::fstream& the_file, const std::strin
            << "'>size proportional to Sqrt(Radius)</font>)\n";
   the_file << "</td></tr>\n";
   the_file << "<tr valign=middle bgcolor='" << BGSPACE << "'>\n";
-  the_file << "<td bgcolor='" << BGSPACE << "'><img alt='Sun' src='" << url_path << "ref/Sun.gif' ";
+  the_file << "<td bgcolor='" << BGSPACE << "'><img alt='Sun' src='" << escapeXmlAttr(url_path) << "ref/Sun.gif' ";
   the_file << "width=15 height=63 border=0></td>\n";
 }
 
@@ -1400,9 +1401,9 @@ static auto html_write_planet_thumbnail(std::fstream& the_file, planet* the_plan
   info = ss.str();
 
   the_file << "\t<td bgcolor='" << BGSPACE << "' align=center><a href='"
-           << (int_link ? "" : system_url) << "#" << counter << "' title='#" << counter << " - "
+           << (int_link ? "" : escapeXmlAttr(system_url)) << "#" << counter << "' title='#" << counter << " - "
            << info << "'>";
-  the_file << "<img alt='" << ptype << "' src='" << url_path << "ref/"
+  the_file << "<img alt='" << ptype << "' src='" << escapeXmlAttr(url_path) << "ref/"
            << image_type_string(the_planet) << "Planet.webp' width=" << ppixels
            << " height=" << ppixels << " border=0>";
   the_file << "</a>";
@@ -1457,9 +1458,9 @@ static auto html_write_moon_thumbnails(std::fstream& the_file, planet* the_plane
     ss << " Zone = " << moon->getOrbitZone();
     std::string info = ss.str();
 
-    the_file << "\n\t\t<br><a href='" << (int_link ? "" : system_url) << "#" << counter << "."
+    the_file << "\n\t\t<br><a href='" << (int_link ? "" : escapeXmlAttr(system_url)) << "#" << counter << "."
              << moons << "' title='#" << counter << "." << moons << " - " << info << "'>";
-    the_file << "<img alt='" << mtype << "' src='" << url_path << "ref/"
+    the_file << "<img alt='" << mtype << "' src='" << escapeXmlAttr(url_path) << "ref/"
              << image_type_string(moon) << "Planet.webp' width=" << mpixels
              << " height=" << mpixels << " border=0>";
     the_file << "</a>";
@@ -1492,7 +1493,7 @@ static void html_write_terrestrials_table(std::fstream& the_file, planet* innerm
     if (is_habitable_jovian(the_planet) || is_terrestrial(the_planet) ||
         is_potentialy_habitable(the_planet)) {
       the_file << "\n\t<tr><td align=right width='5%'>";
-      the_file << "<a href='" << (int_link ? "" : system_url) << "#" << counter << "'><small>#"
+      the_file << "<a href='" << (int_link ? "" : escapeXmlAttr(system_url)) << "#" << counter << "'><small>#"
                << counter << "</small></a>";
       the_file << "</td>\n\t\t<td><small>" << type_string(the_planet) << ": </small>";
 
@@ -1506,7 +1507,7 @@ static void html_write_terrestrials_table(std::fstream& the_file, planet* innerm
       for (planet* moon : the_planet->moons) {
         if (is_habitable_jovian(moon) || is_terrestrial(moon) || is_potentialy_habitable(moon)) {
           the_file << "\n\t<tr><td align=right width='5%'>";
-          the_file << "<a href='" << (int_link ? "" : system_url) << "#" << counter << "."
+          the_file << "<a href='" << (int_link ? "" : escapeXmlAttr(system_url)) << "#" << counter << "."
                    << moons << "'><small>#" << counter << "." << moons << "</small></a>";
           the_file << "</td>\n\t\t<td><small>" << type_string(moon) << ": </small>";
 
@@ -1665,7 +1666,7 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
   }
 
   the_file << "<td bgcolor='" << BGSPACE << "' align=right valign=bottom>";
-  the_file << "<a href='" << url_path << "ref/Key.html'><font size='-3' color='" << TXSPACE
+  the_file << "<a href='" << escapeXmlAttr(url_path) << "ref/Key.html'><font size='-3' color='" << TXSPACE
            << "'>See<br>Key</font></a></td>\n";
   the_file << "</tr></table>\n";
 
@@ -2047,7 +2048,7 @@ static void html_write_atmospheric_gases(planet* the_planet, bool do_gases,
 <td align=right>(ipp:{:.2f})</td>
 <td align=right>&nbsp;{}</td></tr>
 )",
-                                gases[index].getName(), percentage,
+                                escapeXmlText(gases[index].getName()), percentage,
                                 the_planet->getGas(i).getSurfPressure(), ipp,
                                 poisonous ? "poisonous" : "");
       }
@@ -2161,7 +2162,7 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
 <tr><th>Planet type</th>
 <td colspan=2><img alt='{0}' src='{1}ref/{2}Planet.webp' align=middle width=150 height=150>{0}
 )",
-                          typeString, url_path, image_type_string(the_planet));
+                          typeString, escapeXmlAttr(url_path), image_type_string(the_planet));
 
   if ((int)the_planet->getDay() == (int)(the_planet->getOrbPeriod() * 24.0)) {
     the_file << "<br>Tidally Locked 1 Face\n";
@@ -2218,7 +2219,7 @@ void html_describe_system(planet* innermost_planet, bool do_gases, bool do_moons
     typeString = type_string(the_planet);
 
     the_file << "<tr align=right>\n\t<td><a href='#" << counter << "'>" << counter
-             << "</a></td>\n\t<td align=center><img alt='" << typeString << "' src='" << url_path
+             << "</a></td>\n\t<td align=center><img alt='" << typeString << "' src='" << escapeXmlAttr(url_path)
              << "ref/" << image_type_string(the_planet) << "Planet.webp' width='600'></td>\n\t<td>"
              << typeString << "</td>\n\t<td>" << toString(the_planet->getA(), 4)
              << "  AU</td>\n\t<td>" << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES, 4)
@@ -2238,7 +2239,7 @@ void html_describe_system(planet* innermost_planet, bool do_gases, bool do_moons
         the_file << "\n";
         the_file << "\t<td align=center><a href='#" << counter << "." << moons << "'>" << counter
                  << "." << moons << "</a></td>\n";
-        the_file << "\t<td align=center><img alt='" << typeString << "' src='" << url_path << "ref/"
+        the_file << "\t<td align=center><img alt='" << typeString << "' src='" << escapeXmlAttr(url_path) << "ref/"
                  << image_type_string(moon) << "Planet.webp' width='400'></td>\n";
         the_file << "\t<td>" << typeString << "</td>\n";
         the_file << "\t<td>" << toString(moon->getMoonA() * KM_PER_AU, 4) << " km</td>\n";
@@ -2293,7 +2294,7 @@ void celestia_describe_system(planet* innermost_planet, std::string designation,
 
   std::cout << "# Stargen - " << stargen_revision << "; seed=" << seed << "\n"
             << "#\n"
-            << "# " << designation << ", " << system_name << "\n"
+            << "# " << escapeCelestiaId(designation) << ", " << escapeCelestiaId(system_name) << "\n"
             << "#\n"
             << "# Stellar mass: " << toString(the_sun.getMass()) << " solar masses\n"
             << "# Stellar luminosity: " << toString(the_sun.getLuminosity()) << "\n"
@@ -2342,10 +2343,11 @@ void celestia_describe_world(planet* the_planet, const std::string& designation,
                              const std::string& system_name, long seed, long double inc,
                              long double an, int counter, sun& the_sun, bool is_moon,
                              int planet_num) {
+  const std::string designation_esc = escapeCelestiaId(designation);
   const auto name =
       is_moon ? std::format("\"p{}-{}\"", counter, planet_num) : std::format("\"p{}\"", counter);
-  const auto parent = is_moon ? std::format("\"{}/p{}\"", designation, planet_num)
-                              : std::format("\"{}\"", designation);
+  const auto parent = is_moon ? std::format("\"{}/p{}\"", designation_esc, planet_num)
+                              : std::format("\"{}\"", designation_esc);
 
   std::cout << std::format("\t{} {}\n{{\n", name, parent);
 

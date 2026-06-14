@@ -172,6 +172,11 @@ inline auto emit_csv_header() -> std::string {
   return out;
 }
 
+// Defined in utils.cpp. Escapes a value placed inside a single-quoted CSV
+// field (' -> '', CR/LF -> space); a no-op on clean strings, so default output
+// is byte-identical. The JSON path stays raw (nlohmann escapes there).
+auto escapeCsvField(const std::string&) -> std::string;
+
 // CSV data row for one planet/moon, matching the legacy csv_row formatting:
 // strings 'quoted', floats {:.6f}, ints/bools default. Comma+space separated.
 inline auto emit_csv_row(const PlanetRow& r) -> std::string {
@@ -187,7 +192,7 @@ inline auto emit_csv_row(const PlanetRow& r) -> std::string {
       const auto& v = r.[:m:];
       using T = std::remove_cvref_t<decltype(v)>;
       if constexpr (std::is_same_v<T, std::string>) {
-        out += std::format("'{}'", v);
+        out += std::format("'{}'", escapeCsvField(v));
       } else if constexpr (std::is_floating_point_v<T>) {
         out += std::format("{:.6f}", v);
       } else {
