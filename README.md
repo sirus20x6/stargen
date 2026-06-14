@@ -36,6 +36,17 @@ make -jx
 ```
 where x is number of threads +1 to compile faster
 
+### Build options
+Pass these with `-D<option>=<value>` at configure time:
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `ENABLE_TRACY` | `OFF` | Build with the Tracy profiler (worker threads + listen socket + overhead). Off by default for production/CI; turn on for local profiling: `cmake -B build -DENABLE_TRACY=ON`. Always forced off under `SANITIZE`. |
+| `SANITIZE` | *(empty)* | `address`, `thread`, or `undefined` — build with that sanitizer (use a separate build dir, e.g. `cmake -B build-asan -DSANITIZE=address`). |
+| `STARGEN_BUILD_VIEWER` | `ON` | Build the raylib real-time viewer. CI sets it `OFF` (headless, no display backend). |
+
+First-party sources build with `-Wall -Wextra` (not `-Werror`); the large generated star-catalogue translation units are compiled with `-w` to keep their machine-generated noise out of the warning stream.
+
 ## Command Line Usage
 ```
 Usage: stargen [options] [system name]

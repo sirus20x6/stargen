@@ -64,16 +64,23 @@ else()
   set(STARGEN_BIN_OUTPUT_DIR "${CMAKE_SOURCE_DIR}")
 endif()
 
-# Tracy is a profiler. Its bundled rpmalloc allocator recycles memory spans
-# across threads without synchronization that ThreadSanitizer can observe, and
-# its profiler worker threads touch shared globals -- both produce a flood of
-# TSan false positives that drown out real data races. So in a sanitizer build
-# we disable Tracy entirely: the Tracy CMake option is forced OFF (TracyClient
-# becomes a stub with no profiler threads and no rpmalloc), and we do not define
-# TRACY_ENABLE for our targets (the Tracy.hpp macros like ZoneScoped then expand
-# to nothing). TracyClient is still linked so its headers remain on the include
-# path. Normal (non-sanitizer) builds keep full Tracy instrumentation.
-if(SANITIZE)
+# Tracy is a profiler, gated behind ENABLE_TRACY so production / release / CI
+# builds can ship without it: it spawns profiler worker threads, opens a listen
+# socket, and adds runtime overhead (README advises disabling it for production).
+# Default OFF -- opt in for local profiling with -DENABLE_TRACY=ON.
+#
+# Tracy is ALSO forced off under any sanitizer build regardless of ENABLE_TRACY:
+# its bundled rpmalloc allocator recycles memory spans across threads without
+# synchronization that ThreadSanitizer observes, and its worker threads touch
+# shared globals -- both flood TSan with false positives that drown out real
+# data races.
+#
+# When Tracy is off, the fetched Tracy CMake target becomes a stub (no profiler
+# threads, no rpmalloc) and we do not define TRACY_ENABLE for our code, so the
+# Tracy.hpp macros (ZoneScoped, etc.) expand to nothing. TracyClient is still
+# linked either way so its headers remain on the include path.
+option(ENABLE_TRACY "Build with Tracy profiler instrumentation" OFF)
+if(SANITIZE OR NOT ENABLE_TRACY)
   set(TRACY_ENABLE OFF CACHE BOOL "" FORCE)   # affects the fetched Tracy build
   set(STARGEN_TRACY_DEFINES "")               # no TRACY_ENABLE for our code
 else()
@@ -198,25 +205,43 @@ add_library(stargen_core STATIC
 )
 
 # ----------------------------------------------------------------------------
-# clang optimizer workaround for the large predefined star catalogues.
-# ring_universe.cpp, ic3094_2.cpp and andromeda2.cpp (and the not-currently-
-# compiled ring_universe2.cpp) are enormous static tables whose entries are
-# built from runtime calls -- mass(abs2luminosity(...)) -- tens of thousands of
-# times, producing one huge dynamic initializer. clang's optimizer (verified on
-# clang-18/21/22) spins on that effectively forever at every -O level except
-# -O0, while gcc compiles it fine in seconds. These translation units are pure
-# data, so forcing -O0 under clang costs nothing at runtime and lets the clang
-# build complete. (Source COMPILE_OPTIONS are emitted after CMAKE_CXX_FLAGS_*,
-# so this -O0 overrides the Release -O3 for just these files.)
+# Generated star-catalogue translation units. These are enormous machine-style
+# data tables, not first-party logic, so they get special compile handling:
+#
+#  * -w: keep them OUT of the -Wall/-Wextra first-party warning set added below;
+#    they would otherwise emit thousands of warnings that bury the real ones.
+#  * -O0 under clang: ring_universe.cpp, ic3094_2.cpp and andromeda2.cpp build
+#    their entries from tens of thousands of runtime calls -- mass(abs2luminosity
+#    (...)) -- producing one huge dynamic initializer that clang's optimizer
+#    (verified on clang-18/21/22) spins on effectively forever at every -O level
+#    except -O0, while gcc compiles it in seconds. These TUs are pure data, so
+#    forcing -O0 under clang costs nothing at runtime; applying it to all the
+#    catalogue files (not just the three that hang) is harmless and simpler.
+#
+# COMPILE_OPTIONS is a single per-source list emitted after CMAKE_CXX_FLAGS_*,
+# so -w / -O0 here override the target's -Wall and the Release -O3 for just
+# these files.
+set(STARGEN_CATALOG_SOURCES
+    andromeda.cpp
+    andromeda2.cpp
+    ic3094.cpp
+    ic3094_2.cpp
+    jimb.cpp
+    omega_galaxy.cpp
+    omega_galaxy2.cpp
+    Planetary_Habitability_Laboratory.cpp
+    ring_universe.cpp
+    solstation.cpp
+    star_trek.cpp
+)
+set(STARGEN_CATALOG_COMPILE_OPTIONS -w)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set_source_files_properties(
-        ring_universe.cpp
-        ring_universe2.cpp
-        ic3094_2.cpp
-        andromeda2.cpp
-        PROPERTIES COMPILE_OPTIONS "-O0"
-    )
+    list(APPEND STARGEN_CATALOG_COMPILE_OPTIONS -O0)
 endif()
+set_source_files_properties(
+    ${STARGEN_CATALOG_SOURCES}
+    PROPERTIES COMPILE_OPTIONS "${STARGEN_CATALOG_COMPILE_OPTIONS}"
+)
 
 target_compile_definitions(stargen_core PUBLIC ${STARGEN_TRACY_DEFINES})
 target_include_directories(stargen_core PUBLIC
@@ -229,6 +254,15 @@ target_link_libraries(stargen_core PUBLIC
     ${STARGEN_MATH_LIB}             # Standard math library (libm; empty on Windows/macOS)
     yaml-cpp
 )
+
+# First-party warning flags: -Wall/-Wextra on our own translation units. The
+# generated catalogue TUs are excluded via -w above. NOT -Werror -- warnings are
+# for visibility and must not break the build. PRIVATE so they don't leak into
+# the test target (which compiles Catch2) or other consumers. Guarded to the
+# GNU/Clang frontends (the only compilers this project builds with; the Windows
+# lane uses clang++).
+target_compile_options(stargen_core PRIVATE
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra>)
 
 # stargen executable = main.cpp + stargen_core
 add_executable(stargen
@@ -245,6 +279,10 @@ target_include_directories(stargen PRIVATE ${CMAKE_SOURCE_DIR}/tracy)
 target_link_libraries(stargen PRIVATE
     stargen_core
 )
+
+# First-party warnings for main.cpp too (see stargen_core note above).
+target_compile_options(stargen PRIVATE
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra>)
 
 # Set the binary output directory to the source directory
 set_target_properties(stargen PROPERTIES
