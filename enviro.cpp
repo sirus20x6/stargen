@@ -1489,6 +1489,31 @@ auto getSpinResonanceFactor(long double eccentricity) -> long double {
   }
 }
 
+/**
+ * @brief Rocky (ice-free) planet radius from Zeng, Sasselov & Jacobsen 2016.
+ *
+ * R/Re = (1.07 - 0.21 * CMF) * (M/Me)^(1/3.7), a PREM-based closed form for a
+ * two-layer Fe-core + MgSiO3-mantle planet (ApJ 819, 127; arXiv:1512.08827).
+ * CMF is the core (iron) mass fraction. Calibrated for 1-8 Me, CMF 0-0.4; it is
+ * monotonic and well-behaved when extrapolated outside that range, which a
+ * generator needs. Earth (CMF ~= 0.33, M = 1 Me) -> ~1.0 Re.
+ * See research/modern/04-mass-radius-interior.md.
+ *
+ * @param mass_earth planet mass in Earth masses
+ * @param core_mass_fraction iron/core mass fraction (clamped to [0,1])
+ * @return radius in Earth radii
+ */
+static auto zeng_rock_radius(long double mass_earth,
+                             long double core_mass_fraction) -> long double {
+  long double cmf = core_mass_fraction;
+  if (cmf < 0.0L) {
+    cmf = 0.0L;
+  } else if (cmf > 1.0L) {
+    cmf = 1.0L;
+  }
+  return (1.07L - 0.21L * cmf) * std::pow(mass_earth, 1.0L / 3.7L);
+}
+
 auto radius_improved(long double mass, long double imf, long double rmf,
                             long double cmf, bool giant, int zone,
                             planet *the_planet) -> long double {
@@ -1594,18 +1619,11 @@ auto radius_improved(long double mass, long double imf, long double rmf,
         AVE(ice_rock_radius, ice_iron_radius) * half_mass_factor, 1.0,
         ice_iron_radius, false);
   } else {
-    if (rmf < 0.5) {
-      non_ice_rock_radius = planet_radius_helper(
-          rmf, 0.0, non_ice_rock_radii[0.0], 0.5, non_ice_rock_radii[0.5], 1.0,
-          non_ice_rock_radii[1.0], false);
-    } else {
-      radius1 = planet_radius_helper(rmf, 0.0, non_ice_rock_radii[0.0], 0.5,
-                                     non_ice_rock_radii[0.5], 1.0,
-                                     non_ice_rock_radii[1.0], false);
-      radius2 = planet_radius_helper2(rmf, 0.5, non_ice_rock_radii[0.5], 1.0,
-                                      non_ice_rock_radii[1.0]);
-      non_ice_rock_radius = rangeAdjust(rmf, radius1, radius2, 0.5, 1.0);
-    }
+    // Ice-free rocky planet: Zeng et al. 2016 closed form. With no ice the core
+    // (iron) mass fraction is simply 1 - rmf. Replaces the iron/rock EOS-table
+    // blend for the dominant terrestrial case (the ice branches above still use
+    // the water EOS tables, which Zeng 2016 does not cover).
+    non_ice_rock_radius = zeng_rock_radius(mass, 1.0 - rmf);
     radius = non_ice_rock_radius;
   }
   radius *= KM_EARTH_RADIUS;
@@ -1618,26 +1636,10 @@ auto fudged_radius(long double mass, long double imf, long double rmf,
   long double range = NAN, upper_fraction = NAN, lower_fraction = NAN, non_ice_rock_radius = NAN,
       ice_rock_radius = NAN, radius = NAN;
   mass *= SUN_MASS_IN_EARTH_MASSES;
-  if (rmf <= 0.5) {
-    range = 0.5 - 0.0;
-    upper_fraction = rmf / range;
-    lower_fraction = 1.0 - upper_fraction;
-    non_ice_rock_radius =
-        (upper_fraction *
-         half_rock_half_iron_radius(mass, cmf, the_planet,
-                                    solid_half_rock_half_iron)) +
-        (lower_fraction * iron_radius(mass, the_planet, solid_iron));
-  } else {
-    range = 1.0 - 0.5;
-    rmf += quad_trend(-3, 4.5, -1.5, rmf);
-    upper_fraction = (rmf - 0.5) / range;
-    lower_fraction = 1.0 - upper_fraction;
-    non_ice_rock_radius =
-        (upper_fraction * rock_radius(mass, cmf, the_planet, solid_rock)) +
-        (lower_fraction *
-         half_rock_half_iron_radius(mass, cmf, the_planet,
-                                    solid_half_rock_half_iron));
-  }
+  // Rock+iron (ice-free) component via Zeng et al. 2016. Within the non-ice
+  // portion the core (iron) mass fraction is iron/(rock+iron) = (1-imf-rmf)/(1-imf).
+  long double non_ice_cmf = (imf < 1.0) ? (1.0 - imf - rmf) / (1.0 - imf) : 0.0;
+  non_ice_rock_radius = zeng_rock_radius(mass, non_ice_cmf);
 
   if (imf <= 0.5) {
     range = 0.5 - 0.0;
