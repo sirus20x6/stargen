@@ -2915,6 +2915,80 @@ void set_habitability_flags(planet *the_planet) {
       rocky && in_hz && the_planet->getSurfTemp() < FREEZING_POINT_OF_WATER);
 }
 
+/**
+ * @brief Closed-form 1-D-climate surface temperature for an Earth-like CO2-H2O
+ * atmosphere, from Lehmer, Catling & Krissansen-Totton 2020 (Nature Comms 11,
+ * 6153; arXiv:2012.00819, eq. 8). A 4th-order bivariate polynomial in
+ * X = ln(pCO2[bar]) and Y = S/S_earth, fit to the VPL 1-D radiative-convective
+ * model (max error ~3%). Returns the full surface temperature in K (greenhouse
+ * and Bond albedo are implicit). Caller must ensure the validity domain:
+ * S in [0.35, 1.05] S_earth, pCO2 in [1e-6, 10] bar.
+ * See research/modern/10-greenhouse-Ts-polynomial.md.
+ *
+ * @param instellation incident flux S normalized to the solar constant (S/S_earth)
+ * @param pco2_bar CO2 partial pressure in bar
+ * @return surface temperature in Kelvin
+ */
+auto lehmer_surface_temp(long double instellation, long double pco2_bar) -> long double {
+  // c[i][j] multiplies X^i * Y^j (i = power of ln(pCO2), j = power of S/S_earth).
+  static const long double c[5][5] = {
+      {  4.809L, 1045.0L, -1496.0L, 1064.0L, -281.1L},
+      {-222.0L,  1414.0L, -2964.0L, 2655.0L, -868.4L},
+      {-68.44L,   446.4L,  -978.4L,  907.5L, -304.6L},
+      { -6.737L,   44.41L,  -98.86L,   92.87L, -31.48L},
+      { -0.206L,    1.364L,   -3.059L,   2.892L,  -0.985L},
+  };
+  const long double X = std::log(pco2_bar);  // natural log; pCO2 in bar
+  const long double Y = instellation;
+  long double t = 0.0L;
+  long double xi = 1.0L;  // X^i
+  for (const auto& row : c) {
+    long double yj = 1.0L;  // Y^j
+    for (long double cij : row) {
+      t += cij * xi * yj;
+      yj *= Y;
+    }
+    xi *= X;
+  }
+  return t;
+}
+
+/**
+ * @brief Set the diagnostic Lehmer 2020 1-D-climate surface temperature on the
+ * planet, or 0 if it is outside the model's validity domain.
+ *
+ * Additive diagnostic only: does NOT change the planet's actual surface
+ * temperature or any habitability classification. Applies to rocky planets with
+ * an Earth-like CO2-bearing atmosphere whose instellation S = L/a^2 lies in
+ * [0.35, 1.05] S_earth and whose CO2 partial pressure lies in [1e-6, 10] bar.
+ */
+void set_climate_model_temp(planet *the_planet) {
+  the_planet->setClimateModelTemp(0.0);  // sentinel: not applicable
+  if (is_gas_planet(the_planet)) {
+    return;
+  }
+  long double a = the_planet->getA();
+  if (a <= 0.0) {
+    return;
+  }
+  long double instellation = the_planet->getTheSun().getLuminosity() / (a * a);
+  if (instellation < 0.35 || instellation > 1.05) {
+    return;
+  }
+  long double pco2_mb = 0.0;  // CO2 partial pressure, millibars
+  for (int i = 0; i < the_planet->getNumGases(); i++) {
+    if (the_planet->getGas(i).getNum() == AN_CO2) {
+      pco2_mb = the_planet->getGas(i).getSurfPressure();
+      break;
+    }
+  }
+  long double pco2_bar = pco2_mb / MILLIBARS_PER_BAR;
+  if (pco2_bar < 1.0e-6 || pco2_bar > 10.0) {
+    return;
+  }
+  the_planet->setClimateModelTemp(lehmer_surface_temp(instellation, pco2_bar));
+}
+
 auto is_potentialy_habitable_optimistic_size(planet *the_planet) -> bool {
   /*if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 10.0 ||
    (the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) < 0.1) // The Plantary

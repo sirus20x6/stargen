@@ -177,6 +177,10 @@ class planet {
   bool co2CollapseRisk{false};     /* HZ world cold enough that outgassed CO2 may
                                       condense out, risking irreversible
                                       glaciation (Turbet et al. 2017) */
+  long double climateModelTemp{0}; /* diagnostic surface temp (K) from the Lehmer
+                                      et al. 2020 1-D-climate polynomial, for
+                                      Earth-like CO2-H2O atmospheres in its
+                                      validity domain; 0 = not applicable */
   void estimateMass();
  public:
   planet();
@@ -230,6 +234,8 @@ class planet {
   auto getHighXuvEscapeRisk() -> bool;
   void setCo2CollapseRisk(bool);
   auto getCo2CollapseRisk() -> bool;
+  void setClimateModelTemp(long double);
+  auto getClimateModelTemp() -> long double;
   void setEscVelocity(long double);
   auto getEscVelocity() -> long double;
   void setSurfAccel(long double);
