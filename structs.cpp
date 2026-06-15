@@ -1271,6 +1271,12 @@ auto planet::getRadius() -> long double { return radius; }
 
 auto planet::getResonantPeriod() -> bool { return resonantPeriod; }
 
+auto planet::getTidallyLocked() -> bool { return tidallyLocked; }
+
+auto planet::getPmsDesiccationRisk() -> bool { return pmsDesiccationRisk; }
+
+auto planet::getHighXuvEscapeRisk() -> bool { return highXuvEscapeRisk; }
+
 auto planet::getRmf() -> long double { return rmf; }
 
 auto planet::getRmsVelocity() -> long double { return rmsVelocity; }
@@ -1424,6 +1430,12 @@ void planet::setRadius(long double r) {
 }
 
 void planet::setResonantPeriod(bool r) { resonantPeriod = r; }
+
+void planet::setTidallyLocked(bool b) { tidallyLocked = b; }
+
+void planet::setPmsDesiccationRisk(bool b) { pmsDesiccationRisk = b; }
+
+void planet::setHighXuvEscapeRisk(bool b) { highXuvEscapeRisk = b; }
 
 void planet::setRmf(long double r) { rmf = r; }
 

@@ -167,6 +167,13 @@ class planet {
   long double oblateness{};
   bool deleteable{true};
   long double knownRadius{};
+  // Derived habitability caveat flags (set by set_habitability_flags()).
+  bool tidallyLocked{false};       /* synchronous or spin-orbit resonant rotation */
+  bool pmsDesiccationRisk{false};  /* M-dwarf HZ world likely desiccated in the
+                                      pre-main-sequence phase -> abiotic-O2 "mirage
+                                      Earth" (Luger & Barnes 2015) */
+  bool highXuvEscapeRisk{false};   /* close-in M-dwarf world at high atmospheric-
+                                      escape risk from XUV/flares */
   void estimateMass();
  public:
   planet();
@@ -212,6 +219,12 @@ class planet {
   auto getDay() -> long double;
   void setResonantPeriod(bool);
   auto getResonantPeriod() -> bool;
+  void setTidallyLocked(bool);
+  auto getTidallyLocked() -> bool;
+  void setPmsDesiccationRisk(bool);
+  auto getPmsDesiccationRisk() -> bool;
+  void setHighXuvEscapeRisk(bool);
+  auto getHighXuvEscapeRisk() -> bool;
   void setEscVelocity(long double);
   auto getEscVelocity() -> long double;
   void setSurfAccel(long double);

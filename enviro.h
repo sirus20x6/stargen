@@ -120,6 +120,7 @@ auto is_potentialy_habitable_earth_like(planet *) -> bool;
 auto is_habitable_earth_like(planet *) -> bool;
 auto is_potentialy_habitable(planet *) -> bool;
 auto is_habitable(planet *) -> bool;
+void set_habitability_flags(planet *);
 auto convert_km_to_eu(long double) -> long double;
 void makeHabitable(StarGenerator*, sun &, planet *, const std::string&, bool, bool);
 
