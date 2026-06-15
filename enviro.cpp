@@ -265,25 +265,13 @@ std::string eff_temp_to_spec_type(long double eff_temp, long double luminosity) 
     std::string spec_class = eff_temp > 52000 ? "WN" + std::to_string(std::min(9, std::max(0, int(10 - 10 * (eff_temp - 52000) / 148000))))
                                          : get_spec_class();
 
-    if (luminosity == 0) luminosity = 1e-7;
-    long double xmag = 4.83 - 2.5 * log10(luminosity);
-
-    static const std::vector<std::pair<std::string, std::function<std::string(double)>>> lum_classes = {
-        {"O", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -6 ? "Ib" : m < -4.9 ? "II" : m < -4 ? "III" : "V"; }},
-        {"B", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -5 ? "Ib" : m < -4.5 ? "II" : m < -0.5 ? "III" : "V"; }},
-        {"A", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2.25 ? "II" : m < 0 ? "III" : m < 0.125 ? "IV" : "V"; }},
-        {"F", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2 ? "II" : m < 1.75 ? "III" : m < 3 ? "IV" : "V"; }},
-        {"G", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2.25 ? "II" : m < 1.75 ? "III" : m < 3 ? "IV" : "V"; }},
-        {"K", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2 ? "II" : m < 2 ? "III" : m < 4 ? "IV" : "V"; }},
-        {"M", [](double m) { return m < -9 ? "O" : m < -7 ? "Ia" : m < -4.5 ? "Ib" : m < -2 ? "II" : m < 2.5 ? "III" : "V"; }}
-    };
-
-    for (const auto& [prefix, lum_func] : lum_classes) {
-        if (spec_class[0] == prefix[0]) {
-            return spec_class + lum_func(xmag);
-        }
-    }
-
+    // Stars on the mass/luminosity-derived path are main-sequence (mass->L is the
+    // main-sequence relation; age is capped at the MS lifetime; post-MS evolution
+    // is not modelled), so the luminosity class is V. The previous absolute-
+    // magnitude heuristic mislabelled intrinsically-bright MS stars as IV/III
+    // (e.g. an 8 Msun B-dwarf as a giant). Catalog stars set their spectral type
+    // directly (setSpecType) and keep any given giant/subgiant class.
+    (void)luminosity;
     return spec_class + "V";
 }
 
