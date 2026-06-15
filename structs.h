@@ -321,22 +321,6 @@ class planet {
     moons.push_back(moon);
   }
 
-  void backupMoons() {
-    moons_backup.clear();
-    moons_backup = moons;  // Copy the vector
-  }
-
-  void restoreMoons() {
-    // Delete generated (deletable) moons
-    for (planet* moon : moons) {
-      if (moon->getDeletable()) {
-        delete moon;
-      }
-    }
-    moons.clear();
-    moons = moons_backup;  // Restore from backup
-  }
-
   void deleteMoon(size_t index) {
     if (index < moons.size()) {
       delete moons[index];
@@ -351,7 +335,6 @@ class planet {
   }
 
   std::vector<planet*> moons;  // Vector of moons (PRIMARY - use this)
-  std::vector<planet*> moons_backup;  // Backup for predefined moons
 
   // DEPRECATED: Legacy linked list pointers - to be removed
   planet *first_moon;  // DEPRECATED: Use moons vector instead

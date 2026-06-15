@@ -1057,7 +1057,6 @@ planet::~planet() {
     }
   }
   moons.clear();
-  moons_backup.clear();
   first_moon = nullptr;  // chain is now a dangling view of freed moons; drop it
 }
 
