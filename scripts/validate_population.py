@@ -100,10 +100,12 @@ def analyze(systems: list[dict], star_mass: float) -> dict:
     adj_pairs = 0
     hill_spacings: list[float] = []
     period_ratios: list[float] = []
+    total_mass_earth: list[float] = []
 
     for sys_ in systems:
         planets = sorted(sys_.get("planets", []), key=lambda p: p["Distance"])
         counts.append(len(planets))
+        total_mass_earth.append(sum(p["Total Mass"] for p in planets) * SUN_MASS_IN_EARTH)
         det = 0
         for p in planets:
             e = p["Eccentricity"]
@@ -146,6 +148,7 @@ def analyze(systems: list[dict], star_mass: float) -> dict:
 
     return {
         "n_systems": len(systems),
+        "mean_total_mass_earth": sum(total_mass_earth) / len(total_mass_earth) if total_mass_earth else float("nan"),
         "mean_planets": sum(counts) / len(counts) if counts else float("nan"),
         "mean_planets_detcut": sum(det_counts) / len(det_counts) if det_counts else float("nan"),
         "sigma_e_all": rms(all_e),
@@ -185,6 +188,7 @@ def report(m: dict) -> None:
     print()
     print("COUNTS / RADII (intrinsic vs detection-limited; see caveat):")
     line("mean planets / star (intrinsic)", m["mean_planets"], "(StarGen emits ALL bodies)")
+    line("mean total planet mass (Earths)", m["mean_total_mass_earth"], "scales ~M*^1.8 (Ansdell 2016)")
     line("mean planets / star (P<400d,R>1Re)", m["mean_planets_detcut"], "~1.4-2.0 (Hsu 2019)")
     print(f"  small-planet radius bins (Re):  1.0-1.5: {m['radius_small_count']:<5}"
           f" 1.5-2.0(valley): {m['radius_valley_count']:<5} 2.0-3.0: {m['radius_subnep_count']}")
