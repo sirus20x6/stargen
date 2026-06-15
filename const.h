@@ -331,26 +331,29 @@ constexpr int POISONOUS = 3;
 
 // Define the color scheme. Black, Brown and Beige (with a nod to the Duke)
 
-// Main page colors: Beige BG, Dark brown text, Red links
-constexpr const char* BGCOLOR = "#FFCC99";
-constexpr const char* TXCOLOR = "#330000";
-constexpr const char* LINKCOLOR = "#990000";
-constexpr const char* ALINKCOLOR = "#FF0000";
+// Modern dark "deep space" theme. These feed the HTML output's presentational
+// attributes (bgcolor/text/link/font color); the embedded stylesheet in
+// open_html_file layers on typography, spacing, rounded panels and shadows.
+// Page: deep navy-black background, off-white text, cyan links.
+constexpr const char* BGCOLOR = "#0b0f1c";
+constexpr const char* TXCOLOR = "#dfe4f0";
+constexpr const char* LINKCOLOR = "#7fd1e0";
+constexpr const char* ALINKCOLOR = "#b6ecf6";
 
-// Contrasting headers: Light brown with black text
-constexpr const char* BGHEADER = "#CC9966";
-constexpr const char* TXHEADER = "#000000";
+// Section header bars: deep blue with warm stellar-gold text.
+constexpr const char* BGHEADER = "#1b2747";
+constexpr const char* TXHEADER = "#ffd479";
 
-// Space, background for planets, black with sand colored letters
-constexpr const char* BGSPACE = "#000000";
-constexpr const char* TXSPACE = "#FFE6CC";
+// Space / orbit strip: near-black with stellar-gold labels.
+constexpr const char* BGSPACE = "#05070e";
+constexpr const char* TXSPACE = "#ffd479";
 
-// Main table color scheme: Sand with black (space reversed)
-constexpr const char* BGTABLE = "#FFE6CC";
-constexpr const char* TXTABLE = "#000000";
+// Content panels: dark slate with off-white text.
+constexpr const char* BGTABLE = "#121829";
+constexpr const char* TXTABLE = "#dfe4f0";
 
-// Notices: Post-It yellow with normal text
-constexpr const char* BGNOTE = "#FFFF66";
+// Notices: muted amber panel with light text.
+constexpr const char* BGNOTE = "#2a2f1a";
 constexpr const char* TXNOTE = TXCOLOR; // Reuses TXCOLOR for text color in notes
 
 // URL for StarGen's main page
