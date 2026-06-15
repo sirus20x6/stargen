@@ -2886,6 +2886,13 @@ void set_habitability_flags(planet *the_planet) {
   the_planet->setPmsDesiccationRisk(m_dwarf && rocky && in_hz);
   the_planet->setHighXuvEscapeRisk(m_dwarf && rocky && the_planet->getA() < 0.4 &&
                                    the_planet->getSurfGrav() < 1.0);
+
+  // On a cold HZ world, outgassed CO2 can condense out before the carbonate-
+  // silicate thermostat warms the planet, risking irreversible glaciation
+  // (Turbet et al. 2017, EPSL 476, 11). Flag rocky HZ planets currently below
+  // the water freezing point.
+  the_planet->setCo2CollapseRisk(
+      rocky && in_hz && the_planet->getSurfTemp() < FREEZING_POINT_OF_WATER);
 }
 
 auto is_potentialy_habitable_optimistic_size(planet *the_planet) -> bool {

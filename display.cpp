@@ -131,6 +131,10 @@ static void text_print_planet_details(planet* the_planet, int counter) {
     std::cout << "High atmospheric-escape risk from M-dwarf XUV/flare "
                  "irradiation.\n";
   }
+  if (the_planet->getCo2CollapseRisk()) {
+    std::cout << "Cold for the habitable zone: outgassed CO2 may freeze out, "
+                 "risking irreversible glaciation.\n";
+  }
 
   // Orbital properties
   std::cout << std::format("   Distance from primary star:\t{} AU\n", the_planet->getA())
@@ -454,6 +458,7 @@ auto to_row(planet* the_planet, bool is_moon, const std::string& id, bool do_gas
   r.tidally_locked               = the_planet->getTidallyLocked();
   r.pms_desiccation_risk         = the_planet->getPmsDesiccationRisk();
   r.high_xuv_escape_risk         = the_planet->getHighXuvEscapeRisk();
+  r.co2_collapse_risk            = the_planet->getCo2CollapseRisk();
   r.atmosphere_json              = atmosphere_json;
   r.is_moon                      = is_moon;
   return r;
