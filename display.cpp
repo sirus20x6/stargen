@@ -122,6 +122,16 @@ static void text_print_planet_details(planet* the_planet, int counter) {
     std::cout << "Planet's rotation is in a resonant spin lock with the star.\n";
   }
 
+  // Habitability caveats (notably for M-dwarf hosts); see set_habitability_flags.
+  if (the_planet->getPmsDesiccationRisk()) {
+    std::cout << "Likely desiccated during the host M-dwarf's pre-main-sequence "
+                 "phase (possible abiotic-O2 \"mirage Earth\").\n";
+  }
+  if (the_planet->getHighXuvEscapeRisk()) {
+    std::cout << "High atmospheric-escape risk from M-dwarf XUV/flare "
+                 "irradiation.\n";
+  }
+
   // Orbital properties
   std::cout << std::format("   Distance from primary star:\t{} AU\n", the_planet->getA())
             << std::format("   Eccentricity of orbit:\t{}\n", the_planet->getE())
@@ -441,6 +451,9 @@ auto to_row(planet* the_planet, bool is_moon, const std::string& id, bool do_gas
   r.atmosphere                   = generate_atmosphere_string(the_planet, do_gases);  // CSV-style
   r.type                         = type_string(the_planet);
   r.minor_moons                  = the_planet->getMinorMoons();
+  r.tidally_locked               = the_planet->getTidallyLocked();
+  r.pms_desiccation_risk         = the_planet->getPmsDesiccationRisk();
+  r.high_xuv_escape_risk         = the_planet->getHighXuvEscapeRisk();
   r.atmosphere_json              = atmosphere_json;
   r.is_moon                      = is_moon;
   return r;

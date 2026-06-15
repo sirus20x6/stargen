@@ -2851,6 +2851,43 @@ auto calcSph(planet *the_planet) -> long double {
   return ht * hrh;
 }
 
+/**
+ * @brief Set derived habitability caveat flags on the planet.
+ *
+ * "In the habitable zone" is necessary but not sufficient, especially around M
+ * dwarfs. These flags surface well-known caveats computed from already-derived
+ * quantities (host effective temperature/mass, orbital distance, the HZ distance
+ * metric, surface gravity, rotation state):
+ *  - tidally_locked: synchronous or spin-orbit-resonant rotation.
+ *  - pms_desiccation_risk: an M-dwarf HZ terrestrial likely spent the host's
+ *    super-luminous pre-main-sequence phase in a runaway greenhouse, losing its
+ *    water and possibly building abiotic O2 (a "mirage Earth"); Luger & Barnes
+ *    2015, Astrobiology 15, 119.
+ *  - high_xuv_escape_risk: a close-in M-dwarf terrestrial at elevated atmospheric
+ *    escape risk from quiescent XUV and flares.
+ * See research/modern/06-habitable-zone-climate.md.
+ */
+void set_habitability_flags(planet *the_planet) {
+  sun host = the_planet->getTheSun();
+  long double host_mass = host.getMass();
+  // M dwarf: M_star < ~0.6 Msun. Keyed on mass, which is reliably populated; the
+  // host effective temperature is not always derived on the -m generation path
+  // (it can default to a placeholder), so it is not used here.
+  bool m_dwarf = host_mass > 0.0 && host_mass < 0.6;
+
+  long double year_hours = the_planet->getOrbPeriod() * 24.0;
+  bool locked = the_planet->getResonantPeriod() ||
+                (year_hours > 0.0 && the_planet->getDay() >= year_hours * 0.9999);
+  the_planet->setTidallyLocked(locked);
+
+  bool rocky = !is_gas_planet(the_planet);
+  bool in_hz = std::fabs((double)the_planet->getHzd()) <= 1.0;
+
+  the_planet->setPmsDesiccationRisk(m_dwarf && rocky && in_hz);
+  the_planet->setHighXuvEscapeRisk(m_dwarf && rocky && the_planet->getA() < 0.4 &&
+                                   the_planet->getSurfGrav() < 1.0);
+}
+
 auto is_potentialy_habitable_optimistic_size(planet *the_planet) -> bool {
   /*if ((the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) > 10.0 ||
    (the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES) < 0.1) // The Plantary

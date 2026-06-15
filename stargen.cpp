@@ -2369,6 +2369,7 @@ void generate_planet(StarGenerator* gen, planet *the_planet, int planet_no, sun 
   the_planet->setHza(calcHza(the_planet));
   the_planet->setEsi(calcEsi(the_planet));
   the_planet->setSph(calcSph(the_planet));
+  set_habitability_flags(the_planet);
 
   // Generate moons for this planet (if not a moon itself)
   generate_moons(gen, the_planet, planet_no, the_sun, random_tilt, planet_id,

@@ -116,6 +116,9 @@ struct PlanetRow {
   [[=planetrow::fixed_string("Atmosphere")]]                     std::string atmosphere;   // CSV-style ({:.2f}); JSON overrides with atmosphere_json
   [[=planetrow::fixed_string("Type")]]                           std::string type;
   [[=planetrow::fixed_string("Minor Moons")]]                    int         minor_moons;
+  [[=planetrow::fixed_string("Tidally Locked")]]                 bool        tidally_locked;
+  [[=planetrow::fixed_string("PMS Desiccation Risk")]]           bool        pms_desiccation_risk;
+  [[=planetrow::fixed_string("High XUV Escape Risk")]]           bool        high_xuv_escape_risk;
 
   // --- helper fields: no annotation, skipped by the reflective emitters ---
   std::string atmosphere_json;  // JSON-style atmosphere (toString formatting)
