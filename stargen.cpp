@@ -1404,7 +1404,15 @@ void generate_stellar_system(StarGenerator* gen, sun &the_sun, bool use_seed_sys
   }
 
   if (the_sun.getEffTemp() == 0) {
-    the_sun.setEffTemp(spec_type_to_eff_temp(the_sun.getSpecType()));
+    // No spectral type or effective temperature was supplied (e.g. a mass- or
+    // luminosity-specified star). Derive the effective temperature from the
+    // physical mass-luminosity-temperature relation rather than from a defaulted
+    // spectral type, which previously floored it at ~273 K ("Y9V") and corrupted
+    // the temperature-dependent Kopparapu habitable zone. setEffTemp() then
+    // lazily derives the matching spectral type. See
+    // research/modern/07-stellar-relations-binaries.md.
+    the_sun.setEffTemp(
+        mass_to_eff_temp(the_sun.getMass(), the_sun.getLuminosity()));
   }
   gen->config.max_age = gen->config.max_age_backup;
   if (use_seed_system) {

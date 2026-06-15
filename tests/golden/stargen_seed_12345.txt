@@ -3,7 +3,7 @@ Stargen - V$Revision: 3.0 $; seed=12345
 Stellar mass: 1 solar masses
 Stellar luminosity: 0.98401110576113374486
 Age: 2.9435951718504091879 billion years	(7.2188917568565470887 billion left on main sequence)
-Habitable ecosphere radius: 1.1195233204889958 AU
+Habitable ecosphere radius: 1.2491693971174707 AU
 
 Planets present at:
 1	0.32929052848992333358 AU	0.056881742499426778893 EM	.
@@ -35,7 +35,7 @@ Planet is tidally locked with one face to star.
    Mass:			0.056881742499426778893 Earth masses
    Surface gravity:		0.3614652160721370886 Earth gees
    Surface pressure:		0 Earth atmospheres
-   Surface temperature:		192.70055394925742576 degrees Celcius
+   Surface temperature:		200.78923439505848592 degrees Celcius
    Boiling point of water:	-273.14999999999997726 degrees Celcius
    Hydrosphere percentage:	0%
    Cloud cover percentage:	0%
@@ -43,7 +43,7 @@ Planet is tidally locked with one face to star.
    Equatorial radius:		2695.469540671665163 Km
    Density:			4.144258000046801264 grams/cc
    Escape Velocity:		4.1024674329364200823 Km/sec
-   Molecular weight retained:	369.50032419051478963 and above
+   Molecular weight retained:	395.8393906087308779 and above
    Surface acceleration:	354.47628611938230486 cm/sec2
    Axial tilt:			0 degrees
    Planetary albedo:		0.07000000000000000666
@@ -58,7 +58,7 @@ Planet is tidally locked with one face to star.
    Mass:			0.004963935400002713156 Earth masses
    Surface gravity:		0.10786277766144842308 Earth gees
    Surface pressure:		0 Earth atmospheres
-   Surface temperature:		130.19758344239704684 degrees Celcius
+   Surface temperature:		137.20100907620445696 degrees Celcius
    Boiling point of water:	-273.14999999999997726 degrees Celcius
    Hydrosphere percentage:	0%
    Cloud cover percentage:	0%
@@ -66,7 +66,7 @@ Planet is tidally locked with one face to star.
    Equatorial radius:		1418.7067835930604833 Km
    Density:			2.4804207927771987465 grams/cc
    Escape Velocity:		1.6704852615393983433 Km/sec
-   Molecular weight retained:	1311.3340008579400529 and above
+   Molecular weight retained:	1404.8097330395817056 and above
    Surface acceleration:	105.777250855364313896 cm/sec2
    Axial tilt:			0 degrees
    Planetary albedo:		0.07000000000000000666
@@ -81,7 +81,7 @@ Planet is tidally locked with one face to star.
    Mass:			0.006096406370978955241 Earth masses
    Surface gravity:		0.14260381099132767619 Earth gees
    Surface pressure:		0 Earth atmospheres
-   Surface temperature:		121.14760700799104143 degrees Celcius
+   Surface temperature:		127.99389562264207143 degrees Celcius
    Boiling point of water:	-273.14999999999997726 degrees Celcius
    Hydrosphere percentage:	0%
    Cloud cover percentage:	0%
@@ -89,7 +89,7 @@ Planet is tidally locked with one face to star.
    Equatorial radius:		1445.449710184329556 Km
    Density:			2.880329201349892615 grams/cc
    Escape Velocity:		1.8340508450878140866 Km/sec
-   Molecular weight retained:	892.42246401410229983 and above
+   Molecular weight retained:	955.9852088730572337 and above
    Surface acceleration:	139.84656630581035039 cm/sec2
    Axial tilt:			0 degrees
    Planetary albedo:		0.07000000000000000666
@@ -104,7 +104,7 @@ Planet is tidally locked with one face to star.
    Mass:			0.06119851657504032232 Earth masses
    Surface gravity:		0.4153550613440611405 Earth gees
    Surface pressure:		0 Earth atmospheres
-   Surface temperature:		113.548861778586740456 degrees Celcius
+   Surface temperature:		120.26321146684034602 degrees Celcius
    Boiling point of water:	-273.14999999999997726 degrees Celcius
    Hydrosphere percentage:	0%
    Cloud cover percentage:	0%
@@ -112,7 +112,7 @@ Planet is tidally locked with one face to star.
    Equatorial radius:		2690.7952817807982593 Km
    Density:			4.4820438482206959277 grams/cc
    Escape Velocity:		4.2589842033388104754 Km/sec
-   Molecular weight retained:	153.26608034227349663 and above
+   Molecular weight retained:	164.19133589824252592 and above
    Surface acceleration:	407.32417123297370326 cm/sec2
    Axial tilt:			0 degrees
    Planetary albedo:		0.07000000000000000666
@@ -127,7 +127,7 @@ Planet is tidally locked with one face to star.
    Mass:			0.6397642960040522841 Earth masses
    Surface gravity:		1.2221995328418504867 Earth gees
    Surface pressure:		0 Earth atmospheres
-   Surface temperature:		16.657231911023904714 degrees Celcius
+   Surface temperature:		17.09664721092319889 degrees Celcius
    Boiling point of water:	-273.14999999999997726 degrees Celcius
    Hydrosphere percentage:	0%
    Cloud cover percentage:	99.22926533707410606%
@@ -135,7 +135,7 @@ Planet is tidally locked with one face to star.
    Equatorial radius:		5073.074741032417774 Km
    Density:			6.9917098191855810074 grams/cc
    Escape Velocity:		10.028830233224036638 Km/sec
-   Molecular weight retained:	16.917413003185117273 and above
+   Molecular weight retained:	17.020249556260539548 and above
    Surface acceleration:	1198.5683048743532632 cm/sec2
    Axial tilt:			0 degrees
    Planetary albedo:		0.516531694016833495
@@ -150,7 +150,7 @@ Planet is tidally locked with one face to star.
    Mass:			0.06394021786138123063 Earth masses
    Surface gravity:		0.47654443242343379138 Earth gees
    Surface pressure:		0 Earth atmospheres
-   Surface temperature:		49.193854951662501662 degrees Celcius
+   Surface temperature:		54.79079245504829032 degrees Celcius
    Boiling point of water:	-273.14999999999997726 degrees Celcius
    Hydrosphere percentage:	0%
    Cloud cover percentage:	0%
@@ -158,7 +158,7 @@ Planet is tidally locked with one face to star.
    Equatorial radius:		2655.043230257542212 Km
    Density:			4.874572112695911144 grams/cc
    Escape Velocity:		4.3825529090095747963 Km/sec
-   Molecular weight retained:	65.53317782822574544 and above
+   Molecular weight retained:	70.20457487556481806 and above
    Surface acceleration:	467.33044582252668167 cm/sec2
    Axial tilt:			0 degrees
    Planetary albedo:		0.07000000000000000666
@@ -172,7 +172,7 @@ Planet 7
    Mass:			0.15260228929772928803 Earth masses
    Surface gravity:		0.6186394958563824337 Earth gees
    Surface pressure:		0 Earth atmospheres
-   Surface temperature:		4.2680384392294286044 degrees Celcius
+   Surface temperature:		8.600600358432018311 degrees Celcius
    Boiling point of water:	-273.14999999999997726 degrees Celcius
    Hydrosphere percentage:	0%
    Cloud cover percentage:	0%
@@ -180,7 +180,7 @@ Planet 7
    Equatorial radius:		3463.0195350069608171 Km
    Density:			5.2429220741986463854 grams/cc
    Escape Velocity:		5.9282835001484502574 Km/sec
-   Molecular weight retained:	21.24306461330852923 and above
+   Molecular weight retained:	22.601527117659627679 and above
    Surface acceleration:	606.67810120399925683 cm/sec2
    Axial tilt:			130.16308419675237928 degrees
    Planetary albedo:		0.07000000000000000666
@@ -195,21 +195,22 @@ Cold for the habitable zone: outgassed CO2 may freeze out, risking irreversible 
    Mass:			0.34868708360437104053 Earth masses
    Surface gravity:		1.0302638288148448284 Earth gees
    Surface pressure:		0.15628955169226707571 Earth atmospheres
-   Surface temperature:		-80.555131097972364304 degrees Celcius
+   Surface temperature:		-78.43085786841563528 degrees Celcius
    Boiling point of water:	55.164916223671298212 degrees Celcius
    Hydrosphere percentage:	0%
-   Cloud cover percentage:	0.49251562604264359586%
+   Cloud cover percentage:	0.58633585351890394515%
    Ice cover percentage:	85.35713609471300715%
    Equatorial radius:		4206.9433105107871618 Km
    Density:			6.6821013561921666865 grams/cc
    Escape Velocity:		8.130373753353849752 Km/sec
-   Molecular weight retained:	5.6846243182973809314 and above
+   Molecular weight retained:	5.9039937851760130143 and above
    Surface acceleration:	1010.3436776847097662 cm/sec2
    Axial tilt:			105.99729353840434953 degrees
-   Planetary albedo:		0.6199321383656620122
+   Planetary albedo:		0.6200212675817644596
 
 
 Planet 9
+Cold for the habitable zone: outgassed CO2 may freeze out, risking irreversible glaciation.
    Distance from primary star:	1.5232573688759141364 AU
    Eccentricity of orbit:	0.013572953021888612194
    Length of year:		686.6831959988640101 days
@@ -217,156 +218,156 @@ Planet 9
    Mass:			1.3341239377847115686 Earth masses
    Surface gravity:		1.802909739249739854 Earth gees
    Surface pressure:		2.2172214402032715743 Earth atmospheres
-   Surface temperature:		-109.826952271156869756 degrees Celcius
+   Surface temperature:		-111.4047262436157079 degrees Celcius
    Boiling point of water:	123.56515664469952753 degrees Celcius
    Hydrosphere percentage:	0%
-   Cloud cover percentage:	0.36635735437953809935%
+   Cloud cover percentage:	0.29775376498456225578%
    Ice cover percentage:	100%
    Equatorial radius:		6123.691413768453956 Km
    Density:			8.289597850654847863 grams/cc
    Escape Velocity:		13.181576365106403828 Km/sec
-   Molecular weight retained:	1.5693681956625243523 and above
+   Molecular weight retained:	1.5102179428924362371 and above
    Surface acceleration:	1768.0504794413460684 cm/sec2
    Axial tilt:			65.943982781922741765 degrees
-   Planetary albedo:		0.6993405567621167873
+   Planetary albedo:		0.69946404322302774373
 
 
 Planet 10	*gas giant*
    Distance from primary star:	2.2760469761771999595 AU
    Eccentricity of orbit:	0.014571506181385933745
    Length of year:		1254.145286907297711 days
-   Length of day:		14.50651522233658608 hours
+   Length of day:		14.573735191654934667 hours
    Mass:			32.705540882521099498 Earth masses
-   Equatorial radius:		53658.48606644879493 Km
-   Density:			0.30205307995616158836 grams/cc
-   Escape Velocity:		28.823270706243454478 Km/sec
+   Equatorial radius:		52044.205329933751912 Km
+   Density:			0.3310406829338612272 grams/cc
+   Escape Velocity:		28.756720956383538432 Km/sec
    Molecular weight retained:	0.54613249979630363093 and above
-   Surface acceleration:	1303.4267704118172677 cm/sec2
+   Surface acceleration:	1291.4305234204351112 cm/sec2
    Axial tilt:			112.91101876386278491 degrees
-   Planetary albedo:		0.097135270458149148194
+   Planetary albedo:		0.69195595406948757046
 
 
 Planet 11
    Distance from primary star:	3.0651501624522978849 AU
    Eccentricity of orbit:	0.17813163723997674784
    Length of year:		1960.0836590924733526 days
-   Length of day:		19.539516429601885077 hours
+   Length of day:		17.262740718132761033 hours
    Mass:			0.58856339012300186014 Earth masses
-   Surface gravity:		0.54985401862815242455 Earth gees
-   Surface pressure:		0.25600662731955974198 Earth atmospheres
-   Surface temperature:		-148.41457306025508936 degrees Celcius
-   Boiling point of water:	66.04640782783309305 degrees Celcius
+   Surface gravity:		1.1186641583943153742 Earth gees
+   Surface pressure:		0.40652564143020255175 Earth atmospheres
+   Surface temperature:		-157.75134164843938814 degrees Celcius
+   Boiling point of water:	76.91890355234352228 degrees Celcius
    Hydrosphere percentage:	0%
-   Cloud cover percentage:	0.0011506949391284858348%
-   Ice cover percentage:	79.23777868333515812%
-   Equatorial radius:		5672.821568058297202 Km
-   Density:			4.6001612166033575926 grams/cc
-   Escape Velocity:		9.096471662710857345 Km/sec
-   Molecular weight retained:	1.3564550886930928505 and above
-   Surface acceleration:	539.2225911779770774 cm/sec2
-   Axial tilt:			81.55638191190649877 degrees
-   Planetary albedo:		0.58580887591853550536
+   Cloud cover percentage:	0.0014201847854966342392%
+   Ice cover percentage:	100%
+   Equatorial radius:		5011.7722974743930155 Km
+   Density:			6.671084306525173776 grams/cc
+   Escape Velocity:		9.677804998329255032 Km/sec
+   Molecular weight retained:	0.80802717604320322884 and above
+   Surface acceleration:	1097.0347868917612458 cm/sec2
+   Axial tilt:			58.130838431620155404 degrees
+   Planetary albedo:		0.6999974436673860616
 
 
 Planet 12	*gas giant*
    Distance from primary star:	4.4095270134381198187 AU
    Eccentricity of orbit:	0.0082023864671672274155
    Length of year:		3382.0823583910567438 days
-   Length of day:		27.964375600658941444 hours
+   Length of day:		28.02296921185798182 hours
    Mass:			1.8251045386066755698 Earth masses
-   Equatorial radius:		29344.608838151609318 Km
-   Density:			0.103057582114784684675 grams/cc
-   Escape Velocity:		10.089907026993377367 Km/sec
-   Molecular weight retained:	0.56823143011068100806 and above
-   Surface acceleration:	250.20927114693932411 cm/sec2
-   Axial tilt:			16.425025528810063946 degrees
-   Planetary albedo:		0.07519705148470756769
+   Equatorial radius:		27931.176042876345269 Km
+   Density:			0.119508076701885641095 grams/cc
+   Escape Velocity:		10.079352927165185101 Km/sec
+   Molecular weight retained:	0.40614298115698721096 and above
+   Surface acceleration:	347.6589267531330363 cm/sec2
+   Axial tilt:			44.719731576225939307 degrees
+   Planetary albedo:		0.56634259253757936674
 
 
 Planet 13	*gas giant*
    Distance from primary star:	6.726454872456255304 AU
    Eccentricity of orbit:	0.013574670721917439509
    Length of year:		6365.7777920396335047 days
-   Length of day:		8.510959202277784471 hours
+   Length of day:		8.550397467820385666 hours
    Mass:			652.3035700326716637 Earth masses
-   Equatorial radius:		72227.70002488735292 Km
-   Density:			2.470105920725875865 grams/cc
-   Escape Velocity:		79.522608448315551505 Km/sec
-   Molecular weight retained:	0.470854873457733559 and above
-   Surface acceleration:	4846.664451354684267 cm/sec2
-   Axial tilt:			92.02564688856747921 degrees
-   Planetary albedo:		0.079560180485125026134
+   Equatorial radius:		72018.145001853082626 Km
+   Density:			2.4917309175677473394 grams/cc
+   Escape Velocity:		79.33899952501258813 Km/sec
+   Molecular weight retained:	0.5406655844802810366 and above
+   Surface acceleration:	3238.1043336573698312 cm/sec2
+   Axial tilt:			33.078347816457352337 degrees
+   Planetary albedo:		0.49297464843539304976
 
 
 Planet 14
    Distance from primary star:	13.648180577000076059 AU
    Eccentricity of orbit:	0
    Length of year:		18416.581102034145806 days
-   Length of day:		17.869518953026788614 hours
+   Length of day:		18.702326805322549185 hours
    Mass:			0.7490587732460501819 Earth masses
-   Surface gravity:		0.81576801560142986824 Earth gees
-   Surface pressure:		0.26150205094810797997 Earth atmospheres
-   Surface temperature:		-218.61711988572862946 degrees Celcius
-   Boiling point of water:	66.530934736608628555 degrees Celcius
+   Surface gravity:		0.67119971765994387934 Earth gees
+   Surface pressure:		0.22496655414545844487 Earth atmospheres
+   Surface temperature:		-218.68170860007346334 degrees Celcius
+   Boiling point of water:	63.127298835559713552 degrees Celcius
    Hydrosphere percentage:	0%
-   Cloud cover percentage:	4.3950872631357646637e-06%
+   Cloud cover percentage:	4.1808836054526072766e-06%
    Ice cover percentage:	100%
-   Equatorial radius:		5853.124501963980145 Km
-   Density:			5.3300316384483195954 grams/cc
-   Escape Velocity:		10.10275862323748297 Km/sec
-   Molecular weight retained:	0.05916353596327398832 and above
-   Surface acceleration:	799.99514101977619207 cm/sec2
-   Axial tilt:			56.343969797334494842 degrees
-   Planetary albedo:		0.69999999208884288197
+   Equatorial radius:		6125.9090180713033713 Km
+   Density:			4.649234438509538937 grams/cc
+   Escape Velocity:		9.875261091485113139 Km/sec
+   Molecular weight retained:	0.06162801376665732119 and above
+   Surface acceleration:	658.22207111898884 cm/sec2
+   Axial tilt:			58.175665282195382133 degrees
+   Planetary albedo:		0.6999999924744094658
 
 
 Planet 15	*gas giant*
    Distance from primary star:	18.997848568563493705 AU
    Eccentricity of orbit:	0.1276726960001111355
    Length of year:		30244.772765580602988 days
-   Length of day:		24.989211956402799535 hours
+   Length of day:		25.08412678938768658 hours
    Mass:			5.61696320492433811 Earth masses
-   Equatorial radius:		43556.519254267908003 Km
-   Density:			0.09698827999071751781 grams/cc
-   Escape Velocity:		14.137302365960266907 Km/sec
-   Molecular weight retained:	0.0155934301475418022085 and above
-   Surface acceleration:	439.87613835575510088 cm/sec2
-   Axial tilt:			74.082202736207818816 degrees
-   Planetary albedo:		0.31302438463093353139
+   Equatorial radius:		46738.751954401357697 Km
+   Density:			0.07849598127752506237 grams/cc
+   Escape Velocity:		14.110530227447829675 Km/sec
+   Molecular weight retained:	0.057165478022198691227 and above
+   Surface acceleration:	105.57862493321802302 cm/sec2
+   Axial tilt:			151.67747771466338236 degrees
+   Planetary albedo:		0.29612447769362602247
 
 
 Planet 16	*gas giant*
    Distance from primary star:	26.744272453248485406 AU
    Eccentricity of orbit:	0.00343392519934015354
    Length of year:		50517.515723690898902 days
-   Length of day:		30.738959704740632845 hours
+   Length of day:		30.816081388072626283 hours
    Mass:			2.3835069451012859004 Earth masses
-   Equatorial radius:		39347.148449151468977 Km
-   Density:			0.05582822350828211546 grams/cc
-   Escape Velocity:		10.287905228912121384 Km/sec
-   Molecular weight retained:	0.02971653070273890593 and above
-   Surface acceleration:	187.25130251294751736 cm/sec2
-   Axial tilt:			144.42076601789270285 degrees
-   Planetary albedo:		0.30383566353509710157
+   Equatorial radius:		39458.05948541599176 Km
+   Density:			0.055358769781930621956 grams/cc
+   Escape Velocity:		10.275023681876668706 Km/sec
+   Molecular weight retained:	0.02805229703018419299 and above
+   Surface acceleration:	116.848908779696055 cm/sec2
+   Axial tilt:			36.617616843769475565 degrees
+   Planetary albedo:		0.29459421079507890605
 
 
 Planet 17
    Distance from primary star:	44.658659885913400953 AU
    Eccentricity of orbit:	0.15675788795391934483
    Length of year:		109007.2291973598898 days
-   Length of day:		18.265706098634100715 hours
+   Length of day:		24.553817206351630276 hours
    Mass:			0.90120455136914300455 Earth masses
-   Surface gravity:		0.5107901134760775856 Earth gees
-   Surface pressure:		0.12062466253262446872 Earth atmospheres
-   Surface temperature:		-235.57392314402728317 degrees Celcius
-   Boiling point of water:	49.728166699220651026 degrees Celcius
+   Surface gravity:		0.13225627383555945777 Earth gees
+   Surface pressure:		0.052727225047579766904 Earth atmospheres
+   Surface temperature:		-243.14449844593147176 degrees Celcius
+   Boiling point of water:	33.504505816578159738 degrees Celcius
    Hydrosphere percentage:	0%
-   Cloud cover percentage:	2.8805497689963078462e-07%
-   Ice cover percentage:	22.891947924602271477%
-   Equatorial radius:		6562.436436346763081 Km
-   Density:			4.54993534202188443 grams/cc
-   Escape Velocity:		10.465380997900370276 Km/sec
-   Molecular weight retained:	0.010298930578808916676 and above
-   Surface acceleration:	500.9139866320176069 cm/sec2
-   Axial tilt:			125.09376369865780987 degrees
-   Planetary albedo:		0.27590571385896470676
+   Cloud cover percentage:	1.4556794577617124916e-07%
+   Ice cover percentage:	100%
+   Equatorial radius:		8821.606118944703709 Km
+   Density:			1.8730853461544708523 grams/cc
+   Escape Velocity:		9.026383208267169539 Km/sec
+   Molecular weight retained:	0.027172923439864086944 and above
+   Surface acceleration:	129.69909878094891084 cm/sec2
+   Axial tilt:			75.62917950546057 degrees
+   Planetary albedo:		0.69999999973797765314
