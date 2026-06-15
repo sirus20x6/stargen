@@ -59,3 +59,28 @@ add_test(
 # skip it with `ctest --label-exclude local-only`, while verify.sh and the
 # pre-commit hook still run it under the canonical local toolchain.
 set_tests_properties(golden_regression PROPERTIES LABELS "local-only")
+
+# ------------------------------------------------------------------
+# Population-validation harness (diagnostic).
+#
+# scripts/validate_population.py generates a population of systems and reports
+# StarGen's architecture statistics against modern Kepler/CKS targets (peas-in-a-
+# pod size correlation, Hill spacing, period ratios, eccentricity, mutual
+# inclination, occurrence). It is a *diagnostic*, so the ctest only enforces
+# loose gross-sanity bounds (--check); statistical drift is expected and is for
+# humans to read, not for CI to fail on. Labeled local-only: needs python3 and is
+# not a portable pass/fail physics test. Run the full report with:
+#   python3 scripts/validate_population.py --seeds 120
+# ------------------------------------------------------------------
+find_program(STARGEN_PYTHON3 NAMES python3)
+if(STARGEN_PYTHON3)
+    add_test(
+        NAME population_validation
+        COMMAND ${STARGEN_PYTHON3}
+            ${CMAKE_SOURCE_DIR}/scripts/validate_population.py
+            --bin $<TARGET_FILE:stargen>
+            --seeds 40
+            --check
+    )
+    set_tests_properties(population_validation PROPERTIES LABELS "local-only")
+endif()
