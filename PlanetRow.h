@@ -119,6 +119,7 @@ struct PlanetRow {
   [[=planetrow::fixed_string("Tidally Locked")]]                 bool        tidally_locked;
   [[=planetrow::fixed_string("PMS Desiccation Risk")]]           bool        pms_desiccation_risk;
   [[=planetrow::fixed_string("High XUV Escape Risk")]]           bool        high_xuv_escape_risk;
+  [[=planetrow::fixed_string("CO2 Collapse Risk")]]              bool        co2_collapse_risk;
 
   // --- helper fields: no annotation, skipped by the reflective emitters ---
   std::string atmosphere_json;  // JSON-style atmosphere (toString formatting)

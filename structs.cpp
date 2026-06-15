@@ -1277,6 +1277,8 @@ auto planet::getPmsDesiccationRisk() -> bool { return pmsDesiccationRisk; }
 
 auto planet::getHighXuvEscapeRisk() -> bool { return highXuvEscapeRisk; }
 
+auto planet::getCo2CollapseRisk() -> bool { return co2CollapseRisk; }
+
 auto planet::getRmf() -> long double { return rmf; }
 
 auto planet::getRmsVelocity() -> long double { return rmsVelocity; }
@@ -1436,6 +1438,8 @@ void planet::setTidallyLocked(bool b) { tidallyLocked = b; }
 void planet::setPmsDesiccationRisk(bool b) { pmsDesiccationRisk = b; }
 
 void planet::setHighXuvEscapeRisk(bool b) { highXuvEscapeRisk = b; }
+
+void planet::setCo2CollapseRisk(bool b) { co2CollapseRisk = b; }
 
 void planet::setRmf(long double r) { rmf = r; }
 

@@ -187,6 +187,7 @@ Planet 7
 
 
 Planet 8
+Cold for the habitable zone: outgassed CO2 may freeze out, risking irreversible glaciation.
    Distance from primary star:	1.2702814717675298573 AU
    Eccentricity of orbit:	0.011292305496172449467
    Length of year:		522.9342371302939614 days

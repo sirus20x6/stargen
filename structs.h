@@ -174,6 +174,9 @@ class planet {
                                       Earth" (Luger & Barnes 2015) */
   bool highXuvEscapeRisk{false};   /* close-in M-dwarf world at high atmospheric-
                                       escape risk from XUV/flares */
+  bool co2CollapseRisk{false};     /* HZ world cold enough that outgassed CO2 may
+                                      condense out, risking irreversible
+                                      glaciation (Turbet et al. 2017) */
   void estimateMass();
  public:
   planet();
@@ -225,6 +228,8 @@ class planet {
   auto getPmsDesiccationRisk() -> bool;
   void setHighXuvEscapeRisk(bool);
   auto getHighXuvEscapeRisk() -> bool;
+  void setCo2CollapseRisk(bool);
+  auto getCo2CollapseRisk() -> bool;
   void setEscVelocity(long double);
   auto getEscVelocity() -> long double;
   void setSurfAccel(long double);
