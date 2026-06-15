@@ -869,24 +869,8 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
         std::cerr << "Injecting protoplanet at " << toString(a) << " AU.\n";
       }
 
-      // Lynden-Bell & Pringle (1974) self-similar disk, as the volume density
-      // consistent with StarGen's 4*pi*a^2 shell integral. The swept mass per
-      // unit radius dM/da ~ a^2*rho(a) is made to follow the LBP surface-density
-      // mass distribution 2*pi*a*Sigma(a), Sigma ~ (a/Rc)^-gamma exp(-(a/Rc)^(2-gamma)),
-      // which gives rho(a) ~ a^-(1+gamma) exp(-(a/Rc)^(2-gamma)). Normalized to
-      // the previous Dole profile's value at a = 1 AU so magnitudes (and the
-      // gas-capture K-law in collect_dust) stay comparable. See
-      // research/modern/03-disk-structure-and-snowline.md.
-      {
-        const long double rho_ref =
-            dust_density_coeff * sqrt(stell_mass_ratio) * exp(-ALPHA);
-        const long double shape =
-            std::pow(a, -(1.0 + DISK_GAMMA)) *
-            exp(-std::pow(a / DISK_R_C, 2.0 - DISK_GAMMA));
-        const long double shape_ref =
-            exp(-std::pow(1.0 / DISK_R_C, 2.0 - DISK_GAMMA));  // a=1 -> a^-(1+g)=1
-        dust_density = rho_ref * shape / shape_ref;
-      }
+      dust_density = dust_density_coeff * sqrt(stell_mass_ratio) *
+                     exp(-ALPHA * std::pow(a, 1.0 / NDENSITY));
       crit_mass = critical_limit(a, e, stell_luminosity_ratio);
       if (total_mass == PROTOPLANET_MASS && is_seed == false) {
         // std::cout << "test1\n";

@@ -125,13 +125,6 @@ constexpr double B = 1.2E-5;
 constexpr double DUST_DENSITY_COEFF = 2.0E-3;
 constexpr double ALPHA = 5.0;
 constexpr double NDENSITY = 3.0;
-// Lynden-Bell & Pringle (1974) self-similar disk profile (modern ALMA-standard
-// shape). gamma = inner power-law slope (~1.0), R_C = characteristic radius (AU)
-// where the exponential taper provides a physical outer truncation. Used as the
-// volume-density analog consistent with the 4*pi*a^2 shell integral in
-// accrete::collect_dust. See research/modern/03-disk-structure-and-snowline.md.
-constexpr double DISK_GAMMA = 1.0;
-constexpr double DISK_R_C = 30.0;
 constexpr double J = 1.46E-19;
 // Define INCREDIBLY_LARGE_NUMBER based on whether HUGE_VAL is available or not
 #ifdef HUGE_VAL
