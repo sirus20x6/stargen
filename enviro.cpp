@@ -93,6 +93,33 @@ auto luminosity_to_mass(long double luminosity) -> long double {
 }
 
 /**
+ * @brief Main-sequence effective temperature from stellar mass + luminosity.
+ *
+ * Used when a star is specified by mass (or luminosity) with no spectral type, so
+ * its effective temperature would otherwise default to a placeholder. Above 1.5
+ * Msun uses the Eker et al. 2018 mass-Teff relation
+ * (log Teff = -0.170 (log M)^2 + 0.888 log M + 3.671); at or below 1.5 Msun
+ * derives Teff from luminosity and the Eker mass-radius relation
+ * (R = 0.438 M^2 + 0.479 M + 0.075) via Stefan-Boltzmann, anchored so the Sun
+ * (1 Msun) -> ~5778 K. See research/modern/07-stellar-relations-binaries.md.
+ *
+ * @param mass stellar mass in solar masses
+ * @param luminosity luminosity in solar luminosities
+ * @return effective temperature in Kelvin
+ */
+auto mass_to_eff_temp(long double mass, long double luminosity) -> long double {
+    if (mass > 1.5L) {
+        const long double lm = std::log10(mass);
+        return std::pow(10.0L, -0.170L * lm * lm + 0.888L * lm + 3.671L);
+    }
+    long double radius = 0.438L * mass * mass + 0.479L * mass + 0.075L;  // Rsun
+    if (radius <= 0.0L) {
+        radius = 1.0L;
+    }
+    return 5778.0L * std::pow(luminosity / (radius * radius), 0.25L);
+}
+
+/**
  * @brief Get the Lum Index
  * 
  * @param spec_type 
@@ -212,10 +239,15 @@ long double spec_type_to_eff_temp(const std::string& spec_type) {
  * @return std::string 
  */
 std::string eff_temp_to_spec_type(long double eff_temp, long double luminosity) {
+    // Lower temperature bound of each spectral class, on the standard
+    // Morgan-Keenan / Pecaut & Mamajek (2013) scale. The previous boundaries
+    // were miscalibrated (e.g. G set at 6000 K, so a 5778 K Sun fell into K, and
+    // O was never reachable), which produced wrong spectral types for stars whose
+    // type is derived from effective temperature.
     static const std::vector<std::pair<long double, std::string>> temp_classes = {
-        {52000, "O"}, {30000, "B"}, {10000, "A"}, {7500, "F"}, 
-        {6000, "G"}, {5000, "K"}, {3500, "M"}, {2000, "L"}, 
-        {1300, "T"}, {700, "Y"}
+        {30000, "O"}, {10000, "B"}, {7300, "A"}, {6000, "F"},
+        {5300, "G"}, {3900, "K"}, {2300, "M"}, {1300, "L"},
+        {600, "T"}, {0, "Y"}
     };
 
     auto get_spec_class = [&]() {

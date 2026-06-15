@@ -15,6 +15,7 @@ extern thread_local std::map<std::map<long double, long double>, std::vector<lon
 
 auto mass_to_luminosity(long double) -> long double;
 auto luminosity_to_mass(long double) -> long double;
+auto mass_to_eff_temp(long double mass, long double luminosity) -> long double;
 auto getStarType(std::string) -> std::string;
 auto getSubType(std::string) -> int;
 auto spec_type_to_eff_temp(const std::string&) -> long double;
