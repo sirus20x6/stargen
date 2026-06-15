@@ -661,7 +661,7 @@ static void svg_write_header(std::fstream& output, planet* innermost_planet,
  * @brief Draw axis and tick marks
  */
 static void svg_draw_axis(std::fstream& output, const SVGScaleParams& params) {
-  output << "<g stroke='black' stroke-width='1'>\n";
+  output << "<g stroke='#8893b5' stroke-width='1'>\n";
   output << "    <line x1='" << ((params.offset + params.mult) + (params.min_log * params.mult))
          << "' y1='" << (params.max_y - params.margin) << "' x2='"
          << ((params.offset + params.mult) + (params.max_log * params.mult)) << "' y2='"
@@ -694,14 +694,14 @@ static void svg_draw_habitable_zone(std::fstream& output, sun& the_sun, const SV
          << "' y1='" << ((params.max_y - params.margin) - 5) << "' x2='"
          << ((params.offset + params.mult) + (log10(the_sun.getREcosphere(1.0)) * params.mult))
          << "' y2='" << ((params.max_y - params.margin) + 5)
-         << "' stroke='blue' stroke-width='1' />\n";
+         << "' stroke='#9fe6b4' stroke-width='1' />\n";
 
   // Habitable zone range
   output << "<line x1='" << ((params.offset + params.mult) + (log10(min_r_ecosphere) * params.mult))
          << "' y1='" << (params.max_y - params.margin) << "' x2='"
          << ((params.offset + params.mult) + (log10(max_r_ecosphere) * params.mult)) << "' y2='"
          << (params.max_y - params.margin)
-         << "' stroke='#66c' stroke-width='10' stroke-opacity='0.5' />\n";
+         << "' stroke='#3ddc84' stroke-width='10' stroke-opacity='0.30' />\n";
 }
 
 /**
@@ -710,7 +710,7 @@ static void svg_draw_habitable_zone(std::fstream& output, sun& the_sun, const SV
 static void svg_draw_axis_labels(std::fstream& output, const SVGScaleParams& params) {
   output << "<g font-family='Arial' font-size='10' \n";
   output << "   font-style='normal' font-weight='normal'\n";
-  output << "   fill='black' text-anchor='middle'>\n";
+  output << "   fill='#aab2cc' text-anchor='middle'>\n";
 
   for (int x = params.floor; x <= params.ceiling; x++) {
     if (params.min_log <= x && params.max_log >= x) {
@@ -733,10 +733,10 @@ static void svg_draw_planets(std::fstream& output, planet* innermost_planet, con
     long double x2 = (params.offset + params.mult) + (log10(a_planet->getA() * (1.0 + a_planet->getE())) * params.mult);
 
     output << "    <circle cx='" << x << "' cy='30' r='" << r
-           << "' fill='none' stroke='black' stroke-width='1' />\n";
+           << "' fill='none' stroke='#cdd6ee' stroke-width='1' />\n";
     output << "    <line x1='" << x1 << "' y1='" << ((params.max_y - params.margin) - 15.0)
            << "' x2='" << x2 << "' y2='" << ((params.max_y - params.margin) - 15.0)
-           << "' stroke='black' stroke-width='8' stroke-opacity='0.3'/>\n";
+           << "' stroke='#cdd6ee' stroke-width='8' stroke-opacity='0.35'/>\n";
     output << "    <text x='" << x << "' y='" << (params.max_y - (params.margin * 2.0)) << "'>";
     output << (a_planet->getMass() * SUN_MASS_IN_EARTH_MASSES);
     output << "</text>\n\n";
@@ -846,20 +846,39 @@ void open_html_file(const std::string& system_name, long seed, const std::string
                              "' for writing");
   }
 
-  output << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n";
-  output << "        \"http://www.w3.org/TR/html4/loose.dtd\">\n";
-  output << "<html>\n";
+  output << "<!DOCTYPE html>\n";
+  output << "<html lang='en'>\n";
   output << "<head>\n";
-  output << "<meta http-equiv=content-type content='text/html; charset=utf-8'>\n";
+  output << "<meta charset='utf-8'>\n";
+  output << "<meta name='viewport' content='width=device-width, initial-scale=1'>\n";
   output << "\t<title>System " << seed << (noname ? "" : " - ")
          << (noname ? "" : escapeXmlText(system_name)) << "</title>\n";
   output << "\t<meta name='generator' content='" << escapeXmlAttr(prognam) << " - "
          << stargen_revision << "'>\n";
-  output << "<style type='text/css'>\n";
-  output << "<!--\n";
-  output << "table {border-color: #ffd;}\n";
-  output << "-->\n";
-  output << "</style>\n";
+  // Modern "deep space" stylesheet. The dark palette comes from the BG*/TX*
+  // constants (emitted as presentational attributes, which CSS overrides); this
+  // sheet adds typography, spacing, rounded panels, borders and shadows that the
+  // legacy attributes cannot express. Top-level tables become cards; nested
+  // tables stay as plain layout.
+  output << R"CSS(<style>
+:root{--ink:#dfe4f0;--muted:#9aa3c0;--line:#283353;--accent:#7fd1e0;}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  background:radial-gradient(1200px 700px at 50% -10%,#16203c 0%,#0b0f1c 55%,#05070e 100%) fixed;
+  color:var(--ink);line-height:1.55;margin:0;padding:28px 14px;font-size:15px;}
+a{color:var(--accent);text-decoration:none;}
+a:hover{color:#bdeef7;text-decoration:underline;}
+img{max-width:100%;height:auto;border:0;vertical-align:middle;}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0;}
+table{border-collapse:separate;border-spacing:0;width:90%;max-width:1080px;margin:20px auto;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.45);}
+table table{width:100%;max-width:none;margin:0;border:0;border-radius:0;box-shadow:none;}
+td,th{padding:8px 12px;border:0;vertical-align:middle;}
+tr+tr>td{border-top:1px solid rgba(255,255,255,.045);}
+font{font-style:normal;}
+center{color:var(--muted);font-size:13px;}
+</style>
+)CSS";
   output << "<link rel='icon' type='image/png' href='" << escapeXmlAttr(url_path) << "ref/favicon.png'>\n";
   output << "</head>\n";
   output << "<body bgcolor='" << BGCOLOR << "' text='" << TXCOLOR << "' link='" << LINKCOLOR
@@ -2178,6 +2197,34 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
   html_write_physical_properties(the_planet, the_file);
   html_write_atmospheric_gases(the_planet, do_gases, the_file);
   html_write_additional_properties(the_planet, the_file);
+
+  // Modern habitability caveats + the Lehmer et al. 2020 1-D-climate diagnostic
+  // (tidal-lock status is already shown with the planet type above).
+  {
+    std::string notes;
+    if (the_planet->getPmsDesiccationRisk()) {
+      notes += "<li>Likely desiccated during the host M-dwarf's pre-main-sequence "
+               "phase (possible abiotic-O2 \"mirage Earth\").</li>";
+    }
+    if (the_planet->getHighXuvEscapeRisk()) {
+      notes += "<li>High atmospheric-escape risk from M-dwarf XUV/flare irradiation.</li>";
+    }
+    if (the_planet->getCo2CollapseRisk()) {
+      notes += "<li>Cold for the habitable zone: outgassed CO2 may freeze out, "
+               "risking irreversible glaciation.</li>";
+    }
+    if (the_planet->getClimateModelTemp() > 0.0) {
+      notes += std::format(
+          "<li>1-D-climate surface temperature: {:.1f} &deg;C (Lehmer et al. 2020).</li>",
+          (double)(the_planet->getClimateModelTemp() - FREEZING_POINT_OF_WATER));
+    }
+    if (!notes.empty()) {
+      the_file << std::format(
+          "<tr><th>Habitability notes</th><td colspan=2>"
+          "<ul style='margin:4px 0;padding-left:18px'>{}</ul></td></tr>\n",
+          notes);
+    }
+  }
 
   // Close table
   the_file << "</table>\n\n</p>\n<br>\n\n";
