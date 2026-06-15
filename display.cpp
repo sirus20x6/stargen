@@ -160,6 +160,11 @@ static void text_print_planet_details(planet* the_planet, int counter) {
               << std::format("   Hydrosphere percentage:\t{}%\n", the_planet->getHydrosphere() * 100.0)
               << std::format("   Cloud cover percentage:\t{}%\n", the_planet->getCloudCover() * 100.0)
               << std::format("   Ice cover percentage:\t{}%\n", the_planet->getIceCover() * 100.0);
+    if (the_planet->getClimateModelTemp() > 0.0) {
+      std::cout << std::format(
+          "   1D-climate surface temp:\t{} degrees Celcius (Lehmer et al. 2020)\n",
+          the_planet->getClimateModelTemp() - FREEZING_POINT_OF_WATER);
+    }
   }
 
   // Physical properties (all planets)
@@ -459,6 +464,7 @@ auto to_row(planet* the_planet, bool is_moon, const std::string& id, bool do_gas
   r.pms_desiccation_risk         = the_planet->getPmsDesiccationRisk();
   r.high_xuv_escape_risk         = the_planet->getHighXuvEscapeRisk();
   r.co2_collapse_risk            = the_planet->getCo2CollapseRisk();
+  r.climate_model_temp           = the_planet->getClimateModelTemp();
   r.atmosphere_json              = atmosphere_json;
   r.is_moon                      = is_moon;
   return r;

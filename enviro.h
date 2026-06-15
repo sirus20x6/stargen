@@ -122,6 +122,8 @@ auto is_habitable_earth_like(planet *) -> bool;
 auto is_potentialy_habitable(planet *) -> bool;
 auto is_habitable(planet *) -> bool;
 void set_habitability_flags(planet *);
+auto lehmer_surface_temp(long double instellation, long double pco2_bar) -> long double;
+void set_climate_model_temp(planet *);
 auto convert_km_to_eu(long double) -> long double;
 void makeHabitable(StarGenerator*, sun &, planet *, const std::string&, bool, bool);
 
