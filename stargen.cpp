@@ -9,6 +9,7 @@
 #include <memory>      // for std::unique_ptr
 #include "accrete.h"   // for accrete
 #include "const.h"     // for SUN_MASS_IN_EARTH_MASSES, KM_PER_AU, EARTH_AVE...
+#include "units.hh"    // au-typed unit conversions (sgu::)
 #include "display.h"   // for type_string, close_html_file, create_svg_file
 #include "elements.h"  // for gases
 #include "enviro.h"    // for makeHabitable, est_temp, gravity, acceleration
@@ -250,7 +251,13 @@ static auto handle_list_gases_action() -> int {
   }
   std::cout << gases;
   std::cout << "Total Max ipp: " << toString(total) << "\n";
-  std::cout << "Max pressure: " << toString(MAX_HABITABLE_PRESSURE) << " atm\n";
+  // MAX_HABITABLE_PRESSURE is stored in millibars; convert to atmospheres for
+  // display (au-typed). Previously it printed the raw millibar value (~8136)
+  // mislabeled "atm" -- off by ~1000x; the real Dole ceiling is ~8 atm.
+  std::cout << "Max pressure: "
+            << toString(sgu::millibars(static_cast<long double>(MAX_HABITABLE_PRESSURE))
+                            .in(sgu::atmospheres))
+            << " atm\n";
   return EXIT_SUCCESS;
 }
 
