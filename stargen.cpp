@@ -454,7 +454,7 @@ static void output_system(planet* planets, int out_format,
         // GIF graphic mode so no SVG <object> wrapper is emitted.
         html_thumbnails(planets, html_file, planets->getTheSun().getName(),
                         url_path, "", "", "", false, false, true, do_moons,
-                        gfGIF, do_gases);
+                        gfGIF, do_gases, true);
         html_describe_system(planets, do_gases, do_moons, url_path, html_file);
         close_html_file(html_file);
       } else {
@@ -1270,7 +1270,7 @@ auto stargen(actions action, const std::string &flag_char, std::string path,
                          ".html", prognam, html_file);
           html_thumbnails(innermost_planet, html_file, system_name, url_path,
                           system_url, svg_url, file_name, true, false, true,
-                          do_moons, graphic_format, do_gases);
+                          do_moons, graphic_format, do_gases, true);
           html_describe_system(innermost_planet, do_gases, do_moons, url_path,
                                html_file);
           close_html_file(html_file);
