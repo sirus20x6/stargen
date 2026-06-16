@@ -213,3 +213,22 @@ TEST_CASE("equilibrium_temp matches the textbook radiative-equilibrium temperatu
     // freezing — the honest equilibrium temperature (greenhouse not included).
     REQUIRE(equilibrium_temp(1.126L, 1.16L, SUB_NEPTUNE_ALBEDO) < FREEZING_POINT_OF_WATER);
 }
+
+// ── Lehmer 2020 1-D climate polynomial ───────────────────────────────────────
+// lehmer_surface_temp(S, pCO2_bar) returns the full surface temperature (albedo
+// + CO2/H2O greenhouse implicit) for rocky worlds in S in [0.35,1.05] S_earth,
+// pCO2 in [1e-6,10] bar. It now DRIVES surf_temp for in-domain rocky planets.
+TEST_CASE("lehmer_surface_temp is Earth-like and monotone in CO2 and insolation",
+          "[enviro][temperature][climate]") {
+    // Earth-ish: S=1 S_earth, pCO2 ~ 4e-4 bar (~400 ppm) -> temperate, liquid water.
+    const long double t_earth = lehmer_surface_temp(1.0L, 4.0e-4L);
+    REQUIRE(t_earth > 270.0L);
+    REQUIRE(t_earth < 310.0L);
+
+    // More CO2 -> stronger greenhouse -> warmer (within the valid domain).
+    REQUIRE(lehmer_surface_temp(1.0L, 4.0e-3L) > t_earth);
+
+    // More / less insolation -> warmer / cooler.
+    REQUIRE(lehmer_surface_temp(1.05L, 4.0e-4L) > t_earth);
+    REQUIRE(lehmer_surface_temp(0.40L, 4.0e-4L) < t_earth);
+}

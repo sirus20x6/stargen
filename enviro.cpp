@@ -2972,26 +2972,25 @@ auto lehmer_surface_temp(long double instellation, long double pco2_bar) -> long
 }
 
 /**
- * @brief Set the diagnostic Lehmer 2020 1-D-climate surface temperature on the
- * planet, or 0 if it is outside the model's validity domain.
+ * @brief Is the Lehmer 2020 1-D-climate polynomial applicable to this planet,
+ * and if so return its inputs? Rocky planets only, with instellation
+ * S = L/a^2 in [0.35, 1.05] S_earth and CO2 partial pressure in [1e-6, 10] bar.
  *
- * Additive diagnostic only: does NOT change the planet's actual surface
- * temperature or any habitability classification. Applies to rocky planets with
- * an Earth-like CO2-bearing atmosphere whose instellation S = L/a^2 lies in
- * [0.35, 1.05] S_earth and whose CO2 partial pressure lies in [1e-6, 10] bar.
+ * Single source of truth for the validity domain, shared by the diagnostic
+ * setter (set_climate_model_temp) and the driver (apply_lehmer_surface_temp).
  */
-void set_climate_model_temp(planet *the_planet) {
-  the_planet->setClimateModelTemp(0.0);  // sentinel: not applicable
+static auto lehmer_applicable(planet *the_planet, long double &s_out,
+                              long double &pco2_bar_out) -> bool {
   if (is_gas_planet(the_planet)) {
-    return;
+    return false;
   }
   long double a = the_planet->getA();
   if (a <= 0.0) {
-    return;
+    return false;
   }
   long double instellation = the_planet->getTheSun().getLuminosity() / (a * a);
   if (instellation < 0.35 || instellation > 1.05) {
-    return;
+    return false;
   }
   long double pco2_mb = 0.0;  // CO2 partial pressure, millibars
   for (int i = 0; i < the_planet->getNumGases(); i++) {
@@ -3002,9 +3001,56 @@ void set_climate_model_temp(planet *the_planet) {
   }
   long double pco2_bar = pco2_mb / MILLIBARS_PER_BAR;
   if (pco2_bar < 1.0e-6 || pco2_bar > 10.0) {
-    return;
+    return false;
   }
-  the_planet->setClimateModelTemp(lehmer_surface_temp(instellation, pco2_bar));
+  s_out = instellation;
+  pco2_bar_out = pco2_bar;
+  return true;
+}
+
+/**
+ * @brief Set the diagnostic Lehmer 2020 1-D-climate surface temperature on the
+ * planet, or 0 if it is outside the model's validity domain. (Diagnostic field
+ * read by the display; the *actual* surf_temp is driven by
+ * apply_lehmer_surface_temp.)
+ */
+void set_climate_model_temp(planet *the_planet) {
+  long double s = NAN;
+  long double pco2_bar = NAN;
+  the_planet->setClimateModelTemp(
+      lehmer_applicable(the_planet, s, pco2_bar) ? lehmer_surface_temp(s, pco2_bar) : 0.0);
+}
+
+/**
+ * @brief Promote the Lehmer 2020 1-D radiative-convective climate polynomial to
+ * DRIVE the surface temperature of rocky planets inside its validity domain,
+ * replacing the hand-tuned Fogg 1985 grey-opacity result with a GCM-anchored,
+ * CO2-aware temperature. Outside the domain (and for gas planets) the Fogg
+ * result computed by iterate_surface_temp is left untouched (the fallback).
+ *
+ * Minimal and safe: it overrides only surf_temp (and the reported greenhouse
+ * rise + min/max temp range), then lets the caller re-run the habitability
+ * classifiers on the new temperature. It deliberately does NOT re-derive the
+ * hydrosphere/cloud/ice fractions: those were already iterated to convergence by
+ * the Fogg energy balance, and re-deriving them here risks re-establishing an
+ * ocean on a planet that boiled off. The fractions therefore remain those of the
+ * Fogg solution while the reported temperature is the (more accurate) Lehmer one.
+ */
+void apply_lehmer_surface_temp(planet *the_planet) {
+  long double s = NAN;
+  long double pco2_bar = NAN;
+  if (!lehmer_applicable(the_planet, s, pco2_bar)) {
+    return;  // out of domain: keep the Fogg surface temperature
+  }
+  long double ts = lehmer_surface_temp(s, pco2_bar);
+  // Greenhouse rise reported relative to the no-greenhouse equilibrium baseline,
+  // matching how iterate_surface_temp defines greenhsRise.
+  long double baseline = est_temp(the_planet->getTheSun().getREcosphere(
+                                      the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
+                                  the_planet->getA(), the_planet->getAlbedo());
+  the_planet->setSurfTemp(ts);
+  the_planet->setGreenhsRise(ts - baseline);
+  set_temp_range(the_planet);
 }
 
 auto is_potentialy_habitable_optimistic_size(planet *the_planet) -> bool {
