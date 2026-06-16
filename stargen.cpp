@@ -2382,6 +2382,11 @@ void generate_planet(StarGenerator* gen, planet *the_planet, int planet_no, sun 
                                      is_moon, the_fudged_radius);
   }
 
+  // Override the Fogg surface temperature with the GCM-anchored Lehmer 2020
+  // climate model for in-domain rocky planets (no-op otherwise), BEFORE the
+  // habitability classifiers below so they see the corrected temperature.
+  apply_lehmer_surface_temp(the_planet);
+
   the_planet->setHzc(calcHzc(the_planet));
   the_planet->setHza(calcHza(the_planet));
   the_planet->setEsi(calcEsi(the_planet));
