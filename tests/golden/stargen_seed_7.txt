@@ -22,7 +22,7 @@ Planets present at:
 Planet 1
 Planet is tidally locked with one face to star.
    Distance from primary star:	0.31352621900625999072 AU
-   Eccentricity of orbit:	0.022919689331519360717
+   Eccentricity of orbit:	0.0009528138433242713898
    Length of year:		64.12215653567036947 days
    Length of day:		1538.9317568560888674 hours
    Mass:			0.055771788683812297612 Earth masses
@@ -43,11 +43,11 @@ Planet is tidally locked with one face to star.
 
 
 Planet 2
-Planet's rotation is in a resonant spin lock with the star.
+Planet is tidally locked with one face to star.
    Distance from primary star:	0.5067601893389549815 AU
-   Eccentricity of orbit:	0.13738414763658656815
+   Eccentricity of orbit:	2.4789891277538846728e-06
    Length of year:		131.76519860050980229 days
-   Length of day:		2371.7735748091764412 hours
+   Length of day:		3162.364766412235255 hours
    Mass:			0.5707127415151546829 Earth masses
    Surface gravity:		1.3143682828764681701 Earth gees
    Surface pressure:		0 Earth atmospheres
@@ -61,14 +61,14 @@ Planet's rotation is in a resonant spin lock with the star.
    Escape Velocity:		9.750049913249480305 Km/sec
    Molecular weight retained:	25.349579787192582883 and above
    Surface acceleration:	1288.9549721270516103 cm/sec2
-   Axial tilt:			14.128921366628834022 degrees
+   Axial tilt:			0 degrees
    Planetary albedo:		0.07000000000000000666
 
 
 Planet 3
 Planet is tidally locked with one face to star.
    Distance from primary star:	0.8210317296924010526 AU
-   Eccentricity of orbit:	0.09812207311223234091
+   Eccentricity of orbit:	0.016925203648279954045
    Length of year:		271.72976531402965727 days
    Length of day:		6521.5143675367117746 hours
    Mass:			0.08721797189763170687 Earth masses
@@ -90,7 +90,7 @@ Planet is tidally locked with one face to star.
 
 Planet 4
    Distance from primary star:	1.0907448503518052304 AU
-   Eccentricity of orbit:	0.048019808401086067713
+   Eccentricity of orbit:	1.1955605064698418415e-16
    Length of year:		416.0838552097032845 days
    Length of day:		13.074917831634465724 hours
    Mass:			1.9170235954703192081 Earth masses
@@ -112,7 +112,7 @@ Planet 4
 
 Planet 5	*gas giant*
    Distance from primary star:	2.2704109662780684606 AU
-   Eccentricity of orbit:	0.16536867296144835282
+   Eccentricity of orbit:	3.5783317229259853992e-22
    Length of year:		1249.5177934578438476 days
    Length of day:		16.53623395266104701 hours
    Mass:			17.819444607061895997 Earth masses
@@ -127,7 +127,7 @@ Planet 5	*gas giant*
 
 Planet 6	*gas giant*
    Distance from primary star:	4.6111487314583936383 AU
-   Eccentricity of orbit:	0.06472317548282343475
+   Eccentricity of orbit:	2.6236708934887649273e-847
    Length of year:		3614.1837382443345015 days
    Length of day:		8.905578879471576206 hours
    Mass:			461.33340899326759296 Earth masses
@@ -142,7 +142,7 @@ Planet 6	*gas giant*
 
 Planet 7	*gas giant*
    Distance from primary star:	11.598752025745930624 AU
-   Eccentricity of orbit:	0.084224604222405489106
+   Eccentricity of orbit:	2.5099419245536114347e-486
    Length of year:		14413.040235385907002 days
    Length of day:		8.807496229122457044 hours
    Mass:			703.62649732524165946 Earth masses
@@ -157,7 +157,7 @@ Planet 7	*gas giant*
 
 Planet 8	*gas giant*
    Distance from primary star:	16.084340240521843244 AU
-   Eccentricity of orbit:	0.056649266129099651312
+   Eccentricity of orbit:	2.3096505957766945655e-06
    Length of year:		23561.165375476410265 days
    Length of day:		22.77341251515869049 hours
    Mass:			8.380116491038893308 Earth masses
@@ -172,7 +172,7 @@ Planet 8	*gas giant*
 
 Planet 9
    Distance from primary star:	34.215336130573957396 AU
-   Eccentricity of orbit:	0.11288505050073853464
+   Eccentricity of orbit:	0.10600396070975251464
    Length of year:		73101.867977330240585 days
    Length of day:		33.247230722541781286 hours
    Mass:			0.15381154405988455896 Earth masses
@@ -194,7 +194,7 @@ Planet 9
 
 Planet 10
    Distance from primary star:	48.215196160164372582 AU
-   Eccentricity of orbit:	0.06741210509082971869
+   Eccentricity of orbit:	0.061549924853484881508
    Length of year:		122284.98038136711079 days
    Length of day:		31.233782304407881392 hours
    Mass:			0.22609161332517152814 Earth masses

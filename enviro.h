@@ -32,6 +32,9 @@ auto tidal_sync_time_years(long double a_au, long double m_star_solar, long doub
                            long double q, long double k2) -> long double;
 auto tidal_lock_timescale_years(planet *, long double, bool, long double, long double)
     -> long double;
+auto gas_disk_damped_eccentricity(long double e, long double a_au, long double m_p_solar,
+                                  long double m_star_solar) -> long double;
+void apply_gas_disk_damping(sun &the_sun, planet *innermost);
 auto inclination(long double, long double) -> long double;
 auto escape_vel(long double, long double) -> long double;
 auto rms_vel(long double, long double) -> long double;

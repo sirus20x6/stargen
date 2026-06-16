@@ -29,7 +29,7 @@ Planets present at:
 Planet 1
 Planet is tidally locked with one face to star.
    Distance from primary star:	0.32929052848992333358 AU
-   Eccentricity of orbit:	0.044021088632346591423
+   Eccentricity of orbit:	0.0016653872956749951057
    Length of year:		69.0186055070339832 days
    Length of day:		1656.4465321688155968 hours
    Mass:			0.056881742499426778893 Earth masses
@@ -52,7 +52,7 @@ Planet is tidally locked with one face to star.
 Planet 2
 Planet is tidally locked with one face to star.
    Distance from primary star:	0.43925180315611207356 AU
-   Eccentricity of orbit:	0.0154299804187318679595
+   Eccentricity of orbit:	0.012652111351925964329
    Length of year:		106.3329064866177643 days
    Length of day:		2551.9897556788263433 hours
    Mass:			0.004963935400002713156 Earth masses
@@ -75,7 +75,7 @@ Planet is tidally locked with one face to star.
 Planet 3
 Planet is tidally locked with one face to star.
    Distance from primary star:	0.45964674491661890242 AU
-   Eccentricity of orbit:	0.025185506734100728422
+   Eccentricity of orbit:	0.019839922781041273124
    Length of year:		113.8239461776287372 days
    Length of day:		2731.7747082630896929 hours
    Mass:			0.006096406370978955241 Earth masses
@@ -98,7 +98,7 @@ Planet is tidally locked with one face to star.
 Planet 4
 Planet is tidally locked with one face to star.
    Distance from primary star:	0.4778886148734016992 AU
-   Eccentricity of orbit:	0.016789484131539109818
+   Eccentricity of orbit:	0.001759429192365152608
    Length of year:		120.66667476436553169 days
    Length of day:		2896.0001943447727606 hours
    Mass:			0.06119851657504032232 Earth masses
@@ -121,7 +121,7 @@ Planet is tidally locked with one face to star.
 Planet 5
 Planet is tidally locked with one face to star.
    Distance from primary star:	0.61296553499806550697 AU
-   Eccentricity of orbit:	0.061661145837307691873
+   Eccentricity of orbit:	9.3638212342158537206e-11
    Length of year:		175.28753174684774581 days
    Length of day:		4206.9007619243458995 hours
    Mass:			0.6397642960040522841 Earth masses
@@ -144,7 +144,7 @@ Planet is tidally locked with one face to star.
 Planet 6
 Planet is tidally locked with one face to star.
    Distance from primary star:	0.68775488031796824204 AU
-   Eccentricity of orbit:	0.03205333361981198482
+   Eccentricity of orbit:	0.0058254442030081258342
    Length of year:		208.32809293116259253 days
    Length of day:		4999.8742303479022207 hours
    Mass:			0.06394021786138123063 Earth masses
@@ -166,7 +166,7 @@ Planet is tidally locked with one face to star.
 
 Planet 7
    Distance from primary star:	0.928545262202229191 AU
-   Eccentricity of orbit:	0.049940742480315653017
+   Eccentricity of orbit:	0.0021259031785267082753
    Length of year:		326.81492129378319358 days
    Length of day:		32.12745260442253654 hours
    Mass:			0.15260228929772928803 Earth masses
@@ -189,7 +189,7 @@ Planet 7
 Planet 8
 Cold for the habitable zone: outgassed CO2 may freeze out, risking irreversible glaciation.
    Distance from primary star:	1.2702814717675298573 AU
-   Eccentricity of orbit:	0.011292305496172449467
+   Eccentricity of orbit:	9.4400867972548216637e-05
    Length of year:		522.9342371302939614 days
    Length of day:		19.258283959924820214 hours
    Mass:			0.34868708360437104053 Earth masses
@@ -212,7 +212,7 @@ Cold for the habitable zone: outgassed CO2 may freeze out, risking irreversible 
 Planet 9
 Cold for the habitable zone: outgassed CO2 may freeze out, risking irreversible glaciation.
    Distance from primary star:	1.5232573688759141364 AU
-   Eccentricity of orbit:	0.013572953021888612194
+   Eccentricity of orbit:	2.9944616841109548981e-09
    Length of year:		686.6831959988640101 days
    Length of day:		14.046054157651570614 hours
    Mass:			1.3341239377847115686 Earth masses
@@ -234,7 +234,7 @@ Cold for the habitable zone: outgassed CO2 may freeze out, risking irreversible 
 
 Planet 10	*gas giant*
    Distance from primary star:	2.2760469761771999595 AU
-   Eccentricity of orbit:	0.014571506181385933745
+   Eccentricity of orbit:	5.488169651649801356e-112
    Length of year:		1254.145286907297711 days
    Length of day:		14.573735191654934667 hours
    Mass:			32.705540882521099498 Earth masses
@@ -249,7 +249,7 @@ Planet 10	*gas giant*
 
 Planet 11
    Distance from primary star:	3.0651501624522978849 AU
-   Eccentricity of orbit:	0.17813163723997674784
+   Eccentricity of orbit:	0.06952887599742213382
    Length of year:		1960.0836590924733526 days
    Length of day:		18.136655036425911933 hours
    Mass:			0.58856339012300186014 Earth masses
@@ -271,7 +271,7 @@ Planet 11
 
 Planet 12	*gas giant*
    Distance from primary star:	4.4095270134381198187 AU
-   Eccentricity of orbit:	0.0082023864671672274155
+   Eccentricity of orbit:	6.2356284162971495302e-06
    Length of year:		3382.0823583910567438 days
    Length of day:		28.02296921185798182 hours
    Mass:			1.8251045386066755698 Earth masses
@@ -286,7 +286,7 @@ Planet 12	*gas giant*
 
 Planet 13	*gas giant*
    Distance from primary star:	6.726454872456255304 AU
-   Eccentricity of orbit:	0.013574670721917439509
+   Eccentricity of orbit:	2.4742079190485444772e-740
    Length of year:		6365.7777920396335047 days
    Length of day:		8.550397467820385666 hours
    Mass:			652.3035700326716637 Earth masses
@@ -323,7 +323,7 @@ Planet 14
 
 Planet 15	*gas giant*
    Distance from primary star:	18.997848568563493705 AU
-   Eccentricity of orbit:	0.1276726960001111355
+   Eccentricity of orbit:	0.004494564219160512889
    Length of year:		30244.772765580602988 days
    Length of day:		25.08412678938768658 hours
    Mass:			5.61696320492433811 Earth masses
@@ -338,7 +338,7 @@ Planet 15	*gas giant*
 
 Planet 16	*gas giant*
    Distance from primary star:	26.744272453248485406 AU
-   Eccentricity of orbit:	0.00343392519934015354
+   Eccentricity of orbit:	0.00073642312520735097544
    Length of year:		50517.515723690898902 days
    Length of day:		30.816081388072626283 hours
    Mass:			2.3835069451012859004 Earth masses
@@ -353,7 +353,7 @@ Planet 16	*gas giant*
 
 Planet 17
    Distance from primary star:	44.658659885913400953 AU
-   Eccentricity of orbit:	0.15675788795391934483
+   Eccentricity of orbit:	0.13607306311658803029
    Length of year:		109007.2291973598898 days
    Length of day:		18.08348838498803049 hours
    Mass:			0.90120455136914300455 Earth masses

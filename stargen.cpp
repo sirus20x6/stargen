@@ -1460,6 +1460,12 @@ void generate_stellar_system(StarGenerator* gen, sun &the_sun, bool use_seed_sys
       return;
     }
     the_sun.setAge(random_number(gen->config.min_age, gen->config.max_age));
+
+    // Post-accretion gas-disk eccentricity damping (Cresswell & Nelson 2008).
+    // Non-seed systems only: predefined/catalogue systems keep their published
+    // eccentricities. Pure arithmetic (no RNG) -> determinism preserved and the
+    // rest of the population is byte-identical; only eccentricities change.
+    apply_gas_disk_damping(the_sun, gen->sim_context.innermost_planet);
   }
   // Publish THIS system's fully-initialised sun (mass, luminosity, effTemp, age
   // are all set by this point) into the per-thread active-sun clone, so the
