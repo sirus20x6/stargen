@@ -446,6 +446,15 @@ static void output_system(planet* planets, int out_format,
         std::fstream html_file;
         open_html_file(planets->getTheSun().getName(), seed, path, url_path,
                       file_name, ".html", prognam, html_file);
+        // Always lead the page with the horizontal system "orbit strip" overview
+        // (planets in a row, sized proportional to sqrt(radius)). It iterates the
+        // global g_sim_context.planets, which the output loop rebuilds for this
+        // system before calling us; output is single-threaded so that is safe.
+        // Strip only (details/terrestrials tables are left to html_describe_system);
+        // GIF graphic mode so no SVG <object> wrapper is emitted.
+        html_thumbnails(planets, html_file, planets->getTheSun().getName(),
+                        url_path, "", "", "", false, false, true, do_moons,
+                        gfGIF, do_gases);
         html_describe_system(planets, do_gases, do_moons, url_path, html_file);
         close_html_file(html_file);
       } else {
