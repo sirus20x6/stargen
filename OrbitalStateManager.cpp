@@ -137,10 +137,10 @@ void OrbitalStateManager::setTimeScale(double scale) {
  * @param p Planet to query
  * @return Position in AU (sun at origin), or (0,0,0) if not found
  */
-Vector3 OrbitalStateManager::getPosition(const SystemID& system_id, planet* p) const {
+Vec3 OrbitalStateManager::getPosition(const SystemID& system_id, planet* p) const {
     auto it = simulators_.find(system_id);
     if (it == simulators_.end()) {
-        return Vector3(0, 0, 0);
+        return Vec3(0, 0, 0);
     }
 
     return it->second->getPosition(p);
@@ -153,10 +153,10 @@ Vector3 OrbitalStateManager::getPosition(const SystemID& system_id, planet* p) c
  * @param p Planet to query
  * @return Velocity in AU/year, or (0,0,0) if not found
  */
-Vector3 OrbitalStateManager::getVelocity(const SystemID& system_id, planet* p) const {
+Vec3 OrbitalStateManager::getVelocity(const SystemID& system_id, planet* p) const {
     auto it = simulators_.find(system_id);
     if (it == simulators_.end()) {
-        return Vector3(0, 0, 0);
+        return Vec3(0, 0, 0);
     }
 
     return it->second->getVelocity(p);

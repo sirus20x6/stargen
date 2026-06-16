@@ -16,7 +16,9 @@
 #include <exception>    // for std::exception
 #include <vector>
 #include "raylib.h"
+#undef PI  // raylib defines PI as a float macro; StarGen uses a constexpr double PI (const.h)
 #include "stargen.h"
+#include "const.h"
 #include "StarGenerator.h"
 #include "OrbitalSimulator.h"
 #include "OrbitalStateManager.h"
@@ -128,7 +130,7 @@ std::vector<planet*> buildPlanetList(planet* system) {
 /**
  * @brief Convert world position (AU) to screen position (pixels)
  */
-Vector2 worldToScreen(const Vector3& worldPos, const ViewState& view) {
+Vector2 worldToScreen(const Vec3& worldPos, const ViewState& view) {
     float screenX = SCREEN_WIDTH / 2.0f + (worldPos.x * view.zoom + view.offset.x);
     float screenY = SCREEN_HEIGHT / 2.0f + (worldPos.y * view.zoom + view.offset.y);
     return {screenX, screenY};
@@ -152,7 +154,7 @@ void updateFollowCamera(ViewState& view, const OrbitalStateManager& manager) {
         view.targetOffset = {0, 0};
     } else if (view.followMode == FollowMode::FOLLOW_PLANET && view.followTarget != nullptr) {
         // Follow selected planet
-        Vector3 planetPos = manager.getPosition("main", view.followTarget);
+        Vec3 planetPos = manager.getPosition("main", view.followTarget);
 
         // Calculate offset to center planet
         view.targetOffset.x = -planetPos.x * view.zoom;
@@ -176,7 +178,7 @@ planet* findPlanetAtPosition(Vector2 screenPos, const std::vector<planet*>& plan
     constexpr float CLICK_RADIUS = 10.0f;  // Pixel tolerance
 
     for (planet* p : planets) {
-        Vector3 planetPos = manager.getPosition("main", p);
+        Vec3 planetPos = manager.getPosition("main", p);
         Vector2 screenPlanetPos = worldToScreen(planetPos, view);
 
         float dx = screenPos.x - screenPlanetPos.x;
@@ -195,7 +197,7 @@ planet* findPlanetAtPosition(Vector2 screenPos, const std::vector<planet*>& plan
  * @brief Draw the sun at the center
  */
 void drawSun(const ViewState& view, bool isFollowTarget) {
-    Vector2 sunPos = worldToScreen(Vector3(0, 0, 0), view);
+    Vector2 sunPos = worldToScreen(Vec3(0, 0, 0), view);
     float sunRadius = std::max(5.0f, 10.0f * view.zoom / 50.0f);
 
     DrawCircleV(sunPos, sunRadius, YELLOW);
@@ -210,7 +212,7 @@ void drawSun(const ViewState& view, bool isFollowTarget) {
 /**
  * @brief Draw a planet
  */
-void drawPlanet(planet* p, const Vector3& pos, const ViewState& view, bool isFollowTarget) {
+void drawPlanet(planet* p, const Vec3& pos, const ViewState& view, bool isFollowTarget) {
     Vector2 screenPos = worldToScreen(pos, view);
 
     // Calculate planet visual radius (not to scale, for visibility)
@@ -249,7 +251,7 @@ void drawOrbit(planet* p, const ViewState& view) {
     float a = p->getA();  // Semi-major axis
     float e = p->getE();  // Eccentricity
 
-    Vector2 center = worldToScreen(Vector3(0, 0, 0), view);
+    Vector2 center = worldToScreen(Vec3(0, 0, 0), view);
     float radiusX = a * view.zoom;
     float radiusY = a * (1.0f - e * e) * view.zoom;  // Semi-minor axis approximation
 
@@ -498,7 +500,7 @@ int main() {
             drawOrbit(p, view);
 
             // Get current position
-            Vector3 pos = manager.getPosition("main", p);
+            Vec3 pos = manager.getPosition("main", p);
 
             // Check if this is the follow target
             bool isFollowTarget = (view.followMode == FollowMode::FOLLOW_PLANET &&

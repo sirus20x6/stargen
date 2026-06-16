@@ -132,7 +132,7 @@ int main() {
         int idx = 0;
         for (planet* p = system; p != nullptr; p = p->next_planet) {
             idx++;
-            Vector3 pos = sim.getPosition(p);
+            Vec3 pos = sim.getPosition(p);
             double distance = pos.length();
 
             std::cout << "  Planet " << idx
@@ -156,7 +156,7 @@ int main() {
         }
 
         planet* p = system;  // Just show first planet
-        Vector3 pos = sim.getPosition(p);
+        Vec3 pos = sim.getPosition(p);
 
         std::cout << "Year " << std::setw(2) << year
                  << ": Planet 1 at distance " << pos.length() << " AU\n";

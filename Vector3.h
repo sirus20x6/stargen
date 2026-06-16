@@ -9,37 +9,37 @@
  * Used by OrbitalSimulator for position/velocity calculations.
  * Does NOT affect planet generation - purely for runtime simulation.
  */
-struct Vector3 {
+struct Vec3 {
     double x, y, z;
 
-    Vector3() : x(0), y(0), z(0) {}
-    Vector3(double x_, double y_, double z_) : x(x_), y(y_), z(z_) {}
+    Vec3() : x(0), y(0), z(0) {}
+    Vec3(double x_, double y_, double z_) : x(x_), y(y_), z(z_) {}
 
     // Vector operations
-    Vector3 operator+(const Vector3& v) const {
-        return Vector3(x + v.x, y + v.y, z + v.z);
+    Vec3 operator+(const Vec3& v) const {
+        return Vec3(x + v.x, y + v.y, z + v.z);
     }
 
-    Vector3 operator-(const Vector3& v) const {
-        return Vector3(x - v.x, y - v.y, z - v.z);
+    Vec3 operator-(const Vec3& v) const {
+        return Vec3(x - v.x, y - v.y, z - v.z);
     }
 
-    Vector3 operator*(double s) const {
-        return Vector3(x * s, y * s, z * s);
+    Vec3 operator*(double s) const {
+        return Vec3(x * s, y * s, z * s);
     }
 
-    Vector3 operator/(double s) const {
-        return Vector3(x / s, y / s, z / s);
+    Vec3 operator/(double s) const {
+        return Vec3(x / s, y / s, z / s);
     }
 
     // Dot product
-    double dot(const Vector3& v) const {
+    double dot(const Vec3& v) const {
         return x * v.x + y * v.y + z * v.z;
     }
 
     // Cross product
-    Vector3 cross(const Vector3& v) const {
-        return Vector3(
+    Vec3 cross(const Vec3& v) const {
+        return Vec3(
             y * v.z - z * v.y,
             z * v.x - x * v.z,
             x * v.y - y * v.x
@@ -52,12 +52,12 @@ struct Vector3 {
     }
 
     // Normalize
-    Vector3 normalize() const {
+    Vec3 normalize() const {
         double len = length();
         if (len > 0.0) {
             return *this / len;
         }
-        return Vector3(0, 0, 0);
+        return Vec3(0, 0, 0);
     }
 };
 

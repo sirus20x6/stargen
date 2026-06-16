@@ -85,32 +85,32 @@ void OrbitalSimulator::updatePositions() {
 
         double z = (sin_w * sin_i) * x_orb + (cos_w * sin_i) * y_orb;
 
-        state.position = Vector3(x, y, z);
+        state.position = Vec3(x, y, z);
 
         // Calculate velocity (optional, for future use)
         // v = (μ/h) * [-sin(ν), e + cos(ν), 0] in orbital plane
         // Then rotate to 3D space
         // For now, we'll leave velocity as zero - can be added later if needed
-        state.velocity = Vector3(0, 0, 0);
+        state.velocity = Vec3(0, 0, 0);
 
         state.last_update_time = current_time_;
     }
 }
 
-Vector3 OrbitalSimulator::getPosition(planet* p) const {
+Vec3 OrbitalSimulator::getPosition(planet* p) const {
     auto it = states_.find(p);
     if (it != states_.end()) {
         return it->second.position;
     }
-    return Vector3(0, 0, 0);
+    return Vec3(0, 0, 0);
 }
 
-Vector3 OrbitalSimulator::getVelocity(planet* p) const {
+Vec3 OrbitalSimulator::getVelocity(planet* p) const {
     auto it = states_.find(p);
     if (it != states_.end()) {
         return it->second.velocity;
     }
-    return Vector3(0, 0, 0);
+    return Vec3(0, 0, 0);
 }
 
 bool OrbitalSimulator::hasState(planet* p) const {
