@@ -19,6 +19,8 @@
 #undef PI  // raylib defines PI as a float macro; StarGen uses a constexpr double PI (const.h)
 #include "stargen.h"
 #include "const.h"
+#include "AccretionRecorder.h"
+#include <algorithm>
 #include "StarGenerator.h"
 #include "OrbitalSimulator.h"
 #include "OrbitalStateManager.h"
@@ -316,6 +318,76 @@ void drawUI(const OrbitalStateManager& manager, const ViewState& view,
     DrawText("ESC: Exit", padding, y, 16, WHITE);
 }
 
+/**
+ * @brief Play back the recorded accretion ("formation") timeline: dust lanes
+ * thinning into rings while planetesimals appear, grow, and merge, scrubbed over
+ * a fixed duration. Returns when the user skips (SPACE/ENTER) or closes the
+ * window; the caller then enters the live orbital view.
+ */
+void playFormation(const AccretionRecorder& rec, ViewState& view) {
+    const int n = static_cast<int>(rec.frames.size());
+    if (n == 0) {
+        return;
+    }
+    const float duration = 12.0f;  // seconds to scrub the whole formation
+
+    // Auto-fit zoom to the initial dust disk / widest orbit.
+    double maxR = 1.0;
+    for (const auto& b : rec.frames.front().bands) maxR = std::max(maxR, b.outer);
+    for (const auto& f : rec.frames)
+        for (const auto& bd : f.bodies) maxR = std::max(maxR, bd.a * (1.0 + bd.e));
+    view.zoom = static_cast<float>((SCREEN_HEIGHT * 0.42) / std::max(1.0, maxR));
+
+    float elapsed = 0.0f;
+    while (!WindowShouldClose()) {
+        elapsed += GetFrameTime();
+        if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER)) break;  // skip to orbits
+        if (IsKeyPressed(KEY_R)) elapsed = 0.0f;                        // replay
+        float wheel = GetMouseWheelMove();
+        if (wheel != 0.0f) view.zoom *= (wheel > 0 ? 1.1f : 0.9f);
+
+        float t = std::min(1.0f, elapsed / duration);
+        int idx = static_cast<int>(t * (n - 1));
+        const AccretionFrame& f = rec.frames[idx];
+        Vector2 c = {SCREEN_WIDTH / 2.0f + view.offset.x, SCREEN_HEIGHT / 2.0f + view.offset.y};
+
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        // Dust lanes: tan where dust remains, faint blue where only gas remains.
+        for (const auto& b : f.bands) {
+            if (!b.hasDust && !b.hasGas) continue;
+            float ri = static_cast<float>(b.inner * view.zoom);
+            float ro = static_cast<float>(b.outer * view.zoom);
+            Color col = b.hasDust ? Color{150, 110, 70, 60} : Color{80, 110, 180, 32};
+            DrawRing(c, ri, ro, 0.0f, 360.0f, 96, col);
+        }
+        // Star.
+        DrawCircleV(c, 6.0f, Color{255, 220, 120, 255});
+        // Planetesimals / embryos: position on their orbit (slow drift), size ~ mass^(1/3).
+        for (const auto& bd : f.bodies) {
+            double theta = std::fmod(bd.a * 2.3999632 + elapsed * 0.3, 2.0 * PI);
+            float x = c.x + static_cast<float>(bd.a * std::cos(theta) * view.zoom);
+            float y = c.y + static_cast<float>(bd.a * std::sin(theta) * view.zoom);
+            double me = bd.mass * SUN_MASS_IN_EARTH_MASSES;
+            float r = static_cast<float>(std::clamp(1.5 + std::cbrt(std::max(me, 1.0e-6)) * 1.6, 1.5, 22.0));
+            Color col = me > 10.0 ? Color{120, 170, 230, 255} : Color{210, 180, 140, 255};
+            DrawCircle(static_cast<int>(x), static_cast<int>(y), r, col);
+        }
+
+        // HUD.
+        DrawText("ACCRETION / FORMATION", 20, 20, 24, YELLOW);
+        DrawText(TextFormat("step %d / %d    bodies: %d", idx + 1, n, (int)f.bodies.size()), 20, 50, 18,
+                 WHITE);
+        DrawText("SPACE/ENTER: skip to orbital view    R: replay    mouse wheel: zoom", 20,
+                 SCREEN_HEIGHT - 30, 16, GRAY);
+        if (t >= 1.0f) {
+            DrawText("formation complete -- SPACE for the live orbital view", 20, 80, 18, GREEN);
+        }
+        EndDrawing();
+    }
+}
+
 int main() {
     // Initialize generation system. The data loaders throw std::runtime_error on
     // a missing/malformed file; fail gracefully instead of std::terminate().
@@ -332,6 +404,8 @@ int main() {
     StarGenerator gen;
     accrete acc;
     sun the_sun;
+    AccretionRecorder recorder;
+    acc.setAccretionRecorder(&recorder);  // capture the formation timeline during generation
     planet* system = generateSystem(gen, acc, the_sun, 42);
 
     if (!system) {
@@ -366,6 +440,11 @@ int main() {
     std::cout << "Starting viewer...\n";
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Stellar System Viewer - Advanced Camera");
     SetTargetFPS(60);
+
+    // Play the recorded accretion/formation timeline first, then fall through to
+    // the live orbital view of the finished system.
+    std::cout << "Recorded " << recorder.frames.size() << " formation frames\n";
+    playFormation(recorder, view);
 
     // Main loop
     while (!WindowShouldClose()) {

@@ -379,6 +379,11 @@ class dust {
   ~dust();
   void setInnerEdge(long double);
   auto getInnerEdge() const -> long double;
+  // Side-effect-free read of the raw inner edge. getInnerEdge() above mutates
+  // innerEdge (via const_cast) when inner>=outer, which the accretion relies on;
+  // read-only consumers (e.g. the formation recorder) must use this instead so
+  // they never perturb the deterministic accretion state.
+  auto peekInnerEdge() const -> long double { return innerEdge; }
   void setOuterEdge(long double);
   auto getOuterEdge() const -> long double;
   void setDustPresent(bool);
