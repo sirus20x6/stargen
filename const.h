@@ -66,6 +66,17 @@ constexpr double FREEZING_POINT_OF_WATER = 273.15;
 constexpr double EARTH_AVERAGE_CELSIUS = 14.0;
 constexpr double EARTH_AVERAGE_KELVIN = EARTH_AVERAGE_CELSIUS + FREEZING_POINT_OF_WATER;
 constexpr double DAYS_IN_A_YEAR = 365.256;
+constexpr double SECONDS_PER_YEAR = DAYS_IN_A_YEAR * 24.0 * 3600.0;
+/* Tidal quality factor Q and degree-2 tidal Love number k2 of the SPINNING body,
+ * for the Gladman et al. 1996 (Icarus 122, 166) tidal-synchronization timescale
+ * t_sync ~ (4/9)(Q/k2) a^6 w I / (G M_star^2 R_p^5). Named TIDAL_LOVE_K2_* to
+ * avoid the unrelated K2 (planethood timescale) below.
+ *   Rocky:  Earth-like Q~12, k2~0.30 (Goldreich & Soter 1966; Murray & Dermott 1999, Tab. 4.1).
+ *   Gas:    Jupiter-like Q~1e5, k2~0.38 (Lainey et al. 2009; Wahl et al. 2016). */
+constexpr double TIDAL_Q_ROCKY       = 12.0;
+constexpr double TIDAL_Q_GAS         = 1.0E5;
+constexpr double TIDAL_LOVE_K2_ROCKY = 0.30;
+constexpr double TIDAL_LOVE_K2_GAS   = 0.38;
 //		gas_retention_threshold = 5.0;  		/* ratio of esc vel to
 //RMS vel */
 constexpr double GAS_RETENTION_THRESHOLD = 6.0; /* ratio of esc vel to RMS vel */

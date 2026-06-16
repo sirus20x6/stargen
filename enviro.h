@@ -27,6 +27,11 @@ auto empirical_density(long double, long double, long double, bool)
 auto volume_density(long double, long double) -> long double;
 auto period(long double, long double, long double) -> long double;
 auto day_length(planet *, long double, bool) -> long double;
+auto tidal_sync_time_years(long double a_au, long double m_star_solar, long double r_p_km,
+                           long double m_p_solar, long double spin_rad_s, long double moi_factor,
+                           long double q, long double k2) -> long double;
+auto tidal_lock_timescale_years(planet *, long double, bool, long double, long double)
+    -> long double;
 auto inclination(long double, long double) -> long double;
 auto escape_vel(long double, long double) -> long double;
 auto rms_vel(long double, long double) -> long double;
