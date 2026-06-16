@@ -91,6 +91,21 @@ constexpr double GAS_GIANT_ALBEDO = 0.5; /* albedo of a gas giant	*/
  * Sudarsky *giant* class albedos (~0.8) for tSubSubGasGiant bodies. */
 constexpr double SUB_NEPTUNE_ALBEDO = 0.30;
 
+/* Condensation-sequence bulk composition (replaces the old random zone bins).
+ * The snow line scales as 2.7*sqrt(L/Lsun) AU (the locus where the disk grain
+ * temperature ~ 170 K; Hayashi 1981 + canonical Solar-System value). Refractory
+ * material is split into iron and rock by the solar Fe/(Fe+rock) mass ratio
+ * (~0.33, bulk-Earth analog; Lodders 2003). Inside the silicate condensation
+ * temperature the hot inner disk is iron-enriched (Wang 2019 devolatilization).
+ * Ice is capped at ICE_MAX_FRACTION beyond the snow line. cmf (carbon-of-rock)
+ * is kept small/solar. COMPOSITION_SCATTER adds modest per-body diversity. */
+constexpr double SNOW_LINE_AU_AT_1LSUN  = 2.7;
+constexpr double IRON_REFRACTORY_FRACTION = 0.33;
+constexpr double ICE_MAX_FRACTION       = 0.5;
+constexpr double SOLAR_CMF              = 0.05;
+constexpr double COMPOSITION_SCATTER    = 0.15;
+constexpr double T_SILICATE_CONDENSE    = 1350.0; /* K; Lodders 2003 forsterite */
+
 // Albedo values for various celestial body classifications
 constexpr double CLASS_I_ALBEDO = 0.57;
 constexpr double CLASS_II_ALBEDO = 0.81;
