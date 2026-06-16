@@ -857,24 +857,28 @@ void open_html_file(const std::string& system_name, long seed, const std::string
          << stargen_revision << "'>\n";
   // Modern "deep space" stylesheet. The dark palette comes from the BG*/TX*
   // constants (emitted as presentational attributes, which CSS overrides); this
-  // sheet adds typography, spacing, rounded panels, borders and shadows that the
-  // legacy attributes cannot express. Top-level tables become cards; nested
-  // tables stay as plain layout.
+  // sheet layers on typography and turns the bordered (border=3) panels into
+  // rounded cards. It deliberately does NOT set a global img max-width or cell
+  // padding, so the system-overview strip keeps its intrinsic, radius-proportional
+  // planet icons and reads as a horizontal "solar system" lineup (wide systems
+  // scroll horizontally, as before). Only the bordered panels get card chrome;
+  // the black orbit strip (border=0) is left as plain layout.
   output << R"CSS(<style>
 :root{--ink:#dfe4f0;--muted:#9aa3c0;--line:#283353;--accent:#7fd1e0;}
 *{box-sizing:border-box;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   background:radial-gradient(1200px 700px at 50% -10%,#16203c 0%,#0b0f1c 55%,#05070e 100%) fixed;
-  color:var(--ink);line-height:1.55;margin:0;padding:28px 14px;font-size:15px;}
+  color:var(--ink);line-height:1.5;margin:0;padding:24px 12px;font-size:15px;}
 a{color:var(--accent);text-decoration:none;}
 a:hover{color:#bdeef7;text-decoration:underline;}
-img{max-width:100%;height:auto;border:0;vertical-align:middle;}
+img{border:0;vertical-align:middle;}
 hr{border:0;border-top:1px solid var(--line);margin:18px 0;}
-table{border-collapse:separate;border-spacing:0;width:90%;max-width:1080px;margin:20px auto;
-  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.45);}
-table table{width:100%;max-width:none;margin:0;border:0;border-radius:0;box-shadow:none;}
-td,th{padding:8px 12px;border:0;vertical-align:middle;}
-tr+tr>td{border-top:1px solid rgba(255,255,255,.045);}
+/* Card chrome only on the bordered panels; no overflow:hidden so a wide orbit
+   strip is never clipped. */
+table[border='3']{border-collapse:separate;border-spacing:0;border:1px solid var(--line);
+  border-radius:12px;box-shadow:0 8px 26px rgba(0,0,0,.40);margin:18px auto;}
+/* Tame the oversized legacy inline planet thumbnails in data tables. */
+td img[width='600']{width:auto;max-width:128px;height:auto;}
 font{font-style:normal;}
 center{color:var(--muted);font-size:13px;}
 </style>
@@ -1349,7 +1353,7 @@ static void html_write_thumbnail_header(std::fstream& the_file, const std::strin
   if (graphic_format == gfSVG) {
     the_file << "<object data='" << escapeXmlAttr(svg_url) << "' type='image/svg+xml'\n";
     the_file << "        width='100%' height='100%' border=1 "
-                "style='background-color:white;'>\n";
+                "style='background-color:#05070e;'>\n";
   }
 
   the_file << "<table border=0 cellspacing=0 cellpadding=3 bgcolor='" << BGSPACE
