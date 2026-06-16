@@ -45,6 +45,8 @@ auto cloud_fraction(long double, long double, long double, long double)
 auto ice_fraction(long double, long double) -> long double;
 auto eff_temp(long double, long double, long double) -> long double;
 auto est_temp(long double, long double, long double) -> long double;
+auto equilibrium_temp(long double luminosity, long double orb_radius, long double albedo)
+    -> long double;
 auto grnhouse(long double, long double) -> bool;
 auto green_rise(long double, long double, long double) -> long double;
 auto planet_albedo(planet *) -> long double;

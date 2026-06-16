@@ -899,6 +899,19 @@ auto est_temp(long double ecosphere_radius, long double orb_radius,
          pow1_4((1.0 - albedo) / (1.0 - EARTH_ALBEDO)) * EARTH_AVERAGE_KELVIN;
 }
 
+/*--------------------------------------------------------------------------*/
+/* Standard radiative equilibrium temperature (global average, full heat     */
+/* redistribution): T_eq = T_EQ_BASE * (1-A)^(1/4) * (L/Lsun)^(1/4) / sqrt(a)*/
+/* Uses the star's actual luminosity (in solar units) and the orbital radius */
+/* in AU, rather than est_temp's r_ecosphere proxy and Earth-surface (288 K) */
+/* normalization. Earth (L=1, a=1, A=0.3) -> 254.8 K, the true equilibrium   */
+/* temperature (Earth's 288 K mean surface is that plus a ~33 K greenhouse).  */
+/*--------------------------------------------------------------------------*/
+auto equilibrium_temp(long double luminosity, long double orb_radius,
+                      long double albedo) -> long double {
+  return T_EQ_BASE * pow1_4(1.0 - albedo) * pow1_4(luminosity) / sqrt(orb_radius);
+}
+
 /*-------------------------------------------------------------------------*/
 /* Old grnhouse:                                                           */
 /* Note that if the orbital radius of the planet is greater than or equal  */
@@ -2041,11 +2054,11 @@ void gas_giant_temperature_albedo(planet *the_planet, long double parent_mass,
   if (the_planet->getTheSun().getAge() == 0.0) {
     the_planet->setTheSun(the_sun_clone);
   }
-  temp3 = about(GAS_GIANT_ALBEDO, 0.1);
+  temp3 = about(the_planet->getType() == tSubSubGasGiant ? SUB_NEPTUNE_ALBEDO : GAS_GIANT_ALBEDO,
+                0.1);
   the_planet->setAlbedo(temp3);
-  temp1 = est_temp(the_planet->getTheSun().getREcosphere(
-                       the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
-                   the_planet->getA(), the_planet->getAlbedo());
+  temp1 = equilibrium_temp(the_planet->getTheSun().getLuminosity(),
+                           the_planet->getA(), the_planet->getAlbedo());
   the_planet->setEstimatedTemp(temp1);
   // temp4 = new_radius = gas_radius(temp1, the_planet->getDustMass(),
   // the_planet->getMass(), the_planet->getTheSun().getAge(), the_planet);
@@ -2058,7 +2071,13 @@ void gas_giant_temperature_albedo(planet *the_planet, long double parent_mass,
     if (loops >= 1000) {
       break;
     }
-    if (temp1 > TEMPERATURE_CARBON_GIANT) {
+    if (the_planet->getType() == tSubSubGasGiant) {
+      // Gas dwarfs / sub-Neptunes are not Sudarsky giants: use a realistic
+      // ice-giant-like Bond albedo (~0.3) regardless of cloud-class temperature,
+      // instead of the giant water-/ammonia-cloud albedos (~0.8) that made them
+      // absurdly cold. See SUB_NEPTUNE_ALBEDO in const.h for references.
+      new_albedo = about(SUB_NEPTUNE_ALBEDO, 0.1);
+    } else if (temp1 > TEMPERATURE_CARBON_GIANT) {
       new_albedo = about(CARBON_GIANT_ALBEDO, 0.1);
     } else if (temp1 > TEMPERATURE_CLASS_V) {
       new_albedo =
@@ -2094,9 +2113,8 @@ void gas_giant_temperature_albedo(planet *the_planet, long double parent_mass,
       new_albedo = about(METHANE_GIANT_ALBEDO, 0.1);
     }
     temp3 = ((new_albedo * 2.0) + temp3) / 3.0;
-    temp2 = est_temp(the_planet->getTheSun().getREcosphere(
-                         the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES),
-                     the_planet->getA(), temp3);
+    temp2 = equilibrium_temp(the_planet->getTheSun().getLuminosity(),
+                             the_planet->getA(), temp3);
     temp1 = (temp2 + (temp1 * 2.0)) / 3.0;
     the_planet->setEstimatedTemp(temp1);
     // new_radius = gas_radius(temp1, the_planet->getDustMass(),

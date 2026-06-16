@@ -182,3 +182,34 @@ TEST_CASE("eff_temp scales with distance and albedo as expected",
     // A more reflective (higher-albedo) planet absorbs less and is cooler.
     REQUIRE(eff_temp(r_ecosphere, 1.0L, 0.6L) < t_earth);
 }
+
+// ── Radiative equilibrium temperature ───────────────────────────────────────
+// equilibrium_temp(luminosity, orb_radius, albedo) is the standard
+// T_eq = T_EQ_BASE * (1-A)^(1/4) * (L/Lsun)^(1/4) / sqrt(a) — the physically
+// correct equilibrium temperature used for gas planets (no Earth-surface bias).
+TEST_CASE("equilibrium_temp matches the textbook radiative-equilibrium temperature",
+          "[enviro][temperature]") {
+    // Earth: L=1 Lsun, a=1 AU, A=0.3 -> ~255 K. (Earth's 288 K mean surface is
+    // this equilibrium temperature plus the ~33 K greenhouse effect.)
+    const long double t_earth = equilibrium_temp(1.0L, 1.0L, 0.3L);
+    REQUIRE_THAT(static_cast<double>(t_earth),
+                 WithinRel(static_cast<double>(T_EQ_BASE) * std::pow(0.7, 0.25), 1e-9));
+    REQUIRE(t_earth > 250.0L);
+    REQUIRE(t_earth < 260.0L);
+
+    // Farther out is cooler; quadrupling the distance halves it (T ~ 1/sqrt(a)).
+    REQUIRE(equilibrium_temp(1.0L, 2.0L, 0.3L) < t_earth);
+    REQUIRE_THAT(static_cast<double>(equilibrium_temp(1.0L, 4.0L, 0.3L)),
+                 WithinRel(static_cast<double>(t_earth / 2.0L), 1e-9));
+
+    // A more luminous star warms the planet; T ~ L^(1/4): 16x luminosity doubles T.
+    REQUIRE_THAT(static_cast<double>(equilibrium_temp(16.0L, 1.0L, 0.3L)),
+                 WithinRel(static_cast<double>(t_earth * 2.0L), 1e-9));
+
+    // A more reflective (higher-albedo) planet is cooler.
+    REQUIRE(equilibrium_temp(1.0L, 1.0L, 0.6L) < t_earth);
+
+    // A realistic gas-dwarf albedo at a habitable-zone distance sits below
+    // freezing — the honest equilibrium temperature (greenhouse not included).
+    REQUIRE(equilibrium_temp(1.126L, 1.16L, SUB_NEPTUNE_ALBEDO) < FREEZING_POINT_OF_WATER);
+}
