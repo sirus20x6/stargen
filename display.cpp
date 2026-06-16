@@ -1629,7 +1629,7 @@ static void html_write_system_details(std::fstream& the_file, sun& the_sun) {
 void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std::string& system_name,
                      const std::string& url_path, const std::string& system_url, const std::string& svg_url,
                      const std::string& file_name, bool details, bool terrestrials, bool int_link,
-                     bool do_moons, int graphic_format, bool do_gases) {
+                     bool do_moons, int graphic_format, bool do_gases, bool orbit_map) {
   if (!the_file) {
     throw std::runtime_error("StarGen: thumbnail output stream is not open");
   }
@@ -1691,6 +1691,34 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
   }
 
   the_file << "</td></tr>\n";
+
+  // Inline SVG "orbit map" row: the habitability scale (AU distance axis + green
+  // habitable-zone band + planets positioned by distance), placed as a row inside
+  // this same border=3 / width=90% table directly beneath the strip so the two
+  // share a section and width and read together as one scale. GIF mode only — in
+  // SVG mode the <object> above already renders the orbit map, so we skip it here
+  // to avoid a duplicate. g_sim_context.planets is set for this system by the
+  // output loop before we run.
+  if (orbit_map && graphic_format != gfSVG && !g_sim_context.planets.empty()) {
+    planet* outermost = g_sim_context.planets.back();
+    SVGScaleParams sp = calculate_svg_scale(innermost_planet, outermost);
+    sun svg_sun = innermost_planet->getTheSun();
+    the_file << "<tr><th colspan=2 bgcolor='" << BGHEADER << "' align=center>"
+             << "<font size='+1' color='" << TXHEADER
+             << "'>Orbit Map &amp; Habitable Zone</font></th></tr>\n";
+    the_file << "<tr><td colspan=2 bgcolor='" << BGSPACE << "'>\n";
+    the_file << "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100%' "
+                "preserveAspectRatio='xMidYMid meet'\n";
+    the_file << "     viewBox='-" << sp.margin << " -" << sp.margin << " "
+             << (sp.max_x + (sp.margin * 2.0)) << " " << (sp.max_y + (sp.margin * 2.0))
+             << "' style='max-height:220px'>\n";
+    svg_draw_axis(the_file, sp);
+    svg_draw_habitable_zone(the_file, svg_sun, sp);
+    svg_draw_axis_labels(the_file, sp);
+    svg_draw_planets(the_file, innermost_planet, sp);
+    the_file << "</g>\n</svg>\n";
+    the_file << "</td></tr>\n";
+  }
 
   // Write terrestrial/habitable planets table
   if (terrestrials && (terrestrials_seen || habitable_jovians_seen || potentialy_habitables_seen)) {
@@ -2252,33 +2280,9 @@ void html_describe_system(planet* innermost_planet, bool do_gases, bool do_moons
   int     moons;
   std::string  typeString;
 
-  // Inline SVG "orbit map": the habitability scale (AU distance axis + green
-  // habitable-zone band + planets positioned by distance). Brought into every
-  // HTML page, including GIF mode, rather than only -V/-S SVG output. Reuses the
-  // same SVG drawing helpers; g_sim_context.planets is set for this system by the
-  // output loop before we run.
-  if (!g_sim_context.planets.empty()) {
-    planet* outermost = g_sim_context.planets.back();
-    SVGScaleParams sp = calculate_svg_scale(innermost_planet, outermost);
-    sun svg_sun = innermost_planet->getTheSun();
-    the_file << "\n<table border=3 cellspacing=2 cellpadding=2 align=center bgcolor='" << BGTABLE
-             << "' width='90%'>\n";
-    the_file << "<tr><th bgcolor='" << BGHEADER << "' align=center>"
-             << "<font size='+2' color='" << TXHEADER
-             << "'>Orbit Map &amp; Habitable Zone</font></th></tr>\n";
-    the_file << "<tr><td bgcolor='" << BGSPACE << "'>\n";
-    the_file << "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100%' "
-                "preserveAspectRatio='xMidYMid meet'\n";
-    the_file << "     viewBox='-" << sp.margin << " -" << sp.margin << " "
-             << (sp.max_x + (sp.margin * 2.0)) << " " << (sp.max_y + (sp.margin * 2.0))
-             << "' style='max-height:220px'>\n";
-    svg_draw_axis(the_file, sp);
-    svg_draw_habitable_zone(the_file, svg_sun, sp);
-    svg_draw_axis_labels(the_file, sp);
-    svg_draw_planets(the_file, innermost_planet, sp);
-    the_file << "</g>\n</svg>\n";
-    the_file << "</td></tr></table>\n";
-  }
+  // Note: the inline SVG "orbit map" (habitability scale) is emitted by
+  // html_thumbnails as a row inside the strip table directly above, so the strip
+  // and the orbit map share one section and width and read together as a scale.
 
   the_file << "\n<table border=3 cellspacing=2 cellpadding=2 align=center bgcolor='" << BGTABLE
            << "' width='90%'>\n";

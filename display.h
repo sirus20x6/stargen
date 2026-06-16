@@ -43,7 +43,7 @@ void html_star_details_helper(std::fstream& the_file, const std::string& header,
                               long double temperature, long double age,
                               long double life, const std::string &spec_type);
 void html_thumbnails(planet *, std::fstream &, const std::string&, const std::string&, const std::string&, const std::string&,
-                     const std::string&, bool, bool, bool, bool, int, bool);
+                     const std::string&, bool, bool, bool, bool, int, bool, bool orbit_map = false);
 void html_thumbnail_totals(std::fstream &);
 void html_describe_planet(planet *, int, int, bool, const std::string&, std::fstream &);
 void html_describe_system(planet *, bool, bool, const std::string&, std::fstream &);
