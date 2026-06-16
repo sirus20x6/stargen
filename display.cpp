@@ -2219,7 +2219,7 @@ static void html_write_physical_properties(planet* the_planet, std::fstream& the
                             the_planet->getSph());
   } else {
     the_file << std::format(R"(
-<tr><th>Estimated Temperature<br><small>reflective cloud-top equilibrium; excludes greenhouse &amp; internal heat</small></th>
+<tr><th>Estimated Temperature<br><small>radiative equilibrium; excludes greenhouse &amp; internal heat</small></th>
 <td>{:.2f}&deg; K</td>
 <td>{:.2f}&deg; C Earth temperature</td></tr>
 )",

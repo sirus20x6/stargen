@@ -23,6 +23,11 @@ constexpr double EARTH_EXOSPHERE_TEMP = 1273.0; /* Units of degrees Kelvin	*/
 constexpr double SUN_MASS_IN_EARTH_MASSES = 332775.64;
 constexpr double ASTEROID_MASS_LIMIT = 0.001; /* Units of Earth Masses	*/
 constexpr double EARTH_EFFECTIVE_TEMP = 250.0; /* Units of degrees Kelvin (was 255) */
+/* Radiative-equilibrium temperature of a zero-albedo body at 1 AU from the Sun,
+ * full heat redistribution (f=1): T0 = (L_sun / (16*pi*sigma*AU^2))^(1/4) = 278.3 K.
+ * Basis for the standard equilibrium temperature T_eq = T0*(1-A)^(1/4)*(L/Lsun)^(1/4)/sqrt(a).
+ * (Cf. Earth: T0*(1-0.3)^(1/4) = 254.8 K, the textbook equilibrium temperature.) */
+constexpr double T_EQ_BASE = 278.3; /* Units of degrees Kelvin */
 constexpr double CLOUD_COVERAGE_FACTOR = 1.839E-8; /* Km2/kg					*/
 constexpr double EARTH_WATER_MASS_PER_AREA = 3.83E15; /* grams per square km*/
 constexpr double EARTH_SURF_PRES_IN_MILLIBARS = 1013.25;
@@ -68,6 +73,12 @@ constexpr double GAS_RETENTION_THRESHOLD = 6.0; /* ratio of esc vel to RMS vel *
 constexpr double ICE_ALBEDO = 0.7;
 constexpr double CLOUD_ALBEDO = 0.52;
 constexpr double GAS_GIANT_ALBEDO = 0.5; /* albedo of a gas giant	*/
+/* Bond albedo for gas dwarfs / sub-Neptunes. Anchored to the real ice giants
+ * (Neptune 0.29, Uranus 0.30) and the standard sub-Neptune modelling assumption
+ * (~0.3; e.g. K2-18b: Benneke et al. 2019); self-consistent atmospheres often give
+ * lower (hazes absorb: Blain et al. 2021; arXiv:2409.03683). Used instead of the
+ * Sudarsky *giant* class albedos (~0.8) for tSubSubGasGiant bodies. */
+constexpr double SUB_NEPTUNE_ALBEDO = 0.30;
 
 // Albedo values for various celestial body classifications
 constexpr double CLASS_I_ALBEDO = 0.57;

@@ -278,11 +278,11 @@ static auto handle_list_catalog_html_action(catalog& cat_arg) -> int {
  * @brief Handle aSizeCheck action - display type sizes and planet temperatures
  */
 static auto handle_size_check_action() -> int {
-  long double tempE = est_temp(1.0, 1.0, EARTH_ALBEDO);
-  long double tempJ = est_temp(1.0, 5.2034, GAS_GIANT_ALBEDO);
-  long double tempS = est_temp(1.0, 9.5371, GAS_GIANT_ALBEDO);
-  long double tempU = est_temp(1.0, 19.1913, GAS_GIANT_ALBEDO);
-  long double tempN = est_temp(1.0, 30.0690, GAS_GIANT_ALBEDO);
+  long double tempE = equilibrium_temp(1.0, 1.0, EARTH_ALBEDO);
+  long double tempJ = equilibrium_temp(1.0, 5.2034, GAS_GIANT_ALBEDO);
+  long double tempS = equilibrium_temp(1.0, 9.5371, GAS_GIANT_ALBEDO);
+  long double tempU = equilibrium_temp(1.0, 19.1913, GAS_GIANT_ALBEDO);
+  long double tempN = equilibrium_temp(1.0, 30.0690, GAS_GIANT_ALBEDO);
 
   std::cout << "Size of float: " << sizeof(float) << "\n";
   std::cout << "Size of doubles: " << sizeof(double) << "\n";
