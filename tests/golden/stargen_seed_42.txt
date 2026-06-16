@@ -98,18 +98,18 @@ Planet 4
    Mass:			0.70275157781690689954 Earth masses
    Surface gravity:		1.431288968348296826 Earth gees
    Surface pressure:		0.6374057465478117838 Earth atmospheres
-   Surface temperature:		10.7266597384680653915 degrees Celcius
+   Surface temperature:		10.079735045779226965 degrees Celcius
    Boiling point of water:	88.18328607380306039 degrees Celcius
    Hydrosphere percentage:	78.73600166173135274%
-   Cloud cover percentage:	43.785100508583591383%
-   Ice cover percentage:	3.141200265705741779%
+   Cloud cover percentage:	42.138122924652794025%
+   Ice cover percentage:	3.1792484788539148435%
    Equatorial radius:		5077.351779182848753 Km
    Density:			7.6606786566112598505 grams/cc
    Escape Velocity:		10.506503222525771707 Km/sec
    Molecular weight retained:	6.0255179629751864645 and above
    Surface acceleration:	1403.6149961452824548 cm/sec2
    Axial tilt:			162.12711989020007763 degrees
-   Planetary albedo:		0.2690151310106037725
+   Planetary albedo:		0.27509672837955726968
 
 
 Planet 5
