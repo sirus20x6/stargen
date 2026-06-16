@@ -1255,6 +1255,33 @@ static void describe_atmosphere_surface(std::fstream& the_file, planet* the_plan
 }
 
 /**
+ * @brief Thermal adjective (Hot/Warm/Cold/Frigid) from the planet's most
+ *        meaningful temperature.
+ *
+ * Uses the greenhouse surface temperature for worlds that have a surface, and the
+ * (reflective cloud-top) estimated temperature for gas giants/dwarfs, which have
+ * no surface. This replaces the old orbit-position-only word, which labelled a
+ * bright, cold gas dwarf "Warm" merely for sitting in the habitable zone even
+ * though its displayed Estimated Temperature was far below freezing. Note we do
+ * NOT use the equilibrium temp for rocky worlds: Earth's own equilibrium temp is
+ * ~255 K (-18 C), which would mislabel Earth-likes as "Cold".
+ */
+static auto describe_thermal_class(planet* the_planet) -> std::string {
+  long double temp_k =
+      is_gas_planet(the_planet) ? the_planet->getEstimatedTemp() : the_planet->getSurfTemp();
+  if (temp_k >= FREEZING_POINT_OF_WATER + 50.0) {
+    return "Hot ";
+  }
+  if (temp_k >= FREEZING_POINT_OF_WATER) {
+    return "Warm ";
+  }
+  if (temp_k >= FREEZING_POINT_OF_WATER - 50.0) {
+    return "Cold ";
+  }
+  return "Frigid ";
+}
+
+/**
  * @brief Describe habitability classification
  */
 static auto describe_habitability(planet* the_planet, sun& the_sun) -> std::string {
@@ -1271,7 +1298,6 @@ static auto describe_habitability(planet* the_planet, sun& the_sun) -> std::stri
     } else if (is_potentialy_habitable_extended(the_planet)) {
       result = "Potentially Habitable (Extended Definition) ";
     }
-    result += (the_planet->getA() < min_r_ecosphere ? "Hot " : "Cold ");
   } else {
     if (is_habitable(the_planet)) {
       if (is_habitable_earth_like(the_planet)) {
@@ -1294,8 +1320,10 @@ static auto describe_habitability(planet* the_planet, sun& the_sun) -> std::stri
         result = "Potentially Habitable (Extended Definition) ";
       }
     }
-    result += "Warm ";
   }
+
+  // Thermal adjective from actual temperature, not orbital position.
+  result += describe_thermal_class(the_planet);
 
   return result;
 }
@@ -2191,7 +2219,7 @@ static void html_write_physical_properties(planet* the_planet, std::fstream& the
                             the_planet->getSph());
   } else {
     the_file << std::format(R"(
-<tr><th>Estimated Temperature</th>
+<tr><th>Estimated Temperature<br><small>reflective cloud-top equilibrium; excludes greenhouse &amp; internal heat</small></th>
 <td>{:.2f}&deg; K</td>
 <td>{:.2f}&deg; C Earth temperature</td></tr>
 )",
