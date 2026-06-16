@@ -232,3 +232,29 @@ TEST_CASE("lehmer_surface_temp is Earth-like and monotone in CO2 and insolation"
     REQUIRE(lehmer_surface_temp(1.05L, 4.0e-4L) > t_earth);
     REQUIRE(lehmer_surface_temp(0.40L, 4.0e-4L) < t_earth);
 }
+
+// ── Tidal synchronization timescale (Gladman et al. 1996) ────────────────────
+// tidal_sync_time_years returns the despinning time in years; the generator
+// declares a body tidally locked when this is <= the system age.
+TEST_CASE("tidal_sync_time_years: Earth unlocked, close-in M-dwarf planet locked",
+          "[enviro][tidal]") {
+    const long double earth_mass_solar = 1.0L / SUN_MASS_IN_EARTH_MASSES;
+    const long double earth_spin = 7.29e-5L;  // rad/s (~current Earth)
+
+    // Earth around the Sun: despinning time >> the 4.5 Gyr age -> NOT locked.
+    long double t_earth = tidal_sync_time_years(1.0L, 1.0L, 6378.0L, earth_mass_solar,
+                                                earth_spin, 0.33L, TIDAL_Q_ROCKY, TIDAL_LOVE_K2_ROCKY);
+    REQUIRE(t_earth > 1.0e10L);  // > 10 Gyr
+
+    // Same planet at 0.1 AU around a 0.3 Msun M dwarf: t_sync ~ a^6/M_star^2 plunges
+    // far below any Gyr age -> synchronously rotating (locked).
+    long double t_mdwarf = tidal_sync_time_years(0.1L, 0.3L, 6378.0L, earth_mass_solar,
+                                                 earth_spin, 0.33L, TIDAL_Q_ROCKY, TIDAL_LOVE_K2_ROCKY);
+    REQUIRE(t_mdwarf < 1.0e9L);
+    REQUIRE(t_mdwarf < t_earth);
+
+    // Monotonic in distance: farther out despins far more slowly (t ~ a^6).
+    long double t_far = tidal_sync_time_years(2.0L, 1.0L, 6378.0L, earth_mass_solar,
+                                              earth_spin, 0.33L, TIDAL_Q_ROCKY, TIDAL_LOVE_K2_ROCKY);
+    REQUIRE(t_far > t_earth);
+}

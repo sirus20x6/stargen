@@ -390,6 +390,53 @@ auto period(long double separation, long double small_mass,
  * @param is_moon 
  * @return long double 
  */
+/*--------------------------------------------------------------------------*/
+/* Tidal synchronization ("despinning") timescale, Gladman et al. 1996       */
+/* (Icarus 122, 166, eq. 1) / Peale 1977 / Murray & Dermott 1999. Pure       */
+/* numeric core in CGS, returned in YEARS so it can be compared directly with */
+/* the system age. The moment of inertia is written explicitly,              */
+/* C = moi_factor * M_p * R_p^2, so the net radius dependence is R_p^-3:      */
+/*   t_sync = (4/9)(Q/k2) * a^6 * w * C / (G * M_star^2 * R_p^5)   [seconds]   */
+/* (The 4/9 prefactor is order-unity and convention-dependent; the lock       */
+/* decision spans many orders of magnitude in t_sync so it is insensitive to  */
+/* it. Sanity: Earth/Sun ~13 Gyr -> unlocked; 1 M_earth at 0.1 AU around a    */
+/* 0.3 Msun M dwarf ~1.5e5 yr -> locked.)                                     */
+/*--------------------------------------------------------------------------*/
+auto tidal_sync_time_years(long double a_au, long double m_star_solar, long double r_p_km,
+                           long double m_p_solar, long double spin_rad_s, long double moi_factor,
+                           long double q, long double k2) -> long double {
+  long double a_cm = a_au * CM_PER_AU;
+  long double m_star_g = m_star_solar * SOLAR_MASS_IN_GRAMS;
+  long double r_p_cm = r_p_km * CM_PER_KM;
+  long double m_p_g = m_p_solar * SOLAR_MASS_IN_GRAMS;
+  if (a_cm <= 0.0 || m_star_g <= 0.0 || r_p_cm <= 0.0 || m_p_g <= 0.0 || spin_rad_s <= 0.0 ||
+      k2 <= 0.0) {
+    return INCREDIBLY_LARGE_NUMBER;  // degenerate inputs cannot lock
+  }
+  long double moment_of_inertia = moi_factor * m_p_g * (r_p_cm * r_p_cm);
+  long double a6 = std::pow(a_cm, 6.0L);
+  long double r5 = std::pow(r_p_cm, 5.0L);
+  long double t_sync_sec = (4.0L / 9.0L) * (q / k2) *
+                           (a6 * spin_rad_s * moment_of_inertia) /
+                           (GRAV_CONSTANT * (m_star_g * m_star_g) * r5);
+  return t_sync_sec / SECONDS_PER_YEAR;
+}
+
+/**
+ * @brief Tidal-lock timescale (years) for a planet/moon, selecting Q/k2 by type.
+ * Wrapper over tidal_sync_time_years; pure, no globals/RNG -> determinism-safe.
+ * parent_mass is in SOLAR masses (the star for planets, the planet for moons),
+ * matching day_length's convention.
+ */
+auto tidal_lock_timescale_years(planet *the_planet, long double parent_mass, bool is_moon,
+                                long double spin_rad_s, long double moi_factor) -> long double {
+  long double a_au = is_moon ? the_planet->getMoonA() : the_planet->getA();
+  long double q = is_gas_planet(the_planet) ? TIDAL_Q_GAS : TIDAL_Q_ROCKY;
+  long double k2 = is_gas_planet(the_planet) ? TIDAL_LOVE_K2_GAS : TIDAL_LOVE_K2_ROCKY;
+  return tidal_sync_time_years(a_au, parent_mass, the_planet->getRadius(), the_planet->getMass(),
+                               spin_rad_s, moi_factor, q, k2);
+}
+
 auto day_length(planet *the_planet, long double parent_mass,
                        bool is_moon) -> long double {
   long double planetary_mass_in_grams =
@@ -448,7 +495,14 @@ auto day_length(planet *the_planet, long double parent_mass,
     day_in_hours = RADIANS_PER_ROTATION / (SECONDS_PER_HOUR * ang_velocity);
   }
 
-  if (day_in_hours >= year_in_hours || stopped) {
+  // Physically-derived tidal lock: synchronized when the Gladman et al. 1996
+  // despinning timescale is short compared with the host system age (replaces the
+  // old kinematic day>=year test). NB k2 here is the moment-of-inertia factor
+  // computed at line ~467, NOT a tidal Love number.
+  long double t_sync_years =
+      tidal_lock_timescale_years(the_planet, parent_mass, is_moon, base_angular_velocity, k2);
+
+  if (stopped || (t_sync_years <= the_planet->getTheSun().getAge())) {
     if ((the_planet->getE() > 0.1 && !is_moon) ||
         (the_planet->getMoonE() > 0.1 && is_moon)) {
       if (!is_moon) {
