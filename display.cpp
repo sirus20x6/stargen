@@ -2502,68 +2502,13 @@ void html_describe_system(planet* innermost_planet, bool do_gases, bool do_moons
                           const std::string& url_path, std::fstream& the_file) {
   performanceMonitor.recordFileOperation("html_output");
   do_gases = (flags_arg_clone & fDoGases) != 0;
-  planet* the_planet;
-  int     counter;
-  planet* moon;
-  int     moons;
-  std::string  typeString;
+  int counter;
+  int moons;
 
-  // Note: the inline SVG "orbit map" (habitability scale) is emitted by
-  // html_thumbnails as a row inside the strip table directly above, so the strip
-  // and the orbit map share one section and width and read together as a scale.
-
-  the_file << "\n<table border=3 cellspacing=2 cellpadding=2 align=center bgcolor='" << BGTABLE
-           << "' width='90%'>\n";
-  the_file << "<tr><th colspan=7 bgcolor='" << BGHEADER << "' align=center>\n";
-  the_file << "<font size='+2' color='" << TXHEADER << "'>Planetary Overview</font></th></tr>\n\n";
-  the_file << "<tr align=center>\n";
-  the_file << "\t<th>#</th><th "
-              "colspan=3>Type</th><th>Dist.</th><th>Mass</th><th>Radius</th>\n";
-  the_file << "</tr>\n";
-
-  counter = 1;
-  for (planet* the_planet : g_sim_context.planets) {
-    typeString = type_string(the_planet);
-
-    the_file << "<tr align=right>\n\t<td><a href='#" << counter << "'>" << counter
-             << "</a></td>\n\t<td align=center><img alt='" << typeString << "' src='" << escapeXmlAttr(url_path)
-             << "ref/" << image_type_string(the_planet) << "Planet.webp' width='600'></td>\n\t<td>"
-             << typeString << "</td>\n\t<td>" << toString(the_planet->getA(), 4)
-             << "  AU</td>\n\t<td>" << toString(the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES, 4)
-             << " EM</td>\n\t<td>" << toString(convert_km_to_eu(the_planet->getRadius()), 4)
-             << " ER";
-    if (is_gas_planet(the_planet)) {
-      the_file << " (" << toString(the_planet->getRadius() / KM_JUPITER_RADIUS, 4) << " JR)";
-    }
-    the_file << "</td></tr>\n";
-
-    if (do_moons && !the_planet->moons.empty()) {
-      moons = 1;
-      for (planet* moon : the_planet->moons) {
-        typeString = type_string(moon);
-
-        the_file << "<tr align=right>\n";
-        the_file << "\n";
-        the_file << "\t<td align=center><a href='#" << counter << "." << moons << "'>" << counter
-                 << "." << moons << "</a></td>\n";
-        the_file << "\t<td align=center><img alt='" << typeString << "' src='" << escapeXmlAttr(url_path) << "ref/"
-                 << image_type_string(moon) << "Planet.webp' width='400'></td>\n";
-        the_file << "\t<td>" << typeString << "</td>\n";
-        the_file << "\t<td>" << toString(moon->getMoonA() * KM_PER_AU, 4) << " km</td>\n";
-        the_file << "\t<td>" << toString(moon->getMass() * SUN_MASS_IN_EARTH_MASSES, 4)
-                 << " EM</td>\n";
-        the_file << "\t<td>" << toString(convert_km_to_eu(moon->getRadius()), 4) << " ER";
-        if (is_gas_planet(moon)) {
-          the_file << " (" << toString(moon->getRadius() / KM_JUPITER_RADIUS, 4) << " JR)";
-        }
-        the_file << "</td>";
-        the_file << "</tr>\n";
-        moons++;
-      }
-    }
-    counter++;
-  }
-  the_file << "</table>\n<br clear=all>\n";
+  // The system overview (planet icon strip + orbit map / habitable-zone scale) is
+  // emitted by html_thumbnails above; here we emit only the per-planet detail
+  // tables. (The old "Planetary Overview" summary table was removed as redundant
+  // with that figure.)
 
   // Tables for individual planets
   counter = 1;
