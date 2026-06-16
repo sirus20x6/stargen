@@ -19,6 +19,7 @@
 #undef PI  // raylib defines PI as a float macro; StarGen uses a constexpr double PI (const.h)
 #include "stargen.h"
 #include "const.h"
+#include "utils.h"      // set_active_random_context
 #include "AccretionRecorder.h"
 #include <algorithm>
 #include "StarGenerator.h"
@@ -110,6 +111,14 @@ planet* generateSystem(StarGenerator& gen, accrete& acc, sun& the_sun, long seed
     the_sun.setLuminosity(1.0);
 
     acc.setRandomContext(&gen.random_context);
+    // Route the free RNG functions (random_number/randf/... in utils.cpp) through
+    // the seeded context. Without this they fall back to the GLOBAL g_generator
+    // context, which the viewer never seeds -> the same seed produced a different
+    // planet count every run. Mirrors the generation worker path (stargen.cpp).
+    set_active_random_context(&gen.random_context);
+    // Populate this thread's thread_local gas-radius interpolation tables (the
+    // viewer's main() never called initRadii(); guarded, so this is a one-time cost).
+    initRadii();
 
     generate_stellar_system(&gen, the_sun, false, nullptr, "S",
                            0, "Viewer System", 0.0, 0.0,
@@ -329,7 +338,18 @@ void playFormation(const AccretionRecorder& rec, ViewState& view) {
     if (n == 0) {
         return;
     }
-    const float duration = 12.0f;  // seconds to scrub the whole formation
+
+    // Advance frame-by-frame at a fixed dwell rate (recorded frames per second)
+    // rather than scrubbing a whole timeline into a fixed wall-clock duration.
+    // The per-tick advance is CAPPED at 1.0 frame, so floor(framePos) increases
+    // by at most 1 each render tick -- every recorded step is displayed for at
+    // least one frame and NONE is ever skipped, even on a render hitch or for a
+    // system with more steps than the render budget. Total play time scales with
+    // the number of steps (n / formationFps seconds).
+    float formationFps = 18.0f;  // adjustable with +/- ; clamped < 60 below
+    double framePos = 0.0;
+    bool paused = false;
+    float wallClock = 0.0f;  // always-advancing clock for the cosmetic orbital drift
 
     // Auto-fit zoom to the initial dust disk / widest orbit.
     double maxR = 1.0;
@@ -338,16 +358,31 @@ void playFormation(const AccretionRecorder& rec, ViewState& view) {
         for (const auto& bd : f.bodies) maxR = std::max(maxR, bd.a * (1.0 + bd.e));
     view.zoom = static_cast<float>((SCREEN_HEIGHT * 0.42) / std::max(1.0, maxR));
 
-    float elapsed = 0.0f;
     while (!WindowShouldClose()) {
-        elapsed += GetFrameTime();
+        const float dt = GetFrameTime();
+        wallClock += dt;
         if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER)) break;  // skip to orbits
-        if (IsKeyPressed(KEY_R)) elapsed = 0.0f;                        // replay
+        if (IsKeyPressed(KEY_R)) framePos = 0.0;                        // replay
+        if (IsKeyPressed(KEY_P)) paused = !paused;                      // pause/resume
+        // Speed control (kept < 60 fps so the per-tick advance stays < 1 frame).
+        if (IsKeyPressed(KEY_EQUAL) || IsKeyPressed(KEY_KP_ADD)) formationFps = std::min(50.0f, formationFps + 4.0f);
+        if (IsKeyPressed(KEY_MINUS) || IsKeyPressed(KEY_KP_SUBTRACT)) formationFps = std::max(1.0f, formationFps - 4.0f);
+        // When paused, step exactly one frame at a time with the arrow keys.
+        if (paused) {
+            if (IsKeyPressed(KEY_RIGHT)) framePos = std::min((double)(n - 1), framePos + 1.0);
+            if (IsKeyPressed(KEY_LEFT)) framePos = std::max(0.0, framePos - 1.0);
+        }
         float wheel = GetMouseWheelMove();
         if (wheel != 0.0f) view.zoom *= (wheel > 0 ? 1.1f : 0.9f);
 
-        float t = std::min(1.0f, elapsed / duration);
-        int idx = static_cast<int>(t * (n - 1));
+        // Advance the recorded frame, capped at one frame per tick (no skipping).
+        if (!paused) {
+            double advance = static_cast<double>(formationFps) * dt;
+            if (advance > 1.0) advance = 1.0;
+            framePos = std::min(static_cast<double>(n - 1), framePos + advance);
+        }
+        int idx = std::min(n - 1, static_cast<int>(framePos));
+        const bool complete = (idx >= n - 1) && !paused;
         const AccretionFrame& f = rec.frames[idx];
         Vector2 c = {SCREEN_WIDTH / 2.0f + view.offset.x, SCREEN_HEIGHT / 2.0f + view.offset.y};
 
@@ -366,7 +401,7 @@ void playFormation(const AccretionRecorder& rec, ViewState& view) {
         DrawCircleV(c, 6.0f, Color{255, 220, 120, 255});
         // Planetesimals / embryos: position on their orbit (slow drift), size ~ mass^(1/3).
         for (const auto& bd : f.bodies) {
-            double theta = std::fmod(bd.a * 2.3999632 + elapsed * 0.3, 2.0 * PI);
+            double theta = std::fmod(bd.a * 2.3999632 + wallClock * 0.3, 2.0 * PI);
             float x = c.x + static_cast<float>(bd.a * std::cos(theta) * view.zoom);
             float y = c.y + static_cast<float>(bd.a * std::sin(theta) * view.zoom);
             double me = bd.mass * SUN_MASS_IN_EARTH_MASSES;
@@ -377,11 +412,12 @@ void playFormation(const AccretionRecorder& rec, ViewState& view) {
 
         // HUD.
         DrawText("ACCRETION / FORMATION", 20, 20, 24, YELLOW);
-        DrawText(TextFormat("step %d / %d    bodies: %d", idx + 1, n, (int)f.bodies.size()), 20, 50, 18,
-                 WHITE);
-        DrawText("SPACE/ENTER: skip to orbital view    R: replay    mouse wheel: zoom", 20,
-                 SCREEN_HEIGHT - 30, 16, GRAY);
-        if (t >= 1.0f) {
+        DrawText(TextFormat("step %d / %d    bodies: %d    %s%.0f fps", idx + 1, n,
+                            (int)f.bodies.size(), paused ? "PAUSED  " : "", formationFps),
+                 20, 50, 18, WHITE);
+        DrawText("SPACE/ENTER: orbital view   P: pause   <-/->: step (paused)   +/-: speed   R: replay   wheel: zoom",
+                 20, SCREEN_HEIGHT - 30, 16, GRAY);
+        if (complete) {
             DrawText("formation complete -- SPACE for the live orbital view", 20, 80, 18, GREEN);
         }
         EndDrawing();
