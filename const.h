@@ -154,6 +154,14 @@ constexpr double MILLIBARS_PER_BAR = 1000.00;
 
 constexpr double GRAV_CONSTANT = 6.672E-8;
 
+/* Oligarchic dynamical-stability spacing: during coalescence, two bodies whose
+ * orbital separation is below K_STABLE_HILL mutual Hill radii are dynamically
+ * unstable and merge (in addition to the Dole feeding-zone overlap test). This
+ * pushes survivors toward the observed ~10-Hill-radius oligarch spacing
+ * (Kokubo & Ida 1998/2002; Pu & Wu 2015). 0.0 disables it (legacy behavior).
+ * Calibrated against the population harness. */
+constexpr double K_STABLE_HILL = 8.0;
+
 /* Post-accretion gas-disk eccentricity damping (Cresswell & Nelson 2008,
  * A&A 482, 677). h is the disk aspect ratio H/r; the gas disperses after
  * DISK_LIFETIME_YEARS (2-5 Myr; Haisch et al. 2001, Mamajek 2009).
