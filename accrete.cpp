@@ -1,4 +1,5 @@
 #include "accrete.h"
+#include "AccretionRecorder.h"
 #include <cassert>    // for assert
 #include <cmath>      // for pow, sqrt, NAN, fabs, exp, M_PI
 #include <iostream>   // for operator<<, basic_ostream, char_traits, cerr
@@ -784,6 +785,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
   }
 
   set_initial_conditions(inner_dust, outer_dust);
+  if (recorder != nullptr) { recorder->capture(dust_bands, planet_head); }  // initial dust disk
 
   if (the_sun.getIsCircumbinary()) {
     planet_outer_bound = farthest_planet(stell_mass_ratio);
@@ -974,6 +976,9 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
                         planet_inner_bound, planet_outer_bound);
     }
     // std::cout << "test 3\n";
+    if (recorder != nullptr) {  // one frame per accretion step (formation viewer)
+      recorder->capture(dust_bands, planet_head);
+    }
   }
   ZoneScoped;
 
