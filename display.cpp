@@ -846,11 +846,13 @@ static void svg_draw_system_map(std::fstream& output, const SVGScaleParams& para
   const double view_h   = view_bottom - view_top;
 
   // Full-width, single figure. Generous height cap so it is not cramped; because
-  // everything is one SVG, clamping just scales the whole thing uniformly.
+  // everything is one SVG. No height cap: width fills the cell and the height
+  // follows from the viewBox aspect ratio (height:auto), so it spans the full
+  // page width like the old GIF overview and grows as tall as it needs.
   output << "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100%' "
             "preserveAspectRatio='xMidYMid meet'\n";
   output << "     viewBox='-" << params.margin << " " << view_top << " " << view_w << " " << view_h
-         << "' style='width:100%;max-height:380px'>\n";
+         << "' style='display:block;width:100%;height:auto'>\n";
 
   // Scale first, so icons/connectors paint on top of it.
   svg_draw_axis(output, params);
