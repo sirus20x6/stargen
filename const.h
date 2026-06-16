@@ -54,10 +54,19 @@ constexpr double MAX_HABITABLE_PRESSURE = 118 * PSI_TO_MILLIBARS;
 // atm:
 constexpr double PPM_PRSSURE = EARTH_SURF_PRES_IN_MILLIBARS / 1000000.;
 // Dole p. 18
-constexpr double MAX_F_IPP = 0.1 * PPM_PRSSURE;
-constexpr double MAX_CL_IPP = 1.0 * PPM_PRSSURE;
-constexpr double MAX_NH3_IPP = 100. * PPM_PRSSURE;
-constexpr double MAX_O3_IPP = 0.1 * PPM_PRSSURE;
+// NOTE: at runtime the breathability classifier reads the per-gas inspired-pp
+// limits from data/elements.yaml (the *_IPP macros below are documentation of
+// the values baked into that file, not read directly by enviro.cpp).
+constexpr double MAX_F_IPP = 0.1 * PPM_PRSSURE;   // NIOSH REL / OSHA PEL 0.1 ppm
+constexpr double MAX_CL_IPP = 1.0 * PPM_PRSSURE;  // OSHA PEL ceiling 1 ppm
+// Ammonia lowered from Dole's 1964 figure of 100 ppm to the modern NIOSH REL
+// (TWA 25 ppm; OSHA PEL 50 ppm; IDLH 300 ppm). 100 ppm is acutely irritating
+// and not indefinitely breathable. (NIOSH Pocket Guide, npgd0028.)
+constexpr double MAX_NH3_IPP = 25. * PPM_PRSSURE;
+constexpr double MAX_O3_IPP = 0.1 * PPM_PRSSURE;  // NIOSH ceiling / OSHA PEL 0.1 ppm
+// Methane's limit is its 5% lower explosive limit (50000 ppm), NOT a toxicity
+// threshold -- it is a simple asphyxiant/flammable gas with no PEL. The
+// breathability classifier treats an excess as UNBREATHABLE, not POISONOUS.
 constexpr double MAX_CH4_IPP = 50000. * PPM_PRSSURE;
 constexpr double EARTH_CONVECTION_FACTOR = 0.43;
 

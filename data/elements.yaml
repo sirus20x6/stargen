@@ -108,7 +108,7 @@
   abund_e: 1.99526e-05
   abund_s: 3.13329
   reactivity: 0
-  max_inspired_pp: 3106.391184210526 # MAX_N2_IPP
+  max_inspired_pp: 3106.411184210526 # MAX_N2_IPP (2330 mmHg; was 3106.3912 typo)
   min_inspired_pp: 13.332236842105263 # MIN_N2_IPP
 - atomic_number: 8
   symbol: O # Assuming atomic oxygen for symbol, html_symbol is O2
@@ -1900,7 +1900,7 @@
   abund_e: 0.002
   abund_s: 0.001
   reactivity: 1
-  max_inspired_pp: 0.101325 # MAX_NH3_IPP
+  max_inspired_pp: 0.02533125 # MAX_NH3_IPP (25 ppm, NIOSH REL; was 100 ppm)
   min_inspired_pp: 0.0
 - atomic_number: 901
   symbol: H2O
