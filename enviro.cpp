@@ -1205,7 +1205,7 @@ long double opacity(long double molecular_weight, long double surf_pressure, lon
 auto gas_life(long double molecular_weight, planet *the_planet) -> long double {
   long double v = rms_vel(molecular_weight, the_planet->getExosphericTemp());
   long double g = the_planet->getSurfGrav() * EARTH_ACCELERATION;
-  long double r = the_planet->getRadius() * CM_PER_KM;
+  long double r = sgu::km_to_cm(the_planet->getRadius());
   long double t =
       (pow3(v) / (2.0 * pow2(g) * r)) * exp((3.0 * g * r) / pow2(v));
   long double years = t / (SECONDS_PER_HOUR * 24.0 * DAYS_IN_A_YEAR);
@@ -2922,7 +2922,7 @@ auto calcOblateness(planet *the_planet) -> long double {
                                (mass_in_eu * std::pow(the_planet->getDay(), 2.0)));
   } else {
     planetary_mass_in_grams = the_planet->getMass() * SOLAR_MASS_IN_GRAMS;
-    equatorial_radius_in_cm = the_planet->getRadius() * CM_PER_KM;
+    equatorial_radius_in_cm = sgu::km_to_cm(the_planet->getRadius());
     k2 = calculate_moment_of_inertia_coeffient(the_planet);
     if (the_planet->getDay() == 0) {
       // Day length not yet calculated - return 0 oblateness as placeholder
@@ -3004,7 +3004,7 @@ auto calcEsiComponents(planet *the_planet) -> EsiComponents {
   return {
       calcEsiHelper(convert_km_to_eu(the_planet->getRadius()), 1.0, 0.57),
       calcEsiHelper(the_planet->getDensity() / EARTH_DENSITY, 1.0, 1.07),
-      calcEsiHelper((the_planet->getEscVelocity() / CM_PER_KM) / 11.186, 1.0, 0.70),
+      calcEsiHelper((sgu::cm_to_km(the_planet->getEscVelocity())) / 11.186, 1.0, 0.70),
       calcEsiHelper(the_planet->getSurfTemp(), EARTH_AVERAGE_KELVIN, 5.58)};
 }
 
