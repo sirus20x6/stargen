@@ -226,6 +226,7 @@ target_compile_definitions(stargen_core PUBLIC ${STARGEN_TRACY_DEFINES})
 target_include_directories(stargen_core PUBLIC
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/tracy
+    ${CMAKE_SOURCE_DIR}/third_party   # vendored Aurora "au" units library (au/au.hh)
 )
 target_link_libraries(stargen_core PUBLIC
     TracyClient                     # Links the Tracy library and sets up its include paths.
