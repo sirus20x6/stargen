@@ -94,7 +94,12 @@ constexpr double EARTH_ALBEDO = 0.3;
 constexpr double GREENHOUSE_TRIGGER_ALBEDO = 0.20;
 constexpr double ROCKY_ALBEDO = 0.15;
 constexpr double ROCKY_AIRLESS_ALBEDO = 0.07;
-constexpr double WATER_ALBEDO = 0.04;
+/* Bond albedo of open ocean. Earth's seawater reflects ~0.06 of incident
+ * sunlight in the broadband (diffuse ~0.05-0.08, rising at grazing incidence);
+ * the prior 0.04 sat below the observed range and slightly over-cooled water
+ * worlds. (Cf. Earth ocean albedo ~0.06; Pierrehumbert, Principles of Planetary
+ * Climate 2010.) */
+constexpr double WATER_ALBEDO = 0.06;
 
 // Temperature constants for various celestial bodies
 constexpr double TEMPERATURE_NEPTUNE = 48.1;
