@@ -529,7 +529,15 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
       dist2 = (the_planet->getA() * (1.0 + the_planet->getE()) * (1.0 + reduced_mass)) - the_planet->getA();
     }
 
-    if (fabs(diff) <= fabs(dist1) || fabs(diff) <= fabs(dist2)) {
+    // Dynamical-stability (oligarchic) merge: bodies separated by fewer than
+    // K_STABLE_HILL mutual Hill radii are unstable and collide, on top of the
+    // Dole feeding-zone overlap test. Masses are in solar units with the star
+    // implicitly ~1 Msun (matching reduced_mass above), exact for a 1-Msun star.
+    long double mutual_hill =
+        ((the_planet->getA() + a) / 2.0) * std::cbrt((the_planet->getMass() + mass) / 3.0);
+
+    if (fabs(diff) <= fabs(dist1) || fabs(diff) <= fabs(dist2) ||
+        (K_STABLE_HILL > 0.0 && fabs(diff) <= K_STABLE_HILL * mutual_hill)) {
       long double new_dust = 0;
       long double new_gas = 0;
       long double new_a =
