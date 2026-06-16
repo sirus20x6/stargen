@@ -50,6 +50,28 @@ constexpr auto atmospheres = au::QuantityMaker<Atmospheres>{};
 struct Dynes : decltype(au::Newtons{} / au::mag<100000>()) {};
 constexpr auto dynes = au::QuantityMaker<Dynes>{};
 
+// ---- exact length conversions ----------------------------------------------
+// Thin wrappers that route StarGen's exact length conversions through au, so the
+// factors live in one tested place and each conversion is dimensionally checked.
+// All factors are integers / exact powers of ten, so these are BYTE-IDENTICAL to
+// the corresponding const.h literal multiplies (CM_PER_AU, CM_PER_KM,
+// CM_PER_METER, KM_PER_AU) -- pinned in units_test. Long double in/out keeps the
+// legacy call sites unchanged (no signature cascade).
+inline long double au_to_cm(long double au_val) {
+    return au::astronomical_units(au_val).in(centimeters);
+}
+// NOTE: au_to_km is NOT byte-identical to StarGen's KM_PER_AU (= CM_PER_AU /
+// CM_PER_KM): au collapses the exact 1495978707/10 magnitude while StarGen
+// divides two literals, and they round ~1 ULP apart. Use only where a deliberate
+// golden rebaseline is acceptable (verified in units_test).
+inline long double au_to_km(long double au_val) {
+    return au::astronomical_units(au_val).in(kilometers);
+}
+inline long double km_to_cm(long double km) { return kilometers(km).in(centimeters); }
+inline long double cm_to_km(long double cm) { return centimeters(cm).in(kilometers); }
+inline long double m_to_cm(long double m) { return au::meters(m).in(centimeters); }
+inline long double cm_to_m(long double cm) { return centimeters(cm).in(au::meters); }
+
 }  // namespace sgu
 
 #endif  // STARGEN_UNITS_H

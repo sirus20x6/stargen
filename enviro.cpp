@@ -11,6 +11,7 @@
 #include <numbers>                 // for std::numbers::pi (portable replacement for M_PI)
 #include <functional>
 #include "const.h"                 // for SUN_MASS_IN_EARTH_MASSES, AVE, pow2
+#include "units.hh"                // au-backed exact length conversions (sgu::)
 #include "elements.h"              // for gases
 #include "gas_radius_helpers.h"    // for mini_neptune_radius, gas_dwarf_radius
 #include "radius_tables.h"         // for solid_rock, solid_half_rock_half_iron
@@ -307,7 +308,7 @@ auto volume_radius(long double mass, long double density) -> long double {
 
   mass = mass * SOLAR_MASS_IN_GRAMS;
   volume = mass / density;
-  return std::pow((3.0 * volume) / (4.0 * PI), (1.0 / 3.0)) / CM_PER_KM;
+  return sgu::cm_to_km(std::pow((3.0 * volume) / (4.0 * PI), (1.0 / 3.0)));
 }
 
 /**
@@ -345,7 +346,7 @@ auto volume_density(long double mass, long double equat_radius) -> long double {
   long double volume = NAN;
 
   mass = mass * SOLAR_MASS_IN_GRAMS;
-  equat_radius = equat_radius * CM_PER_KM;
+  equat_radius = sgu::km_to_cm(equat_radius);
   volume = (4.0 * PI * pow3(equat_radius)) / 3.0;
   return mass / volume;
 }
@@ -405,9 +406,9 @@ auto period(long double separation, long double small_mass,
 auto tidal_sync_time_years(long double a_au, long double m_star_solar, long double r_p_km,
                            long double m_p_solar, long double spin_rad_s, long double moi_factor,
                            long double q, long double k2) -> long double {
-  long double a_cm = a_au * CM_PER_AU;
+  long double a_cm = sgu::au_to_cm(a_au);
   long double m_star_g = m_star_solar * SOLAR_MASS_IN_GRAMS;
-  long double r_p_cm = r_p_km * CM_PER_KM;
+  long double r_p_cm = sgu::km_to_cm(r_p_km);
   long double m_p_g = m_p_solar * SOLAR_MASS_IN_GRAMS;
   if (a_cm <= 0.0 || m_star_g <= 0.0 || r_p_cm <= 0.0 || m_p_g <= 0.0 || spin_rad_s <= 0.0 ||
       k2 <= 0.0) {
@@ -488,7 +489,7 @@ auto day_length(planet *the_planet, long double parent_mass,
                        bool is_moon) -> long double {
   long double planetary_mass_in_grams =
       the_planet->getMass() * SOLAR_MASS_IN_GRAMS;
-  long double equatorial_radius_in_cm = the_planet->getRadius() * CM_PER_KM;
+  long double equatorial_radius_in_cm = sgu::km_to_cm(the_planet->getRadius());
   long double year_in_hours = the_planet->getOrbPeriod() * 24.0;
   // bool giant; maybe this used to be used
   //bool giant = the_planet->getType() == tGasGiant || the_planet->getType() == tBrownDwarf || the_planet->getType() == tSubGasGiant || the_planet->getType() == tSubSubGasGiant;
@@ -616,7 +617,7 @@ auto escape_vel(long double mass, long double radius) -> long double {
   long double mass_in_grams = NAN, radius_in_cm = NAN;
 
   mass_in_grams = mass * SOLAR_MASS_IN_GRAMS;
-  radius_in_cm = radius * CM_PER_KM;
+  radius_in_cm = sgu::km_to_cm(radius);
   return sqrt(2.0 * GRAV_CONSTANT * mass_in_grams / radius_in_cm);
 }
 
@@ -628,8 +629,8 @@ auto escape_vel(long double mass, long double radius) -> long double {
 /*------------------------------------------------------------------------*/
 
 auto rms_vel(long double molecular_weight, long double exospheric_temp) -> long double {
-  return sqrt((3.0 * MOLAR_GAS_CONST * exospheric_temp) / molecular_weight) *
-         CM_PER_METER;
+  return sgu::m_to_cm(
+      sqrt((3.0 * MOLAR_GAS_CONST * exospheric_temp) / molecular_weight));
 }
 
 auto min_molec_weight(planet *the_planet) -> long double {
@@ -689,7 +690,7 @@ auto molecule_limit(long double mass, long double equat_radius,
   long double esc_velocity = escape_vel(mass, equat_radius);
 
   return (3.0 * MOLAR_GAS_CONST * exospheric_temp) /
-         (pow2((esc_velocity / GAS_RETENTION_THRESHOLD) / CM_PER_METER));
+         (pow2(sgu::cm_to_m(esc_velocity / GAS_RETENTION_THRESHOLD)));
 }
 
 /*----------------------------------------------------------------------*/
@@ -700,7 +701,7 @@ auto molecule_limit(long double mass, long double equat_radius,
 
 auto acceleration(long double mass, long double radius) -> long double {
   return GRAV_CONSTANT * (mass * SOLAR_MASS_IN_GRAMS) /
-         pow2(radius * CM_PER_KM);
+         pow2(sgu::km_to_cm(radius));
 }
 
 auto acceleration(planet *the_planet) -> long double {
@@ -3537,6 +3538,9 @@ auto convert_su_to_eu(long double mass) -> long double {
   return mass * SUN_MASS_IN_EARTH_MASSES;
 }
 
+// NOTE: kept as the literal multiply (not sgu::au_to_km) -- au's AU->km factor
+// differs from KM_PER_AU (= CM_PER_AU/CM_PER_KM) by ~1 ULP, so switching here
+// would not be byte-identical (a deliberate rebaseline, deferred). See units_test.
 auto convert_au_to_km(long double au) -> long double { return au * KM_PER_AU; }
 
 auto is_potentialy_habitable_conservative_size(planet *the_planet) -> bool {
