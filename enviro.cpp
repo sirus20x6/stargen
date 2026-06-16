@@ -437,6 +437,53 @@ auto tidal_lock_timescale_years(planet *the_planet, long double parent_mass, boo
                                spin_rad_s, moi_factor, q, k2);
 }
 
+/*--------------------------------------------------------------------------*/
+/* Post-accretion gas-disk eccentricity damping (Cresswell & Nelson 2008,    */
+/* A&A 482, 677; parameterizing Tanaka & Ward 2004). All in solar/AU/year     */
+/* units, so Omega_K and the disk lifetime are dimensionless-consistent and   */
+/* no new unit constants are needed. Returns the damped eccentricity. Pure    */
+/* (no RNG, no globals) -> determinism-safe. Inclination is intentionally NOT */
+/* damped here: it is assigned later in generate_planet, so it is zero at this */
+/* stage (the iota terms vanish).                                             */
+/*--------------------------------------------------------------------------*/
+auto gas_disk_damped_eccentricity(long double e, long double a_au, long double m_p_solar,
+                                  long double m_star_solar) -> long double {
+  if (e <= 0.0 || a_au <= 0.0 || m_p_solar <= 0.0 || m_star_solar <= 0.0) {
+    return e;
+  }
+  long double h = DISK_ASPECT_RATIO;
+  long double sigma = DISK_SIGMA0_SOLAR_PER_AU2 * std::pow(a_au, -1.5L);  // solar / AU^2
+  long double p_yr = std::sqrt((a_au * a_au * a_au) / (m_star_solar + m_p_solar));  // Kepler III
+  long double omega_k = (2.0L * PI) / p_yr;                                          // rad/yr
+  long double t_wave =
+      (m_star_solar / m_p_solar) * (m_star_solar / (sigma * a_au * a_au)) *
+      (h * h * h * h) / omega_k;  // Tanaka & Ward wave time, years
+  long double eps = e / h;
+  long double bracket = 1.0L - 0.14L * (eps * eps) + 0.06L * (eps * eps * eps);
+  if (bracket < DISK_DAMP_BRACKET_FLOOR) {
+    bracket = DISK_DAMP_BRACKET_FLOOR;  // never anti-damp at e >> h
+  }
+  long double t_e = (t_wave / 0.780L) * bracket;
+  if (t_e <= 0.0) {
+    return e;
+  }
+  return e * std::exp(-DISK_LIFETIME_YEARS / t_e);
+}
+
+/**
+ * @brief Apply one post-accretion gas-disk eccentricity-damping pass over the
+ * whole planet list (Cresswell & Nelson 2008). Called once after accretion,
+ * before per-planet environment generation. Pure arithmetic, adds no RNG draws,
+ * so it leaves the rest of the population (masses, distances, compositions)
+ * byte-identical and preserves parallel/serial determinism.
+ */
+void apply_gas_disk_damping(sun &the_sun, planet *innermost) {
+  long double m_star = the_sun.getIsCircumbinary() ? the_sun.getCombinedMass() : the_sun.getMass();
+  for (planet *p = innermost; p != nullptr; p = p->next_planet) {
+    p->setE(gas_disk_damped_eccentricity(p->getE(), p->getA(), p->getMass(), m_star));
+  }
+}
+
 auto day_length(planet *the_planet, long double parent_mass,
                        bool is_moon) -> long double {
   long double planetary_mass_in_grams =

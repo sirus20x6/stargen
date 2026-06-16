@@ -133,6 +133,21 @@ constexpr double MILLIBARS_PER_BAR = 1000.00;
 
 constexpr double GRAV_CONSTANT = 6.672E-8;
 
+/* Post-accretion gas-disk eccentricity damping (Cresswell & Nelson 2008,
+ * A&A 482, 677). h is the disk aspect ratio H/r; the gas disperses after
+ * DISK_LIFETIME_YEARS (2-5 Myr; Haisch et al. 2001, Mamajek 2009).
+ * DISK_SIGMA0 is an EFFECTIVE normalization of the C&N damping functional form,
+ * calibrated so the post-damping eccentricity dispersion matches the observed
+ * value (sigma_e ~ 0.04-0.06; Xie et al. 2016, Van Eylen et al. 2019). It is
+ * NOT a literal disk surface density: real Type-I gas damping is far stronger,
+ * and the observed residual eccentricity is set by post-dispersal dynamics that
+ * StarGen does not model. DISK_DAMP_BRACKET_FLOOR keeps the C&N bracket positive
+ * for e >> h (slow damping) rather than letting it anti-damp. */
+constexpr double DISK_ASPECT_RATIO         = 0.04;
+constexpr double DISK_LIFETIME_YEARS       = 3.0E6;
+constexpr double DISK_SIGMA0_SOLAR_PER_AU2 = 1.0E-6;
+constexpr double DISK_DAMP_BRACKET_FLOOR   = 0.10;
+
 // SI-unit physical constants used by the enviro.cpp acceleration helpers. These
 // are the EXACT values those functions previously redefined locally, kept
 // verbatim so generated output stays byte-identical. They intentionally differ

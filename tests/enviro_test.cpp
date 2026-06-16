@@ -258,3 +258,26 @@ TEST_CASE("tidal_sync_time_years: Earth unlocked, close-in M-dwarf planet locked
                                               earth_spin, 0.33L, TIDAL_Q_ROCKY, TIDAL_LOVE_K2_ROCKY);
     REQUIRE(t_far > t_earth);
 }
+
+// ── Gas-disk eccentricity damping (Cresswell & Nelson 2008) ──────────────────
+// gas_disk_damped_eccentricity multiplies e by exp(-dt/t_e); circular orbits
+// stay circular, and damping is stronger (more reduction) closer to the star.
+TEST_CASE("gas_disk_damped_eccentricity reduces e deterministically",
+          "[enviro][damping]") {
+    const long double earth_mass_solar = 1.0L / SUN_MASS_IN_EARTH_MASSES;
+    const long double e0 = 0.10L;
+
+    long double e1 = gas_disk_damped_eccentricity(e0, 1.0L, earth_mass_solar, 1.0L);
+    REQUIRE(e1 < e0);    // damping reduces eccentricity
+    REQUIRE(e1 >= 0.0L);
+
+    // Pure / deterministic: identical inputs -> identical output.
+    REQUIRE(gas_disk_damped_eccentricity(e0, 1.0L, earth_mass_solar, 1.0L) == e1);
+
+    // A circular orbit stays exactly circular.
+    REQUIRE(gas_disk_damped_eccentricity(0.0L, 1.0L, earth_mass_solar, 1.0L) == 0.0L);
+
+    // t_wave ~ a, so a closer-in planet damps at least as hard -> smaller e.
+    long double e_close = gas_disk_damped_eccentricity(e0, 0.3L, earth_mass_solar, 1.0L);
+    REQUIRE(e_close <= e1);
+}
