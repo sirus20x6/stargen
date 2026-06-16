@@ -14,8 +14,8 @@
  * - OrbitalState = dynamic runtime position (calculated each frame)
  */
 struct OrbitalState {
-    Vector3 position;           // Current 3D position (AU)
-    Vector3 velocity;           // Current 3D velocity (AU/year)
+    Vec3 position;           // Current 3D position (AU)
+    Vec3 velocity;           // Current 3D velocity (AU/year)
     double mean_anomaly;        // Current mean anomaly (radians)
     double last_update_time;    // Last simulation time (years)
 
@@ -46,7 +46,7 @@ struct OrbitalState {
  *
  *   while (running) {
  *       sim.advance(delta_time);                    // ← Calculate positions
- *       Vector3 pos = sim.getPosition(planet);      // ← Get current position
+ *       Vec3 pos = sim.getPosition(planet);      // ← Get current position
  *       renderer.drawPlanet(planet, pos);           // ← Render
  *   }
  *
@@ -93,7 +93,7 @@ public:
      * @param p Planet to query (non-const as planet getters aren't const)
      * @return Position in AU (sun at origin)
      */
-    Vector3 getPosition(planet* p) const;
+    Vec3 getPosition(planet* p) const;
 
     /**
      * @brief Get current 3D velocity of a planet
@@ -101,7 +101,7 @@ public:
      * @param p Planet to query (non-const as planet getters aren't const)
      * @return Velocity in AU/year
      */
-    Vector3 getVelocity(planet* p) const;
+    Vec3 getVelocity(planet* p) const;
 
     /**
      * @brief Get current simulation time

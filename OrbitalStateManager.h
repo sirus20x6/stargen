@@ -34,7 +34,7 @@
  * while (running) {
  *     manager.update(delta_time);  // Update all systems
  *
- *     Vector3 earth_pos = manager.getPosition("Sol", earth_planet);
+ *     Vec3 earth_pos = manager.getPosition("Sol", earth_planet);
  *     // ... render ...
  * }
  * ```
@@ -122,7 +122,7 @@ public:
      * @param p Planet to query
      * @return Position in AU (sun at origin), or (0,0,0) if not found
      */
-    Vector3 getPosition(const SystemID& system_id, planet* p) const;
+    Vec3 getPosition(const SystemID& system_id, planet* p) const;
 
     /**
      * @brief Get 3D velocity of a planet in a system
@@ -131,7 +131,7 @@ public:
      * @param p Planet to query
      * @return Velocity in AU/year, or (0,0,0) if not found
      */
-    Vector3 getVelocity(const SystemID& system_id, planet* p) const;
+    Vec3 getVelocity(const SystemID& system_id, planet* p) const;
 
     /**
      * @brief Get number of systems being managed
