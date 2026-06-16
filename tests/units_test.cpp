@@ -47,3 +47,30 @@ TEST_CASE("au custom units extract expected raw values", "[units]") {
                          .in(sgu::atmospheres)),
                  WithinAbs(1.0, 1e-9));
 }
+
+// The exact length-conversion helpers route through au but use integer / power-
+// of-ten factors, so they must be BYTE-IDENTICAL to StarGen's const.h literal
+// multiplies/divides. This pins the byte-identity the enviro.cpp port relies on;
+// exact == (not a tolerance) is intentional.
+TEST_CASE("au length-conversion helpers are byte-identical to const.h", "[units]") {
+    for (long double v : {0.0L, 1.0L, 0.387L, 1.523662L, 12345.678L, 9.5e8L}) {
+        REQUIRE(sgu::au_to_cm(v) == v * static_cast<long double>(CM_PER_AU));
+        REQUIRE(sgu::km_to_cm(v) == v * static_cast<long double>(CM_PER_KM));
+        REQUIRE(sgu::m_to_cm(v) == v * static_cast<long double>(CM_PER_METER));
+        REQUIRE(sgu::cm_to_km(v) == v / static_cast<long double>(CM_PER_KM));
+        REQUIRE(sgu::cm_to_m(v) == v / static_cast<long double>(CM_PER_METER));
+    }
+}
+
+// au_to_km is the lone length conversion that is NOT byte-identical to its
+// const.h counterpart (au's exact AU magnitude vs StarGen's CM_PER_AU/CM_PER_KM
+// division differ ~1 ULP). Documented as a rebaseline-only conversion; asserted
+// within a tight tolerance rather than exact.
+TEST_CASE("au_to_km matches KM_PER_AU within ~1 ULP (rebaseline-only)", "[units]") {
+    for (long double v : {1.0L, 5.203L, 9.5e8L}) {
+        REQUIRE_THAT(static_cast<double>(sgu::au_to_km(v)),
+                     WithinRel(static_cast<double>(v) *
+                                   static_cast<double>(KM_PER_AU),
+                               1e-15));
+    }
+}
