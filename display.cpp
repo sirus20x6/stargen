@@ -12,6 +12,7 @@
 #include "PerformanceMonitor.h"
 #include "SimulationContext.h"
 #include "const.h"
+#include "units.hh"   // au-backed exact length conversions (sgu::)
 #include "elements.h"
 #include "enviro.h"
 #include "stargen.h"
@@ -171,7 +172,7 @@ static void text_print_planet_details(planet* the_planet, int counter) {
   std::cout << std::format("   Equatorial radius:\t\t{} Km\n", the_planet->getRadius())
             << std::format("   Density:\t\t\t{} grams/cc\n", the_planet->getDensity())
             << std::format("   Escape Velocity:\t\t{} Km/sec\n",
-                           the_planet->getEscVelocity() / CM_PER_KM)
+                           sgu::cm_to_km(the_planet->getEscVelocity()))
             << std::format("   Molecular weight retained:\t{} and above\n",
                            the_planet->getMolecWeight())
             << std::format("   Surface acceleration:\t{} cm/sec2\n", the_planet->getSurfAccel())
@@ -2278,7 +2279,7 @@ static void html_write_physical_properties(planet* the_planet, std::fstream& the
                           convert_km_to_eu(the_planet->getPolarRadius()),
                           the_planet->getPolarRadius() / KM_JUPITER_RADIUS,
                           the_planet->getDensity(), the_planet->getDensity() / EARTH_DENSITY,
-                          the_planet->getEscVelocity() / CM_PER_KM, the_planet->getMolecWeight());
+                          sgu::cm_to_km(the_planet->getEscVelocity()), the_planet->getMolecWeight());
 
   list_molecules(the_file, the_planet->getMolecWeight());
 }
@@ -2712,7 +2713,7 @@ void print_planet_details(planet* the_planet) {
   print_detail("SPH:", the_planet->getSph());
   print_detail("ESI:", the_planet->getEsi());
   print_detail("Density:", the_planet->getDensity(), "grams/cc");
-  print_detail("Escape Velocity:", the_planet->getEscVelocity() / CM_PER_KM, "Km/sec");
+  print_detail("Escape Velocity:", sgu::cm_to_km(the_planet->getEscVelocity()), "Km/sec");
   print_detail("Surface acceleration:", the_planet->getSurfAccel(), "cm/sec2");
   print_detail("Surface gravity:", the_planet->getSurfGrav(), "Earth gees");
   print_detail("Surface temperature:", the_planet->getSurfTemp() - FREEZING_POINT_OF_WATER,

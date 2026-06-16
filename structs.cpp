@@ -6,6 +6,7 @@
 #include <utility>      // for move
 #include "c_structs.h"  // for star2
 #include "const.h"      // for pow2, KM_PER_AU, ACCURACY_FOR_PEAK, CM_PER_KM
+#include "units.hh"     // au-backed exact length conversions (sgu::)
 #include "enviro.h"     // for eff_temp_to_spec_type, luminosity_to_mass
 #include "utils.h"      // for quicksort, fix_inclination, my_strtoupper
 
@@ -1240,7 +1241,7 @@ auto planet::getOblateness() -> long double {
     result = multiplier * (pow(radius, 3.0) / (mass_in_eu * std::pow(day, 2.0)));
   } else {
     planetary_mass_in_grams = getMass() * SOLAR_MASS_IN_GRAMS;
-    equatorial_radius_in_cm = radius * CM_PER_KM;
+    equatorial_radius_in_cm = sgu::km_to_cm(radius);
     k2 = calculate_moment_of_inertia_coeffient(the_planet);
     if (day == 0) {
       // Day length not yet calculated - return 0 oblateness as placeholder
