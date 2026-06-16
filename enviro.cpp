@@ -588,11 +588,15 @@ auto inclination(long double orb_radius, long double parent_mass) -> long double
   long double obliquity = std::acos(cos_obliquity) * 180.0L / PI;  // degrees, [0,180]
 
   // Tides erode obliquity for planets close to the star (Heller et al. 2011,
-  // arXiv:1101.2156); damp toward zero inside the tidal-influence distance. A
-  // full treatment is the tidal-locking-timescale card; this keeps the prior
-  // close-in damping intent.
-  if (orb_radius < parent_mass) {
-    obliquity *= (orb_radius / parent_mass);
+  // arXiv:1101.2156); damp linearly toward zero inside the tidal-influence
+  // distance. That distance scales with stellar mass as M^(1/3) -- the same
+  // dependence as the tidal-locking critical radius -- rather than the old
+  // dimensionally-inconsistent comparison of an AU distance against a solar mass.
+  // OBLIQUITY_TIDAL_REACH_AU = 1.0 makes this identical to the prior behavior at
+  // one solar mass.
+  long double tidal_reach = OBLIQUITY_TIDAL_REACH_AU * std::cbrt(parent_mass);
+  if (tidal_reach > 0.0 && orb_radius < tidal_reach) {
+    obliquity *= (orb_radius / tidal_reach);
   }
 
   return obliquity;
@@ -1554,6 +1558,19 @@ void set_temp_range(planet *the_planet) {
   the_planet->setMinTemp(soft(wl, max, min));
 }
 
+/**
+ * @brief Spin-orbit resonance ratio for a tidally-evolved eccentric body.
+ *
+ * On an eccentric orbit the tidal equilibrium spin is not 1:1 synchronous but a
+ * higher spin-orbit resonance (e.g. Mercury's 3:2), because the tidal torque is
+ * dominated by the fast pericenter passage. This snaps the body to the nearest
+ * low-order resonance using (1-e)/(1+e) -- the ratio of the orbital angular
+ * velocity at apocenter to that at pericenter -- as the selector, and returns the
+ * resonant ratio = (rotation period)/(orbital period), i.e. the day/year factor
+ * the caller multiplies by the orbital period. Returns 1 (synchronous) at e=0.
+ *   Goldreich & Peale 1966, AJ 71, 425; Murray & Dermott 1999, Solar System
+ *   Dynamics, ch. 5. (Discretized lookup; valid for the low-e terrestrial regime.)
+ */
 auto getSpinResonanceFactor(long double eccentricity) -> long double {
   long double top = 1.0 - eccentricity;
   long double bottom = 1.0 + eccentricity;

@@ -77,6 +77,12 @@ constexpr double TIDAL_Q_ROCKY       = 12.0;
 constexpr double TIDAL_Q_GAS         = 1.0E5;
 constexpr double TIDAL_LOVE_K2_ROCKY = 0.30;
 constexpr double TIDAL_LOVE_K2_GAS   = 0.38;
+/* Characteristic distance (AU) inside which tides erode a planet's primordial
+ * obliquity, at 1 solar mass. It scales with the stellar mass as M^(1/3) -- the
+ * same dependence as the tidal-locking critical distance (t_sync ~ a^6/M^2 at
+ * fixed age => a_crit ~ M^(1/3)). (Heller et al. 2011, arXiv:1101.2156.) The
+ * value 1.0 keeps the long-standing solar-mass behavior unchanged. */
+constexpr double OBLIQUITY_TIDAL_REACH_AU = 1.0;
 //		gas_retention_threshold = 5.0;  		/* ratio of esc vel to
 //RMS vel */
 constexpr double GAS_RETENTION_THRESHOLD = 6.0; /* ratio of esc vel to RMS vel */
