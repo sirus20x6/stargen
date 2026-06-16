@@ -281,3 +281,22 @@ TEST_CASE("gas_disk_damped_eccentricity reduces e deterministically",
     long double e_close = gas_disk_damped_eccentricity(e0, 0.3L, earth_mass_solar, 1.0L);
     REQUIRE(e_close <= e1);
 }
+
+// ── Condensation composition: snow line + disk temperature ───────────────────
+TEST_CASE("snow line scales as sqrt(L); disk temp falls with distance",
+          "[enviro][composition]") {
+    // Solar snow line at the canonical 2.7 AU, scaling as sqrt(L).
+    REQUIRE_THAT(static_cast<double>(snow_line_au(1.0L)), WithinRel(2.7, 1e-9));
+    REQUIRE_THAT(static_cast<double>(snow_line_au(4.0L)), WithinRel(5.4, 1e-9));  // sqrt(4)=2
+    REQUIRE(snow_line_au(4.0L) > snow_line_au(1.0L));
+
+    // Grain temperature at the snow line is ~170 K independent of luminosity.
+    long double t_at_snow = disk_condensation_temp(1.0L, snow_line_au(1.0L));
+    REQUIRE(t_at_snow > 150.0L);
+    REQUIRE(t_at_snow < 185.0L);
+    REQUIRE_THAT(static_cast<double>(disk_condensation_temp(9.0L, snow_line_au(9.0L))),
+                 WithinRel(static_cast<double>(t_at_snow), 1e-9));  // L-independent
+
+    // Closer in is hotter.
+    REQUIRE(disk_condensation_temp(1.0L, 0.5L) > disk_condensation_temp(1.0L, 2.0L));
+}

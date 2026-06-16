@@ -2670,85 +2670,97 @@ void calculate_gases(sun &the_sun, planet *the_planet, std::string planet_id) {
   }
 }
 
-void assign_composition(planet *the_planet, sun &the_sun, bool is_moon) {
-  long double lambda = calcLambda(the_planet->getA(), the_planet->getMass());
+/*--------------------------------------------------------------------------*/
+/* Snow line (water-ice condensation distance), luminosity-scaled. The 2.7 AU */
+/* Solar-System value scales as sqrt(L) so the grain temperature at the snow  */
+/* line is ~170 K independent of L. (Hayashi 1981; canonical 2.7 AU @ 1 Lsun.)*/
+/*--------------------------------------------------------------------------*/
+auto snow_line_au(long double luminosity) -> long double {
+  long double lum = luminosity > 0.0 ? luminosity : 1.0;
+  return SNOW_LINE_AU_AT_1LSUN * std::sqrt(lum);
+}
 
-  if (lambda >= 1 ||
-      ((the_planet->getDustMass() * SUN_MASS_IN_EARTH_MASSES) > 0.005 &&
-       is_moon)) {
-    if (the_planet->getImf() == 0 && the_planet->getRmf() == 0) {
-      long double rock_max = NAN;
-      the_planet->setImf(0);
-      if (the_planet->getOrbitZone() == 2) {
-        the_planet->setImf(random_number(0, 0.5));
-      } else if (the_planet->getOrbitZone() == 3) {
-        the_planet->setImf(random_number(0, 1));
+/*--------------------------------------------------------------------------*/
+/* Disk midplane grain (condensation) temperature proxy at distance a: the    */
+/* zero-albedo radiative-equilibrium temperature. NOT the planet's later      */
+/* surface/equilibrium temperature.                                          */
+/*--------------------------------------------------------------------------*/
+auto disk_condensation_temp(long double luminosity, long double a) -> long double {
+  long double lum = luminosity > 0.0 ? luminosity : 1.0;
+  return equilibrium_temp(lum, a, 0.0);
+}
+
+/*--------------------------------------------------------------------------*/
+/* Bulk composition from the condensation sequence (replaces the old random  */
+/* zone-binned draw). Inside the snow line no water ice condenses; beyond it  */
+/* the ice mass fraction rises with distance (colder), capped at             */
+/* ICE_MAX_FRACTION. The refractory budget is split into iron and rock by the */
+/* solar Fe ratio (~0.33; Lodders 2003), with the hot inner disk iron-        */
+/* enriched as silicates fail to fully condense (Wang 2019 devolatilization). */
+/* Solar relative abundances are assumed (the star carries no Fe/Mg/Si).      */
+/* Modest per-body scatter keeps diversity. Exactly the (imf, rmf, cmf)       */
+/* triplet the radius code consumes (iron implicit = 1 - imf - rmf). RNG is   */
+/* drawn only through the existing per-body guards, in fixed order ->         */
+/* determinism-safe; the old data-dependent redraw loop is gone.             */
+/*--------------------------------------------------------------------------*/
+void assign_composition(planet *the_planet, sun &the_sun, bool is_moon) {
+  (void)is_moon;  // composition follows the body's heliocentric distance
+  long double lum = the_sun.getLuminosity();
+  long double a = the_planet->getA();
+  long double a_snow = snow_line_au(lum);
+  long double t_cond = disk_condensation_temp(lum, a);
+
+  if (the_planet->getImf() == 0 && the_planet->getRmf() == 0) {
+    long double ice_scatter = random_number(0.0, 1.0);
+    long double iron_scatter = about(1.0, COMPOSITION_SCATTER);
+
+    // Ice only beyond the snow line; fraction grows with how far beyond (colder).
+    long double f_ice = 0.0;
+    if (a > a_snow) {
+      long double cold = 1.0 - (a_snow / a);  // 0 at the snow line -> 1 far out
+      f_ice = ICE_MAX_FRACTION * cold * (0.7 + 0.6 * ice_scatter);
+      if (f_ice < 0.0) {
+        f_ice = 0.0;
       }
-      if (the_planet->getA() <
-          habitable_zone_distance(
-              the_sun, RECENT_VENUS,
-              the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES)) {
-        rock_max = 0.5;
-      } else {
-        rock_max = 1.0 - the_planet->getImf();
-      }
-      the_planet->setRmf(random_number(0, rock_max));
-    }
-    if (the_planet->getCmf() == 0) {
-      the_planet->setCmf(pow(random_number(0, 1), 8.0));
-    }
-  } else {
-    long double rand = NAN;
-    rand = random_number(0.0, 100.0);
-    if (the_planet->getOrbitZone() == 1) {
-      if (the_planet->getRmf() == 0) {
-        if (rand <= 92.9292929) {
-          the_planet->setRmf(random_number(0.2, 1));
-        } else {
-          the_planet->setRmf(random_number(0, 0.2));
-        }
-      }
-      if (the_planet->getCmf() == 0) {
-        if (rand <= 75.757575758) {
-          the_planet->setCmf(random_number(0.75, 1));
-        } else {
-          the_planet->setCmf(random_number(0, 0.75));
-        }
-      }
-    } else {
-      if (the_planet->getImf() == 0) {
-        if (rand > 99.0) {
-          the_planet->setImf(random_number(0.5, 1.0));
-        } else {
-          the_planet->setImf(
-              std::pow(random_number(0, std::pow(0.5, 1.0 / 8.0)), 1.0 / 8.0));
-        }
-      }
-      if (the_planet->getRmf() == 0) {
-        if (rand > 99) {
-          the_planet->setRmf(random_number(0.0, 1.0 - the_planet->getImf()));
-        } else if (rand <= 92) {
-          the_planet->setRmf(random_number(0.2, 1.0 - the_planet->getImf()));
-        } else {
-          the_planet->setRmf(random_number(0, 0.2));
-        }
-      }
-      if (the_planet->getCmf() == 0) {
-        if (rand > 92) {
-          the_planet->setCmf(pow(random_number(0.0, 1.0), 8.0));
-        } else if (rand <= 75) {
-          the_planet->setCmf(random_number(0.75, 1.0));
-        } else {
-          the_planet->setCmf(
-              std::pow(random_number(0.0, std::pow(0.75, 1.0 / 8.0)), 8.0));
-        }
+      if (f_ice > ICE_MAX_FRACTION) {
+        f_ice = ICE_MAX_FRACTION;
       }
     }
+
+    long double iron_frac = IRON_REFRACTORY_FRACTION * iron_scatter;
+    if (t_cond > T_SILICATE_CONDENSE) {  // hot inner disk: iron-enriched residue
+      long double devol = (t_cond - T_SILICATE_CONDENSE) / 500.0;
+      if (devol > 1.0) {
+        devol = 1.0;
+      }
+      iron_frac = iron_frac + (0.70 - iron_frac) * devol;
+    }
+    if (iron_frac < 0.05) {
+      iron_frac = 0.05;
+    }
+    if (iron_frac > 0.95) {
+      iron_frac = 0.95;
+    }
+
+    long double refractory = 1.0 - f_ice;
+    the_planet->setImf(f_ice);
+    the_planet->setRmf(refractory * (1.0 - iron_frac));  // iron implicit = refractory*iron_frac
   }
-  while ((the_planet->getImf() + the_planet->getRmf()) > 1.0) {
-    // this shouldn't happened but it sometimes does
-    long double max = 1.0 - the_planet->getImf();
-    the_planet->setRmf(random_number(0.0, max));
+
+  if (the_planet->getCmf() == 0) {
+    long double cmf = about(SOLAR_CMF, COMPOSITION_SCATTER);  // carbon-of-rock, small/solar
+    if (cmf < 0.0) {
+      cmf = 0.0;
+    }
+    if (cmf > 0.2) {
+      cmf = 0.2;
+    }
+    the_planet->setCmf(cmf);
+  }
+
+  // Deterministic clamp (replaces the old data-dependent RNG redraw loop).
+  if ((the_planet->getImf() + the_planet->getRmf()) > 1.0) {
+    the_planet->setRmf(1.0 - the_planet->getImf());
   }
 }
 

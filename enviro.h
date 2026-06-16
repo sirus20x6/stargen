@@ -81,6 +81,8 @@ void gas_giant_temperature_albedo(planet *, long double, bool);
 auto getGasGiantAlbedo(const std::string&, const std::string&, long double) -> long double;
 void calculate_gases(sun &, planet *, std::string);
 void assign_composition(planet *, sun &, bool);
+auto snow_line_au(long double luminosity) -> long double;
+auto disk_condensation_temp(long double luminosity, long double a) -> long double;
 auto is_gas_planet(planet *) -> bool;
 auto is_earth_like(planet *) -> bool;
 auto is_habitable_jovian_conservative(planet *) -> bool;
