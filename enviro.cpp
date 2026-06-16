@@ -1485,9 +1485,19 @@ auto inspired_partial_pressure(long double surf_pressure,
 /*------------------------------------------------------------------------*/
 
 auto breathability(planet *the_planet) -> unsigned int {
-  bool nitrogen_ok = false;
+  // Breathability gates on OXYGEN only. Any gas above its maximum inspired
+  // partial pressure makes the air POISONOUS (handled in the loop); oxygen must
+  // additionally sit at/above its physiological floor. CO2 and N2 are NOT
+  // required to be present: there is no minimum inhaled CO2 or N2 for
+  // respiration (the body holds alveolar pCO2 ~40 mmHg regardless of ambient
+  // CO2), so a clean, CO2-poor / N2-poor O2 atmosphere is perfectly breathable.
+  // Their only hazard is in EXCESS, which the POISONOUS check already covers.
+  // The previous code ANDed nitrogen_ok && co2_ok into BREATHABLE, which wrongly
+  // demanded a *minimum* CO2 (>=0.05 mmHg) and N2 (>=10 mmHg) and so flagged
+  // otherwise-respirable atmospheres UNBREATHABLE; classic StarGen gated on
+  // oxygen alone.
   bool oxygen_ok = false;
-  bool co2_ok = false;
+  bool methane_excess = false;
 
   if (the_planet->getNumGases() == 0) {
     return NONE;
@@ -1506,26 +1516,30 @@ auto breathability(planet *the_planet) -> unsigned int {
     }
 
     if (ipp > gases[gas_no].getMaxIpp()) {
+      // Methane's limit is its 5% lower explosive limit, not a toxicity
+      // threshold -- it is a simple asphyxiant/flammable gas with no PEL. Excess
+      // methane is UNBREATHABLE, not POISONOUS. Defer the verdict so a genuinely
+      // toxic gas over its own limit still takes POISONOUS precedence.
+      if (the_planet->getGas(i).getNum() == AN_CH4) {
+        methane_excess = true;
+        continue;
+      }
       return POISONOUS;
     }
 
-    if (the_planet->getGas(i).getNum() == AN_N) {
-      nitrogen_ok =
-          ipp >= gases[gas_no].getMinIpp() && ipp <= gases[gas_no].getMaxIpp();
-    } else if (the_planet->getGas(i).getNum() == AN_O) {
+    if (the_planet->getGas(i).getNum() == AN_O) {
       oxygen_ok =
-          ipp >= gases[gas_no].getMinIpp() && ipp <= gases[gas_no].getMaxIpp();
-    } else if (the_planet->getGas(i).getNum() == AN_CO2) {
-      co2_ok =
           ipp >= gases[gas_no].getMinIpp() && ipp <= gases[gas_no].getMaxIpp();
     }
   }
 
-  if (nitrogen_ok && oxygen_ok && co2_ok) {
-    return BREATHABLE;
-  } else {
+  if (methane_excess) {
     return UNBREATHABLE;
   }
+  if (oxygen_ok) {
+    return BREATHABLE;
+  }
+  return UNBREATHABLE;
 }
 
 void set_temp_range(planet *the_planet) {
