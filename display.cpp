@@ -770,40 +770,95 @@ static void strip_icon_image(std::fstream& output, planet* body, double cx, doub
   output << "</a>\n";
 }
 
+// Icon side lengths (in viewBox units), shared by the layout pre-pass and the
+// draw pass so the two can never diverge.
+static auto planet_icon_width(planet* p) -> double {
+  if (p->getType() == tAsteroids) {
+    return 11.0;
+  }
+  double w = sqrt(convert_km_to_eu(p->getRadius())) * 14.0;
+  if (w < 9.0) {
+    w = 9.0;
+  }
+  if (w > 40.0) {
+    w = 40.0;
+  }
+  return w;
+}
+
+static auto moon_icon_width(planet* m) -> double {
+  double mw = sqrt(convert_km_to_eu(m->getRadius())) * 18.0;
+  if (mw < 5.0) {
+    mw = 5.0;
+  }
+  if (mw > 14.0) {
+    mw = 14.0;
+  }
+  return mw;
+}
+
 /**
- * @brief Draw the planet "strip" as type icons positioned by log-distance.
+ * @brief Draw the whole system as ONE continuous SVG: type icons positioned by
+ *        log-distance, each connected straight down to its place on the AU axis,
+ *        with the habitable-zone band and distance labels in the same figure.
  *
- * Shares the SVGScaleParams x-mapping (and viewBox x-range) with the orbit map
- * drawn directly below it, so each planet's type icon sits in the same column as
- * its dot on the AU axis and the two rows read together as one distance scale.
- * Moons (when do_moons) are stacked vertically above their parent planet at the
- * same x, so they stay associated without disturbing the distance layout. The
- * strip's max-height is kept proportional to the orbit map's (same viewBox-height
- * ratio) so both SVGs render at equal width at any viewport and stay aligned.
- * Sets the three habitable-category flags so the caller can decide whether to
- * emit the terrestrials table.
+ * Because the icons and the scale live in a single coordinate system there is no
+ * separator or gap between them — a planet's icon sits directly above its tick on
+ * the axis and its eccentricity bar, and the figure reads top-to-bottom as one
+ * unit. Moons (when do_moons) stack vertically above their parent planet at the
+ * same x. Sets the three habitable-category flags so the caller can decide
+ * whether to emit the terrestrials table.
  */
-static void svg_draw_icon_strip(std::fstream& output, const SVGScaleParams& params,
+static void svg_draw_system_map(std::fstream& output, const SVGScaleParams& params,
                                 const std::string& url_path, const std::string& system_url,
                                 bool int_link, bool do_gases, bool do_moons, sun& the_sun,
                                 bool& terrestrials_seen, bool& habitable_jovians_seen,
                                 bool& potentialy_habitables_seen) {
-  const double strip_h  = 120.0;  // viewBox height (moons stack upward from the baseline)
-  const double baseline = 92.0;   // y of planet icon centers
-  const double view_w   = (double)(params.max_x + (params.margin * 2.0));
-  // Match the orbit map's max-height:220 on its 160-unit-tall viewBox so both
-  // SVGs clamp at the same container width and never diverge horizontally.
-  const double max_h    = 220.0 * strip_h / (params.max_y + (params.margin * 2.0));
+  const double view_w      = (double)(params.max_x + (params.margin * 2.0));
+  const double view_bottom = (double)(params.max_y + params.margin);  // keeps the AU labels (y=120) in view
+  const double axis_y      = (double)(params.max_y - params.margin);  // where svg_draw_axis puts the line
+  const double baseline    = 50.0;                                    // y of planet icon centers
+  const double ecc_y       = axis_y - 12.0;                           // eccentricity bars sit just above the axis
+  const double moon_gap    = 2.0;
 
+  // Pre-pass: find the highest point any icon/moon reaches so the viewBox can
+  // grow upward to fit the tallest moon stack (nothing clips) yet stay snug when
+  // there are few moons. Seed with the sun icon's top edge.
+  double min_top = baseline - 16.0;
+  for (planet* p : g_sim_context.planets) {
+    double w = planet_icon_width(p);
+    if ((baseline - (w / 2.0)) < min_top) {
+      min_top = baseline - (w / 2.0);
+    }
+    if (do_moons) {
+      double cursor = (baseline - (w / 2.0)) - 3.0;
+      for (planet* moon : p->moons) {
+        double mw  = moon_icon_width(moon);
+        double top = cursor - mw;  // top edge = (cursor - mw/2) - mw/2
+        if (top < min_top) {
+          min_top = top;
+        }
+        cursor = top - moon_gap;
+      }
+    }
+  }
+  const double view_top = min_top - 4.0;
+  const double view_h   = view_bottom - view_top;
+
+  // Full-width, single figure. Generous height cap so it is not cramped; because
+  // everything is one SVG, clamping just scales the whole thing uniformly.
   output << "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100%' "
             "preserveAspectRatio='xMidYMid meet'\n";
-  output << "     viewBox='-" << params.margin << " 0 " << view_w << " " << strip_h
-         << "' style='max-height:" << max_h << "px'>\n";
+  output << "     viewBox='-" << params.margin << " " << view_top << " " << view_w << " " << view_h
+         << "' style='width:100%;max-height:380px'>\n";
+
+  // Scale first, so icons/connectors paint on top of it.
+  svg_draw_axis(output, params);
+  svg_draw_habitable_zone(output, the_sun, params);
 
   // The sun has no log-distance position; pin it at the far left edge.
   output << "<image href='" << escapeXmlAttr(url_path) << "ref/Sun.gif' x='"
-         << (-params.margin + 2.0) << "' y='" << (baseline - 16.0)
-         << "' width='10' height='32' />\n";
+         << (-params.margin + 2.0) << "' y='" << (baseline - 16.0) << "' width='10' height='32' />\n";
 
   int counter = 1;
   for (planet* p : g_sim_context.planets) {
@@ -813,18 +868,16 @@ static void svg_draw_icon_strip(std::fstream& output, const SVGScaleParams& para
     }
 
     double x = (double)((params.offset + params.mult) + (log10(p->getA()) * params.mult));
-    double w;
-    if (p->getType() == tAsteroids) {
-      w = 11.0;
-    } else {
-      w = sqrt(convert_km_to_eu(p->getRadius())) * 14.0;
-      if (w < 9.0) {
-        w = 9.0;
-      }
-      if (w > 40.0) {
-        w = 40.0;
-      }
-    }
+    double w = planet_icon_width(p);
+
+    // Eccentricity bar + a connector from the icon straight down to the axis, so
+    // the icon and its position on the scale read as one continuous mark.
+    double x1 = (double)((params.offset + params.mult) + (log10(p->getA() * (1.0 - p->getE())) * params.mult));
+    double x2 = (double)((params.offset + params.mult) + (log10(p->getA() * (1.0 + p->getE())) * params.mult));
+    output << "<line x1='" << x1 << "' y1='" << ecc_y << "' x2='" << x2 << "' y2='" << ecc_y
+           << "' stroke='#cdd6ee' stroke-width='8' stroke-opacity='0.35' />\n";
+    output << "<line x1='" << x << "' y1='" << (baseline + (w / 2.0)) << "' x2='" << x << "' y2='" << axis_y
+           << "' stroke='#cdd6ee' stroke-width='1' stroke-opacity='0.30' />\n";
 
     std::string p_href = (int_link ? "" : escapeXmlAttr(system_url)) + "#" + std::to_string(counter);
     strip_icon_image(output, p, x, baseline, w, p_href, url_path,
@@ -840,9 +893,8 @@ static void svg_draw_icon_strip(std::fstream& output, const SVGScaleParams& para
       potentialy_habitables_seen = true;
     }
 
-    // Moons: stack upward from just above the planet icon, at the same x. Flags
-    // are accumulated for every moon; drawing stops once the stack runs out of
-    // vertical room (rather than clipping ugly partial icons off the top).
+    // Moons: stack upward from just above the planet icon, at the same x. The
+    // pre-pass already sized the viewBox so the whole stack fits without clipping.
     if (do_moons) {
       double cursor = (baseline - (w / 2.0)) - 3.0;  // top edge of planet, minus a gap
       int    midx   = 1;
@@ -857,21 +909,12 @@ static void svg_draw_icon_strip(std::fstream& output, const SVGScaleParams& para
           potentialy_habitables_seen = true;
         }
 
-        double mw = sqrt(convert_km_to_eu(moon->getRadius())) * 18.0;
-        if (mw < 5.0) {
-          mw = 5.0;
-        }
-        if (mw > 14.0) {
-          mw = 14.0;
-        }
-        double mcy = cursor - (mw / 2.0);
-        if ((mcy - (mw / 2.0)) >= 0.0) {  // fits within the viewBox top
-          std::string m_label = "#" + std::to_string(counter) + "." + std::to_string(midx);
-          std::string m_href  = (int_link ? "" : escapeXmlAttr(system_url)) + m_label;
-          strip_icon_image(output, moon, x, mcy, mw, m_href, url_path,
-                           strip_icon_title(moon, m_label));
-          cursor = (mcy - (mw / 2.0)) - 2.0;
-        }
+        double      mw      = moon_icon_width(moon);
+        double      mcy     = cursor - (mw / 2.0);
+        std::string m_label = "#" + std::to_string(counter) + "." + std::to_string(midx);
+        std::string m_href  = (int_link ? "" : escapeXmlAttr(system_url)) + m_label;
+        strip_icon_image(output, moon, x, mcy, mw, m_href, url_path, strip_icon_title(moon, m_label));
+        cursor = (mcy - (mw / 2.0)) - moon_gap;
         midx++;
       }
     }
@@ -879,7 +922,9 @@ static void svg_draw_icon_strip(std::fstream& output, const SVGScaleParams& para
     counter++;
   }
 
-  output << "</svg>\n";
+  // AU distance labels last; this opens a <g> that the closing </g> wraps.
+  svg_draw_axis_labels(output, params);
+  output << "</g>\n</svg>\n";
 }
 
 void create_svg_file(planet* innermost_planet, std::string path, std::string file_name, std::string svg_ext,
@@ -1781,15 +1826,17 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
   // Count all system objects
   SystemObjectCounts counts = count_system_objects(innermost_planet, do_moons);
 
-  // System-page path (orbit_map, GIF mode): render the strip itself as an SVG
-  // whose icons are positioned by log-distance, sharing the orbit map's x-axis so
-  // the two rows line up column-for-column and read together as one scale. SVG
-  // mode keeps the classic table strip (its <object> already carries the orbits).
+  // System-page path (orbit_map, GIF mode): render the whole system as ONE
+  // continuous, full-width SVG — type icons positioned by log-distance, each
+  // connected straight down to the AU axis and habitable-zone band, with moons
+  // stacked above their planet. No separator between "strip" and "scale": they
+  // are the same figure. SVG mode keeps the classic table strip (its <object>
+  // already carries the orbits).
   if (orbit_map && graphic_format != gfSVG && !g_sim_context.planets.empty()) {
     SVGScaleParams sp = calculate_svg_scale(innermost_planet, g_sim_context.planets.back());
 
-    the_file << "<p>\n\n<table border=3 cellspacing=2 cellpadding=2 align=center bgcolor='"
-             << BGTABLE << "' width='90%'>\n";
+    the_file << "<p>\n\n<table border=3 cellspacing=0 cellpadding=0 align=center bgcolor='"
+             << BGTABLE << "' width='100%'>\n";
     the_file << "<tr><th colspan=2 bgcolor='" << BGTABLE << "' align=center>\n\t<font size='+2' color='"
              << TXTABLE << "'>";
     if (file_name.empty()) {
@@ -1803,27 +1850,11 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
              << TXHEADER << "'><b>" << counts.planet_count << " Planets,</b> <b>" << counts.dwarf_planet_count
              << " Dwarf Planets,</b> <b>" << counts.asteroid_belt_count << " Asteroid Belts</b>, <b>"
              << counts.moon_count << " Moons</b></font>\n\t(<font size='-1' color='" << TXHEADER
-             << "'>size proportional to Sqrt(Radius); position by distance</font>)\n</td></tr>\n";
+             << "'>size proportional to Sqrt(Radius); position &amp; habitable zone by distance</font>)\n</td></tr>\n";
 
     the_file << "<tr><td colspan=2 bgcolor='" << BGSPACE << "'>\n";
-    svg_draw_icon_strip(the_file, sp, url_path, system_url, int_link, do_gases, do_moons, the_sun,
+    svg_draw_system_map(the_file, sp, url_path, system_url, int_link, do_gases, do_moons, the_sun,
                         terrestrials_seen, habitable_jovians_seen, potentialy_habitables_seen);
-    the_file << "</td></tr>\n";
-
-    the_file << "<tr><th colspan=2 bgcolor='" << BGHEADER << "' align=center>"
-             << "<font size='+1' color='" << TXHEADER
-             << "'>Orbit Map &amp; Habitable Zone</font></th></tr>\n";
-    the_file << "<tr><td colspan=2 bgcolor='" << BGSPACE << "'>\n";
-    the_file << "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100%' "
-                "preserveAspectRatio='xMidYMid meet'\n";
-    the_file << "     viewBox='-" << sp.margin << " -" << sp.margin << " "
-             << (sp.max_x + (sp.margin * 2.0)) << " " << (sp.max_y + (sp.margin * 2.0))
-             << "' style='max-height:220px'>\n";
-    svg_draw_axis(the_file, sp);
-    svg_draw_habitable_zone(the_file, the_sun, sp);
-    svg_draw_axis_labels(the_file, sp);
-    svg_draw_planets(the_file, innermost_planet, sp);
-    the_file << "</g>\n</svg>\n";
     the_file << "</td></tr>\n";
 
     if (terrestrials && (terrestrials_seen || habitable_jovians_seen || potentialy_habitables_seen)) {
