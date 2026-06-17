@@ -747,6 +747,76 @@ void accrete::coalesce_planetesimals(long double a, long double e, long double m
  * @return planet* 
  */
 
+// --- Giant migration (research/modern/11-giant-migration.md; -r only) ----------
+// Parametric inward disk migration of a giant / giant-core. Deterministic: a FIXED
+// number of draws (two) in a FIXED order from the per-system RandomContext, and an
+// ANALYTIC perihelion clamp (no rejection loops), so serial == parallel and the
+// stream is robust to threshold tweaks. Modifies a and e in place. Runs only under
+// allow_planet_migration (-r), so the default golden path never executes it.
+static void migrate_giant(long double &a, long double &e,
+                          long double total_mass_solar, long double stell_mass_ratio,
+                          long double min_distance, RandomContext *rng) {
+  const long double a_form = a;
+  const long double m_p_earth = total_mass_solar * SUN_MASS_IN_EARTH_MASSES;
+
+  // Fixed draw order (always two): available-time fraction, then ecc quantile.
+  const long double u_t = rng->randDouble(0.0L, 1.0L);
+  const long double u_e = rng->randDouble(0.0L, 1.0L);
+
+  // Inner trap: disk inner edge / magnetospheric cavity, never inside min_distance.
+  long double a_stop = MIGRATION_INNER_EDGE_AU;
+  if (a_stop < min_distance) {
+    a_stop = min_distance;
+  }
+
+  // Migration timescale (yr): viscous Type II above the gap-opening mass, faster
+  // Tanaka Type I below it; efficiency folds in the empirical rate reduction.
+  const long double gap_mass_earth =
+      MIGRATION_GAP_MASS_MJUP * JUPITER_MASS * stell_mass_ratio;
+  long double tau_yr;
+  if (m_p_earth >= gap_mass_earth) {
+    tau_yr = MIGRATION_TYPE2_NORM_YR * std::pow(a_form, 1.5L) / sqrt(stell_mass_ratio);
+  } else {
+    tau_yr = MIGRATION_TYPE1_NORM_YR / m_p_earth * std::pow(a_form / 10.0L, 25.0L / 14.0L);
+  }
+  tau_yr /= MIGRATION_EFFICIENCY;
+  if (tau_yr <= 0.0L) {
+    return;
+  }
+
+  // Available migration time = fraction of disk lifetime (early formers get the
+  // full budget). The spread carves the hot/warm/cold distribution.
+  const long double dt = u_t * DISK_LIFETIME_YEARS;
+  long double a_new = a_form * std::exp(-dt / tau_yr);
+  if (a_new < a_stop) {
+    a_new = a_stop;
+  }
+  if (a_new > a_form) {
+    a_new = a_form;  // inward only
+  }
+
+  // Eccentricity: broad Rayleigh for cold/warm giants; tidal circularization for
+  // hot orbits whose perihelion crosses the circularization locus.
+  long double e_broad = GIANT_ECC_SIGMA * sqrt(-2.0L * std::log(1.0L - u_e));
+  if (e_broad > GIANT_ECC_MAX) {
+    e_broad = GIANT_ECC_MAX;
+  }
+  long double e_new = e_broad;
+  if (a_new * (1.0L - e_broad) < MIGRATION_CIRC_AU) {
+    e_new = 0.0L;  // tides circularize hot Jupiters
+  }
+  // Analytic clamp: keep perihelion >= min_distance without a rejection loop.
+  if (a_new > 0.0L && a_new * (1.0L - e_new) < min_distance) {
+    e_new = 1.0L - (min_distance / a_new);
+    if (e_new < 0.0L) {
+      e_new = 0.0L;
+    }
+  }
+
+  a = a_new;
+  e = e_new;
+}
+
 auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
                            long double outer_dust,
                            long double outer_planet_limit,
@@ -902,45 +972,15 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
           else {
             min_distance = 0.015;
           }
-          long double new_a = 0;
-          long double new_e = 0;
-          new_a = random_number(min_distance, a);
-          new_e = random_eccentricity(ecc_coef);
-          for (int i = 0;(calcPerihelion(new_a, new_e) < min_distance) && (i < 1000); i++) {
-            new_a = random_number(min_distance, a);
-            new_e = random_eccentricity(ecc_coef);
-          }
-          if (total_mass >= ((0.7 * JUPITER_MASS) / SUN_MASS_IN_EARTH_MASSES)) {
-            if (random_ctx->randInt(14) == 0 && min_distance < 0.2) {
-              new_a = random_number(min_distance, 0.2);
-              new_e = random_eccentricity(ecc_coef);
-              for (int i = 0;(calcPerihelion(new_a, new_e) < min_distance) && (i < 1000); i++) {
-                new_a = random_number(min_distance, 0.2);
-                new_e = random_eccentricity(ecc_coef);
-              }
-            }
-            if (random_ctx->randInt(10) == 0 &&
-                calcPerihelion(new_a, 0.1) > min_distance) {
-              while (new_e < 0.1) {
-                new_e = random_eccentricity(0.25);
-                for (int i = 0;(calcPerihelion(new_a, new_e) < min_distance) && (i < 1000); i++) {
-                  new_a = random_number(min_distance, a);
-                  new_e = random_eccentricity(ecc_coef);
-                }
-              }
-            }
-          } else if (total_mass >= (2.0 / SUN_MASS_IN_EARTH_MASSES) &&
-                     total_mass <= (10.0 / SUN_MASS_IN_EARTH_MASSES) &&
-                     a >= (4.0 * sqrt(stell_luminosity_ratio)) &&
-                     (dust_mass / total_mass) >= 0.75) {
-            if (random_ctx->randInt(4) == 0) {
-              new_a = random_number(min_distance, a / 2.0);
-              new_e = random_eccentricity(ecc_coef);
-              for (int i = 0;calcPerihelion(new_a, new_e) < planet_inner_bound && i < 1000;i++) {
-                new_a = random_number(min_distance, a / 2.0);
-                new_e = random_eccentricity(ecc_coef);
-              }
-            }
+          long double new_a = a;
+          long double new_e = e;
+          // Only giants / giant-cores migrate; terrestrials stay at their
+          // formation orbit (protects the inner peas-in-a-pod architecture).
+          // See research/modern/11-giant-migration.md and migrate_giant() above.
+          if ((total_mass * SUN_MASS_IN_EARTH_MASSES) >=
+              (MIGRATION_MIN_MASS_MJUP * JUPITER_MASS)) {
+            migrate_giant(new_a, new_e, total_mass, stell_mass_ratio, min_distance,
+                          random_ctx);
           }
           a = new_a;
           e = new_e;

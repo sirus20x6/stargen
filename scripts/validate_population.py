@@ -43,7 +43,7 @@ def repo_root() -> str:
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-def generate(bin_path: str, work: str, seed: int, mass: float) -> dict | None:
+def generate(bin_path: str, work: str, seed: int, mass: float, migrate: bool = False) -> dict | None:
     """Run stargen for one seed and return the parsed system, or None on failure."""
     html = os.path.join(work, "html")
     os.makedirs(html, exist_ok=True)
@@ -56,8 +56,11 @@ def generate(bin_path: str, work: str, seed: int, mass: float) -> dict | None:
         os.remove(out)
     except FileNotFoundError:
         pass
+    argv = [bin_path, f"-s{seed}", f"-m{mass}", "-JS", "-o", "sys"]
+    if migrate:
+        argv.append("-r")  # enable giant migration (research/modern/11-giant-migration.md)
     rc = subprocess.run(
-        [bin_path, f"-s{seed}", f"-m{mass}", "-JS", "-o", "sys"],
+        argv,
         cwd=work, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
     )
     if rc.returncode != 0 or not os.path.exists(out):
@@ -311,6 +314,7 @@ def main() -> int:
     ap.add_argument("--mass", type=float, default=1.0)
     ap.add_argument("--json", action="store_true", help="emit metrics as JSON")
     ap.add_argument("--check", action="store_true", help="exit nonzero on gross-sanity violation")
+    ap.add_argument("--migrate", action="store_true", help="enable giant migration (passes -r)")
     args = ap.parse_args()
 
     if not os.path.exists(args.bin):
@@ -323,7 +327,7 @@ def main() -> int:
     systems = []
     with tempfile.TemporaryDirectory(dir=os.environ["TMPDIR"]) as work:
         for i in range(args.seeds):
-            s = generate(args.bin, work, args.seed_start + i, args.mass)
+            s = generate(args.bin, work, args.seed_start + i, args.mass, args.migrate)
             if s is not None:
                 systems.append(s)
 
