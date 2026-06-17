@@ -201,11 +201,28 @@ constexpr double MIGRATION_MIN_MASS_MJUP = 0.1;     // only bodies > 0.1 M_Jup m
 constexpr double MIGRATION_GAP_MASS_MJUP = 0.5;     // Type II gap-opening threshold (per M_star)
 constexpr double MIGRATION_TYPE1_NORM_YR = 1.1E5;   // Tanaka 2002 Type I normalization (yr)
 constexpr double MIGRATION_TYPE2_NORM_YR = 7.0E5;   // Type II viscous normalization at 1 AU (yr)
-constexpr double MIGRATION_EFFICIENCY    = 0.0001;     // overall rate multiplier (primary calibration knob)
+constexpr double MIGRATION_EFFICIENCY    = 0.0005;     // overall rate multiplier (primary calibration knob)
 constexpr double MIGRATION_INNER_EDGE_AU = 0.05;    // inner trap a_stop (disk edge / cavity)
 constexpr double MIGRATION_CIRC_AU       = 0.05;    // tidal circularization locus (hot -> e=0)
 constexpr double GIANT_ECC_SIGMA         = 0.215;   // Rayleigh sigma -> <e>~0.27 for cold giants
 constexpr double GIANT_ECC_MAX           = 0.80;    // eccentricity cap
+
+/* Metallicity-dependent giant-formation gate (default-on). StarGen's accretion
+ * forms a gas giant in ~84% of systems (crit_mass is low everywhere); the observed
+ * giant frequency is ~10-20% and rises steeply with stellar [Fe/H]. We draw a
+ * per-star [Fe/H] ~ N(mean,sigma) -- solar-neighborhood FGK metallicity distribution
+ * is ~Gaussian, mean ~0, sigma ~0.20 dex (Casagrande 2011; Nordstrom 2004) -- and
+ * accept the star as giant-capable with probability
+ *   P = NORM * (Mstar/Msun) * 10^(SLOPE*[Fe/H])   (Fischer & Valenti 2005 slope ~2.0),
+ * NORM calibrated so the population integrates to ~10-20% (closed form
+ * <P> = NORM*10^(SLOPE*mean)*exp((SLOPE*ln10)^2*sigma^2/2)). A non-giant-capable
+ * star has gas runaway suppressed (crit_mass made unreachable) -> rocky/ice cores. */
+constexpr double GIANT_METALLICITY_MEAN  = 0.0;    // dex (solar-centered FGK MDF)
+constexpr double GIANT_METALLICITY_SIGMA = 0.20;   // dex (Casagrande 2011 / Nordstrom 2004)
+constexpr double GIANT_FORMATION_NORM    = 0.10;   // calibration knob (-> ~12% integrated)
+constexpr double GIANT_FORMATION_FEH_SLOPE = 2.0;  // Fischer & Valenti 2005
+constexpr double GIANT_FORMATION_PROB_CAP = 0.90;  // cap (relation validated to [Fe/H]~+0.5)
+constexpr double GIANT_FORMATION_MASS_TURNOVER_MSUN = 2.0; // occurrence drops above ~2 Msun (Reffert 2015)
 
 // SI-unit physical constants used by the enviro.cpp acceleration helpers. These
 // are the EXACT values those functions previously redefined locally, kept
