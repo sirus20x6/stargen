@@ -30,8 +30,11 @@ using planet_type = enum planet_type {
            // positional type_counts[]/weighted-count table in stargen.cpp.
   tBrownDwarf,  // seb
   tIron,
-  tCarbon,
-  tOil
+  tCarbon,  // carbon-dominated rock (Kuchner & Seager 2005). Currently only
+            // reachable in carbon-rich (C/O>1) systems, which StarGen does not
+            // yet model -- see the carbon-rich-system note in assign_type.
+  tOil      // DEPRECATED: a non-physical "oil ocean" (originally Star-Trek-
+            // flavored); never assigned. Kept vestigial to preserve ordinals.
 };
 
 class gas;

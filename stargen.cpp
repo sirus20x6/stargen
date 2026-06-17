@@ -2708,14 +2708,12 @@ void assign_type(StarGenerator* gen, sun &the_sun, planet *the_planet, const std
         makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
     } else if (the_planet->getHydrosphere() >=
-               0.8)  // In Star Trek, any planet that is 80% covered with water,
-                     // it is considered an ocean planet
+               0.8)  // any planet >=80% covered with water is an ocean world
     {
-      if (the_planet->getCmf() >= 0.75) {
-        the_planet->setType(tOil);
-      } else {
-        the_planet->setType(tWater);
-      }
+      // (Retired the cmf>=0.75 "Oil" ocean: tOil had no planetary-science basis
+      // -- the original code cited Star Trek -- and was unreachable anyway since
+      // procedural cmf tops out near SOLAR_CMF*1.15 ~= 0.06.)
+      the_planet->setType(tWater);
       if (!second_time) {
         makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
@@ -2728,11 +2726,8 @@ void assign_type(StarGenerator* gen, sun &the_sun, planet *the_planet, const std
         makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
     } else if (the_planet->getHydrosphere() >= 0.05) {
-      if (the_planet->getCmf() >= 0.75) {
-        the_planet->setType(tOil);
-      } else {
-        the_planet->setType(tTerrestrial);
-      }
+      // (tOil retired here too -- see the ocean branch above.)
+      the_planet->setType(tTerrestrial);
       if (!second_time) {
         makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
       }
