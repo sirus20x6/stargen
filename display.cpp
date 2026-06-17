@@ -1072,6 +1072,35 @@ table[border='3']{border-collapse:separate;border-spacing:0;border:1px solid var
 td img[width='600']{width:auto;max-width:128px;height:auto;}
 font{font-style:normal;}
 center{color:var(--muted);font-size:13px;}
+/* --- Readability layer (HTML-only, value-coded) ------------------------- */
+/* Zebra + hover on the TOP-LEVEL value cells of the bordered detail tables.
+   Scoped with '>tbody>tr>td' so nested tables (temperature range, gases,
+   oblateness) and the label/header <th> cells are never touched. */
+table[border='3']>tbody>tr:nth-of-type(even)>td{background:rgba(255,255,255,.022);}
+table[border='3']>tbody>tr:hover>td{background:rgba(127,209,224,.075);}
+/* Temperature-coded headline cell: blue=frozen -> green=temperate -> red=hot.
+   !important so the tint wins over the zebra stripe on even rows. */
+.t-frozen{background:rgba(120,170,255,.20)!important;color:#e6eeff!important;}
+.t-cold{background:rgba(90,200,230,.16)!important;color:#dcf6fc!important;}
+.t-temperate{background:rgba(110,225,140,.20)!important;color:#e3ffe9!important;}
+.t-warm{background:rgba(255,190,90,.18)!important;color:#ffeccd!important;}
+.t-hot{background:rgba(255,105,75,.22)!important;color:#ffdcd3!important;}
+/* Status chips / glyphs shown under the planet type. */
+.chips{margin-top:8px;line-height:2.1;}
+.chip{display:inline-block;font-size:12px;line-height:1;padding:5px 9px;margin:0 6px 2px 0;
+  border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+  white-space:nowrap;}
+.chip-good{color:#8aeaa6;border-color:rgba(127,230,160,.45);background:rgba(127,230,160,.10);}
+.chip-warn{color:#ffce7a;border-color:rgba(255,197,107,.45);background:rgba(255,197,107,.10);}
+.chip-bad{color:#ff957a;border-color:rgba(255,138,107,.45);background:rgba(255,138,107,.10);}
+.glyph{font-style:normal;font-weight:600;}
+.poison{color:#ff957a;font-weight:600;}
+/* Potentially/▶ habitable planet: green halo + header badge. */
+table.habitable{box-shadow:0 0 0 2px rgba(127,230,160,.55),0 10px 30px rgba(0,0,0,.5)!important;}
+.badge{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.04em;
+  padding:3px 11px;margin-left:12px;border-radius:999px;vertical-align:middle;
+  color:#04230f;background:#7fe6a0;}
+.badge-maybe{color:#11210a;background:#cfe89a;}
 </style>
 )CSS";
   output << "<link rel='icon' type='image/png' href='" << escapeXmlAttr(url_path) << "ref/favicon.png'>\n";
@@ -1142,6 +1171,27 @@ static auto describe_temperature_level(long double rel_temp) -> std::string {
     default:
       return "Hot";
   }
+}
+
+// === HTML readability helpers (value-coded cells, status glyphs) ===========
+// Map an absolute temperature (Kelvin) to a CSS tier class used to tint the
+// headline temperature cell (blue=frozen -> green=temperate -> red=hot). The
+// bands bracket the liquid-water range so a temperate world reads green at a
+// glance. HTML-only; the golden TEXT output does not use this.
+static auto temp_tier_class(long double kelvin) -> const char* {
+  if (kelvin < 240.0L) {
+    return "t-frozen";
+  }
+  if (kelvin < FREEZING_POINT_OF_WATER) {
+    return "t-cold";
+  }
+  if (kelvin < 323.15L) {
+    return "t-temperate";
+  }
+  if (kelvin < 373.15L) {
+    return "t-warm";
+  }
+  return "t-hot";
 }
 
 /**
@@ -2178,12 +2228,13 @@ static void html_write_physical_properties(planet* the_planet, std::fstream& the
 <td>{:.2f} Earth atmospheres</td></tr>
 
 <tr><th>Surface temperature</th>
-<td>{:.2f}&deg; Celcius<br>{:.2f}&deg; Fahrenheit</td>
+<td class='{}'>{:.2f}&deg; Celcius<br>{:.2f}&deg; Fahrenheit</td>
 <td rowspan=2 valign=top>{:.2f}&deg; C Earth temperature<br>{:.2f}&deg; F Earth temperature
 )",
                             the_planet->getSurfAccel(), the_planet->getSurfGrav(),
                             the_planet->getSurfPressure(),
-                            the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS, celsius,
+                            the_planet->getSurfPressure() / EARTH_SURF_PRES_IN_MILLIBARS,
+                            temp_tier_class(the_planet->getSurfTemp()), celsius,
                             32.0 + (celsius * 1.8), celsius - EARTH_AVERAGE_CELSIUS,
                             (celsius - EARTH_AVERAGE_CELSIUS) * 1.8);
 
@@ -2229,9 +2280,10 @@ static void html_write_physical_properties(planet* the_planet, std::fstream& the
   } else {
     the_file << std::format(R"(
 <tr><th>Estimated Temperature<br><small>radiative equilibrium; excludes greenhouse &amp; internal heat</small></th>
-<td>{:.2f}&deg; K</td>
+<td class='{}'>{:.2f}&deg; K</td>
 <td>{:.2f}&deg; C Earth temperature</td></tr>
 )",
+                            temp_tier_class(the_planet->getEstimatedTemp()),
                             the_planet->getEstimatedTemp(),
                             the_planet->getEstimatedTemp() - EARTH_AVERAGE_KELVIN);
   }
@@ -2331,7 +2383,7 @@ static void html_write_atmospheric_gases(planet* the_planet, bool do_gases,
 )",
                                 escapeXmlText(gases[index].getName()), percentage,
                                 the_planet->getGas(i).getSurfPressure(), ipp,
-                                poisonous ? "poisonous" : "");
+                                poisonous ? "<span class='poison'>&#9888; poisonous</span>" : "");
       }
     }
     the_file << "</table>\n";
@@ -2428,18 +2480,30 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
 
   do_gases = (flags_arg_clone & fDoGases) != 0;
 
+  // Highlight a (potentially) habitable world: green halo on the card + a badge
+  // in the title row, so the standout planet pops out of the system at a glance.
+  const bool  is_hab   = is_habitable(the_planet);
+  const bool  is_phab  = !is_hab && is_potentialy_habitable(the_planet);
+  const char* tbl_class = (is_hab || is_phab) ? "habitable" : "";
+  std::string badge;
+  if (is_hab) {
+    badge = "<span class='badge'>&#127757; HABITABLE</span>";
+  } else if (is_phab) {
+    badge = "<span class='badge badge-maybe'>&#127759; POTENTIALLY HABITABLE</span>";
+  }
+
   // Write table header
   the_file << std::format(R"(
 <p>
 <a name='{0}'></a>
-<table border=3 cellspacing=2 cellpadding=2 align=center bgcolor='{1}' width='{2}%'>
+<table border=3 cellspacing=2 cellpadding=2 align=center bgcolor='{1}' width='{2}%' class='{6}'>
 <colgroup span=1 align=left valign=middle>
 <colgroup span=2 align=left valign=middle>
 <tr><th colspan=3 bgcolor='{3}' align=center>
-<font size='+2' color='{4}'>{5} #{0} Statistics</font></th></tr>
+<font size='+2' color='{4}'>{5} #{0} Statistics</font>{7}</th></tr>
 )",
                           planet_id, BGTABLE, (moons == 0) ? 95 : 90, BGHEADER, TXHEADER,
-                          (moons == 0) ? "Planet" : "Moon");
+                          (moons == 0) ? "Planet" : "Moon", tbl_class, badge);
 
   // Write planet type and image
   the_file << std::format(R"(
@@ -2448,15 +2512,39 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
 )",
                           typeString, escapeXmlAttr(url_path), image_type_string(the_planet));
 
+  // Quick-glance status chips shown under the planet type/description: spin
+  // state and air breathability. Detailed caveats (XUV, desiccation, CO2) stay
+  // in the "Habitability notes" row below to avoid duplication.
+  std::string chips;
   if ((int)the_planet->getDay() == (int)(the_planet->getOrbPeriod() * 24.0)) {
-    the_file << "<br>Tidally Locked 1 Face\n";
+    chips += "<span class='chip chip-warn'><span class='glyph'>&#128274;</span> Tidally locked</span>";
   } else if (the_planet->getResonantPeriod()) {
-    the_file << std::format("<br>Resonant Spin Locked ({} Resonance)\n",
-                            moons == 0 ? printSpinResonanceFactor(the_planet->getE())
-                                       : printSpinResonanceFactor(the_planet->getMoonE()));
+    chips += std::format(
+        "<span class='chip chip-warn'><span class='glyph'>&#128274;</span> Spin&ndash;orbit resonance ({})</span>",
+        moons == 0 ? printSpinResonanceFactor(the_planet->getE())
+                   : printSpinResonanceFactor(the_planet->getMoonE()));
+  }
+  if (!is_gas_planet(the_planet) && the_planet->getNumGases() > 0) {
+    switch (breathability(the_planet)) {
+      case BREATHABLE:
+        chips += "<span class='chip chip-good'><span class='glyph'>&#10003;</span> Breathable air</span>";
+        break;
+      case UNBREATHABLE:
+        chips += "<span class='chip chip-warn'>Unbreathable air</span>";
+        break;
+      case POISONOUS:
+        chips += "<span class='chip chip-bad'><span class='glyph'>&#9888;</span> Toxic air</span>";
+        break;
+      default:
+        break;
+    }
   }
 
   print_description(the_file, "<br>", the_planet, "");
+
+  if (!chips.empty()) {
+    the_file << "\n<div class='chips'>" << chips << "</div>";
+  }
 
   the_file << "</td></tr>\n";
 
@@ -2472,19 +2560,23 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
   {
     std::string notes;
     if (the_planet->getPmsDesiccationRisk()) {
-      notes += "<li>Likely desiccated during the host M-dwarf's pre-main-sequence "
+      notes += "<li><span class='glyph' style='color:#ffce7a'>&#9888;</span> Likely desiccated "
+               "during the host M-dwarf's pre-main-sequence "
                "phase (possible abiotic-O2 \"mirage Earth\").</li>";
     }
     if (the_planet->getHighXuvEscapeRisk()) {
-      notes += "<li>High atmospheric-escape risk from M-dwarf XUV/flare irradiation.</li>";
+      notes += "<li><span class='glyph' style='color:#ffce7a'>&#9728;</span> High atmospheric-escape "
+               "risk from M-dwarf XUV/flare irradiation.</li>";
     }
     if (the_planet->getCo2CollapseRisk()) {
-      notes += "<li>Cold for the habitable zone: outgassed CO2 may freeze out, "
+      notes += "<li><span class='glyph' style='color:#9fd4ff'>&#10052;</span> Cold for the habitable "
+               "zone: outgassed CO2 may freeze out, "
                "risking irreversible glaciation.</li>";
     }
     if (the_planet->getClimateModelTemp() > 0.0) {
       notes += std::format(
-          "<li>1-D-climate surface temperature: {:.1f} &deg;C (Lehmer et al. 2020).</li>",
+          "<li><span class='glyph' style='color:#8aeaa6'>&#127777;</span> 1-D-climate surface "
+          "temperature: {:.1f} &deg;C (Lehmer et al. 2020).</li>",
           (double)(the_planet->getClimateModelTemp() - FREEZING_POINT_OF_WATER));
     }
     if (!notes.empty()) {
