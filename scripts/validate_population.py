@@ -86,6 +86,16 @@ def percentile(vals: list[float], q: float) -> float:
     return s[i]
 
 
+def otegi_radius(mass_earth: float, rocky: bool) -> float:
+    """Observed mass-radius relation, Otegi, Bouchy & Helled 2020 (A&A 634, A43,
+    arXiv:1911.04745): rocky M = 0.9 R^3.45, volatile-rich M = 1.74 R^1.58
+    (M in Earth masses, R in Earth radii). Inverted here to R(M). Valid below
+    ~120 M_earth."""
+    if rocky:
+        return (mass_earth / 0.9) ** (1.0 / 3.45)
+    return (mass_earth / 1.74) ** (1.0 / 1.58)
+
+
 def analyze(systems: list[dict], star_mass: float) -> dict:
     all_e: list[float] = []
     multi_e: list[float] = []
@@ -101,6 +111,7 @@ def analyze(systems: list[dict], star_mass: float) -> dict:
     hill_spacings: list[float] = []
     period_ratios: list[float] = []
     total_mass_earth: list[float] = []
+    otegi_resid: list[float] = []  # (R - R_Otegi)/R_Otegi for non-giant planets < 120 M_earth
 
     for sys_ in systems:
         planets = sorted(sys_.get("planets", []), key=lambda p: p["Distance"])
@@ -118,6 +129,15 @@ def analyze(systems: list[dict], star_mass: float) -> dict:
                 det += 1
                 if r_e < 4.0:
                     det_radii_earth.append(r_e)
+            # Observed mass-radius envelope (Otegi 2020): does the generated
+            # radius track real exoplanets at this mass? Restrict to Otegi's
+            # domain (non-giant, 0.5-120 M_earth); pick the rocky vs volatile
+            # branch by bulk density (>= 3.3 g/cc ~ the rocky/water divide).
+            m_e = p["Total Mass"] * SUN_MASS_IN_EARTH
+            if not p.get("Is Gas Giant", False) and 0.5 <= m_e <= 120.0 and r_e > 0.0:
+                r_pred = otegi_radius(m_e, p["Density"] >= 3.3)
+                if r_pred > 0.0:
+                    otegi_resid.append((r_e - r_pred) / r_pred)
         det_counts.append(det)
         if len(planets) >= 2:
             for p in planets:
@@ -164,6 +184,9 @@ def analyze(systems: list[dict], star_mass: float) -> dict:
         "radius_valley_count": sum(1 for r in radii_earth if 1.5 <= r <= 2.0),
         "radius_small_count": sum(1 for r in radii_earth if 1.0 <= r < 1.5),
         "radius_subnep_count": sum(1 for r in radii_earth if 2.0 < r <= 3.0),
+        "otegi_n": len(otegi_resid),
+        "otegi_median_abs_resid": percentile([abs(x) for x in otegi_resid], 0.5),
+        "otegi_within25_frac": (sum(1 for x in otegi_resid if abs(x) <= 0.25) / len(otegi_resid)) if otegi_resid else float("nan"),
     }
 
 
@@ -194,6 +217,12 @@ def report(m: dict) -> None:
           f" 1.5-2.0(valley): {m['radius_valley_count']:<5} 2.0-3.0: {m['radius_subnep_count']}")
     print("      target: a DEFICIT at 1.5-2.0 Re (Fulton 2017). StarGen has no")
     print("      photoevaporation, so it will NOT show the valley -- expected miss.")
+    print()
+    print("MASS-RADIUS ENVELOPE (generated radii vs observed exoplanets):")
+    line("median |R - R_Otegi| / R_Otegi", m["otegi_median_abs_resid"],
+         "small (Otegi 2020 obs M-R)")
+    line("fraction within +/-25% of Otegi", m["otegi_within25_frac"],
+         f">~0.8 desirable  (n={m['otegi_n']})")
     print("=" * 70)
     print("CAVEAT: StarGen generates the intrinsic population; Kepler targets are")
     print("detection-limited. Compare architecture metrics directly; compare counts")
