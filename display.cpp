@@ -513,7 +513,7 @@ auto jsonRow(planet* the_planet, bool do_gases, bool is_moon, std::string id,
  * @param the_planet
  * @return string
  */
-std::string type_string(planet* the_planet) {
+std::string base_type_string(planet* the_planet) {
   switch (the_planet->getType()) {
     case tUnknown:
       return "Unknown";
@@ -550,6 +550,20 @@ std::string type_string(planet* the_planet) {
     default:
       return "Unknown";
   }
+}
+
+/**
+ * @brief Full display name for a planet: state modifiers ("Tidally Locked",
+ * "Hot", "Super-Earth", ...) composed on top of the base composition type.
+ *
+ * Icons must NOT use this (they derive from base_type_string()); see
+ * image_type_string(). The base/modifier split mirrors the existing
+ * "{cloud} Jovian" gas-naming pattern.
+ */
+std::string type_string(planet* the_planet) {
+  // Phase 0: identical to the base name. Modifier prefixes are layered on in
+  // the later phases via modifier_prefix().
+  return base_type_string(the_planet);
 }
 
 /**
@@ -3128,7 +3142,9 @@ std::string image_type_string(planet* the_planet) {
     ss << cloud_type_string(the_planet) << " Gas";
     typeString = ss.str();
   } else {
-    typeString = type_string(the_planet);
+    // Icons key on the BASE composition only, never the modifier-prefixed
+    // display name, or "Tidally LockedWaterPlanet.webp" would 404.
+    typeString = base_type_string(the_planet);
   }
   return remove_spaces(typeString);
 }
