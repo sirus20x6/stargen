@@ -36,6 +36,7 @@ import tempfile
 
 R_EARTH_KM = 6371.0
 SUN_MASS_IN_EARTH = 332946.0
+JUP_EARTH = 317.8  # Jupiter mass in Earth masses (const.h JUPITER_MASS); giants = M > 0.3 M_Jup
 
 
 def repo_root() -> str:
@@ -112,12 +113,24 @@ def analyze(systems: list[dict], star_mass: float) -> dict:
     period_ratios: list[float] = []
     total_mass_earth: list[float] = []
     otegi_resid: list[float] = []  # (R - R_Otegi)/R_Otegi for non-giant planets < 120 M_earth
+    # --- giant-migration baseline (Phase 0 of research/modern/11-giant-migration.md) ---
+    giant_a: list[float] = []       # semi-major axis (AU) of giants (M > 0.3 M_Jup)
+    giant_e_hot: list[float] = []   # eccentricity of hot giants (a < 0.1 AU)
+    giant_e_cold: list[float] = []  # eccentricity of warm/cold giants (a >= 0.1 AU)
+    all_mass_e: list[float] = []    # every planet mass (M_earth), for percentiles
+    densities: list[float] = []     # bulk density g/cc, for sanity
+    n_hot_giant_sys = 0             # systems with >= 1 hot Jupiter (per-star occurrence)
+    n_cold_giant_sys = 0            # systems with >= 1 cold Jupiter
+    hot_icy = 0                     # hot bodies (a<0.2 AU, Teq>1000 K) still carrying ice
+    hot_bodies = 0                  # denominator for hot_icy (composition-staleness guard)
 
     for sys_ in systems:
         planets = sorted(sys_.get("planets", []), key=lambda p: p["Distance"])
         counts.append(len(planets))
         total_mass_earth.append(sum(p["Total Mass"] for p in planets) * SUN_MASS_IN_EARTH)
         det = 0
+        sys_hot_giant = False
+        sys_cold_giant = False
         for p in planets:
             e = p["Eccentricity"]
             all_e.append(e)
@@ -138,7 +151,28 @@ def analyze(systems: list[dict], star_mass: float) -> dict:
                 r_pred = otegi_radius(m_e, p["Density"] >= 3.3)
                 if r_pred > 0.0:
                     otegi_resid.append((r_e - r_pred) / r_pred)
+            # giant-migration baseline: classify giants (M > 0.3 M_Jup) by orbit
+            a_au = p["Distance"]
+            all_mass_e.append(m_e)
+            densities.append(p["Density"])
+            if m_e > 0.3 * JUP_EARTH:
+                giant_a.append(a_au)
+                if a_au < 0.1:
+                    sys_hot_giant = True
+                    giant_e_hot.append(e)
+                else:
+                    giant_e_cold.append(e)
+                if 1.0 <= a_au <= 10.0:
+                    sys_cold_giant = True
+            # composition-staleness guard: hot bodies (a<0.2 AU, Teq>1000 K) that
+            # still carry ice. With migration OFF this should be ~0 (no hot giants).
+            if a_au < 0.2 and p.get("Estimated Temperature", 0.0) > 1000.0:
+                hot_bodies += 1
+                if p.get("Ice Mass Fraction", 0.0) > 0.01:
+                    hot_icy += 1
         det_counts.append(det)
+        n_hot_giant_sys += 1 if sys_hot_giant else 0
+        n_cold_giant_sys += 1 if sys_cold_giant else 0
         if len(planets) >= 2:
             for p in planets:
                 multi_e.append(p["Eccentricity"])
@@ -187,6 +221,25 @@ def analyze(systems: list[dict], star_mass: float) -> dict:
         "otegi_n": len(otegi_resid),
         "otegi_median_abs_resid": percentile([abs(x) for x in otegi_resid], 0.5),
         "otegi_within25_frac": (sum(1 for x in otegi_resid if abs(x) <= 0.25) / len(otegi_resid)) if otegi_resid else float("nan"),
+        "hj_occurrence": n_hot_giant_sys / len(systems) if systems else float("nan"),
+        "cj_occurrence": n_cold_giant_sys / len(systems) if systems else float("nan"),
+        "cold_hot_ratio": (n_cold_giant_sys / n_hot_giant_sys) if n_hot_giant_sys else float("inf"),
+        "n_giants": len(giant_a),
+        "giant_a_bins": [
+            sum(1 for a in giant_a if a < 0.1),
+            sum(1 for a in giant_a if 0.1 <= a < 1.0),
+            sum(1 for a in giant_a if 1.0 <= a < 3.0),
+            sum(1 for a in giant_a if 3.0 <= a < 10.0),
+            sum(1 for a in giant_a if a >= 10.0),
+        ],
+        "giant_e_hot_mean": (sum(giant_e_hot) / len(giant_e_hot)) if giant_e_hot else float("nan"),
+        "giant_e_cold_mean": (sum(giant_e_cold) / len(giant_e_cold)) if giant_e_cold else float("nan"),
+        "mass_p10": percentile(all_mass_e, 0.10),
+        "mass_p50": percentile(all_mass_e, 0.50),
+        "mass_p90": percentile(all_mass_e, 0.90),
+        "density_sane_frac": (sum(1 for d in densities if 0.1 < d < 14.0) / len(densities)) if densities else float("nan"),
+        "hot_icy_frac": (hot_icy / hot_bodies) if hot_bodies else float("nan"),
+        "hot_bodies_n": hot_bodies,
     }
 
 
@@ -223,6 +276,26 @@ def report(m: dict) -> None:
          "small (Otegi 2020 obs M-R)")
     line("fraction within +/-25% of Otegi", m["otegi_within25_frac"],
          f">~0.8 desirable  (n={m['otegi_n']})")
+    print()
+    print("GIANT MIGRATION BASELINE (giants = M > 0.3 M_Jup; targets are POST-migration):")
+    line("hot-Jupiter occurrence (a<0.1 AU)", m["hj_occurrence"],
+         "~0.005-0.01 (Howard12/Mayor11)", fmt="{:.4f}")
+    line("cold-Jupiter occurrence (1-10 AU)", m["cj_occurrence"],
+         "~0.10-0.20 (Zhu 2022)")
+    line("cold:hot ratio", m["cold_hot_ratio"], "~10-20x", fmt="{:.1f}")
+    b = m["giant_a_bins"]
+    print(f"  giant a-bins (AU):  <0.1: {b[0]:<4} 0.1-1: {b[1]:<4} 1-3: {b[2]:<4}"
+          f" 3-10: {b[3]:<4} >10: {b[4]:<4} (n={m['n_giants']})")
+    print("      target shape: HJ pile-up (<0.1) + period valley (0.1-1) + cold peak (1-10)")
+    line("giant <e> hot (a<0.1 AU)", m["giant_e_hot_mean"], "~0.06 circularized (Kipping13)")
+    line("giant <e> warm/cold (a>=0.1 AU)", m["giant_e_cold_mean"], "~0.27 broad (Kipping13)")
+    print()
+    print("MASS / DENSITY SANITY (disk-misadventure guard -- must NOT regress):")
+    print(f"  planet mass M_earth  p10={m['mass_p10']:.3f}  p50={m['mass_p50']:.3f}"
+          f"  p90={m['mass_p90']:.2f}    (watch for inflation)")
+    line("fraction 0.1 < rho < 14 g/cc", m["density_sane_frac"], ">0.95")
+    line("hot bodies w/ ice (a<0.2,T>1000K)", m["hot_icy_frac"],
+         f"~0 (n_hot={m['hot_bodies_n']})")
     print("=" * 70)
     print("CAVEAT: StarGen generates the intrinsic population; Kepler targets are")
     print("detection-limited. Compare architecture metrics directly; compare counts")
