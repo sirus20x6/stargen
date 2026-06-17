@@ -1101,6 +1101,55 @@ table.habitable{box-shadow:0 0 0 2px rgba(127,230,160,.55),0 10px 30px rgba(0,0,
   padding:3px 11px;margin-left:12px;border-radius:999px;vertical-align:middle;
   color:#04230f;background:#7fe6a0;}
 .badge-maybe{color:#11210a;background:#cfe89a;}
+/* Sticky in-page planet navigator (jump bar). */
+.navbar{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+  justify-content:center;padding:8px 10px;margin:0 auto 14px;max-width:1100px;
+  background:rgba(8,12,24,.82);backdrop-filter:blur(6px);border:1px solid var(--line);
+  border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.45);}
+.navbar .nav-label{color:var(--muted);font-size:12px;margin-right:4px;}
+.pill{display:inline-block;font-size:12px;line-height:1;padding:6px 10px;border-radius:999px;
+  border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);
+  text-decoration:none;white-space:nowrap;}
+.pill:hover{border-color:var(--accent);color:#bdeef7;text-decoration:none;}
+.pill.hab{border-color:rgba(127,230,160,.7);box-shadow:inset 0 0 0 1px rgba(127,230,160,.35);}
+.pill.top-pill{background:rgba(127,209,224,.12);}
+.pill .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;
+  vertical-align:middle;}
+.dot.t-frozen{background:#78aaff;}.dot.t-cold{background:#5ac8e6;}.dot.t-temperate{background:#6ee18c;}
+.dot.t-warm{background:#ffbe5a;}.dot.t-hot{background:#ff694b;}
+.tomap{font-size:12px;font-weight:400;margin-left:12px;}
+/* Generic inline value bars (ESI, gas %). */
+.vbar-track{display:inline-block;width:120px;height:9px;border-radius:5px;
+  background:rgba(255,255,255,.08);vertical-align:middle;margin-right:8px;overflow:hidden;}
+.vbar{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#5ac8e6,#6ee18c);}
+.vbar.gasbar{background:#7fd1e0;}
+.esi-num{font-variant-numeric:tabular-nums;}
+.esi-sub{color:var(--muted);font-size:11px;}
+/* System-map legend caption. */
+.maplegend{color:var(--muted);font-size:12px;text-align:center;margin:6px 0 2px;}
+.maplegend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;
+  vertical-align:middle;margin:0 4px 0 14px;}
+.maplegend .sw-hz{background:rgba(61,220,132,.40);border:1px solid #3ddc84;}
+.maplegend .sw-earth{width:3px;height:13px;border-radius:0;background:#3ddc84;}
+/* Responsive: keep wide tables usable on a phone. */
+@media (max-width:640px){
+  body{padding:12px 6px;font-size:14px;}
+  table[border='3']{width:100%!important;}
+  img[width='150']{width:90px!important;height:90px!important;}
+  .navbar{position:static;}
+}
+/* Print: drop dark chrome, ink-friendly, keep tables whole. */
+@media print{
+  body{background:#fff!important;color:#000!important;padding:0;}
+  a{color:#000!important;text-decoration:none;}
+  .navbar,.tomap{display:none!important;}
+  table[border='3']{box-shadow:none!important;border:1px solid #999!important;
+    break-inside:avoid;page-break-inside:avoid;}
+  .t-frozen,.t-cold,.t-temperate,.t-warm,.t-hot{color:#000!important;}
+  .chip{border:1px solid #999!important;color:#000!important;background:#fff!important;}
+  .badge{background:#ddd!important;color:#000!important;}
+  img{max-width:120px!important;}
+}
 </style>
 )CSS";
   output << "<link rel='icon' type='image/png' href='" << escapeXmlAttr(url_path) << "ref/favicon.png'>\n";
@@ -1907,6 +1956,9 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
     throw std::runtime_error("StarGen: thumbnail output stream is not open");
   }
 
+  // Anchor target for the in-page "jump to map / back to top" links.
+  the_file << "<a name='top'></a>\n";
+
   sun the_sun = innermost_planet->getTheSun();
   bool terrestrials_seen = false;
   bool habitable_jovians_seen = false;
@@ -1945,6 +1997,14 @@ void html_thumbnails(planet* innermost_planet, std::fstream& the_file, const std
     svg_draw_system_map(the_file, sp, url_path, system_url, int_link, do_gases, do_moons, the_sun,
                         terrestrials_seen, habitable_jovians_seen, potentialy_habitables_seen);
     the_file << "</td></tr>\n";
+
+    // Inline legend so the map's green band is self-documenting offline (no
+    // need to open the separate Key page just to read the figure).
+    the_file << "<tr><td colspan=2 bgcolor='" << BGSPACE << "'><p class='maplegend'>"
+                "<span class='sw sw-hz'></span> habitable zone"
+                "<span class='sw sw-earth'></span> Earth-equivalent distance"
+                "<span style='margin-left:14px'>icon size &#8733; &#8730;radius &middot; position by distance</span>"
+                "</p></td></tr>\n";
 
     if (terrestrials && (terrestrials_seen || habitable_jovians_seen || potentialy_habitables_seen)) {
       html_write_terrestrials_table(the_file, innermost_planet, system_url, int_link, do_moons);
@@ -2375,13 +2435,14 @@ static void html_write_atmospheric_gases(planet* the_planet, bool do_gases,
           100.0 * (the_planet->getGas(i).getSurfPressure() / the_planet->getSurfPressure());
       if (percentage > 0.001 || poisonous) {
         the_file << std::format(R"(
-<tr><th align=left>{}&nbsp;</th>
-<td align=right>{:.3f}%&nbsp;</td>
-<td align=right>{:.2f} mb&nbsp;</td>
-<td align=right>(ipp:{:.2f})</td>
-<td align=right>&nbsp;{}</td></tr>
+<tr><th align=left>{0}&nbsp;</th>
+<td align=right>{1:.3f}%&nbsp;</td>
+<td><span class='vbar-track' style='width:80px'><span class='vbar gasbar' style='width:{2:.1f}%'></span></span></td>
+<td align=right>{3:.2f} mb&nbsp;</td>
+<td align=right>(ipp:{4:.2f})</td>
+<td align=right>&nbsp;{5}</td></tr>
 )",
-                                escapeXmlText(gases[index].getName()), percentage,
+                                escapeXmlText(gases[index].getName()), percentage, percentage,
                                 the_planet->getGas(i).getSurfPressure(), ipp,
                                 poisonous ? "<span class='poison'>&#9888; poisonous</span>" : "");
       }
@@ -2464,12 +2525,17 @@ static void html_write_additional_properties(planet* the_planet, std::fstream& t
   long double esiv = esi_c.v;
   long double esit = esi_c.t;
 
+  // ESI: a value bar so "how Earth-like" reads at a glance, and the four
+  // sub-indices surfaced as visible text (they were previously emitted only
+  // inside an HTML comment, computed every render but invisible).
+  double esi_frac = static_cast<double>(the_planet->getEsi());
+  esi_frac = esi_frac < 0.0 ? 0.0 : (esi_frac > 1.0 ? 1.0 : esi_frac);
   the_file << std::format(R"(
 <tr><th>Earth Similarity Index (ESI)</th>
-<td>{:.4f}</td>
-<td><!--esir: {:.4f}<br />esid: {:.4f}<br />esiv: {:.4f}<br />esit: {:.4f}--></td></tr>
+<td><span class='vbar-track'><span class='vbar' style='width:{0:.1f}%'></span></span><span class='esi-num'>{1:.4f}</span></td>
+<td><span class='esi-sub'>radius {2:.2f} &middot; density {3:.2f} &middot; esc.vel {4:.2f} &middot; temp {5:.2f}</span></td></tr>
 )",
-                          the_planet->getEsi(), esir, esid, esiv, esit);
+                          esi_frac * 100.0, the_planet->getEsi(), esir, esid, esiv, esit);
 }
 
 void html_describe_planet(planet* the_planet, int counter, int moons, bool do_gases,
@@ -2500,7 +2566,7 @@ void html_describe_planet(planet* the_planet, int counter, int moons, bool do_ga
 <colgroup span=1 align=left valign=middle>
 <colgroup span=2 align=left valign=middle>
 <tr><th colspan=3 bgcolor='{3}' align=center>
-<font size='+2' color='{4}'>{5} #{0} Statistics</font>{7}</th></tr>
+<font size='+2' color='{4}'>{5} #{0} Statistics</font>{7}<a class='tomap' href='#top'>&#8593; Map</a></th></tr>
 )",
                           planet_id, BGTABLE, (moons == 0) ? 95 : 90, BGHEADER, TXHEADER,
                           (moons == 0) ? "Planet" : "Moon", tbl_class, badge);
@@ -2610,6 +2676,24 @@ void html_describe_system(planet* innermost_planet, bool do_gases, bool do_moons
   // emitted by html_thumbnails above; here we emit only the per-planet detail
   // tables. (The old "Planetary Overview" summary table was removed as redundant
   // with that figure.)
+
+  // Sticky in-page navigator: one pill per planet (color dot = temperature tier,
+  // green ring = potentially habitable) linking to its detail table, plus a jump
+  // back to the system map. HTML-only; safe across the determinism/golden checks.
+  if (!g_sim_context.planets.empty()) {
+    the_file << "<div class='navbar'><span class='nav-label'>Jump to:</span>"
+                "<a class='pill top-pill' href='#top'>&#9650; Map</a>";
+    int nav_i = 1;
+    for (planet* p : g_sim_context.planets) {
+      long double tk  = is_gas_planet(p) ? p->getEstimatedTemp() : p->getSurfTemp();
+      bool        hab = is_habitable(p) || is_potentialy_habitable(p);
+      the_file << std::format(
+          "<a class='pill{}' href='#{}' title='{}'><span class='dot {}'></span>{}</a>",
+          hab ? " hab" : "", nav_i, escapeXmlAttr(type_string(p)), temp_tier_class(tk), nav_i);
+      nav_i++;
+    }
+    the_file << "</div>\n";
+  }
 
   // Tables for individual planets
   counter = 1;
