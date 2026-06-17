@@ -565,10 +565,37 @@ std::string base_type_string(planet* the_planet) {
 // base type, the icon, or any generated number. Extended in later phases
 // (thermal / size / lava / hycean).
 std::string modifier_prefix(planet* the_planet) {
-  std::string prefix;
+  std::string       prefix;
+  const bool        rocky = !is_gas_planet(the_planet);
+  const planet_type t     = the_planet->getType();
+
+  // State: synchronous / spin-orbit-resonant rotation.
   if (the_planet->getTidallyLocked()) {
     prefix += "Tidally Locked ";
   }
+
+  // Thermal (rocky only -- gas giants already carry a temperature-derived cloud
+  // class, so a "Hot" prefix there would just duplicate it). Lava = surface hot
+  // enough to melt silicate rock; Hot = strongly irradiated but below melt. Skip
+  // the types whose own name already implies their thermal state.
+  if (rocky && t != tIce && t != tMartian) {
+    const long double ts = the_planet->getSurfTemp();
+    if (ts >= LAVA_SURFACE_TEMP_K) {
+      prefix += "Lava ";
+    } else if (ts >= HOT_SURFACE_TEMP_K) {
+      prefix += "Hot ";
+    }
+  }
+
+  // Size class for rocky worlds: super-Earth band, below the sub-Neptune valley.
+  if (rocky && (t == tRock || t == tTerrestrial || t == tIron || t == tWater ||
+                t == tCarbon)) {
+    const long double r_earth = convert_km_to_eu(the_planet->getRadius());
+    if (r_earth >= SUPER_EARTH_MIN_REARTH && r_earth <= SUPER_EARTH_MAX_REARTH) {
+      prefix += "Super-Earth ";
+    }
+  }
+
   return prefix;
 }
 
