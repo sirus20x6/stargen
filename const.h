@@ -186,6 +186,27 @@ constexpr double DISK_LIFETIME_YEARS       = 3.0E6;
 constexpr double DISK_SIGMA0_SOLAR_PER_AU2 = 1.0E-6;
 constexpr double DISK_DAMP_BRACKET_FLOOR   = 0.10;
 
+/* Giant migration (research/modern/11-giant-migration.md; behind -r, default off).
+ * A parametric inward drift a_final = a_form*exp(-dt/tau) to an inner trap, with
+ * tidal circularization of hot orbits. tau follows Tanaka 2002 Type I
+ * (tau ~ M_p^-1 a^(25/14)) below the gap-opening mass and a viscous Type II
+ * (tau ~ a^1.5) above it (Crida 2006 q_c~5e-4 -> ~0.5 M_Jup); the empirical
+ * efficiency reduction (Ida & Lin 2008a) is folded into MIGRATION_EFFICIENCY. The
+ * inner trap is the disk inner edge / magnetospheric cavity (~0.05 AU; Lin,
+ * Bodenheimer & Richardson 1996) and the tidal-circularization locus is ~0.04-0.05
+ * AU (Wang 2023). Cold/warm giants keep a broad Rayleigh eccentricity
+ * (<e>~0.27; Kipping 2013). These are CALIBRATION knobs tuned against the
+ * Phase-0 population baseline (scripts/validate_population.py --migrate). */
+constexpr double MIGRATION_MIN_MASS_MJUP = 0.1;     // only bodies > 0.1 M_Jup migrate
+constexpr double MIGRATION_GAP_MASS_MJUP = 0.5;     // Type II gap-opening threshold (per M_star)
+constexpr double MIGRATION_TYPE1_NORM_YR = 1.1E5;   // Tanaka 2002 Type I normalization (yr)
+constexpr double MIGRATION_TYPE2_NORM_YR = 7.0E5;   // Type II viscous normalization at 1 AU (yr)
+constexpr double MIGRATION_EFFICIENCY    = 0.0001;     // overall rate multiplier (primary calibration knob)
+constexpr double MIGRATION_INNER_EDGE_AU = 0.05;    // inner trap a_stop (disk edge / cavity)
+constexpr double MIGRATION_CIRC_AU       = 0.05;    // tidal circularization locus (hot -> e=0)
+constexpr double GIANT_ECC_SIGMA         = 0.215;   // Rayleigh sigma -> <e>~0.27 for cold giants
+constexpr double GIANT_ECC_MAX           = 0.80;    // eccentricity cap
+
 // SI-unit physical constants used by the enviro.cpp acceleration helpers. These
 // are the EXACT values those functions previously redefined locally, kept
 // verbatim so generated output stays byte-identical. They intentionally differ
