@@ -139,10 +139,22 @@ constexpr double HOT_SURFACE_TEMP_K     = 1000.0;
  * Fulton 2017 (AJ 154:109) radius valley / sub-Neptune transition (~2 R_earth). */
 constexpr double SUPER_EARTH_MIN_REARTH = 1.25;
 constexpr double SUPER_EARTH_MAX_REARTH = 2.0;
-/* (A Hycean modifier -- a water world with a retained H2/He envelope, Madhusudhan
- * et al. 2021 -- is intentionally NOT implemented: StarGen gives small/rocky
- * worlds a gas-mass fraction of exactly 0, so it has no envelope to detect. It
- * would need an envelope-retention model, like the carbon-rich-system gap.) */
+/* Hycean world (Madhusudhan et al. 2021, ApJ 918:1): a water/volatile-rich world
+ * under a H2/He envelope, potentially habitable. StarGen gives rocky worlds no
+ * envelope, so rather than invent envelope-accretion physics this maps the
+ * Hycean regime onto StarGen's EXISTING small gas-dwarf / sub-Neptunian
+ * population in the temperate range. Mass band 1-10 M_earth is the paper's
+ * range; the equilibrium-temp floor (170 K) is dropped below the paper's ~210 K
+ * because StarGen's est_temp excludes the envelope greenhouse (true surface runs
+ * warmer); the upper bound reuses the existing "Water" cloud band (<=360 K). The
+ * radius ceiling DEVIATES from the paper's ~2.6 R_earth: StarGen's gas-dwarf
+ * radii run larger (3-7 R_earth), so a literal cut yields zero Hyceans -- 6.0 is
+ * a StarGen-population-calibrated "small gas dwarf" cut, not a literature value. */
+constexpr double HYCEAN_TEMP_MIN_K       = 170.0;
+constexpr double HYCEAN_TEMP_MAX_K       = 360.0;
+constexpr double HYCEAN_MASS_MIN_REARTH  = 1.0;
+constexpr double HYCEAN_MASS_MAX_REARTH  = 10.0;
+constexpr double HYCEAN_RADIUS_MAX_REARTH = 6.0;
 
 // Albedo values for various celestial body classifications
 constexpr double CLASS_I_ALBEDO = 0.57;
