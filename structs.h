@@ -25,7 +25,9 @@ using planet_type = enum planet_type {
   tSubGasGiant,
   tSubSubGasGiant,
   tAsteroids,
-  t1Face,
+  t1Face,  // DEPRECATED: tidal lock is now the tidallyLocked modifier flag, never
+           // assigned. Kept (not removed) so enum ordinals 12-15 stay stable for the
+           // positional type_counts[]/weighted-count table in stargen.cpp.
   tBrownDwarf,  // seb
   tIron,
   tCarbon,

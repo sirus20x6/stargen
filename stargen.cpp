@@ -2478,11 +2478,11 @@ static auto update_potential_statistics(SimulationContext& sc, planet* the_plane
   stats_updated |= update_min_max_stat(the_planet->getSurfPressure(), sc.min_potential_p, sc.max_potential_p);
   stats_updated |= update_min_max_stat(the_planet->getMass(), sc.min_potential_mass, sc.max_potential_mass);
 
-  // Update terrestrial-specific stats if applicable
-  if (the_planet->getType() == tTerrestrial ||
-      (the_planet->getType() == t1Face &&
-       the_planet->getHydrosphere() >= 0.05 &&
-       the_planet->getHydrosphere() <= 0.8)) {
+  // Update terrestrial-specific stats if applicable. (Locked terrestrial-water
+  // worlds that used to be t1Face with hydrosphere 0.05-0.8 now classify as
+  // tTerrestrial and are caught by the clause below, so the old t1Face special
+  // case is no longer needed.)
+  if (the_planet->getType() == tTerrestrial) {
     stats_updated |= update_min_max_stat(the_planet->getSurfGrav(), sc.min_potential_terrestrial_g, sc.max_potential_terrestrial_g);
     stats_updated |= update_min_max_stat(illumination, sc.min_potential_terrestrial_l, sc.max_potential_terrestrial_l);
   }
@@ -2690,16 +2690,13 @@ void assign_type(StarGenerator* gen, sun &the_sun, planet *the_planet, const std
     the_planet->setType(tSubSubGasGiant);
   }*/
   else {
-    if ((((int)the_planet->getDay() ==
-          (int)(the_planet->getOrbPeriod() * 24.0)) ||
-         the_planet->getResonantPeriod()) &&
-        !is_moon) {
-      the_planet->setType(t1Face);
-      if (!second_time) {
-        makeHabitable(gen, the_sun, the_planet, planet_id, is_moon, do_gases);
-      }
-    } else if (the_planet->getImf() >= 0.05 &&
-               the_planet->getHydrosphere() == 0.0) {
+    // Tidal lock is a STATE, recorded as a modifier flag (getTidallyLocked(),
+    // set in set_habitability_flags) and shown as a "Tidally Locked" prefix --
+    // NOT a base type. So a tidally-locked world is now classified by
+    // composition like any other, instead of being stamped the type-erasing
+    // "1Face" that hid its real surface (water/ice/terrestrial/...).
+    if (the_planet->getImf() >= 0.05 &&
+        the_planet->getHydrosphere() == 0.0) {
       the_planet->setType(tIce);
       /*the_planet->setIceCover(the_planet->getIceCover() +
       the_planet->getHydrosphere()); if (the_planet->getIceCover() > 1.0)

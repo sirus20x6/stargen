@@ -560,10 +560,20 @@ std::string base_type_string(planet* the_planet) {
  * image_type_string(). The base/modifier split mirrors the existing
  * "{cloud} Jovian" gas-naming pattern.
  */
+// Orthogonal STATE modifiers composed in front of the base composition type.
+// Read at display time from already-computed planet state; they never change the
+// base type, the icon, or any generated number. Extended in later phases
+// (thermal / size / lava / hycean).
+std::string modifier_prefix(planet* the_planet) {
+  std::string prefix;
+  if (the_planet->getTidallyLocked()) {
+    prefix += "Tidally Locked ";
+  }
+  return prefix;
+}
+
 std::string type_string(planet* the_planet) {
-  // Phase 0: identical to the base name. Modifier prefixes are layered on in
-  // the later phases via modifier_prefix().
-  return base_type_string(the_planet);
+  return modifier_prefix(the_planet) + base_type_string(the_planet);
 }
 
 /**

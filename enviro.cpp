@@ -2885,7 +2885,11 @@ auto is_habitable_jovian(planet *the_planet) -> bool {
 auto is_terrestrial(planet *the_planet) -> bool {
   if (the_planet->getType() == tTerrestrial ||
       the_planet->getType() == tWater ||
-      ((the_planet->getType() == t1Face || the_planet->getType() == tIce ||
+      // A tidally-locked rocky world in the HZ counts as terrestrial. This was
+      // keyed on the t1Face base type; now that tidal lock is a modifier flag,
+      // key on the flag (rocky only) to preserve the prior classification.
+      (((the_planet->getTidallyLocked() && !is_gas_planet(the_planet)) ||
+        the_planet->getType() == tIce ||
         the_planet->getType() == tMartian ||
         the_planet->getType() == tVenusian) &&
        fabs(the_planet->getHzd()) < 1.0) ||
