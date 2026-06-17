@@ -513,7 +513,7 @@ auto jsonRow(planet* the_planet, bool do_gases, bool is_moon, std::string id,
  * @param the_planet
  * @return string
  */
-std::string type_string(planet* the_planet) {
+std::string base_type_string(planet* the_planet) {
   switch (the_planet->getType()) {
     case tUnknown:
       return "Unknown";
@@ -550,6 +550,57 @@ std::string type_string(planet* the_planet) {
     default:
       return "Unknown";
   }
+}
+
+/**
+ * @brief Full display name for a planet: state modifiers ("Tidally Locked",
+ * "Hot", "Super-Earth", ...) composed on top of the base composition type.
+ *
+ * Icons must NOT use this (they derive from base_type_string()); see
+ * image_type_string(). The base/modifier split mirrors the existing
+ * "{cloud} Jovian" gas-naming pattern.
+ */
+// Orthogonal STATE modifiers composed in front of the base composition type.
+// Read at display time from already-computed planet state; they never change the
+// base type, the icon, or any generated number. Extended in later phases
+// (thermal / size / lava / hycean).
+std::string modifier_prefix(planet* the_planet) {
+  std::string       prefix;
+  const bool        rocky = !is_gas_planet(the_planet);
+  const planet_type t     = the_planet->getType();
+
+  // State: synchronous / spin-orbit-resonant rotation.
+  if (the_planet->getTidallyLocked()) {
+    prefix += "Tidally Locked ";
+  }
+
+  // Thermal (rocky only -- gas giants already carry a temperature-derived cloud
+  // class, so a "Hot" prefix there would just duplicate it). Lava = surface hot
+  // enough to melt silicate rock; Hot = strongly irradiated but below melt. Skip
+  // the types whose own name already implies their thermal state.
+  if (rocky && t != tIce && t != tMartian) {
+    const long double ts = the_planet->getSurfTemp();
+    if (ts >= LAVA_SURFACE_TEMP_K) {
+      prefix += "Lava ";
+    } else if (ts >= HOT_SURFACE_TEMP_K) {
+      prefix += "Hot ";
+    }
+  }
+
+  // Size class for rocky worlds: super-Earth band, below the sub-Neptune valley.
+  if (rocky && (t == tRock || t == tTerrestrial || t == tIron || t == tWater ||
+                t == tCarbon)) {
+    const long double r_earth = convert_km_to_eu(the_planet->getRadius());
+    if (r_earth >= SUPER_EARTH_MIN_REARTH && r_earth <= SUPER_EARTH_MAX_REARTH) {
+      prefix += "Super-Earth ";
+    }
+  }
+
+  return prefix;
+}
+
+std::string type_string(planet* the_planet) {
+  return modifier_prefix(the_planet) + base_type_string(the_planet);
 }
 
 /**
@@ -3128,7 +3179,9 @@ std::string image_type_string(planet* the_planet) {
     ss << cloud_type_string(the_planet) << " Gas";
     typeString = ss.str();
   } else {
-    typeString = type_string(the_planet);
+    // Icons key on the BASE composition only, never the modifier-prefixed
+    // display name, or "Tidally LockedWaterPlanet.webp" would 404.
+    typeString = base_type_string(the_planet);
   }
   return remove_spaces(typeString);
 }

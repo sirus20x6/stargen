@@ -121,6 +121,29 @@ constexpr double SOLAR_CMF              = 0.05;
 constexpr double COMPOSITION_SCATTER    = 0.15;
 constexpr double T_SILICATE_CONDENSE    = 1350.0; /* K; Lodders 2003 forsterite */
 
+/* --- Display-only planet-type MODIFIERS (orthogonal state, not base types) ----
+ * These drive the "{modifier} {base}" naming in display.cpp::modifier_prefix().
+ * They are evaluated at display time from already-computed planet properties and
+ * never change generation, so they are golden/determinism-safe. Thresholds are
+ * parametric (like the rest of StarGen); citations note the science they track. */
+/* Lava / magma world: surface hot enough to keep silicate rock molten. Basalt
+ * solidus ~1300 K; canonical lava worlds (CoRoT-7b, Kepler-10b, 55 Cnc e,
+ * K2-141b) sit well above this. Kuchner 2003; Leger 2011; Chao 2021 review. */
+constexpr double LAVA_SURFACE_TEMP_K    = 1300.0;
+/* Hot / strongly-irradiated rocky world below the lava regime. Set well above
+ * Venus's ~737 K surface so it flags genuinely scorching worlds (a temperature
+ * gradient Venusian -> Hot Venusian -> Lava Venusian) rather than every
+ * greenhouse world. */
+constexpr double HOT_SURFACE_TEMP_K     = 1000.0;
+/* Super-Earth size class for rocky worlds: between Earth-size and the
+ * Fulton 2017 (AJ 154:109) radius valley / sub-Neptune transition (~2 R_earth). */
+constexpr double SUPER_EARTH_MIN_REARTH = 1.25;
+constexpr double SUPER_EARTH_MAX_REARTH = 2.0;
+/* (A Hycean modifier -- a water world with a retained H2/He envelope, Madhusudhan
+ * et al. 2021 -- is intentionally NOT implemented: StarGen gives small/rocky
+ * worlds a gas-mass fraction of exactly 0, so it has no envelope to detect. It
+ * would need an envelope-retention model, like the carbon-rich-system gap.) */
+
 // Albedo values for various celestial body classifications
 constexpr double CLASS_I_ALBEDO = 0.57;
 constexpr double CLASS_II_ALBEDO = 0.81;

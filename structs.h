@@ -25,11 +25,16 @@ using planet_type = enum planet_type {
   tSubGasGiant,
   tSubSubGasGiant,
   tAsteroids,
-  t1Face,
+  t1Face,  // DEPRECATED: tidal lock is now the tidallyLocked modifier flag, never
+           // assigned. Kept (not removed) so enum ordinals 12-15 stay stable for the
+           // positional type_counts[]/weighted-count table in stargen.cpp.
   tBrownDwarf,  // seb
   tIron,
-  tCarbon,
-  tOil
+  tCarbon,  // carbon-dominated rock (Kuchner & Seager 2005). Currently only
+            // reachable in carbon-rich (C/O>1) systems, which StarGen does not
+            // yet model -- see the carbon-rich-system note in assign_type.
+  tOil      // DEPRECATED: a non-physical "oil ocean" (originally Star-Trek-
+            // flavored); never assigned. Kept vestigial to preserve ordinals.
 };
 
 class gas;
