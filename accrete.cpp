@@ -885,6 +885,31 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
 
   // std::cout << planet_inner_bound << " " << planet_outer_bound << std::endl;
 
+  // --- Metallicity-dependent giant-formation gate (default-on; see const.h) -----
+  // Decide ONCE whether this star can form gas giants, from a per-star [Fe/H] draw
+  // and the observed giant-frequency-metallicity relation. Three fixed draws in a
+  // fixed order (Box-Muller [Fe/H] = 2 draws, then the acceptance draw) -> no
+  // rejection loops, serial == parallel byte-identical. If not giant-capable, gas
+  // runaway is suppressed below (crit_mass made unreachable) so bodies stay cores.
+  bool giant_capable = true;
+  {
+    const long double u1 = random_ctx->randDouble(1.0e-12L, 1.0L);  // avoid log(0)
+    const long double u2 = random_ctx->randDouble(0.0L, 1.0L);
+    const long double feh =
+        GIANT_METALLICITY_MEAN +
+        GIANT_METALLICITY_SIGMA * sqrt(-2.0L * log(u1)) * cos(2.0L * PI * u2);
+    long double p_giant = GIANT_FORMATION_NORM * stell_mass_ratio *
+                          std::pow(10.0L, GIANT_FORMATION_FEH_SLOPE * feh);
+    if (stell_mass_ratio > GIANT_FORMATION_MASS_TURNOVER_MSUN) {  // steep drop for A-stars
+      p_giant *= GIANT_FORMATION_MASS_TURNOVER_MSUN / stell_mass_ratio;
+    }
+    if (p_giant > GIANT_FORMATION_PROB_CAP) {
+      p_giant = GIANT_FORMATION_PROB_CAP;
+    }
+    const long double u_giant = random_ctx->randDouble(0.0L, 1.0L);
+    giant_capable = (u_giant < p_giant);
+  }
+
   // while there's still dust left...
   while (dust_left) {
     if (seeds != nullptr) {
@@ -952,6 +977,9 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
       dust_density = dust_density_coeff * sqrt(stell_mass_ratio) *
                      exp(-ALPHA * std::pow(a, 1.0 / NDENSITY));
       crit_mass = critical_limit(a, e, stell_luminosity_ratio);
+      if (!giant_capable) {
+        crit_mass = INCREDIBLY_LARGE_NUMBER;  // metallicity gate: suppress gas runaway -> rocky/ice core
+      }
       if (total_mass == PROTOPLANET_MASS && is_seed == false) {
         // std::cout << "test1\n";
         // std::cout << total_mass << " " << dust_mass << " " << gas_mass << " " << a
@@ -1009,6 +1037,9 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
       r_inner = inner_effect_limit(a, e, reduced_mass);
       r_outer = outer_effect_limit(a, e, reduced_mass);
       crit_mass = critical_limit(a, e, stell_luminosity_ratio);
+      if (!giant_capable) {
+        crit_mass = INCREDIBLY_LARGE_NUMBER;  // metallicity gate: suppress gas runaway -> rocky/ice core
+      }
       if (planet_inner_bound > a) {
         planet_inner_bound = a;
       }
