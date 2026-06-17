@@ -80,6 +80,8 @@ static void text_print_system_header(sun& the_sun, long int seed) {
               << std::format("Luminosity of Secondary: {}\n", the_sun.getSecondaryLuminosity());
   }
 
+  std::cout << std::format("Stellar metallicity: [Fe/H] = {} dex\n", the_sun.getMetallicity());
+
   std::cout << std::format("Age: {} billion years\t({} billion left on main sequence)\n",
                            the_sun.getAge() / 1.0E9,
                            (the_sun.getLife() - the_sun.getAge()) / 1.0E9)
@@ -303,6 +305,7 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool d
         {"Mass",                        the_sun.getMass()         },
         {"Temperature",                 the_sun.getEffTemp()      },
         {"Spectral Type",               the_sun.getSpecType()     },
+        {"Metallicity",                 the_sun.getMetallicity()  },
         {"Total Time on Main Sequence", the_sun.getLife()         },
         {"Age",                         the_sun.getAge()          },
         {"Earth-like Distance",         the_sun.getREcosphere(1.0)}
@@ -325,6 +328,7 @@ void jsonDescribeSystem(std::fstream& the_file, planet* innermost_planet, bool d
         {"Seperation",                  the_sun.getSeperation()         },
         {"Eccentricity",                the_sun.getEccentricity()       },
         {"Combined Temperature",        the_sun.getCombinedEffTemp()    },
+        {"Metallicity",                 the_sun.getMetallicity()        },
         {"Total Time on Main Sequence", the_sun.getLife()               },
         {"Age",                         the_sun.getAge()                },
         {"Earth-like Distance",         the_sun.getREcosphere(1.0)      }
@@ -1494,7 +1498,8 @@ void list_molecules(std::fstream& the_file, long double weight) {
  */
 void html_star_details_helper(std::fstream& the_file, const std::string& header, long double mass,
                               long double luminosity, long double temperature, long double age,
-                              long double life, const std::string& spec_type) {
+                              long double life, const std::string& spec_type,
+                              long double metallicity) {
   the_file << "<tr><td colspan=2 bgcolor='" << BGHEADER << "' align=center>";
   the_file << "<font size='+1' color='" << TXHEADER << "'><b>" << header << "</b></font>";
   the_file << "</td></tr>\n";
@@ -1506,6 +1511,8 @@ void html_star_details_helper(std::fstream& the_file, const std::string& header,
   the_file << "\t<td>" << toString(temperature) << "</td></tr>\n";
   the_file << "<tr><td>Spectral Type</td>\n";
   the_file << "\t<td>" << escapeXmlText(spec_type) << "</td></tr>\n";
+  the_file << "<tr><td>Metallicity [Fe/H]</td>\n";
+  the_file << "\t<td>" << toString(metallicity) << " dex</td></tr>\n";
   the_file << "<tr><td>Age</td>\n";
   the_file << "\t<td>" << toString(age / 1.0E9) << " billion years<br>("
            << toString((life - age) / 1.0E9) << " billion left on main sequence)<br></td></tr>";
@@ -1766,15 +1773,16 @@ static void html_write_system_details(std::fstream& the_file, sun& the_sun) {
   if (!the_sun.getIsCircumbinary()) {
     html_star_details_helper(the_file, "Stellar Characteristics", the_sun.getMass(),
                              the_sun.getLuminosity(), the_sun.getEffTemp(), the_sun.getAge(),
-                             the_sun.getLife(), the_sun.getSpecType());
+                             the_sun.getLife(), the_sun.getSpecType(), the_sun.getMetallicity());
   } else {
     html_star_details_helper(the_file, "Stellar Characteristics of Primary", the_sun.getMass(),
                              the_sun.getLuminosity(), the_sun.getEffTemp(), the_sun.getAge(),
-                             the_sun.getLife(), the_sun.getSpecType());
+                             the_sun.getLife(), the_sun.getSpecType(), the_sun.getMetallicity());
     html_star_details_helper(the_file, "Stellar Characteristics of Secondary",
                              the_sun.getSecondaryMass(), the_sun.getSecondaryLuminosity(),
                              the_sun.getSecondaryEffTemp(), the_sun.getAge(),
-                             the_sun.getSecondaryLife(), the_sun.getSecondarySpecType());
+                             the_sun.getSecondaryLife(), the_sun.getSecondarySpecType(),
+                             the_sun.getMetallicity());
     the_file << "<tr><td colspan=2 bgcolor='" << BGHEADER << "' align=center>";
     the_file << "<font size='+1' color='" << TXHEADER << "'><b>Orbit Characteristics</b></font>";
     the_file << "</td></tr>\n";
@@ -2552,6 +2560,7 @@ void celestia_describe_system(planet* innermost_planet, std::string designation,
             << "# Stellar mass: " << toString(the_sun.getMass()) << " solar masses\n"
             << "# Stellar luminosity: " << toString(the_sun.getLuminosity()) << "\n"
             << "# Stellar temperature: " << toString(the_sun.getEffTemp()) << " Kelvin\n"
+            << "# Stellar metallicity: [Fe/H] = " << toString(the_sun.getMetallicity()) << " dex\n"
             << "# Age: " << toString(the_sun.getAge() / 1.0E9) << "  billion years\t("
             << toString((the_sun.getLife() - the_sun.getAge()) / 1.0E9)
             << " billion left on main sequence)\n"

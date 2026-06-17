@@ -58,6 +58,7 @@ class sun {
   long double effTemp{0};
   std::string specType{""};
   long double age{0};
+  long double metallicity{0};  // [Fe/H] in dex (0 = solar); drives giant formation
   std::string name{""};
   bool isCircumbinary{false};
   long double secondaryMass{0};
@@ -83,6 +84,8 @@ class sun {
   auto getLife() -> long double;
   void setAge(long double);
   auto getAge() -> long double;
+  void setMetallicity(long double);
+  auto getMetallicity() -> long double;
   void setName(std::string);
   auto getName() -> std::string;
   auto getREcosphere(long double) -> long double;
