@@ -596,6 +596,21 @@ std::string modifier_prefix(planet* the_planet) {
     }
   }
 
+  // Hycean: a temperate, water/volatile-rich gas dwarf / small Neptunian -- a
+  // water world beneath a H2/He envelope (Madhusudhan et al. 2021). StarGen
+  // gives rocky worlds no envelope, so this is recognized on the EXISTING small
+  // gas-dwarf population in the habitable-temperature range (see const.h).
+  if (!rocky && (t == tSubSubGasGiant || t == tSubGasGiant)) {
+    const long double et  = the_planet->getEstimatedTemp();
+    const long double m_e = the_planet->getMass() * SUN_MASS_IN_EARTH_MASSES;
+    const long double r_e = convert_km_to_eu(the_planet->getRadius());
+    if (et >= HYCEAN_TEMP_MIN_K && et <= HYCEAN_TEMP_MAX_K &&
+        m_e >= HYCEAN_MASS_MIN_REARTH && m_e <= HYCEAN_MASS_MAX_REARTH &&
+        r_e <= HYCEAN_RADIUS_MAX_REARTH) {
+      prefix += "Hycean ";
+    }
+  }
+
   return prefix;
 }
 

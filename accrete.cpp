@@ -899,6 +899,10 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
         GIANT_METALLICITY_MEAN +
         GIANT_METALLICITY_SIGMA * sqrt(-2.0L * log(u1)) * cos(2.0L * PI * u2);
     the_sun.setMetallicity(feh);  // expose the per-star [Fe/H] in output
+    // Carbon-rich (C/O>1) systems: a deterministic per-system flag hashed from
+    // the seed (NO RNG draw -> stream unperturbed) that makes rocky bodies
+    // carbon-dominated (-> tCarbon). See assign_composition() / const.h.
+    the_sun.setCarbonRich(carbon_rich_from_seed(random_ctx->getSeed()));
     long double p_giant = GIANT_FORMATION_NORM * stell_mass_ratio *
                           std::pow(10.0L, GIANT_FORMATION_FEH_SLOPE * feh);
     if (stell_mass_ratio > GIANT_FORMATION_MASS_TURNOVER_MSUN) {  // steep drop for A-stars

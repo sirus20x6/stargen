@@ -42,6 +42,10 @@ auto escapeCelestiaId(const std::string&) -> std::string;
 auto random_number(long double, long double) -> long double;
 auto random_number_int(int min, int max) -> int;
 auto about(long double, long double) -> long double;
+// Deterministic per-system "carbon-rich" (C/O>1) flag from the system seed via a
+// splitmix64 hash. PURE -- consumes NO RandomContext draw, so it does not shift
+// the per-system RNG stream. True with probability CARBON_RICH_SYSTEM_FRACTION.
+auto carbon_rich_from_seed(long sys_seed) -> bool;
 auto random_eccentricity(long double) -> long double;
 auto gaussian(long double) -> long double;
 auto poisson(long double) -> long;

@@ -2780,12 +2780,20 @@ void assign_composition(planet *the_planet, sun &the_sun, bool is_moon) {
   }
 
   if (the_planet->getCmf() == 0) {
-    long double cmf = about(SOLAR_CMF, COMPOSITION_SCATTER);  // carbon-of-rock, small/solar
+    // In a carbon-rich (C/O>1) system carbon/carbides condense before silicates,
+    // so rock is carbon-dominated -> high cmf -> the body classifies as tCarbon.
+    // Same single about() draw either way, so the RNG stream is unperturbed; only
+    // the value and clamp differ for carbon-rich systems.
+    const bool  carbon_rich = the_sun.getCarbonRich();
+    long double cmf         = carbon_rich
+                                 ? about(CARBON_RICH_CMF_MEAN, COMPOSITION_SCATTER)
+                                 : about(SOLAR_CMF, COMPOSITION_SCATTER);
     if (cmf < 0.0) {
       cmf = 0.0;
     }
-    if (cmf > 0.2) {
-      cmf = 0.2;
+    const long double cmf_cap = carbon_rich ? 1.0 : 0.2;
+    if (cmf > cmf_cap) {
+      cmf = cmf_cap;
     }
     the_planet->setCmf(cmf);
   }

@@ -882,6 +882,9 @@ void sun::setAge(long double a) { age = a; }
 void sun::setMetallicity(long double m) { metallicity = m; }
 auto sun::getMetallicity() -> long double { return metallicity; }
 
+void sun::setCarbonRich(bool b) { carbonRich = b; }
+auto sun::getCarbonRich() -> bool { return carbonRich; }
+
 void sun::setEffTemp(long double e) {
   effTemp = e;
   if (specType.empty()) {
