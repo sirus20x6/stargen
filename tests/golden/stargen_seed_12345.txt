@@ -2,6 +2,7 @@ Stargen - V$Revision: 3.0 $; seed=12345
                           SYSTEM  CHARACTERISTICS
 Stellar mass: 1 solar masses
 Stellar luminosity: 0.98401110576113374486
+Stellar metallicity: [Fe/H] = 0.06573334406856447265 dex
 Age: 6.4815260371461076243 billion years	(3.6809608915608486525 billion left on main sequence)
 Habitable ecosphere radius: 1.2491693971174707 AU
 

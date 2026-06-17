@@ -879,6 +879,9 @@ auto sun::getSpecType() -> std::string {
 
 void sun::setAge(long double a) { age = a; }
 
+void sun::setMetallicity(long double m) { metallicity = m; }
+auto sun::getMetallicity() -> long double { return metallicity; }
+
 void sun::setEffTemp(long double e) {
   effTemp = e;
   if (specType.empty()) {

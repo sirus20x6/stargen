@@ -898,6 +898,7 @@ auto accrete::dist_planetary_masses(sun &the_sun, long double inner_dust,
     const long double feh =
         GIANT_METALLICITY_MEAN +
         GIANT_METALLICITY_SIGMA * sqrt(-2.0L * log(u1)) * cos(2.0L * PI * u2);
+    the_sun.setMetallicity(feh);  // expose the per-star [Fe/H] in output
     long double p_giant = GIANT_FORMATION_NORM * stell_mass_ratio *
                           std::pow(10.0L, GIANT_FORMATION_FEH_SLOPE * feh);
     if (stell_mass_ratio > GIANT_FORMATION_MASS_TURNOVER_MSUN) {  // steep drop for A-stars
