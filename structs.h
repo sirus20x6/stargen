@@ -30,9 +30,9 @@ using planet_type = enum planet_type {
            // positional type_counts[]/weighted-count table in stargen.cpp.
   tBrownDwarf,  // seb
   tIron,
-  tCarbon,  // carbon-dominated rock (Kuchner & Seager 2005). Currently only
-            // reachable in carbon-rich (C/O>1) systems, which StarGen does not
-            // yet model -- see the carbon-rich-system note in assign_type.
+  tCarbon,  // carbon-dominated rock (Kuchner & Seager 2005). Reached in carbon-
+            // rich (C/O>1) systems: sun::carbonRich (a per-system seed hash, set
+            // in accrete.cpp) boosts cmf>=0.75 in assign_composition.
   tOil      // DEPRECATED: a non-physical "oil ocean" (originally Star-Trek-
             // flavored); never assigned. Kept vestigial to preserve ordinals.
 };
@@ -64,6 +64,7 @@ class sun {
   std::string specType{""};
   long double age{0};
   long double metallicity{0};  // [Fe/H] in dex (0 = solar); drives giant formation
+  bool carbonRich{false};      // C/O>1 disk -> carbon-dominated rock (tCarbon planets)
   std::string name{""};
   bool isCircumbinary{false};
   long double secondaryMass{0};
@@ -91,6 +92,8 @@ class sun {
   auto getAge() -> long double;
   void setMetallicity(long double);
   auto getMetallicity() -> long double;
+  void setCarbonRich(bool);
+  auto getCarbonRich() -> bool;
   void setName(std::string);
   auto getName() -> std::string;
   auto getREcosphere(long double) -> long double;

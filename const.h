@@ -119,6 +119,18 @@ constexpr double IRON_REFRACTORY_FRACTION = 0.33;
 constexpr double ICE_MAX_FRACTION       = 0.5;
 constexpr double SOLAR_CMF              = 0.05;
 constexpr double COMPOSITION_SCATTER    = 0.15;
+/* Carbon planets: a fraction of systems form in carbon-rich (C/O>1) disks where
+ * carbon/carbides condense before silicates, so rock is carbon-dominated rather
+ * than silicate (Kuchner & Seager 2005; Bond et al. 2010). CARBON_RICH_SYSTEM_
+ * FRACTION is the per-system probability -- a deliberately conservative value at
+ * the high end of the C/O>1 host fraction (Fortney 2012); the once-claimed ~25%
+ * C/O>0.8 figure was a large overestimate (Nissen 2013; Brewer & Fischer 2016
+ * find genuine C/O>1 hosts are rare). In a carbon-rich system rocky bodies get
+ * carbon-of-rock fraction ~ CARBON_RICH_CMF_MEAN (vs solar ~0.05), crossing the
+ * existing cmf>=0.75 tCarbon threshold. The flag is a pure hash of the system
+ * seed (no RNG draw), so non-carbon-rich systems are byte-unchanged. */
+constexpr double CARBON_RICH_SYSTEM_FRACTION = 0.05;
+constexpr double CARBON_RICH_CMF_MEAN        = 0.75;
 constexpr double T_SILICATE_CONDENSE    = 1350.0; /* K; Lodders 2003 forsterite */
 
 /* --- Display-only planet-type MODIFIERS (orthogonal state, not base types) ----

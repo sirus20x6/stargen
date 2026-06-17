@@ -6,6 +6,7 @@
 #include <cctype>                   // for toupper, isspace
 #include <cmath>                    // for log, exp, pow, NAN, sqrt, fmod, abs
 #include <cstdlib>                  // for rand, abs, RAND_MAX
+#include <cstdint>                  // for std::uint64_t (carbon_rich_from_seed)
 #include <string>                   // for std::string, basic_string, operator<<
 #include "const.h"                  // for pow2, pow1_4, pow3, pow4
 #include "enviro.h"                 // for eff_temp_to_spec_type, getStarType
@@ -119,6 +120,21 @@ auto random_number_int(int min, int max) -> int {
 /// @return 
 auto about(long double value, long double variation) -> long double {
   return (value + (value * random_number(-variation, variation)));
+}
+
+/// @brief Deterministic per-system carbon-rich (C/O>1) flag from the system seed.
+/// Pure splitmix64 hash -> uniform [0,1) compared to CARBON_RICH_SYSTEM_FRACTION.
+/// Consumes NO RandomContext draw, so it does not shift the per-system RNG stream
+/// (only carbon-rich systems' composition changes); integer-only hash keeps it
+/// byte-identical across compilers/threads.
+auto carbon_rich_from_seed(long sys_seed) -> bool {
+  std::uint64_t z = static_cast<std::uint64_t>(sys_seed) + 0x9E3779B97F4A7C15ULL;
+  z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ULL;
+  z = (z ^ (z >> 27)) * 0x94D049BB133111EBULL;
+  z = z ^ (z >> 31);
+  // Top 53 bits -> double in [0,1).
+  const double u = static_cast<double>(z >> 11) * (1.0 / 9007199254740992.0);
+  return u < CARBON_RICH_SYSTEM_FRACTION;
 }
 
 /// @brief 
